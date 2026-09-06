@@ -152,6 +152,11 @@ require __DIR__ . '/../layouts/admin_header.php';
                         </button>
                       </form>
                     <?php endif; ?>
+                    <form action="<?= url('/admin/system-logs/delete/' . $log['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this error log entry?');" style="display: inline; margin: 0;">
+                      <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.45rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Delete Record">
+                        🗑️
+                      </button>
+                    </form>
                   </div>
                 </td>
               </tr>

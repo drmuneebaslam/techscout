@@ -242,6 +242,7 @@
           <th>Subscription Type</th>
           <th>Subscribed Target</th>
           <th>Subscribed Date</th>
+          <th style="width: 80px; text-align: center;">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -277,10 +278,17 @@
               <td style="font-size: 0.8rem; color: #64748b; font-family: monospace;">
                 <?= \App\Core\DateHelper::format($s['created_at']) ?>
               </td>
+              <td style="text-align: center;">
+                <form action="<?= url('/admin/subscribers/record/delete/' . $s['id']) ?>" method="POST" onsubmit="return confirm('Delete this follower subscription record?');" style="display: inline; margin: 0;">
+                  <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Remove Subscription">
+                    🗑️
+                  </button>
+                </form>
+              </td>
             </tr>
           <?php endforeach; ?>
         <?php else: ?>
-          <tr><td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">No subscription records found.</td></tr>
+          <tr><td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">No subscription records found.</td></tr>
         <?php endif; ?>
       </tbody>
     </table>

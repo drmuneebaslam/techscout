@@ -586,15 +586,19 @@ class Mailer {
                 </div>",
 
             'password_reset' => "
-                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Password Reset Request 🔒</h2>
-                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, we received a request to reset your password for your TechScout account.</p>
-                <div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>
-                  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>Security PIN Code</div>
-                  <div style='font-size:32px;font-weight:900;color:#4f46e5;letter-spacing:6px;margin-top:8px;font-family:monospace;'>{{reset_code}}</div>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Reset Your Password 🔒</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 16px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>We received a request to reset your password for your TechScout account. Click the button below to securely choose a new password:</p>
+                <div style='text-align:center;margin:30px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:14px 34px;border-radius:8px;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.3);letter-spacing:0.3px;'>Click Here to Reset Password &rarr;</a>
                 </div>
-                <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Reset Password Now &rarr;</a>
-                </div>",
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px;margin-bottom:24px;'>
+                  <div style='font-size:13px;color:#64748b;margin-bottom:8px;font-weight:600;'>Can't click the button? Copy and paste this secure link directly into your browser:</div>
+                  <div style='word-break:break-all;font-size:13px;color:#2563eb;font-family:monospace;background:#ffffff;padding:10px 12px;border:1px solid #cbd5e1;border-radius:6px;'>
+                    <a href='{{action_url}}' style='color:#2563eb;text-decoration:underline;'>{{action_url}}</a>
+                  </div>
+                </div>
+                <p style='color:#64748b;font-size:13px;line-height:1.6;margin:0;'>This recovery link is valid for 2 hours. If you did not request this password reset, please disregard this email &mdash; your account remains completely secure.</p>",
 
             'security_alert' => "
                 <h2 style='color:#dc2626;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Security Perimeter Notice 🛡️</h2>

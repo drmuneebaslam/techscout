@@ -1,10 +1,238 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
-<div class="container" style="padding-top: 2.5rem; margin-bottom: 5rem; max-width: 1040px;">
+<style>
+/* ========================================================================= */
+/* NOTIFICATION COMMAND CENTER: FULL MOBILE RESPONSIVENESS & TOUCH ADAPTATION */
+/* ========================================================================= */
+.ts-notif-container {
+  padding-top: 2.5rem;
+  margin-bottom: 5rem;
+  max-width: 1040px;
+}
+
+.ts-notification-hero {
+  border-radius: 20px;
+  padding: 2rem 2.25rem;
+  margin-bottom: 2rem;
+}
+
+.ts-hero-title {
+  font-size: 2.3rem;
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.ts-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+}
+
+.ts-toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ts-notif-filter-strip {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.35rem;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+}
+.ts-notif-filter-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.ts-notif-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 260px;
+}
+
+.notif-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--ts-border-subtle);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 1rem;
+}
+
+.notif-item-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-item-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--ts-bg-surface);
+  border: 1px solid var(--ts-border-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.notif-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Tablet & Mobile Media Queries */
+@media (max-width: 768px) {
+  .ts-notif-container {
+    padding-top: 1.25rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    margin-bottom: 3.5rem !important;
+  }
+  .ts-notification-hero {
+    padding: 1.25rem 1rem !important;
+    border-radius: 16px !important;
+    margin-bottom: 1.25rem !important;
+  }
+  .ts-hero-top-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+  .ts-hero-title {
+    font-size: 1.6rem !important;
+    line-height: 1.25 !important;
+  }
+  .ts-hero-actions-bar {
+    width: 100% !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+  }
+  .ts-hero-actions-bar button {
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: 0.78rem !important;
+    padding: 0.5rem 0.4rem !important;
+    text-align: center !important;
+  }
+  .ts-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+    margin-top: 1.25rem !important;
+  }
+  .ts-toolbar-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+  }
+  .ts-notif-filter-strip {
+    width: 100% !important;
+    padding-bottom: 0.5rem !important;
+  }
+  .ts-notif-search-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .notif-item-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 1rem 0.85rem !important;
+    gap: 0.75rem !important;
+  }
+  .notif-item-left {
+    gap: 0.75rem !important;
+  }
+  .notif-item-icon {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+  }
+  .notif-item-icon i,
+  .notif-item-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .notif-item-controls {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding-top: 0.6rem !important;
+    border-top: 1px solid var(--ts-border-subtle, rgba(148,163,184,0.08)) !important;
+    gap: 0.5rem !important;
+  }
+  .notif-item-controls a,
+  .notif-item-controls button {
+    padding: 0.45rem 0.75rem !important;
+    min-height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  #notifDetailModal {
+    padding: 0.65rem !important;
+  }
+  #notifDetailModal .ts-card {
+    padding: 1.25rem 1rem !important;
+    border-radius: 14px !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+  }
+  #batch-action-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+    padding: 0.65rem 0.85rem !important;
+  }
+  #batch-action-bar > div:last-child {
+    display: flex !important;
+    gap: 0.4rem !important;
+  }
+  #batch-action-bar button {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+  .notif-pagination-row {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ts-hero-title {
+    font-size: 1.35rem !important;
+  }
+  .ts-kpi-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+</style>
+
+<div class="container ts-notif-container">
   
   <!-- Adaptable Light/Dark Hero Header -->
-  <div class="ts-card ts-notification-hero" style="border-radius: 20px; padding: 2rem 2.25rem; margin-bottom: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+  <div class="ts-card ts-notification-hero">
+    <div class="ts-hero-top-row" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
       <div>
         <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
           <span class="ts-badge ts-badge-pink" style="font-size: 0.72rem; letter-spacing: 0.8px; font-weight: 800;">INTELLIGENCE DISPATCH</span>
@@ -12,7 +240,7 @@
             <?= (int)$unreadCount ?> Unread Alerts
           </span>
         </div>
-        <h1 style="font-size: 2.3rem; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px;">
+        <h1 class="ts-hero-title">
           Notification Command Center
         </h1>
         <p style="font-size: 0.95rem; margin: 0.4rem 0 0 0; opacity: 0.85;">
@@ -21,7 +249,7 @@
       </div>
 
       <!-- Quick Global Actions -->
-      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+      <div class="ts-hero-actions-bar" style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
         <button type="button" onclick="markAllNotificationsRead()" id="btn-mark-all-read" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.4); font-weight: 700;">
           <i data-lucide="check-check"></i> Mark All as Read
         </button>
@@ -35,7 +263,7 @@
     </div>
 
     <!-- Live Telemetry KPI Tiles -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.85rem; margin-top: 1.75rem;">
+    <div class="ts-kpi-grid">
       <div class="ts-telemetry-tile">
         <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Total Stream</div>
         <div class="ts-telemetry-tile-val" style="font-size: 1.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;"><?= (int)($counts['all'] ?? $total) ?></div>
@@ -60,10 +288,10 @@
   </div>
 
   <!-- Filter Strip & Instant Search Toolbar -->
-  <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+  <div class="ts-toolbar-row">
     
-    <!-- Filter Navigation Tabs with Live Badges -->
-    <div style="display: flex; gap: 0.45rem; overflow-x: auto; padding-bottom: 0.25rem; scrollbar-width: none;">
+    <!-- Filter Navigation Tabs with Live Badges (Smooth Horizontal Swipe on Mobile) -->
+    <div class="ts-notif-filter-strip">
       <a href="<?= url('/notifications') ?>" class="ts-btn ts-btn-sm <?= empty($currentFilter) || $currentFilter === 'all' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="font-size: 0.82rem; white-space: nowrap; border-radius: 8px;">
         All <span class="ts-badge" style="font-size: 0.68rem; margin-left: 0.35rem;"><?= (int)($counts['all'] ?? $total) ?></span>
       </a>
@@ -85,7 +313,7 @@
     </div>
 
     <!-- Quick Live Filter Search Box & Per-Page Controls -->
-    <div style="display: flex; align-items: center; gap: 0.6rem; min-width: 260px;">
+    <div class="ts-notif-search-wrap">
       <div style="position: relative; flex: 1;">
         <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--ts-text-tertiary);"></i>
         <input type="text" id="notif-search-filter" oninput="filterNotificationsLive(this.value)" placeholder="Search in notifications..." style="width: 100%; padding: 0.45rem 0.8rem 0.45rem 2rem; font-size: 0.82rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); border-radius: 8px; color: var(--ts-text-primary); outline: none;">
@@ -156,17 +384,17 @@
                data-unread="<?= $isUnread ? '1' : '0' ?>"
                data-search="<?= htmlspecialchars(strtolower(($n['title'] ?? '') . ' ' . ($n['message'] ?? '') . ' ' . ($typeLabel ?? ''))) ?>"
                onclick="openNotificationViewer(<?= (int)$n['id'] ?>, '<?= htmlspecialchars(addslashes($n['title']), ENT_QUOTES) ?>', '<?= htmlspecialchars(addslashes($typeLabel), ENT_QUOTES) ?>', '<?= htmlspecialchars(addslashes($n['message']), ENT_QUOTES) ?>', '<?= htmlspecialchars(addslashes($fullUrl), ENT_QUOTES) ?>', '<?= htmlspecialchars(addslashes($formattedExact), ENT_QUOTES) ?>', '<?= htmlspecialchars(addslashes($actionBtnLabel), ENT_QUOTES) ?>')" 
-               style="display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--ts-border-subtle); background: <?= $isUnread ? 'rgba(56,189,248,0.05)' : 'transparent' ?>; border-left: 4px solid <?= $isUnread ? '#38bdf8' : 'transparent' ?>; cursor: pointer; transition: all 0.2s ease; gap: 1rem;" 
+               style="background: <?= $isUnread ? 'rgba(56,189,248,0.05)' : 'transparent' ?>; border-left: 4px solid <?= $isUnread ? '#38bdf8' : 'transparent' ?>;" 
                class="notif-item-row">
             
-            <div style="display: flex; align-items: flex-start; gap: 1rem; flex: 1; min-width: 0;">
+            <div class="notif-item-left">
               <!-- Selection Checkbox -->
               <div onclick="event.stopPropagation();" style="margin-top: 10px;">
                 <input type="checkbox" class="notif-select-box" value="<?= (int)$n['id'] ?>" onchange="updateBatchBar()" style="accent-color: var(--ts-primary); width: 16px; height: 16px; cursor: pointer;">
               </div>
 
               <!-- Notification Icon with Dynamic Gradient -->
-              <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); display: flex; align-items: center; justify-content: center; color: <?= $iconColor ?>; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+              <div class="notif-item-icon" style="color: <?= $iconColor ?>;">
                 <i data-lucide="<?= $iconName ?>" style="width: 20px; height: 20px;"></i>
               </div>
 
@@ -200,7 +428,7 @@
             </div>
 
             <!-- Action Controls Strip -->
-            <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;" onclick="event.stopPropagation();">
+            <div class="notif-item-controls" onclick="event.stopPropagation();">
               <?php if (!empty($fullUrl)): ?>
                 <a href="<?= htmlspecialchars($fullUrl) ?>" onclick="markSingleRead(<?= (int)$n['id'] ?>);" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.4rem 0.9rem; font-size: 0.8rem; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 8px;">
                   <?= htmlspecialchars($actionBtnLabel) ?>
@@ -223,7 +451,7 @@
 
       <!-- Enhanced Pagination Strip -->
       <?php if (($totalPages ?? 1) > 1): ?>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(148,163,184,0.1); background: rgba(15,23,42,0.6); flex-wrap: wrap; gap: 1rem;">
+        <div class="notif-pagination-row" style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(148,163,184,0.1); background: rgba(15,23,42,0.6); flex-wrap: wrap; gap: 1rem;">
           <div style="font-size: 0.85rem; color: #94a3b8;">
             Showing page <strong style="color: #f8fafc;"><?= $currentPage ?></strong> of <strong style="color: #f8fafc;"><?= $totalPages ?></strong> (<?= number_format($total) ?> total items)
           </div>
@@ -605,7 +833,7 @@ async function confirmClearAllNotifications() {
     const fd = new FormData();
     fd.append('filter', filter);
     const res = await fetch(`${baseUrl}/api/v1/notifications/clear-all`, { 
-      method: 'POST',
+      method: 'POST', 
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
       body: fd 
     });

@@ -319,6 +319,7 @@ $router->post('/admin/applications/action/{id}', [AdminController::class, 'appli
 // Audience & Topic/Author Subscribers
 $router->get('/admin/subscribers', [AdminController::class, 'subscribers'], ['admin']);
 $router->get('/admin/subscribers/json', [AdminController::class, 'subscriberListJson'], ['admin']);
+$router->post('/admin/subscribers/record/delete/{id}', [AdminController::class, 'deleteUserSubscription'], ['admin']);
 
 // Moderation & Reports
 $router->get('/admin/moderation', [AdminController::class, 'moderation'], ['admin']);
@@ -370,6 +371,7 @@ $router->post('/admin/jobs/toggle/{id}', [AdminController::class, 'toggleJob'], 
 $router->post('/admin/jobs/delete/{id}', [AdminController::class, 'deleteJob'], ['admin']);
 $router->get('/admin/jobs/applications', [AdminController::class, 'jobApplications'], ['admin']);
 $router->post('/admin/jobs/applications/update/{id}', [AdminController::class, 'updateJobApplication'], ['admin']);
+$router->post('/admin/jobs/applications/delete/{id}', [AdminController::class, 'deleteJobApplication'], ['admin']);
 
 // Inbox & Contact Messages CRUD
 $router->get('/admin/contact-messages', [AdminController::class, 'contactMessages'], ['admin']);
@@ -386,6 +388,7 @@ $router->post('/admin/mail/template/delete/{id}', [AdminController::class, 'dele
 $router->post('/admin/mail/template/assign-credential', [AdminController::class, 'assignTemplateCredential'], ['admin']);
 $router->post('/admin/mail/templates/batch-save-credentials', [AdminController::class, 'batchSaveTemplateCredentials'], ['admin']);
 $router->post('/admin/mail/logs/clear', [AdminController::class, 'clearMailLogs'], ['admin']);
+$router->post('/admin/mail/log/delete/{id}', [AdminController::class, 'deleteMailLog'], ['admin']);
 $router->get('/admin/mail/log/{id}', [AdminController::class, 'viewMailLog'], ['admin']);
 $router->post('/admin/mail/credentials/save', [AdminController::class, 'saveMailCredential'], ['admin']);
 $router->post('/admin/mail/credentials/duplicate/{id}', [AdminController::class, 'duplicateMailCredential'], ['admin']);
@@ -440,6 +443,7 @@ $router->post('/admin/db-manager/optimize', [AdminController::class, 'optimizeTa
 $router->get('/admin/system-logs', [AdminController::class, 'systemLogs'], ['admin']);
 $router->get('/admin/error-logs', [AdminController::class, 'systemLogs'], ['admin']);
 $router->post('/admin/system-logs/resolve/{id}', [AdminController::class, 'resolveSystemLog'], ['admin']);
+$router->post('/admin/system-logs/delete/{id}', [AdminController::class, 'deleteSystemLog'], ['admin']);
 $router->post('/admin/system-logs/clear', [AdminController::class, 'clearSystemLogs'], ['admin']);
 
 // CMS Master Settings & Analytics Telemetry HUD
@@ -511,6 +515,7 @@ $router->get('/about', [PageController::class, 'about']);
 
 // System, Audit Logs & Backup Exporter
 $router->get('/admin/audit-logs', [AdminController::class, 'auditLogs'], ['admin']);
+$router->post('/admin/audit-logs/delete/{id}', [AdminController::class, 'deleteAuditLog'], ['admin']);
 $router->get('/admin/system', [AdminController::class, 'system'], ['admin']);
 $router->post('/admin/system/settings', [AdminController::class, 'saveSettings'], ['admin']);
 $router->get('/admin/system/backup', [AdminController::class, 'exportBackup'], ['admin']);

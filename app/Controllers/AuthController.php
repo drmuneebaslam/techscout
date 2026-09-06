@@ -134,11 +134,12 @@ class AuthController {
         $hash = password_hash($password, PASSWORD_BCRYPT);
         $uuid = bin2hex(random_bytes(16));
         $role = 'member'; // Standard user role by default
+        $verifyCode = sprintf("%06d", mt_rand(100000, 999999));
 
         Database::execute(
-            "INSERT INTO users (uuid, email, password_hash, username, role, status, email_verified_at) 
-             VALUES (?, ?, ?, ?, 'member', 'active', NOW())", 
-            [$uuid, $email, $hash, $username]
+            "INSERT INTO users (uuid, email, password_hash, username, role, status, verification_code, email_verified_at) 
+             VALUES (?, ?, ?, ?, 'member', 'pending_verification', ?, NULL)", 
+            [$uuid, $email, $hash, $username, $verifyCode]
         );
         $userId = (int)Database::lastInsertId();
 
@@ -161,32 +162,27 @@ class AuthController {
             $userId,
             'system',
             '🎉 Welcome to TechScout!',
-            "Hello {$displayName}! Your developer member account is ready. Explore curated intelligence, bookmark prompts & AI tools, and apply for author status anytime!",
-            '/topics'
+            "Hello {$displayName}! Please verify your email with the 6-digit OTP code sent to {$email} to unlock all platform features.",
+            '/verify-email'
         );
 
-        // Auto login and route directly to dashboard or home
+        // Log the user in to session so they can verify on the verification screen
         Auth::attempt($email, $password);
 
-        // Auto-send Welcome Onboarding Email
+        // Dispatch 6-digit Verification OTP Email
         try {
-            \App\Core\Mailer::sendTemplate('welcome', $email, $displayName, [
+            $rendered = \App\Core\Mailer::renderTemplate('email_verification', [
                 'name' => $displayName,
-                'username' => $username,
+                'verification_code' => $verifyCode,
+                'action_url' => url('/verify-email'),
                 'email' => $email,
-                'action_url' => url('/topics'),
-                'login_url' => url('/auth/login')
+                'expires_in' => '30 minutes'
             ]);
+            \App\Core\Mailer::send($email, $displayName, $rendered['subject'], $rendered['html'], 'email_verification');
         } catch (\Throwable $e) {}
 
-        Session::flash('success', 'Account created successfully! Welcome to TechScout.');
-        if ($role === 'admin' || $role === 'super_admin') {
-            Response::redirect('/admin/dashboard');
-        } elseif ($role === 'author') {
-            Response::redirect('/author/dashboard');
-        } else {
-            Response::redirect('/');
-        }
+        Session::flash('info', "Welcome to TechScout! We've sent a 6-digit verification code to {$email}. Please enter it below to verify your account.");
+        Response::redirect('/verify-email');
     }
 
     public function logout(Request $request): void {
@@ -312,44 +308,116 @@ class AuthController {
     // =========================================================================
     public function showVerifyEmail(Request $request): void {
         $user = Auth::user();
+        if (!$user) {
+            Session::flash('info', 'Please log in to your account to verify your email address.');
+            Response::redirect('/auth/login');
+            return;
+        }
+
+        // Check if already active and verified
+        $dbUser = Database::fetch("SELECT * FROM users WHERE id = ?", [$user['id']]);
+        if ($dbUser && !empty($dbUser['email_verified_at']) && $dbUser['status'] === 'active') {
+            Session::flash('info', 'Your email address is already verified.');
+            Response::redirect('/');
+            return;
+        }
+
         Response::view('auth/verify_email', [
             'title' => 'Verify Email | TechScout',
-            'user' => $user
+            'user' => $dbUser ?: $user
         ]);
     }
 
     public function verifyEmail(Request $request): void {
-        $code = trim((string)$request->post('verification_code', ''));
         $user = Auth::user();
-
-        if ($user) {
-            Database::execute("UPDATE users SET email_verified_at = NOW(), status = 'active' WHERE id = ?", [$user['id']]);
-            Session::flash('success', '✓ Email address verified successfully!');
+        if (!$user) {
+            Session::flash('error', 'Session expired. Please sign in to verify your account.');
+            Response::redirect('/auth/login');
+            return;
         }
 
+        $code = preg_replace('/\D/', '', (string)$request->post('verification_code', ''));
+
+        if (empty($code) || strlen($code) !== 6) {
+            Session::flash('error', 'Please enter a valid 6-digit verification code.');
+            Response::redirect('/verify-email');
+            return;
+        }
+
+        $dbUser = Database::fetch("SELECT * FROM users WHERE id = ?", [$user['id']]);
+        if (!$dbUser) {
+            Session::flash('error', 'User account not found.');
+            Response::redirect('/auth/login');
+            return;
+        }
+
+        // Check code
+        if (trim($dbUser['verification_code'] ?? '') !== $code) {
+            Session::flash('error', 'Invalid verification code. Please check your email or request a new code.');
+            Response::redirect('/verify-email');
+            return;
+        }
+
+        // Code valid! Activate user
+        Database::execute("UPDATE users SET email_verified_at = NOW(), status = 'active', verification_code = NULL WHERE id = ?", [$user['id']]);
+
+        // Refresh session
+        $freshUser = Database::fetch("SELECT * FROM users WHERE id = ?", [$user['id']]);
+        if ($freshUser) {
+            unset($freshUser['password_hash']);
+            Session::set('user', $freshUser);
+        }
+
+        // Send Welcome / Activated confirmation email
+        try {
+            $rendered = \App\Core\Mailer::renderTemplate('account_activated', [
+                'name' => $freshUser['username'] ?? 'Member',
+                'username' => $freshUser['username'] ?? 'Member',
+                'action_url' => url('/'),
+                'login_url' => url('/auth/login')
+            ]);
+            \App\Core\Mailer::send($freshUser['email'], $freshUser['username'], $rendered['subject'], $rendered['html'], 'account_activated');
+        } catch (\Throwable $e) {}
+
+        Session::flash('success', '🎉 Email address verified successfully! Your account is now fully active.');
         Response::redirect('/');
     }
 
     public function resendVerifyEmail(Request $request): void {
         $user = Auth::user();
-        if ($user) {
-            $verifyCode = sprintf("%06d", mt_rand(100000, 999999));
-            try {
-                Database::execute("UPDATE users SET verification_code = ? WHERE id = ?", [$verifyCode, $user['id']]);
-                $rendered = \App\Core\Mailer::renderTemplate('email_verification', [
-                    'name' => $user['username'],
-                    'verification_code' => $verifyCode,
-                    'action_url' => url('/verify-email'),
-                    'email' => $user['email'],
-                    'expires_in' => '30 minutes'
-                ]);
-                \App\Core\Mailer::send($user['email'], $user['username'], $rendered['subject'], $rendered['html'], 'email_verification');
-            } catch (\Throwable $e) {}
-
-            Session::flash('success', 'A fresh 6-digit verification code has been dispatched to your email.');
-        } else {
+        if (!$user) {
             Session::flash('error', 'Session expired. Please sign in again.');
+            Response::redirect('/auth/login');
+            return;
         }
+
+        $dbUser = Database::fetch("SELECT * FROM users WHERE id = ?", [$user['id']]);
+        if (!$dbUser) {
+            Session::flash('error', 'Account not found.');
+            Response::redirect('/auth/login');
+            return;
+        }
+
+        if (!empty($dbUser['email_verified_at']) && $dbUser['status'] === 'active') {
+            Session::flash('info', 'Your email address is already verified.');
+            Response::redirect('/');
+            return;
+        }
+
+        $verifyCode = sprintf("%06d", mt_rand(100000, 999999));
+        try {
+            Database::execute("UPDATE users SET verification_code = ? WHERE id = ?", [$verifyCode, $user['id']]);
+            $rendered = \App\Core\Mailer::renderTemplate('email_verification', [
+                'name' => $dbUser['username'] ?? 'Member',
+                'verification_code' => $verifyCode,
+                'action_url' => url('/verify-email'),
+                'email' => $dbUser['email'],
+                'expires_in' => '30 minutes'
+            ]);
+            \App\Core\Mailer::send($dbUser['email'], $dbUser['username'], $rendered['subject'], $rendered['html'], 'email_verification');
+        } catch (\Throwable $e) {}
+
+        Session::flash('success', "A fresh 6-digit verification code has been dispatched to {$dbUser['email']}.");
         Response::redirect('/verify-email');
     }
 

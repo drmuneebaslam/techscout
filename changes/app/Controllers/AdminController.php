@@ -2278,6 +2278,16 @@ class AdminController {
         Response::redirect('/admin/mail?tab=logs');
     }
 
+    public function deleteMailLog(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::execute("DELETE FROM mail_logs WHERE id = ?", [$id]);
+            AuditLog::log('admin.delete_mail_log', 'mail_logs', $id);
+            Session::flash('success', 'Mail delivery log record removed.');
+        }
+        Response::redirect('/admin/mail?tab=logs');
+    }
+
     public function deleteMailTemplate(Request $request, array $params): void {
         $id = (int)($params['id'] ?? 0);
         if ($id > 0) {
@@ -2675,6 +2685,15 @@ class AdminController {
         ]);
     }
 
+    public function deleteAuditLog(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::execute("DELETE FROM audit_logs WHERE id = ?", [$id]);
+            Session::flash('success', 'Audit log record removed.');
+        }
+        Response::redirect('/admin/audit-logs');
+    }
+
     public function saveSettings(Request $request): void {
         $socialNetworks = ['twitter', 'github', 'youtube', 'facebook', 'discord', 'linkedin', 'telegram', 'reddit', 'instagram', 'tiktok', 'twitch', 'rss'];
         $settingsKeys = ['enable_bg_grid_lines', 'enable_jobs_section', 'allow_all_authors_templates', 'default_timezone', 'ad_header_code', 'ad_slot_top', 'ad_slot_sidebar', 'ad_slot_in_article', 'ad_slot_footer', 'custom_footer_links_json'];
@@ -2991,6 +3010,16 @@ class AdminController {
         Response::redirect('/admin/jobs/applications');
     }
 
+    public function deleteJobApplication(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::execute("DELETE FROM job_applications WHERE id = ?", [$id]);
+            AuditLog::log('admin.delete_job_application', 'job_applications', $id);
+            Session::flash('success', 'Candidate application record removed.');
+        }
+        Response::redirect('/admin/jobs/applications');
+    }
+
     // ------------------------------------------------------------------------
     // 11. INBOX & CONTACT MESSAGES (REPLYABLE)
     // ------------------------------------------------------------------------
@@ -3157,6 +3186,16 @@ class AdminController {
             'count' => count($subscribers),
             'subscribers' => $subscribers
         ]);
+    }
+
+    public function deleteUserSubscription(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::execute("DELETE FROM user_subscriptions WHERE id = ?", [$id]);
+            AuditLog::log('admin.delete_user_subscription', 'user_subscriptions', $id);
+            Session::flash('success', 'Subscription record removed.');
+        }
+        Response::redirect('/admin/subscribers');
     }
 
     // ------------------------------------------------------------------------
@@ -5947,6 +5986,16 @@ class AdminController {
     public function clearSystemLogs(Request $request): void {
         Database::execute("TRUNCATE TABLE system_error_logs");
         Session::flash('success', 'All system error logs cleared.');
+        Response::redirect('/admin/system-logs');
+    }
+
+    public function deleteSystemLog(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::execute("DELETE FROM system_error_logs WHERE id = ?", [$id]);
+            AuditLog::log('admin.delete_system_log', 'system_error_logs', $id);
+            Session::flash('success', 'System error log record removed.');
+        }
         Response::redirect('/admin/system-logs');
     }
 

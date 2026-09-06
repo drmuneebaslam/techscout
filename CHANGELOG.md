@@ -4,6 +4,47 @@ All notable changes and architectural updates to the platform are documented in 
 
 ---
 
+## [2026-09-06] - Admin Single-Record Table Deletion, Post-Signup OTP Email Verification, Click-to-Reset Password Link & Responsive Notification Center
+
+### 1. Granular Admin Single-Record Deletion Across All Tables
+- **`AdminController::deleteMailLog` & `views/admin/mail.php`**:
+  - Added dedicated per-row delete action (`POST /admin/mail/log/delete/{id}`) allowing administrators to delete single email delivery records with confirmation.
+- **`AdminController::deleteSystemLog` & `views/admin/system_logs.php`**:
+  - Added per-row delete action (`POST /admin/system-logs/delete/{id}`) for individual runtime exception telemetry records.
+- **`AdminController::deleteAuditLog` & `views/admin/audit_logs.php`**:
+  - Added individual deletion button (`POST /admin/audit-logs/delete/{id}`) for specific forensic audit trail entries.
+- **`AdminController::deleteUserSubscription` & `views/admin/subscribers.php`**:
+  - Added single-record deletion (`POST /admin/subscribers/record/delete/{id}`) for topic/author/category subscriptions in the live follow stream.
+- **`AdminController::deleteJobApplication` & `views/admin/job_applications.php`**:
+  - Added delete application action (`POST /admin/jobs/applications/delete/{id}`) for individual candidate submissions.
+
+### 2. Post-Signup 6-Digit OTP Email Verification Screen
+- **`AuthController::register`**:
+  - Users are now registered with `status = 'pending_verification'` and a cryptographically generated 6-digit `verification_code`.
+  - Sends the `email_verification` template and redirects the new user immediately to `/verify-email`.
+- **`AuthController::verifyEmail`**:
+  - Validates user-submitted OTP against the stored database `verification_code`.
+  - Upon valid matching, sets `email_verified_at = NOW()`, updates `status = 'active'`, clears code, dispatches `account_activated` confirmation email, refreshes session, and redirects to home.
+- **`views/auth/verify_email.php`**:
+  - Rebuilt with a high-contrast, responsive card featuring 6 individual auto-advancing digit inputs, paste support (splitting 6 digits across inputs), 60-second cooldown timer on resend, and spam folder tips.
+
+### 3. Forgot Password Email Updated to Direct Click-to-Reset Link
+- **`Mailer.php` (`password_reset` template)**:
+  - Replaced prominent raw hex PIN code with a high-visibility, primary "Click Here to Reset Password &rarr;" call-to-action button.
+  - Added fallback clickable plaintext link in a clean code box for seamless copy-pasting, complete with 2-hour expiration notice and security advisory.
+
+### 4. Notification Screen Full Mobile Responsiveness Overhaul
+- **`views/notifications/index.php`**:
+  - Added comprehensive `@media (max-width: 768px)` and `@media (max-width: 480px)` responsive architecture:
+    - **Header & Hero**: Collapsible padding, fluid title typography, stacked full-width touch-friendly actions.
+    - **Telemetry KPI Grid**: Adapts cleanly from multi-column desktop grid to 2-column mobile layout.
+    - **Filter Ribbon**: Smooth horizontal swipe with hidden scrollbars for one-touch category toggling on phones.
+    - **Search Toolbar**: Full-width input and responsive pagination controls.
+    - **Notification Row Items (`.notif-item-row`)**: Stacks icon, title, message body, and action buttons vertically on mobile devices, ensuring full readability without truncation or horizontal overflow.
+    - **Detail Reader Modal (`#notifDetailModal`)**: Responsive width up to 95vw with scrollable modal body and accessible buttons.
+
+---
+
 ## [2026-09-06] - Universal Mail Envelope System, Block-Based Component Builder & Payout File Attachments
 
 ### 1. Universal Envelope System & Auto Light Mode Sanitization

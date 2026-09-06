@@ -60,10 +60,17 @@
             <td style="font-size: 0.8rem; color: #64748b; font-family: monospace;">
               <?= \App\Core\DateHelper::format($app['created_at']) ?>
             </td>
-            <td>
-              <button type="button" onclick='inspectCandidate(<?= json_encode($app, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
-                Inspect & Review 🔍
-              </button>
+            <td style="white-space: nowrap;">
+              <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
+                <button type="button" onclick='inspectCandidate(<?= json_encode($app, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
+                  Inspect & Review 🔍
+                </button>
+                <form action="<?= url('/admin/jobs/applications/delete/' . $app['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this candidate application?');" style="display: inline; margin: 0;">
+                  <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.45rem; font-size: 0.75rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Delete Application">
+                    🗑️
+                  </button>
+                </form>
+              </div>
             </td>
           </tr>
         <?php endforeach; ?>

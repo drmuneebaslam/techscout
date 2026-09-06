@@ -934,10 +934,17 @@
                 <td style="font-family: var(--admin-font-mono); font-size: 0.76rem; color: #94a3b8; white-space: nowrap;">
                   <?= \App\Core\DateHelper::formatDateTime($log['created_at']) ?>
                 </td>
-                <td style="text-align: center;">
-                  <button type="button" onclick="inspectSentMail(<?= $log['id'] ?>)" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.25rem 0.65rem; font-size: 0.74rem; background: #6366f1; border-color: #6366f1;">
-                    Inspect 👁️
-                  </button>
+                <td style="text-align: center; white-space: nowrap;">
+                  <div style="display: inline-flex; gap: 0.35rem; align-items: center; justify-content: center;">
+                    <button type="button" onclick="inspectSentMail(<?= $log['id'] ?>)" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.74rem; background: #6366f1; border-color: #6366f1;" title="Inspect Mail">
+                      Inspect 👁️
+                    </button>
+                    <form action="<?= url('/admin/mail/log/delete/' . $log['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this mail delivery log record?');" style="display: inline; margin: 0;">
+                      <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.74rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Delete Log Record">
+                        🗑️
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             <?php endforeach; ?>

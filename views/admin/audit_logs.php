@@ -232,6 +232,11 @@
                   <?php elseif (empty($log['before_state']) && empty($log['after_state'])): ?>
                     <span style="color: #64748b; font-size: 0.72rem;">Logged</span>
                   <?php endif; ?>
+                  <form action="<?= url('/admin/audit-logs/delete/' . $log['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this audit trail entry?');" style="display: inline; margin: 0;">
+                    <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.72rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Delete Log Record">
+                      🗑️
+                    </button>
+                  </form>
                 </div>
               </td>
             </tr>
