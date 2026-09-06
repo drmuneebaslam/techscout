@@ -15,7 +15,7 @@ class Auth {
         if (empty($sessionToken)) {
             $sessionToken = bin2hex(random_bytes(32));
             Session::set('auth_session_token', $sessionToken);
-            \App\Models\SessionManager::registerSession($userId, $sessionToken, $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', $_SERVER['HTTP_USER_AGENT'] ?? null);
+            \App\Models\SessionManager::registerSession($userId, $sessionToken, AuditLog::getClientIp(), $_SERVER['HTTP_USER_AGENT'] ?? null);
             return true;
         }
 
@@ -25,8 +25,13 @@ class Auth {
             if (!$sessRow) {
                 // If impersonating, keep the impersonation session intact unless terminated
                 if (!self::isImpersonating()) {
-                    self::logout();
-                    return false;
+                    $dbUser = Database::fetch("SELECT id, status FROM users WHERE id = ? LIMIT 1", [$userId]);
+                    if (!$dbUser || in_array($dbUser['status'] ?? '', ['banned', 'suspended'], true)) {
+                        self::logout();
+                        return false;
+                    }
+                    // Auto-heal/re-register active session for valid user if device record was pruned
+                    \App\Models\SessionManager::registerSession($userId, $sessionToken, AuditLog::getClientIp(), $_SERVER['HTTP_USER_AGENT'] ?? null);
                 }
             }
         } catch (\Throwable $e) {}
@@ -184,11 +189,12 @@ class Auth {
 
             $sessionToken = bin2hex(random_bytes(32));
             Session::set('auth_session_token', $sessionToken);
-            \App\Models\SessionManager::registerSession((int)$user['id'], $sessionToken, $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', $_SERVER['HTTP_USER_AGENT'] ?? null);
+            $clientIp = AuditLog::getClientIp();
+            \App\Models\SessionManager::registerSession((int)$user['id'], $sessionToken, $clientIp, $_SERVER['HTTP_USER_AGENT'] ?? null);
 
             // Update last login
             Database::execute("UPDATE users SET last_login_at = NOW(), last_login_ip = ? WHERE id = ?", [
-                $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+                $clientIp,
                 $user['id']
             ]);
 
@@ -205,7 +211,7 @@ class Auth {
         
         $sessionToken = bin2hex(random_bytes(32));
         Session::set('auth_session_token', $sessionToken);
-        \App\Models\SessionManager::registerSession((int)$user['id'], $sessionToken, $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', $_SERVER['HTTP_USER_AGENT'] ?? null);
+        \App\Models\SessionManager::registerSession((int)$user['id'], $sessionToken, AuditLog::getClientIp(), $_SERVER['HTTP_USER_AGENT'] ?? null);
 
         self::user();
     }
@@ -245,7 +251,7 @@ class Auth {
         \App\Models\SessionManager::registerSession(
             (int)$targetUser['id'],
             $impersonateToken,
-            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+            AuditLog::getClientIp(),
             ($_SERVER['HTTP_USER_AGENT'] ?? '') . ' [Admin Impersonation]'
         );
 
@@ -288,7 +294,7 @@ class Auth {
         \App\Models\SessionManager::registerSession(
             (int)$adminUser['id'],
             $adminToken,
-            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+            AuditLog::getClientIp(),
             $_SERVER['HTTP_USER_AGENT'] ?? null
         );
 
