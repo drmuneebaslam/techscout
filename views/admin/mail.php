@@ -1160,8 +1160,45 @@
         </div>
       </details>
 
+      <!-- Modern Block-Based Component Library Palette -->
+      <div style="margin-bottom: 0.85rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="font-size: 0.8rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
+            <i data-lucide="blocks" style="width: 15px; height: 15px; color: #6366f1;"></i> 
+            <span>Universal Block Component Library (Light Mode)</span>
+          </div>
+          <span style="font-size: 0.7rem; color: #64748b;">1-Click insert pre-styled, high-contrast blocks</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+          <button type="button" onclick="insertBlockComponent('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f5f3ff;">
+            ✨ Hero Header
+          </button>
+          <button type="button" onclick="insertBlockComponent('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">
+            ℹ️ Info Callout
+          </button>
+          <button type="button" onclick="insertBlockComponent('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;">
+            ✅ Success Box
+          </button>
+          <button type="button" onclick="insertBlockComponent('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #d97706; border-color: #fde68a; background: #fffbeb;">
+            ⚠️ Warning Box
+          </button>
+          <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;">
+            🔘 Primary CTA Button
+          </button>
+          <button type="button" onclick="insertBlockComponent('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">
+            💰 Disbursal / Action Button
+          </button>
+          <button type="button" onclick="insertBlockComponent('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;">
+            📊 Key-Value Data Grid
+          </button>
+          <button type="button" onclick="insertBlockComponent('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;">
+            🔑 OTP PIN Badge
+          </button>
+        </div>
+      </div>
+
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-        <label class="admin-modal-label" style="margin: 0;">HTML Content Template (White Background &amp; Grid Lines Shell)</label>
+        <label class="admin-modal-label" style="margin: 0;">HTML Content Template (Wrapped Automatically with Universal White &amp; Grid Shell)</label>
         <div style="display: flex; gap: 0.3rem;">
           <button type="button" onclick="insertTmplTag('{{name}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; font-family: monospace;">+ {{name}}</button>
           <button type="button" onclick="insertTmplTag('{{action_url}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; font-family: monospace;">+ {{action_url}}</button>
@@ -2151,6 +2188,32 @@ function insertTmplTag(tag) {
   textarea.focus();
 }
 
+function insertBlockComponent(type) {
+  const textarea = document.getElementById('tmpl_html_input');
+  if (!textarea) return;
+
+  const blocks = {
+    hero: `\n<h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>{{headline}}</h2>\n<p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, here is your latest intelligence briefing from TechScout.</p>\n`,
+    callout_info: `\n<div style='background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px;color:#0369a1;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#0284c7;'>💡 Technical Briefing:</strong> {{message}}\n</div>\n`,
+    callout_success: `\n<div style='background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid #059669;border-radius:8px;padding:16px;color:#065f46;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#059669;'>✓ Verified & Approved:</strong> Your submission or transaction has been processed successfully.\n</div>\n`,
+    callout_warning: `\n<div style='background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:8px;padding:16px;color:#92400e;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#d97706;'>⚠️ Attention Required:</strong> Please review and adjust the requested parameters.\n</div>\n`,
+    cta_primary: `\n<div style='text-align:center;margin:28px 0;'>\n  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Explore TechScout Intelligence &rarr;</a>\n</div>\n`,
+    cta_green: `\n<div style='text-align:center;margin:28px 0;'>\n  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>View Disbursed Payout Ledger &rarr;</a>\n</div>\n`,
+    datagrid: `\n<div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin:20px 0;'>\n  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>\n    <div><strong style='color:#64748b;'>Reference ID:</strong> <span style='color:#0f172a;font-weight:600;'>#{{payout_id}}</span></div>\n    <div><strong style='color:#64748b;'>Transaction Amount:</strong> <strong style='font-size:16px;color:#059669;'>\${{amount}} USD</strong></div>\n    <div><strong style='color:#64748b;'>Status:</strong> <span style='background:#ecfdf5;color:#059669;padding:2px 8px;border-radius:4px;font-weight:700;font-size:12px;border:1px solid #a7f3d0;'>COMPLETED</span></div>\n  </div>\n</div>\n`,
+    otp_box: `\n<div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>\n  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>One-Time Authorization PIN (Expires in {{expires_in}})</div>\n  <div style='font-size:34px;font-weight:900;color:#4f46e5;letter-spacing:8px;margin-top:8px;font-family:monospace;'>{{verification_code}}</div>\n</div>\n`
+  };
+
+  const snippet = blocks[type] || '';
+  if (!snippet) return;
+
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+  textarea.value = text.substring(0, start) + snippet + text.substring(end);
+  textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+  textarea.focus();
+}
+
 function previewTemplateModal(key) {
   const tmpl = MAIL_TEMPLATES[key];
   if (!tmpl) return;
@@ -2166,7 +2229,13 @@ function previewTemplateModal(key) {
     .replace(/\{\{username\}\}/g, 'devin_systems')
     .replace(/\{\{action_url\}\}/g, actionUrl)
     .replace(/\{\{headline\}\}/g, tmpl.subject || 'Engineering Update')
-    .replace(/\{\{message\}\}/g, 'This is simulated dynamic message body content previewing the live template layout...');
+    .replace(/\{\{message\}\}/g, 'This is simulated dynamic message body content previewing the live template layout...')
+    .replace(/background:\s*#0f172a/gi, 'background:#ffffff')
+    .replace(/background-color:\s*#0f172a/gi, 'background-color:#ffffff')
+    .replace(/background:\s*#05070b/gi, 'background:#f8fafc')
+    .replace(/color:\s*#f8fafc/gi, 'color:#0f172a')
+    .replace(/color:\s*#cbd5e1/gi, 'color:#334155')
+    .replace(/color:\s*#94a3b8/gi, 'color:#475569');
 
   const fullEnvelope = `<!DOCTYPE html>
 <html>

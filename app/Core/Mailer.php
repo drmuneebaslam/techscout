@@ -302,6 +302,89 @@ class Mailer {
         }
     }
 
+    public static function sanitizeLightMode(string $html): string {
+        $replaces = [
+            'background:#0f172a' => 'background:#ffffff',
+            'background-color:#0f172a' => 'background-color:#ffffff',
+            'background: #0f172a' => 'background: #ffffff',
+            'background:#05070b' => 'background:#f8fafc',
+            'background-color:#05070b' => 'background-color:#f8fafc',
+            'background: #05070b' => 'background: #f8fafc',
+            'background:#1e293b' => 'background:#f1f5f9',
+            'background: #1e293b' => 'background: #f1f5f9',
+            'color:#f8fafc' => 'color:#0f172a',
+            'color: #f8fafc' => 'color: #0f172a',
+            'color:#cbd5e1' => 'color:#334155',
+            'color: #cbd5e1' => 'color: #334155',
+            'color:#94a3b8' => 'color:#475569',
+            'color: #94a3b8' => 'color: #475569',
+            'color:#64748b' => 'color:#475569',
+            'color: #64748b' => 'color: #475569',
+            'rgba(99,102,241,0.3)' => '#e0e7ff',
+            'rgba(56,189,248,0.3)' => '#bae6fd',
+            'rgba(16,185,129,0.3)' => '#a7f3d0'
+        ];
+        return str_ireplace(array_keys($replaces), array_values($replaces), $html);
+    }
+
+    public static function wrapUniversalEnvelope(string $innerContent, string $subject, array $options = []): string {
+        // If content is already a full HTML document, return as is (with light-mode sanitization)
+        if (stripos($innerContent, '<!DOCTYPE') !== false || stripos($innerContent, '<html') !== false) {
+            return self::sanitizeLightMode($innerContent);
+        }
+
+        $appUrl = rtrim(Config::get('app_url') ?: 'http://localhost/techscout.n', '/');
+        $siteName = Config::get('app_name', 'TechScout');
+        $cleanInner = self::sanitizeLightMode($innerContent);
+        $attachmentsHtml = $options['attachments_html'] ?? '';
+
+        return "<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>" . htmlspecialchars($subject) . "</title>
+</head>
+<body style='margin:0;padding:0;background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif;color:#0f172a;'>
+  <table width='100%' border='0' cellspacing='0' cellpadding='0' style='background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;padding:36px 12px;'>
+    <tr>
+      <td align='center'>
+        <table width='100%' border='0' cellspacing='0' cellpadding='0' style='max-width:600px;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.07), 0 8px 10px -6px rgba(0,0,0,0.05);overflow:hidden;'>
+          <!-- Header Branding with Universal Grid Accent -->
+          <tr>
+            <td style='background:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.05) 1px, transparent 1px);background-size:24px 24px;padding:26px 32px;border-bottom:2px solid #6366f1;text-align:center;'>
+              <a href='" . $appUrl . "' style='text-decoration:none;'>
+                <span style='font-size:24px;font-weight:900;letter-spacing:-0.5px;color:#0f172a;'>Tech<span style='color:#6366f1;'>Scout</span></span>
+              </a>
+              <div style='color:#64748b;font-size:11px;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;'>Developer Intelligence Network</div>
+            </td>
+          </tr>
+          <!-- Body Content Area -->
+          <tr>
+            <td style='padding:36px 32px;color:#1e293b;font-size:15px;line-height:1.65;'>
+              " . $cleanInner . "
+              " . $attachmentsHtml . "
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style='background-color:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center;'>
+              <p style='color:#64748b;font-size:12px;margin:0 0 6px 0;'>
+                &copy; " . date('Y') . " " . htmlspecialchars($siteName) . " Platform &bull; Built for builders, engineers, and creators.
+              </p>
+              <p style='color:#64748b;font-size:11px;margin:0;'>
+                You received this email because you are an active member, creator, or subscriber.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>";
+    }
+
     public static function renderTemplate(string $templateKey, array $data = [], array $attachments = []): array {
         $templates = self::getTemplates();
         $tmpl = $templates[$templateKey] ?? $templates['community_broadcast'];
@@ -399,7 +482,6 @@ class Mailer {
 
         // Format Attachments Box if present
         $attachmentsHtml = '';
-        $hasAttachments = false;
         $itemsList = [];
 
         if (!empty($attachments)) {
@@ -417,7 +499,7 @@ class Mailer {
                         if (!empty($f['url'])) {
                             $fn = !empty($f['name']) ? $f['name'] : basename($f['url']);
                             $sz = !empty($f['size']) ? " ({$f['size']})" : '';
-                            $itemsList[] = "<li><a href='{$f['url']}' style='color:#34d399;text-decoration:none;font-weight:600;' target='_blank'>📄 {$fn}{$sz} ⬇</a></li>";
+                            $itemsList[] = "<li><a href='{$f['url']}' style='color:#059669;text-decoration:none;font-weight:600;' target='_blank'>📄 {$fn}{$sz} ⬇</a></li>";
                         }
                     }
                 }
@@ -427,63 +509,22 @@ class Mailer {
                         $itemsList[] = "<li><a href='{$att['url']}' style='color:#38bdf8;text-decoration:none;font-weight:600;' target='_blank'>🔗 {$att['title']} ↗</a></li>";
                     } elseif (isset($att['name']) && isset($att['url'])) {
                         $sz = !empty($att['size']) ? " ({$att['size']})" : '';
-                        $itemsList[] = "<li><a href='{$att['url']}' style='color:#34d399;text-decoration:none;font-weight:600;' target='_blank'>📄 {$att['name']}{$sz} ⬇</a></li>";
+                        $itemsList[] = "<li><a href='{$att['url']}' style='color:#059669;text-decoration:none;font-weight:600;' target='_blank'>📄 {$att['name']}{$sz} ⬇</a></li>";
+                    } elseif (isset($att['name'])) {
+                        $itemsList[] = "<li style='color:#334155;font-weight:600;'>📎 " . htmlspecialchars($att['name']) . " (Attached to email)</li>";
                     }
                 }
             }
 
             if (!empty($itemsList)) {
                 $attachmentsHtml .= "<div style='margin-top:24px;padding:18px;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;'>";
-                $attachmentsHtml .= "<div style='color:#0f172a;font-size:13px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;'>📎 Attached Resources & Files:</div>";
+                $attachmentsHtml .= "<div style='color:#0f172a;font-size:13px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;'>📎 Attached Files &amp; Resources:</div>";
                 $attachmentsHtml .= "<ul style='margin:0;padding-left:20px;color:#334155;font-size:13px;line-height:1.6;'>" . implode('', $itemsList) . "</ul></div>";
             }
         }
 
-        $html = "<!DOCTYPE html>
-<html>
-<head>
-  <meta charset='utf-8'>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <title>" . htmlspecialchars($subject) . "</title>
-</head>
-<body style='margin:0;padding:0;background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif;color:#0f172a;'>
-  <table width='100%' border='0' cellspacing='0' cellpadding='0' style='background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;padding:36px 12px;'>
-    <tr>
-      <td align='center'>
-        <table width='100%' border='0' cellspacing='0' cellpadding='0' style='max-width:600px;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.07), 0 8px 10px -6px rgba(0,0,0,0.05);overflow:hidden;'>
-          <!-- Header Branding with Grid Accent -->
-          <tr>
-            <td style='background:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.05) 1px, transparent 1px);background-size:24px 24px;padding:26px 32px;border-bottom:2px solid #6366f1;text-align:center;'>
-              <a href='" . $appUrl . "' style='text-decoration:none;'>
-                <span style='font-size:24px;font-weight:900;letter-spacing:-0.5px;color:#0f172a;'>Tech<span style='color:#6366f1;'>Scout</span></span>
-              </a>
-              <div style='color:#64748b;font-size:11px;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;'>Developer Intelligence Network</div>
-            </td>
-          </tr>
-          <!-- Body Content -->
-          <tr>
-            <td style='padding:36px 32px;color:#1e293b;font-size:15px;line-height:1.65;'>
-              " . $body . "
-              " . $attachmentsHtml . "
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style='background-color:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center;'>
-              <p style='color:#64748b;font-size:12px;margin:0 0 6px 0;'>
-                &copy; " . date('Y') . " TechScout Platform &bull; Built for builders, engineers, and creators.
-              </p>
-              <p style='color:#94a3b8;font-size:11px;margin:0;'>
-                You received this email because you are a registered member or subscriber of TechScout.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>";
+        // Apply Universal Envelope Wrapper
+        $html = self::wrapUniversalEnvelope($body, $subject, ['attachments_html' => $attachmentsHtml]);
 
         return [
             'subject' => $subject,

@@ -41,4 +41,34 @@ UPDATE `notifications`
   SET `action_url` = REPLACE(`action_url`, 'http://localhost/techscout.n', 'https://funwithcoding.free.nf') 
   WHERE `action_url` LIKE '%http://localhost/techscout.n%';
 
+-- 4. Modernize all existing stored mail templates to pure light mode
+UPDATE `mail_templates`
+  SET `html_content` = REPLACE(`html_content`, 'background:#0f172a', 'background:#f8fafc')
+  WHERE `html_content` LIKE '%background:#0f172a%';
+
+UPDATE `mail_templates`
+  SET `html_content` = REPLACE(`html_content`, 'background-color:#0f172a', 'background-color:#f8fafc')
+  WHERE `html_content` LIKE '%background-color:#0f172a%';
+
+UPDATE `mail_templates`
+  SET `html_content` = REPLACE(`html_content`, 'background:#05070b', 'background:#f8fafc')
+  WHERE `html_content` LIKE '%background:#05070b%';
+
+UPDATE `mail_templates`
+  SET `html_content` = REPLACE(`html_content`, 'color:#f8fafc', 'color:#0f172a')
+  WHERE `html_content` LIKE '%color:#f8fafc%';
+
+UPDATE `mail_templates`
+  SET `html_content` = REPLACE(`html_content`, 'color:#cbd5e1', 'color:#334155')
+  WHERE `html_content` LIKE '%color:#cbd5e1%';
+
+UPDATE `mail_templates`
+  SET `html_content` = REPLACE(`html_content`, 'color:#94a3b8', 'color:#475569')
+  WHERE `html_content` LIKE '%color:#94a3b8%';
+
+UPDATE `mail_templates`
+  SET `html_content` = REPLACE(`html_content`, 'color:#64748b', 'color:#475569')
+  WHERE `html_content` LIKE '%color:#64748b%';
+
 -- Upgrade complete.
+

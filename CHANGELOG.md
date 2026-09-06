@@ -4,6 +4,39 @@ All notable changes and architectural updates to the platform are documented in 
 
 ---
 
+## [2026-09-06] - Universal Mail Envelope System, Block-Based Component Builder & Payout File Attachments
+
+### 1. Universal Envelope System & Auto Light Mode Sanitization
+- **`Mailer::wrapUniversalEnvelope`**:
+  - Implemented an automatic universal background & shell system so new templates can be written as simple inner HTML blocks without boilerplate `<html>` or wrapper duplication.
+  - Automatically wraps inner content in a crisp white card (`#ffffff`), subtle grid lines (`rgba(99,102,241,0.08)` 32px grid), TechScout brand header, and official platform footer.
+  - Fully backward compatible with legacy full-document templates.
+- **`Mailer::sanitizeLightMode`**:
+  - Automatically sanitizes dark backgrounds (`#0f172a`, `#05070b`, `#1e293b`) and dim text (`#f8fafc`, `#cbd5e1`, `#94a3b8`) across all email templates and legacy database template rows into vibrant, high-contrast light styling (`#ffffff`, `#f8fafc`, `#0f172a`, `#334155`).
+
+### 2. Modern Block-Based Component Builder (Template Studio)
+- Added an interactive **Universal Block Component Library** in `views/admin/mail.php` (`#templateEditorModal`):
+  - **Hero Header**: High-contrast title and greeting block.
+  - **Info Callout**: Crisp blue alert box with left accent border.
+  - **Success Box**: Green confirmation block with checkmark.
+  - **Warning Box**: Amber compliance attention notice.
+  - **Primary CTA Button**: Modern indigo gradient action button.
+  - **Disbursal / Action Button**: Green payout receipt ledger action button.
+  - **Key-Value Data Grid**: Light slate data card with borders and status pill.
+  - **OTP PIN Badge**: Mono-spaced 6-digit verification box with expiration badge.
+- Live template preview iframe upgraded to automatically sanitize dark styles and render within the universal light envelope.
+
+### 3. Physical Receipt & Document Attachments for Creator Payouts
+- **`AdminController::processAuthorPayout`**:
+  - Uploaded receipt proof (`receipt_file` via `multipart/form-data`) is physically attached to the `payout_approved` email dispatch (`Mailer::sendTemplate`).
+  - Automatically handles both newly uploaded receipts and existing stored receipts from `/assets/uploads/receipts/`.
+  - Attaches actual binary receipt files (PDF, PNG, JPG, WEBP) directly into the outgoing email so creators receive their payment confirmation slip in Gmail/client inbox.
+
+### 4. Database Light Mode Migration Script
+- Updated `database/mail_tracking_upgrade.sql` with queries to clean and convert any older custom rows in `mail_templates` table to light mode automatically upon running the upgrade.
+
+---
+
 ## [2026-09-06] - Extended Mail System, Pure Light Mode Templates, Telemetry HUD & Timezone Engine
 
 ### 1. Pure Light Mode Mail Templates & Grid Lines (Zero Dark Boxes)

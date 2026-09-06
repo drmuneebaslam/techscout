@@ -5411,6 +5411,8 @@ class AdminController {
         $netAmount = max(0, $amountUsd - $feeDeducted);
 
         $receiptUrl = null;
+        $receiptFilePath = null;
+        $receiptFileName = null;
         $receiptFile = $_FILES['receipt_file'] ?? null;
         if ($receiptFile && !empty($receiptFile['tmp_name']) && $receiptFile['error'] === UPLOAD_ERR_OK) {
             $ext = strtolower(pathinfo($receiptFile['name'], PATHINFO_EXTENSION));
@@ -5419,9 +5421,22 @@ class AdminController {
                 if (!is_dir($receiptDir)) mkdir($receiptDir, 0755, true);
 
                 $filename = 'receipt_' . $payoutId . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                if (move_uploaded_file($receiptFile['tmp_name'], $receiptDir . '/' . $filename)) {
+                $targetDest = $receiptDir . '/' . $filename;
+                if (move_uploaded_file($receiptFile['tmp_name'], $targetDest)) {
                     $receiptUrl = '/assets/uploads/receipts/' . $filename;
+                    $receiptFilePath = $targetDest;
+                    $receiptFileName = $receiptFile['name'] ?: $filename;
                 }
+            }
+        }
+
+        // If no new file uploaded but existing receipt_url exists, resolve physical path for attachment
+        if (!$receiptFilePath && !empty($payout['receipt_url'])) {
+            $existingPath = __DIR__ . '/../../' . ltrim($payout['receipt_url'], '/');
+            if (file_exists($existingPath)) {
+                $receiptFilePath = $existingPath;
+                $receiptFileName = basename($existingPath);
+                $receiptUrl = $payout['receipt_url'];
             }
         }
 
@@ -5469,11 +5484,24 @@ class AdminController {
                 '/author/dashboard#payouts'
             );
 
-            // Send Official Transactional Email to Creator
+            // Send Official Transactional Email to Creator with physical receipt attachment
             try {
                 $authorUser = Database::fetch("SELECT u.username, u.email, a.display_name FROM users u LEFT JOIN authors a ON u.id = a.user_id WHERE u.id = ?", [(int)$payout['user_id']]);
                 if ($authorUser && !empty($authorUser['email'])) {
                     $recipientName = !empty($authorUser['display_name']) ? $authorUser['display_name'] : ($authorUser['username'] ?? ($payout['display_name'] ?? 'Creator'));
+                    
+                    // Build attachments array for Mailer
+                    $mailAttachments = [];
+                    if ($receiptFilePath && file_exists($receiptFilePath)) {
+                        $mime = mime_content_type($receiptFilePath) ?: 'application/octet-stream';
+                        $mailAttachments[] = [
+                            'name' => $receiptFileName ?: basename($receiptFilePath),
+                            'path' => $receiptFilePath,
+                            'type' => $mime,
+                            'url' => $receiptUrl ? \App\Core\Config::url($receiptUrl) : ''
+                        ];
+                    }
+
                     if ($action === 'paid') {
                         \App\Core\Mailer::sendTemplate('payout_approved', $authorUser['email'], $recipientName, [
                             'name' => $recipientName,
@@ -5485,7 +5513,7 @@ class AdminController {
                             'receipt_url' => (string)($receiptUrl ? \App\Core\Config::url($receiptUrl) : ''),
                             'destination' => (string)($payout['payout_address'] ?? 'Verified Destination'),
                             'action_url' => url('/author/rewards')
-                        ]);
+                        ], $mailAttachments);
                     } elseif ($action === 'rejected') {
                         \App\Core\Mailer::sendTemplate('payout_rejected', $authorUser['email'], $recipientName, [
                             'name' => $recipientName,
@@ -5493,7 +5521,7 @@ class AdminController {
                             'payout_id' => (string)$payoutId,
                             'admin_notes' => (string)($adminNotes ?: 'Compliance verification requirements not met.'),
                             'action_url' => url('/author/rewards')
-                        ]);
+                        ], $mailAttachments);
                     }
                 }
             } catch (\Throwable $e) {}
