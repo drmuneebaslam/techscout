@@ -508,11 +508,20 @@ class Database {
                   `attachments_json` JSON NULL,
                   `driver` VARCHAR(30) NOT NULL DEFAULT 'log',
                   `credential_name` VARCHAR(150) NULL,
+                  `tracking_token` VARCHAR(64) NULL,
+                  `open_count` INT UNSIGNED NOT NULL DEFAULT 0,
+                  `opened_at` DATETIME NULL,
+                  `click_count` INT UNSIGNED NOT NULL DEFAULT 0,
+                  `clicked_at` DATETIME NULL,
+                  `last_clicked_url` TEXT NULL,
+                  `user_ip` VARCHAR(45) NULL,
+                  `user_agent` TEXT NULL,
                   `status` ENUM('sent', 'failed', 'queued') NOT NULL DEFAULT 'sent',
                   `error_message` TEXT NULL,
                   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                   INDEX `idx_ml_email` (`to_email`),
-                  INDEX `idx_ml_status` (`status`)
+                  INDEX `idx_ml_status` (`status`),
+                  INDEX `idx_ml_token` (`tracking_token`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
             } else {
                 $mailCols = array_column($pdo->query("SHOW COLUMNS FROM `mail_logs`")->fetchAll(PDO::FETCH_ASSOC), 'Field');
@@ -530,6 +539,30 @@ class Database {
                 }
                 if (!in_array('credential_name', $mailCols)) {
                     $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `credential_name` VARCHAR(150) NULL AFTER `driver`");
+                }
+                if (!in_array('tracking_token', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `tracking_token` VARCHAR(64) NULL AFTER `credential_name`, ADD INDEX `idx_ml_token` (`tracking_token`)");
+                }
+                if (!in_array('open_count', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `open_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `tracking_token`");
+                }
+                if (!in_array('opened_at', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `opened_at` DATETIME NULL AFTER `open_count`");
+                }
+                if (!in_array('click_count', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `click_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `opened_at`");
+                }
+                if (!in_array('clicked_at', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `clicked_at` DATETIME NULL AFTER `click_count`");
+                }
+                if (!in_array('last_clicked_url', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `last_clicked_url` TEXT NULL AFTER `clicked_at`");
+                }
+                if (!in_array('user_ip', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_ip` VARCHAR(45) NULL AFTER `last_clicked_url`");
+                }
+                if (!in_array('user_agent', $mailCols)) {
+                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_agent` TEXT NULL AFTER `user_ip`");
                 }
             }
 
@@ -1399,7 +1432,7 @@ class Database {
                 ('site_maintenance_mode', '0'),
                 ('site_maintenance_message', 'TechScout core systems are currently executing scheduled platform upgrades. We will be back online shortly.')");
 
-            // 27. Ensure mail_logs table has sender and credential tracking columns
+            // 27. Ensure mail_logs table has sender, credential, and engagement tracking columns
             try {
                 $mlCheck = $pdo->query("SHOW TABLES LIKE 'mail_logs'")->fetchAll();
                 if (!empty($mlCheck)) {
@@ -1412,6 +1445,30 @@ class Database {
                     }
                     if (!in_array('credential_name', $mlCols)) {
                         $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `credential_name` VARCHAR(255) NULL AFTER `driver`");
+                    }
+                    if (!in_array('tracking_token', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `tracking_token` VARCHAR(64) NULL AFTER `credential_name`, ADD INDEX `idx_ml_token` (`tracking_token`)");
+                    }
+                    if (!in_array('open_count', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `open_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `tracking_token`");
+                    }
+                    if (!in_array('opened_at', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `opened_at` DATETIME NULL AFTER `open_count`");
+                    }
+                    if (!in_array('click_count', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `click_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `opened_at`");
+                    }
+                    if (!in_array('clicked_at', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `clicked_at` DATETIME NULL AFTER `click_count`");
+                    }
+                    if (!in_array('last_clicked_url', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `last_clicked_url` TEXT NULL AFTER `clicked_at`");
+                    }
+                    if (!in_array('user_ip', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_ip` VARCHAR(45) NULL AFTER `last_clicked_url`");
+                    }
+                    if (!in_array('user_agent', $mlCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_agent` TEXT NULL AFTER `user_ip`");
                     }
                 }
             } catch (Throwable $e) {}
@@ -1430,10 +1487,12 @@ class Database {
                 }
             } catch (Throwable $e) {}
 
-            // 29. Auto-heal notification action_url to remove stale /tech/ subfolder path
+            // 29. Auto-heal notification action_url to remove stale /tech/ or /techscout.n/ subfolder path
             try {
                 $pdo->exec("UPDATE `notifications` SET `action_url` = REPLACE(`action_url`, '/tech/', '/') WHERE `action_url` LIKE '%/tech/%'");
                 $pdo->exec("UPDATE `notifications` SET `action_url` = REPLACE(`action_url`, 'funwithcoding.free.nf/tech', 'funwithcoding.free.nf') WHERE `action_url` LIKE '%funwithcoding.free.nf/tech%'");
+                $pdo->exec("UPDATE `notifications` SET `action_url` = REPLACE(`action_url`, '/techscout.n/', '/') WHERE `action_url` LIKE '%/techscout.n/%'");
+                $pdo->exec("UPDATE `notifications` SET `action_url` = REPLACE(`action_url`, 'http://localhost/techscout.n', 'https://funwithcoding.free.nf') WHERE `action_url` LIKE '%http://localhost/techscout.n%'");
             } catch (Throwable $e) {}
         } catch (Throwable $e) {
             // Ignore minor migration conflicts

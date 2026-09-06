@@ -2450,6 +2450,61 @@ class AdminController {
         ]);
     }
 
+    public function trackMailOpen(Request $request, array $params): void {
+        $token = trim((string)($params['token'] ?? ''));
+        if (!empty($token)) {
+            try {
+                $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                $ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
+                Database::executeSilent(
+                    "UPDATE mail_logs 
+                     SET open_count = open_count + 1, 
+                         opened_at = IF(opened_at IS NULL, NOW(), opened_at), 
+                         user_ip = ?, 
+                         user_agent = ? 
+                     WHERE tracking_token = ?",
+                    [$ip, $ua, $token]
+                );
+            } catch (\Throwable $e) {}
+        }
+
+        header('Content-Type: image/gif');
+        header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        echo base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+        exit;
+    }
+
+    public function trackMailClick(Request $request, array $params): void {
+        $token = trim((string)($params['token'] ?? ''));
+        $targetUrl = (string)$request->query('url', '');
+
+        if (empty($targetUrl) || !filter_var($targetUrl, FILTER_VALIDATE_URL)) {
+            $targetUrl = \App\Core\Config::get('app_url') ?: '/';
+        }
+
+        if (!empty($token)) {
+            try {
+                $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                $ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
+                Database::executeSilent(
+                    "UPDATE mail_logs 
+                     SET click_count = click_count + 1, 
+                         clicked_at = IF(clicked_at IS NULL, NOW(), clicked_at), 
+                         last_clicked_url = ?, 
+                         user_ip = ?, 
+                         user_agent = ? 
+                     WHERE tracking_token = ?",
+                    [substr($targetUrl, 0, 500), $ip, $ua, $token]
+                );
+            } catch (\Throwable $e) {}
+        }
+
+        header("Location: " . $targetUrl, true, 302);
+        exit;
+    }
+
     // ------------------------------------------------------------------------
     // 11. ADVERTISEMENTS & MONETIZATION
     // ------------------------------------------------------------------------

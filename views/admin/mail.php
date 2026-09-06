@@ -404,17 +404,17 @@
               <span style="font-size: 0.72rem; color: #64748b;">Simulated Recipient: Alex Rivera</span>
             </div>
 
-            <div style="background: #04070e; border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; overflow: hidden; height: 420px; display: flex; flex-direction: column;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; height: 420px; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
               <!-- Simulated Email Client Header -->
-              <div style="background: #080d1a; border-bottom: 1px solid rgba(148,163,184,0.12); padding: 0.6rem 0.85rem; font-size: 0.78rem;">
-                <div style="color: #f8fafc; font-weight: 700;" id="simSubject">Subject: TechScout Intelligence Update</div>
+              <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 0.85rem; font-size: 0.78rem;">
+                <div style="color: #0f172a; font-weight: 700;" id="simSubject">Subject: TechScout Intelligence Update</div>
                 <div style="color: #64748b; font-size: 0.7rem; margin-top: 0.15rem;">
-                  From: <strong>TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
+                  From: <strong style="color: #334155;">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
                 </div>
               </div>
 
-              <!-- Rendered Iframe -->
-              <iframe id="livePreviewFrame" style="width: 100%; height: 100%; border: none; background: #04070e; flex: 1;"></iframe>
+              <!-- Rendered Iframe (Pure Light Mode Canvas with Grid Lines) -->
+              <iframe id="livePreviewFrame" style="width: 100%; height: 100%; border: none; background: #ffffff; flex: 1;"></iframe>
             </div>
           </div>
         </div>
@@ -880,11 +880,12 @@
       <table class="admin-table" id="mailLogsTable">
         <thead>
           <tr>
-            <th style="width: 90px;">Status</th>
+            <th style="width: 110px;">Status</th>
             <th>Recipient</th>
-            <th>Subject</th>
-            <th style="width: 170px;">Dispatched</th>
-            <th style="width: 100px; text-align: center;">Action</th>
+            <th>Subject &amp; Template</th>
+            <th style="width: 140px;">Sender / Channel</th>
+            <th style="width: 155px;">Dispatched</th>
+            <th style="width: 90px; text-align: center;">Action</th>
           </tr>
         </thead>
         <tbody id="mailLogsTableBody">
@@ -893,13 +894,25 @@
               <tr class="mail-log-row" 
                   data-recipient="<?= htmlspecialchars(strtolower($log['to_email'] ?? '')) ?>" 
                   data-subject="<?= htmlspecialchars(strtolower($log['subject'] ?? '')) ?>" 
-                  data-status="<?= htmlspecialchars(strtolower($log['status'] ?? 'sent')) ?>">
+                  data-status="<?= htmlspecialchars(strtolower($log['status'] ?? 'sent')) ?>"
+                  data-opened="<?= !empty($log['open_count']) ? '1' : '0' ?>"
+                  data-clicked="<?= !empty($log['click_count']) ? '1' : '0' ?>">
                 <td>
-                  <?php if ($log['status'] === 'sent'): ?>
-                    <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; padding: 2px 7px;">SENT ✓</span>
-                  <?php else: ?>
-                    <span class="strike-badge" style="font-size: 0.68rem; padding: 2px 7px;" title="<?= htmlspecialchars($log['error_message'] ?? '') ?>">FAILED ❌</span>
-                  <?php endif; ?>
+                  <div style="display: flex; flex-direction: column; gap: 3px; align-items: flex-start;">
+                    <?php if ($log['status'] === 'sent'): ?>
+                      <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; padding: 2px 7px;">SENT ✓</span>
+                    <?php else: ?>
+                      <span class="strike-badge" style="font-size: 0.68rem; padding: 2px 7px;" title="<?= htmlspecialchars($log['error_message'] ?? '') ?>">FAILED ❌</span>
+                    <?php endif; ?>
+                    <div style="display: flex; gap: 3px; align-items: center; flex-wrap: wrap;">
+                      <?php if (!empty($log['open_count'])): ?>
+                        <span class="ts-badge" style="background: rgba(168,85,247,0.18); color: #c084fc; font-size: 0.65rem; padding: 1px 5px;" title="Opened <?= (int)$log['open_count'] ?> time(s)">👁️ <?= (int)$log['open_count'] ?></span>
+                      <?php endif; ?>
+                      <?php if (!empty($log['click_count'])): ?>
+                        <span class="ts-badge" style="background: rgba(6,182,212,0.18); color: #22d3ee; font-size: 0.65rem; padding: 1px 5px;" title="Clicked <?= (int)$log['click_count'] ?> time(s)">🔗 <?= (int)$log['click_count'] ?></span>
+                      <?php endif; ?>
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <div style="font-weight: 600; color: #f8fafc; font-size: 0.85rem; line-height: 1.3;"><?= htmlspecialchars($log['to_email']) ?></div>
@@ -907,8 +920,16 @@
                     <div style="font-size: 0.72rem; color: #64748b;"><?= htmlspecialchars($log['to_name']) ?></div>
                   <?php endif; ?>
                 </td>
-                <td style="font-size: 0.83rem; color: #cbd5e1; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  <?= htmlspecialchars($log['subject']) ?>
+                <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis;">
+                  <div style="font-size: 0.83rem; font-weight: 600; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= htmlspecialchars($log['subject']) ?></div>
+                  <div style="font-size: 0.7rem; color: #64748b; font-family: var(--admin-font-mono); margin-top: 1px;">
+                    Template: <span style="color: #38bdf8;"><?= htmlspecialchars($log['template_key'] ?? 'custom') ?></span>
+                  </div>
+                </td>
+                <td>
+                  <span class="ts-badge" style="background: rgba(99,102,241,0.15); color: #818cf8; font-size: 0.7rem; font-family: var(--admin-font-mono); padding: 2px 7px;">
+                    <?= htmlspecialchars($log['credential_name'] ?? strtoupper($log['driver'] ?? 'LOG')) ?>
+                  </span>
                 </td>
                 <td style="font-family: var(--admin-font-mono); font-size: 0.76rem; color: #94a3b8; white-space: nowrap;">
                   <?= \App\Core\DateHelper::formatDateTime($log['created_at']) ?>
@@ -921,7 +942,7 @@
               </tr>
             <?php endforeach; ?>
           <?php else: ?>
-            <tr><td colspan="5" style="text-align: center; padding: 2.5rem; color: #64748b;">No email delivery logs recorded yet.</td></tr>
+            <tr><td colspan="6" style="text-align: center; padding: 2.5rem; color: #64748b;">No email delivery logs recorded yet.</td></tr>
           <?php endif; ?>
         </tbody>
       </table>
@@ -1162,14 +1183,19 @@
 <!-- ========================================================================= -->
 <!-- MODAL: SENT EMAIL VIEWER & INSPECTOR -->
 <!-- ========================================================================= -->
+<!-- ========================================================================= -->
+<!-- MODAL: SENT EMAIL EXECUTIVE TELEMETRY HUD & SANDBOX -->
+<!-- ========================================================================= -->
 <div id="sentMailModal" class="admin-modal-overlay">
-  <div class="admin-modal-box modal-cyan" style="max-width: 880px; width: 95%; max-height: 94vh; display: flex; flex-direction: column;">
-    <div class="admin-modal-header" style="padding-bottom: 0.75rem;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 940px; width: 95%; max-height: 94vh; display: flex; flex-direction: column;">
+    <div class="admin-modal-header" style="padding-bottom: 0.65rem;">
       <div style="flex: 1; min-width: 0; margin-right: 1rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
           <span class="ts-badge ts-badge-green" id="inspectStatusBadge" style="font-size: 0.72rem; padding: 2px 8px;">SENT ✓</span>
           <span class="ts-badge ts-badge-cyan" id="inspectTemplateKey" style="font-size: 0.7rem; font-family: var(--admin-font-mono);">Template: custom</span>
           <span class="ts-badge" style="background: rgba(168,85,247,0.2); color: #c084fc; font-size: 0.7rem;" id="inspectDriverBadge">Driver: API</span>
+          <span id="inspectOpenBadge" class="ts-badge" style="font-size: 0.7rem;">👁️ UNOPENED</span>
+          <span id="inspectClickBadge" class="ts-badge" style="font-size: 0.7rem;">🔗 NO CLICKS</span>
         </div>
         <h3 class="admin-modal-title" style="color: #38bdf8; font-size: 1.15rem; word-break: break-word;" id="inspectSubject">
           Email Subject
@@ -1178,55 +1204,95 @@
       <button type="button" onclick="closeInspectModal()" class="admin-modal-close" title="Close Modal">✕</button>
     </div>
 
-    <!-- Executive Details HUD (4 Rich Metadata Cards) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.65rem; margin-bottom: 0.85rem;">
-      <!-- Card 1: Sender -->
-      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 0.65rem 0.85rem;">
-        <div style="font-size: 0.68rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sent By (Sender)</div>
-        <div style="color: #38bdf8; font-weight: 600; font-size: 0.82rem; margin-top: 0.2rem; word-break: break-all;" id="inspectSenderEmail">system</div>
-        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.15rem;" id="inspectSenderAccount">Account: Platform Default</div>
+    <!-- Tracking Token Bar -->
+    <div style="background: rgba(15,23,42,0.85); border: 1px solid rgba(99,102,241,0.25); border-radius: 8px; padding: 0.45rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <span style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Tracking Token:</span>
+        <code id="inspectTrackingToken" style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #38bdf8; background: rgba(56,189,248,0.1); padding: 2px 6px; border-radius: 4px;">--</code>
+        <button type="button" onclick="copyTrackingToken()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; color: #38bdf8;" title="Copy tracking token">
+          📋 Copy
+        </button>
+      </div>
+      <div style="font-size: 0.72rem; color: #94a3b8;" id="inspectSummaryCounters">
+        Opens: <strong style="color: #c084fc;" id="inspectOpenSummary">0</strong> &bull; Clicks: <strong style="color: #22d3ee;" id="inspectClickSummary">0</strong>
+      </div>
+    </div>
+
+    <!-- Executive Telemetry Grid (6 Rich Metadata HUD Cards) -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.55rem; margin-bottom: 0.75rem;">
+      <!-- Card 1: Sender & Channel -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 0.55rem 0.75rem;">
+        <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sent By (Sender)</div>
+        <div style="color: #38bdf8; font-weight: 600; font-size: 0.8rem; margin-top: 0.15rem; word-break: break-all;" id="inspectSenderEmail">system</div>
+        <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 0.1rem;" id="inspectSenderAccount">Account: Platform Default</div>
       </div>
 
       <!-- Card 2: Recipient -->
-      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.65rem 0.85rem;">
-        <div style="font-size: 0.68rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Delivered To (Recipient)</div>
-        <div style="color: #f8fafc; font-weight: 600; font-size: 0.82rem; margin-top: 0.2rem; word-break: break-all;" id="inspectRecipientFull">user@example.com</div>
-        <div style="font-size: 0.7rem; color: #64748b; margin-top: 0.15rem;" id="inspectRecipientName">Direct Dispatch</div>
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.55rem 0.75rem;">
+        <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Delivered To (Recipient)</div>
+        <div style="color: #f8fafc; font-weight: 600; font-size: 0.8rem; margin-top: 0.15rem; word-break: break-all;" id="inspectRecipientFull">user@example.com</div>
+        <div style="font-size: 0.68rem; color: #64748b; margin-top: 0.1rem;" id="inspectRecipientName">Direct Dispatch</div>
       </div>
 
-      <!-- Card 3: Coordinates -->
-      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.65rem 0.85rem;">
-        <div style="font-size: 0.68rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Delivery Coordinates</div>
-        <div style="color: #cbd5e1; font-size: 0.78rem; margin-top: 0.2rem;" id="inspectLogId">Log #0</div>
-        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.15rem;" id="inspectMsgId">Transport: Outbound Relay</div>
+      <!-- Card 3: Open Engagement Telemetry -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 0.55rem 0.75rem;">
+        <div style="font-size: 0.65rem; color: #c084fc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between;">
+          <span>Open Telemetry</span>
+          <span id="inspectOpenCountBadge" style="font-size: 0.68rem; font-weight: 800;">0x</span>
+        </div>
+        <div style="color: #f8fafc; font-size: 0.76rem; margin-top: 0.15rem;" id="inspectOpenedAtText">Not yet opened</div>
+        <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="inspectReaderClient">Reader: --</div>
       </div>
 
-      <!-- Card 4: Timing -->
-      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.65rem 0.85rem;">
-        <div style="font-size: 0.68rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Dispatch Timestamp</div>
-        <div style="color: #cbd5e1; font-family: var(--admin-font-mono); font-size: 0.78rem; margin-top: 0.2rem;" id="inspectTimestampExact">--:--:--</div>
-        <div style="font-size: 0.7rem; color: #10b981; margin-top: 0.15rem;">✓ Recorded in PKT (+05:00)</div>
+      <!-- Card 4: Click Engagement Telemetry -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(6,182,212,0.25); border-radius: 8px; padding: 0.55rem 0.75rem;">
+        <div style="font-size: 0.65rem; color: #22d3ee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between;">
+          <span>Click Telemetry</span>
+          <span id="inspectClickCountBadge" style="font-size: 0.68rem; font-weight: 800;">0x</span>
+        </div>
+        <div style="color: #f8fafc; font-size: 0.76rem; margin-top: 0.15rem;" id="inspectClickedAtText">No clicks recorded</div>
+        <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="inspectLastUrlText">URL: None</div>
+      </div>
+
+      <!-- Card 5: Coordinates -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.55rem 0.75rem;">
+        <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Coordinates</div>
+        <div style="color: #cbd5e1; font-size: 0.76rem; margin-top: 0.15rem;" id="inspectLogId">Log #0</div>
+        <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 0.1rem;" id="inspectMsgId">Transport: Outbound Relay</div>
+      </div>
+
+      <!-- Card 6: Timing -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.55rem 0.75rem;">
+        <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Dispatch Timestamp</div>
+        <div style="color: #cbd5e1; font-family: var(--admin-font-mono); font-size: 0.76rem; margin-top: 0.15rem;" id="inspectTimestampExact">--:--:--</div>
+        <div style="font-size: 0.68rem; color: #10b981; margin-top: 0.1rem;">✓ Localized Timezone</div>
       </div>
     </div>
 
     <!-- Error Diagnostics Banner (Conditional) -->
-    <div id="inspectErrorAlert" style="display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-left: 4px solid #ef4444; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.85rem; font-size: 0.82rem; color: #fecaca;">
-      <strong style="color: #ef4444; display: block; margin-bottom: 0.2rem;">❌ Dispatch Exception / Failure Trace:</strong>
-      <div id="inspectErrorText" style="font-family: var(--admin-font-mono); font-size: 0.78rem; word-break: break-all;"></div>
+    <div id="inspectErrorAlert" style="display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-left: 4px solid #ef4444; border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 0.65rem; font-size: 0.8rem; color: #fecaca;">
+      <strong style="color: #ef4444; display: block; margin-bottom: 0.15rem;">❌ Dispatch Exception / Failure Trace:</strong>
+      <div id="inspectErrorText" style="font-family: var(--admin-font-mono); font-size: 0.75rem; word-break: break-all;"></div>
     </div>
 
     <!-- Attachments Display -->
-    <div id="inspectAttachmentsBox" style="display: none; background: #04070e; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 0.85rem; font-size: 0.8rem;">
-      <strong style="color: #38bdf8; display: block; margin-bottom: 0.25rem;">📎 Attached Resources:</strong>
+    <div id="inspectAttachmentsBox" style="display: none; background: #04070e; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.5rem 0.85rem; margin-bottom: 0.65rem; font-size: 0.78rem;">
+      <strong style="color: #38bdf8; display: block; margin-bottom: 0.2rem;">📎 Attached Resources:</strong>
       <div id="inspectAttachmentsList"></div>
     </div>
 
-    <!-- Action Toolbar Above HTML Preview -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-      <div style="font-size: 0.78rem; font-weight: 700; color: #94a3b8; display: flex; align-items: center; gap: 0.35rem;">
-        <i data-lucide="eye" style="width: 14px; height: 14px; color: #38bdf8;"></i> Rendered Email Output (White BG + Grid Lines Shell)
+    <!-- Subtab Navigation & Action Toolbar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.4rem;">
+      <div style="display: flex; gap: 0.35rem;">
+        <button type="button" onclick="switchInspectSubTab('preview')" id="btnInspectSubPreview" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem;">
+          👁️ Email Sandbox (Light Mode)
+        </button>
+        <button type="button" onclick="switchInspectSubTab('json')" id="btnInspectSubJson" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem;">
+          💻 Technical Payload (JSON)
+        </button>
       </div>
-      <div style="display: flex; gap: 0.4rem;">
+
+      <div style="display: flex; gap: 0.35rem;">
         <button type="button" onclick="copyInspectHtml()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; color: #38bdf8;" title="Copy complete HTML body to clipboard">
           📋 Copy HTML
         </button>
@@ -1239,12 +1305,21 @@
       </div>
     </div>
 
-    <!-- HTML Email Body Preview Frame -->
-    <div style="flex: 1; min-height: 380px; background: #ffffff; border: 1px solid rgba(148,163,184,0.25); border-radius: 10px; overflow: hidden; position: relative;">
+    <!-- Email Sandbox Frame (Pure Light Mode Canvas with Grid Lines) -->
+    <div id="inspectPreviewContainer" style="flex: 1; min-height: 380px; background: #ffffff; border: 1px solid rgba(148,163,184,0.25); border-radius: 10px; overflow: hidden; position: relative;">
       <iframe id="inspectFrame" style="width: 100%; height: 100%; min-height: 380px; border: none; background: #ffffff;"></iframe>
     </div>
 
-    <div class="admin-modal-footer" style="margin-top: 0.75rem; padding-top: 0.75rem;">
+    <!-- Raw Technical JSON Payload View (Hidden by default) -->
+    <div id="inspectJsonContainer" style="display: none; flex: 1; min-height: 380px; background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 10px; overflow: auto; padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Full Database Record Telemetry:</span>
+        <button type="button" onclick="copyInspectJson()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; color: #38bdf8;">📋 Copy JSON</button>
+      </div>
+      <pre id="inspectRawJson" style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #38bdf8; margin: 0; white-space: pre-wrap; word-break: break-all;"></pre>
+    </div>
+
+    <div class="admin-modal-footer" style="margin-top: 0.65rem; padding-top: 0.65rem;">
       <button type="button" onclick="closeInspectModal()" class="ts-btn ts-btn-outline ts-btn-sm">Close Inspector</button>
     </div>
   </div>
@@ -1638,6 +1713,71 @@ function inspectSentMail(logId) {
           driverBadge.textContent = 'Driver: ' + (log.driver || 'LOG').toUpperCase();
         }
 
+        // Tracking Token & Engagement Badges
+        const tokenEl = document.getElementById('inspectTrackingToken');
+        if (tokenEl) tokenEl.textContent = log.tracking_token || 'N/A';
+
+        const openBadge = document.getElementById('inspectOpenBadge');
+        if (openBadge) {
+          if (log.open_count && parseInt(log.open_count) > 0) {
+            openBadge.className = 'ts-badge';
+            openBadge.style.background = 'rgba(168,85,247,0.25)';
+            openBadge.style.color = '#c084fc';
+            openBadge.textContent = `👁️ OPENED ${log.open_count}x`;
+          } else {
+            openBadge.className = 'ts-badge';
+            openBadge.style.background = 'rgba(148,163,184,0.15)';
+            openBadge.style.color = '#94a3b8';
+            openBadge.textContent = '👁️ UNOPENED';
+          }
+        }
+
+        const clickBadge = document.getElementById('inspectClickBadge');
+        if (clickBadge) {
+          if (log.click_count && parseInt(log.click_count) > 0) {
+            clickBadge.className = 'ts-badge';
+            clickBadge.style.background = 'rgba(6,182,212,0.25)';
+            clickBadge.style.color = '#22d3ee';
+            clickBadge.textContent = `🔗 CLICKED ${log.click_count}x`;
+          } else {
+            clickBadge.className = 'ts-badge';
+            clickBadge.style.background = 'rgba(148,163,184,0.15)';
+            clickBadge.style.color = '#94a3b8';
+            clickBadge.textContent = '🔗 NO CLICKS';
+          }
+        }
+
+        const openSum = document.getElementById('inspectOpenSummary');
+        if (openSum) openSum.textContent = log.open_count || 0;
+        const clickSum = document.getElementById('inspectClickSummary');
+        if (clickSum) clickSum.textContent = log.click_count || 0;
+
+        // Open Telemetry Card
+        const openCountBadge = document.getElementById('inspectOpenCountBadge');
+        if (openCountBadge) openCountBadge.textContent = `${log.open_count || 0}x`;
+        const openedAtText = document.getElementById('inspectOpenedAtText');
+        if (openedAtText) openedAtText.textContent = log.opened_at ? `First: ${log.opened_at}` : 'Not yet opened';
+        const readerClient = document.getElementById('inspectReaderClient');
+        if (readerClient) {
+          readerClient.textContent = log.user_ip ? `IP: ${log.user_ip} ${log.user_agent ? '• ' + log.user_agent.substring(0, 30) + '...' : ''}` : 'Reader: Pending First Open';
+        }
+
+        // Click Telemetry Card
+        const clickCountBadge = document.getElementById('inspectClickCountBadge');
+        if (clickCountBadge) clickCountBadge.textContent = `${log.click_count || 0}x`;
+        const clickedAtText = document.getElementById('inspectClickedAtText');
+        if (clickedAtText) clickedAtText.textContent = log.clicked_at ? `First: ${log.clicked_at}` : 'No clicks recorded';
+        const lastUrlText = document.getElementById('inspectLastUrlText');
+        if (lastUrlText) {
+          lastUrlText.innerHTML = log.last_clicked_url ? `<a href="${log.last_clicked_url}" target="_blank" style="color:#22d3ee;text-decoration:underline;">${log.last_clicked_url} ↗</a>` : 'URL: None';
+        }
+
+        // Raw JSON Record
+        const rawJsonEl = document.getElementById('inspectRawJson');
+        if (rawJsonEl) {
+          rawJsonEl.textContent = JSON.stringify(log, null, 2);
+        }
+
         // Sender HUD Card
         const senderEmail = document.getElementById('inspectSenderEmail');
         if (senderEmail) {
@@ -1714,7 +1854,7 @@ function inspectSentMail(logId) {
           }
         }
 
-        // Render HTML inside iframe
+        // Render HTML inside iframe (Pure Light Mode)
         const frame = document.getElementById('inspectFrame');
         if (frame) {
           const doc = frame.contentWindow.document;
@@ -1722,6 +1862,9 @@ function inspectSentMail(logId) {
           doc.write(log.body_html || '<div style="color:#64748b;padding:24px;font-family:sans-serif;text-align:center;">No HTML body stored for this log entry.</div>');
           doc.close();
         }
+
+        // Reset to preview subtab
+        switchInspectSubTab('preview');
 
         document.getElementById('sentMailModal').style.display = 'flex';
         if (window.lucide) {
@@ -1732,6 +1875,42 @@ function inspectSentMail(logId) {
     .catch(e => {
       alert('Could not retrieve email log details.');
     });
+}
+
+function switchInspectSubTab(tab) {
+  const btnPrev = document.getElementById('btnInspectSubPreview');
+  const btnJson = document.getElementById('btnInspectSubJson');
+  const prevBox = document.getElementById('inspectPreviewContainer');
+  const jsonBox = document.getElementById('inspectJsonContainer');
+
+  if (tab === 'json') {
+    if (btnPrev) { btnPrev.className = 'ts-btn ts-btn-outline ts-btn-sm'; }
+    if (btnJson) { btnJson.className = 'ts-btn ts-btn-primary ts-btn-sm'; }
+    if (prevBox) prevBox.style.display = 'none';
+    if (jsonBox) jsonBox.style.display = 'block';
+  } else {
+    if (btnPrev) { btnPrev.className = 'ts-btn ts-btn-primary ts-btn-sm'; }
+    if (btnJson) { btnJson.className = 'ts-btn ts-btn-outline ts-btn-sm'; }
+    if (prevBox) prevBox.style.display = 'block';
+    if (jsonBox) jsonBox.style.display = 'none';
+  }
+}
+
+function copyTrackingToken() {
+  if (!currentInspectedLog || !currentInspectedLog.tracking_token) {
+    alert('No tracking token recorded for this message.');
+    return;
+  }
+  navigator.clipboard.writeText(currentInspectedLog.tracking_token).then(() => {
+    alert('Tracking Token copied to clipboard! 📋');
+  });
+}
+
+function copyInspectJson() {
+  if (!currentInspectedLog) return;
+  navigator.clipboard.writeText(JSON.stringify(currentInspectedLog, null, 2)).then(() => {
+    alert('Full telemetry log JSON copied to clipboard! 📋');
+  });
 }
 
 function copyInspectHtml() {

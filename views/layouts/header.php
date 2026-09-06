@@ -788,11 +788,19 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
 
     if (actionUrl && actionUrl.trim() !== '') {
       let dest = actionUrl.trim();
-      // Auto-heal /tech/ path moved to root domain (https://funwithcoding.free.nf)
-      dest = dest.replace(/^(https?:\/\/[^\/]+)?\/tech(\/.*)?$/, (match, p1, p2) => (p1 || '') + (p2 || '/'));
-      if (!dest.startsWith('http://') && !dest.startsWith('https://')) {
-        const base = window.location.origin;
-        dest = base + (dest.startsWith('/') ? dest : '/' + dest);
+      // Auto-heal /tech/ or /techscout.n/ path moved to root domain (https://funwithcoding.free.nf)
+      try {
+        if (dest.startsWith('http://') || dest.startsWith('https://')) {
+          const u = new URL(dest);
+          let p = u.pathname.replace(/^\/(techscout\.n|tech)(\/|$)/i, '/');
+          dest = window.location.origin + p + u.search + u.hash;
+        } else {
+          let p = dest.replace(/^\/(techscout\.n|tech)(\/|$)/i, '/');
+          if (!p.startsWith('/')) p = '/' + p;
+          dest = window.location.origin + p;
+        }
+      } catch(e) {
+        dest = window.location.origin + (dest.startsWith('/') ? dest : '/' + dest);
       }
       window.location.href = dest;
     } else {

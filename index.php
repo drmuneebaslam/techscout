@@ -470,6 +470,10 @@ $router->post('/admin/newsletters/retry-delivery/{id}', [AdminController::class,
 $router->get('/newsletter/track/open/{token}', [AdminController::class, 'trackNewsletterOpen']);
 $router->get('/newsletter/track/click/{token}', [AdminController::class, 'trackNewsletterClick']);
 
+// General Platform Mail Open & Click Tracking (Public Unauthenticated Webhooks)
+$router->get('/mail/track/open/{token}', [AdminController::class, 'trackMailOpen']);
+$router->get('/mail/track/click/{token}', [AdminController::class, 'trackMailClick']);
+
 // CMS Navigation & Multi-Tier Layout Builder
 $router->get('/admin/navigation', [AdminController::class, 'navigation'], ['admin']);
 $router->post('/admin/navigation/save', [AdminController::class, 'saveNavigationItem'], ['admin']);

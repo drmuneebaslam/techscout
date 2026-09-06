@@ -433,9 +433,9 @@ class Mailer {
             }
 
             if (!empty($itemsList)) {
-                $attachmentsHtml .= "<div style='margin-top:24px;padding:16px;background:#0f172a;border:1px solid rgba(56,189,248,0.3);border-radius:8px;'>";
-                $attachmentsHtml .= "<div style='color:#38bdf8;font-size:13px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;'>📎 Attached Resources & Files:</div>";
-                $attachmentsHtml .= "<ul style='margin:0;padding-left:20px;color:#cbd5e1;font-size:13px;line-height:1.6;'>" . implode('', $itemsList) . "</ul></div>";
+                $attachmentsHtml .= "<div style='margin-top:24px;padding:18px;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;'>";
+                $attachmentsHtml .= "<div style='color:#0f172a;font-size:13px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;'>📎 Attached Resources & Files:</div>";
+                $attachmentsHtml .= "<ul style='margin:0;padding-left:20px;color:#334155;font-size:13px;line-height:1.6;'>" . implode('', $itemsList) . "</ul></div>";
             }
         }
 
@@ -494,327 +494,329 @@ class Mailer {
     public static function getDefaultTemplateBody(string $templateKey): string {
         return match ($templateKey) {
             'welcome' => "
-                <h2 style='color:#f8fafc;font-size:22px;margin:0 0 16px 0;'>Welcome aboard TechScout, {{name}}! 🚀</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>You have joined the frontier community for technical journalism, AI tool indexing, custom GPT exploration, and creator monetization.</p>
-                <div style='background:#0f172a;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:16px;margin-bottom:24px;'>
-                  <div style='color:#38bdf8;font-weight:700;font-size:14px;margin-bottom:6px;'>⚡ Quickstart actions:</div>
-                  <ul style='color:#94a3b8;font-size:14px;line-height:1.6;margin:0;padding-left:20px;'>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Welcome aboard TechScout, {{name}}! 🚀</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>You have joined the frontier community for technical journalism, AI tool indexing, custom GPT exploration, and creator monetization.</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='color:#4f46e5;font-weight:700;font-size:14px;margin-bottom:8px;'>⚡ Quickstart actions:</div>
+                  <ul style='color:#475569;font-size:14px;line-height:1.65;margin:0;padding-left:20px;'>
                     <li>Explore curated technical breakdowns &amp; blueprints</li>
                     <li>Subscribe to your favorite technology topics</li>
                     <li>Publish technical guides and earn creator reputation</li>
                   </ul>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Explore TechScout Intelligence &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Explore TechScout Intelligence &rarr;</a>
                 </div>",
 
             'email_verification' => "
-                <h2 style='color:#f8fafc;font-size:22px;margin:0 0 16px 0;'>Verify Your Email Address 📧</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, please verify your email address to activate your account:</p>
-                <div style='text-align:center;background:#0f172a;border:1px solid rgba(56,189,248,0.3);border-radius:8px;padding:18px;margin:20px 0;'>
-                  <div style='font-size:12px;color:#94a3b8;letter-spacing:1px;text-transform:uppercase;'>Verification PIN Code (Expires in {{expires_in}})</div>
-                  <div style='font-size:32px;font-weight:800;color:#38bdf8;letter-spacing:6px;margin-top:6px;font-family:monospace;'>{{verification_code}}</div>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Verify Your Email Address 📧</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, please verify your email address to activate your account:</p>
+                <div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>
+                  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>Verification PIN Code (Expires in {{expires_in}})</div>
+                  <div style='font-size:34px;font-weight:900;color:#4f46e5;letter-spacing:8px;margin-top:8px;font-family:monospace;'>{{verification_code}}</div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Confirm &amp; Verify Email &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Confirm &amp; Verify Email &rarr;</a>
                 </div>",
 
             'account_activated' => "
-                <h2 style='color:#34d399;font-size:22px;margin:0 0 16px 0;'>Account Successfully Verified! ✅</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your email address has been verified and your TechScout account is fully active.</p>
-                <div style='background:#0f172a;border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:16px;margin-bottom:24px;'>
-                  <div style='color:#34d399;font-weight:700;font-size:14px;margin-bottom:4px;'>✓ Member Permissions Unlocked</div>
-                  <div style='color:#94a3b8;font-size:13px;'>You can now join architectural discussions, save custom prompt blueprints, and explore the AI tool radar.</div>
+                <h2 style='color:#059669;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Account Successfully Verified! ✅</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your email address has been verified and your TechScout account is fully active.</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='color:#059669;font-weight:700;font-size:14px;margin-bottom:6px;'>✓ Member Permissions Unlocked</div>
+                  <div style='color:#475569;font-size:14px;'>You can now join architectural discussions, save custom prompt blueprints, and explore the AI tool radar.</div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#10b981,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Go to Your Dashboard &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#059669,#10b981);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>Go to Your Dashboard &rarr;</a>
                 </div>",
 
             'login_alert' => "
-                <h2 style='color:#f8fafc;font-size:22px;margin:0 0 16px 0;'>New Sign-In Security Alert 🔐</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, we detected a new sign-in to your TechScout account:</p>
-                <div style='background:#0f172a;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:16px;margin-bottom:24px;'>
-                  <div style='display:grid;gap:6px;font-size:14px;color:#cbd5e1;'>
-                    <div><strong>Time:</strong> {{timestamp}}</div>
-                    <div><strong>IP Address:</strong> <code style='color:#38bdf8;'>{{ip_address}}</code></div>
-                    <div><strong>Client Device:</strong> {{browser}}</div>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>New Sign-In Security Alert 🔐</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, we detected a new sign-in to your TechScout account:</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>
+                    <div><strong style='color:#64748b;'>Time:</strong> <span style='color:#0f172a;font-weight:600;'>{{timestamp}}</span></div>
+                    <div><strong style='color:#64748b;'>IP Address:</strong> <code style='color:#4f46e5;background:#eef2ff;padding:2px 6px;border-radius:4px;'>{{ip_address}}</code></div>
+                    <div><strong style='color:#64748b;'>Client Device:</strong> <span style='color:#0f172a;'>{{browser}}</span></div>
                   </div>
                 </div>
-                <div style='text-align:center;margin:20px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#ef4444;color:#ffffff;font-weight:700;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:14px;'>Secure My Account &rarr;</a>
+                <div style='text-align:center;margin:24px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#dc2626;color:#ffffff;font-weight:700;text-decoration:none;padding:11px 26px;border-radius:8px;font-size:14px;box-shadow:0 4px 12px rgba(220,38,38,0.25);'>Secure My Account &rarr;</a>
                 </div>",
 
             'password_reset' => "
-                <h2 style='color:#f8fafc;font-size:22px;margin:0 0 16px 0;'>Password Reset Request 🔒</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, we received a request to reset your password for your TechScout account.</p>
-                <div style='text-align:center;background:#0f172a;border:1px solid rgba(56,189,248,0.3);border-radius:8px;padding:18px;margin:20px 0;'>
-                  <div style='font-size:12px;color:#94a3b8;letter-spacing:1px;text-transform:uppercase;'>Security PIN Code</div>
-                  <div style='font-size:28px;font-weight:800;color:#38bdf8;letter-spacing:4px;margin-top:6px;font-family:monospace;'>{{reset_code}}</div>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Password Reset Request 🔒</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, we received a request to reset your password for your TechScout account.</p>
+                <div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>
+                  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>Security PIN Code</div>
+                  <div style='font-size:32px;font-weight:900;color:#4f46e5;letter-spacing:6px;margin-top:8px;font-family:monospace;'>{{reset_code}}</div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Reset Password Now &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Reset Password Now &rarr;</a>
                 </div>",
 
             'security_alert' => "
-                <h2 style='color:#f87171;font-size:22px;margin:0 0 16px 0;'>Security Perimeter Notice 🛡️</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your TechScout account password or credential profile was recently updated at <strong>{{change_time}}</strong>.</p>
-                <p style='color:#94a3b8;font-size:14px;'>If you initiated this change, no further action is required. If you did NOT perform this action, revoke all sessions and reset your password immediately.</p>
+                <h2 style='color:#dc2626;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Security Perimeter Notice 🛡️</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your TechScout account password or credential profile was recently updated at <strong>{{change_time}}</strong>.</p>
+                <div style='background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;padding:16px;border-radius:8px;margin-bottom:24px;color:#991b1b;font-size:14px;line-height:1.6;'>
+                  If you initiated this change, no further action is required. If you did NOT perform this action, revoke all active sessions and reset your password immediately.
+                </div>
                 <div style='text-align:center;margin:24px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#ef4444;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Review Account Security &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#dc2626;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(220,38,38,0.25);'>Review Account Security &rarr;</a>
                 </div>",
 
             'payout_requested' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>Creator Payout Claim Submitted 💸</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, we received your withdrawal claim for royalty credits. Your request is queued for financial compliance review.</p>
-                <div style='background:#0f172a;border:1px solid rgba(56,189,248,0.25);border-radius:8px;padding:18px;margin-bottom:24px;'>
-                  <div style='display:grid;gap:8px;font-size:14px;color:#cbd5e1;'>
-                    <div><strong style='color:#94a3b8;'>Payout Identifier:</strong> #{{payout_id}} (Ref: <code>{{ref_no}}</code>)</div>
-                    <div><strong style='color:#94a3b8;'>Gross Requested:</strong> \${{amount}} USD</div>
-                    <div><strong style='color:#94a3b8;'>Platform &amp; Bank Fees:</strong> -\${{fee_deducted}} USD</div>
-                    <div><strong style='color:#34d399;'>Net Disbursable:</strong> <strong style='font-size:16px;color:#34d399;'>\${{net_amount}} USD</strong></div>
-                    <div><strong style='color:#94a3b8;'>Destination Method:</strong> {{method_type}} &bull; {{destination}}</div>
-                    <div><strong style='color:#94a3b8;'>Status:</strong> <span style='background:rgba(245,158,11,0.2);color:#f59e0b;padding:2px 8px;border-radius:4px;font-weight:700;'>⏳ PENDING COMPLIANCE</span></div>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Creator Payout Claim Submitted 💸</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, we received your withdrawal claim for royalty credits. Your request is queued for financial compliance review.</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>
+                    <div><strong style='color:#64748b;'>Payout Identifier:</strong> <span style='color:#0f172a;font-weight:600;'>#{{payout_id}}</span> (Ref: <code>{{ref_no}}</code>)</div>
+                    <div><strong style='color:#64748b;'>Gross Requested:</strong> \${{amount}} USD</div>
+                    <div><strong style='color:#64748b;'>Platform &amp; Bank Fees:</strong> -\${{fee_deducted}} USD</div>
+                    <div><strong style='color:#059669;'>Net Disbursable:</strong> <strong style='font-size:16px;color:#059669;'>\${{net_amount}} USD</strong></div>
+                    <div><strong style='color:#64748b;'>Destination Method:</strong> {{method_type}} &bull; {{destination}}</div>
+                    <div><strong style='color:#64748b;'>Status:</strong> <span style='background:#fffbeb;color:#d97706;padding:3px 10px;border-radius:4px;font-weight:700;font-size:12px;border:1px solid #fde68a;'>⏳ PENDING COMPLIANCE</span></div>
                   </div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#38bdf8,#6366f1);color:#020617;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Track Rewards Dashboard &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Track Rewards Dashboard &rarr;</a>
                 </div>",
 
             'payout_approved' => "
-                <h2 style='color:#34d399;font-size:22px;margin:0 0 16px 0;'>Creator Payout Transferred &amp; Disbursed! 💰</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your withdrawal claim <strong>#{{payout_id}}</strong> has been approved by the treasury desk and funds have been dispatched!</p>
-                <div style='background:#0f172a;border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:18px;margin-bottom:24px;'>
-                  <div style='display:grid;gap:8px;font-size:14px;color:#cbd5e1;'>
-                    <div><strong style='color:#94a3b8;'>Disbursed Amount:</strong> <strong style='font-size:18px;color:#34d399;'>\${{net_amount}} USD</strong></div>
-                    <div><strong style='color:#94a3b8;'>Transaction Reference:</strong> <code>{{transaction_ref}}</code></div>
-                    <div><strong style='color:#94a3b8;'>Destination:</strong> {{destination}}</div>
-                    <div><strong style='color:#94a3b8;'>Status:</strong> <span style='background:rgba(16,185,129,0.2);color:#34d399;padding:2px 8px;border-radius:4px;font-weight:700;'>✅ COMPLETED &amp; DISBURSED</span></div>
+                <h2 style='color:#059669;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Creator Payout Transferred &amp; Disbursed! 💰</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your withdrawal claim <strong>#{{payout_id}}</strong> has been approved by the treasury desk and funds have been dispatched!</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>
+                    <div><strong style='color:#64748b;'>Disbursed Amount:</strong> <strong style='font-size:18px;color:#059669;'>\${{net_amount}} USD</strong></div>
+                    <div><strong style='color:#64748b;'>Transaction Reference:</strong> <code style='color:#4f46e5;'>{{transaction_ref}}</code></div>
+                    <div><strong style='color:#64748b;'>Destination:</strong> {{destination}}</div>
+                    <div><strong style='color:#64748b;'>Status:</strong> <span style='background:#ecfdf5;color:#059669;padding:3px 10px;border-radius:4px;font-weight:700;font-size:12px;border:1px solid #a7f3d0;'>✅ COMPLETED &amp; DISBURSED</span></div>
                   </div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#10b981;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>View Royalty Balance Ledger &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>View Royalty Balance Ledger &rarr;</a>
                 </div>",
 
             'payout_rejected' => "
-                <h2 style='color:#f59e0b;font-size:22px;margin:0 0 16px 0;'>Payout Claim Update ⚠️</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your recent withdrawal claim <strong>#{{payout_id}}</strong> could not be completed and requires revision.</p>
-                <div style='background:rgba(245,158,11,0.1);border-left:4px solid #f59e0b;padding:16px;border-radius:0 8px 8px 0;margin-bottom:24px;'>
-                  <div style='color:#f59e0b;font-weight:700;font-size:13px;margin-bottom:4px;'>TREASURY COMPLIANCE NOTE:</div>
-                  <div style='color:#fcd34d;font-size:14px;line-height:1.6;'>{{admin_notes}}</div>
+                <h2 style='color:#d97706;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Payout Claim Update ⚠️</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, your recent withdrawal claim <strong>#{{payout_id}}</strong> could not be completed and requires revision.</p>
+                <div style='background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;padding:16px;border-radius:8px;margin-bottom:20px;'>
+                  <div style='color:#b45309;font-weight:700;font-size:13px;margin-bottom:4px;'>TREASURY COMPLIANCE NOTE:</div>
+                  <div style='color:#92400e;font-size:14px;line-height:1.6;'>{{admin_notes}}</div>
                 </div>
-                <div style='background:#0f172a;border:1px solid rgba(148,163,184,0.15);border-radius:8px;padding:14px;margin-bottom:24px;color:#94a3b8;font-size:13px;'>
-                  <strong style='color:#34d399;'>✓ Funds Protection Guarantee:</strong> 100% of your deducted credits (\${{amount}} USD) have been automatically restored to your active royalty balance.
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:24px;color:#475569;font-size:13px;'>
+                  <strong style='color:#059669;'>✓ Funds Protection Guarantee:</strong> 100% of your deducted credits (\${{amount}} USD) have been automatically restored to your active royalty balance.
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#f59e0b;color:#020617;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Update Payment Destination &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#d97706;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(217,119,6,0.25);'>Update Payment Destination &rarr;</a>
                 </div>",
 
             'tip_received' => "
-                <h2 style='color:#c084fc;font-size:22px;margin:0 0 16px 0;'>Reader Patronage Tip Received! 🎁</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, a community reader has awarded your work with a direct creator tip!</p>
-                <div style='background:#0f172a;border:1px solid rgba(168,85,247,0.3);border-radius:8px;padding:18px;margin-bottom:24px;'>
-                  <div style='display:grid;gap:8px;font-size:14px;color:#cbd5e1;'>
-                    <div><strong style='color:#94a3b8;'>Supporter:</strong> <strong>{{tipper_name}}</strong></div>
-                    <div><strong style='color:#94a3b8;'>Gross Tip:</strong> \${{amount}} USD</div>
-                    <div><strong style='color:#34d399;'>Net Credited:</strong> <strong style='font-size:16px;color:#34d399;'>+\${{net_amount}} USD</strong></div>
-                    <div><strong style='color:#94a3b8;'>Target Article:</strong> {{article_title}}</div>
+                <h2 style='color:#7c3aed;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Reader Patronage Tip Received! 🎁</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, a community reader has awarded your work with a direct creator tip!</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>
+                    <div><strong style='color:#64748b;'>Supporter:</strong> <strong>{{tipper_name}}</strong></div>
+                    <div><strong style='color:#64748b;'>Gross Tip:</strong> \${{amount}} USD</div>
+                    <div><strong style='color:#059669;'>Net Credited:</strong> <strong style='font-size:16px;color:#059669;'>+\${{net_amount}} USD</strong></div>
+                    <div><strong style='color:#64748b;'>Target Article:</strong> {{article_title}}</div>
                   </div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#a855f7,#ec4899);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Open Author Studio &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#7c3aed,#db2777);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(124,58,237,0.25);'>Open Author Studio &rarr;</a>
                 </div>",
 
             'article_approved' => "
-                <h2 style='color:#34d399;font-size:22px;margin:0 0 16px 0;'>Congratulations! Your submission is now LIVE! 🎉</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Our editorial board has verified and approved your technical publication <strong>&ldquo;{{article_title}}&rdquo;</strong>. It is now indexed across the TechScout global network.</p>
+                <h2 style='color:#059669;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Congratulations! Your submission is now LIVE! 🎉</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Our editorial board has verified and approved your technical publication <strong>&ldquo;{{article_title}}&rdquo;</strong>. It is now indexed across the TechScout global network.</p>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#10b981;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>View Live Publication &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>View Live Publication &rarr;</a>
                 </div>",
 
             'editorial_revisions' => "
-                <h2 style='color:#f59e0b;font-size:22px;margin:0 0 16px 0;'>Action Required: Editorial Revisions Requested 📋</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Our editorial team has reviewed your submission <strong>&ldquo;{{article_title}}&rdquo;</strong> and requested the following adjustments before publication:</p>
-                <div style='background:rgba(245,158,11,0.1);border-left:4px solid #f59e0b;padding:14px;border-radius:0 6px 6px 0;color:#fcd34d;font-size:14px;line-height:1.6;margin-bottom:24px;'>
+                <h2 style='color:#d97706;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Action Required: Editorial Revisions Requested 📋</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Our editorial team has reviewed your submission <strong>&ldquo;{{article_title}}&rdquo;</strong> and requested the following adjustments before publication:</p>
+                <div style='background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;padding:16px;border-radius:8px;color:#92400e;font-size:14px;line-height:1.6;margin-bottom:24px;'>
                   {{editorial_notes}}
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#f59e0b;color:#000000;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Open Editor to Make Changes &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#d97706;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(217,119,6,0.25);'>Open Editor to Make Changes &rarr;</a>
                 </div>",
 
             'author_approved' => "
-                <h2 style='color:#c084fc;font-size:22px;margin:0 0 16px 0;'>Welcome to the TechScout Creator Network! 🌟</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Your application for creator publishing privileges has been approved! You can now publish deep-dive technical articles, submit verified AI tools, and earn creator rewards.</p>
+                <h2 style='color:#7c3aed;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Welcome to the TechScout Creator Network! 🌟</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Your application for creator publishing privileges has been approved! You can now publish deep-dive technical articles, submit verified AI tools, and earn creator rewards.</p>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#a855f7,#ec4899);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Launch Author Studio &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#7c3aed,#db2777);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(124,58,237,0.25);'>Launch Author Studio &rarr;</a>
                 </div>",
 
             'ticket_reply' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>Support Helpdesk Response 🎫</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>A member of our engineering support team has provided an update on your ticket <strong>#{{ticket_number}}</strong>:</p>
-                <div style='background:#0f172a;border:1px solid rgba(56,189,248,0.3);border-radius:8px;padding:16px;color:#e2e8f0;font-size:14px;line-height:1.6;margin-bottom:24px;'>
+                <h2 style='color:#0284c7;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Support Helpdesk Response 🎫</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>A member of our engineering support team has provided an update on your ticket <strong>#{{ticket_number}}</strong>:</p>
+                <div style='background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px;color:#0369a1;font-size:14px;line-height:1.65;margin-bottom:24px;'>
                   {{reply_message}}
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#38bdf8;color:#05070b;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>View Support Ticket &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#0284c7;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(2,132,199,0.25);'>View Support Ticket &rarr;</a>
                 </div>",
 
             'contact_reply' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>TechScout Operations Response 💬</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>In response to your inquiry regarding <strong>&ldquo;{{inquiry_subject}}&rdquo;</strong>:</p>
-                <div style='background:#0f172a;border:1px solid rgba(56,189,248,0.3);border-radius:8px;padding:16px;color:#e2e8f0;font-size:14px;line-height:1.6;margin-bottom:24px;'>
+                <h2 style='color:#0284c7;font-size:22px;font-weight:800;margin:0 0 16px 0;'>TechScout Operations Response 💬</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>In response to your inquiry regarding <strong>&ldquo;{{inquiry_subject}}&rdquo;</strong>:</p>
+                <div style='background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px;color:#0369a1;font-size:14px;line-height:1.65;margin-bottom:24px;'>
                   {{reply_message}}
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Visit TechScout &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Visit TechScout &rarr;</a>
                 </div>",
 
             'author_application_received' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>Author Application Received 📝</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong> (@{{username}}),</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Thank you for applying to join the TechScout Creator Network! Our editorial board is reviewing your portfolio, technical writing samples, and expertise areas.</p>
-                <div style='background:#0f172a;border:1px solid rgba(56,189,248,0.3);border-radius:8px;padding:16px;margin-bottom:24px;'>
-                  <div style='color:#38bdf8;font-weight:700;font-size:14px;margin-bottom:6px;'>⏱️ What to expect next:</div>
-                  <ul style='color:#94a3b8;font-size:14px;line-height:1.6;margin:0;padding-left:20px;'>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Author Application Received 📝</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong> (@{{username}}),</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Thank you for applying to join the TechScout Creator Network! Our editorial board is reviewing your portfolio, technical writing samples, and expertise areas.</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='color:#4f46e5;font-weight:700;font-size:14px;margin-bottom:6px;'>⏱️ What to expect next:</div>
+                  <ul style='color:#475569;font-size:14px;line-height:1.65;margin:0;padding-left:20px;'>
                     <li>Review turnaround is typically 24-48 business hours.</li>
                     <li>Once approved, you will unlock the Creator Studio, article drafting, and author monetization.</li>
                   </ul>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>View Application Status &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>View Application Status &rarr;</a>
                 </div>",
 
             'article_submitted' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>Article Submitted for Review 📑</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Your technical submission <strong>&ldquo;{{article_title}}&rdquo;</strong> has been placed into the TechScout editorial review queue.</p>
-                <div style='background:#0f172a;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:16px;margin-bottom:24px;'>
-                  <div style='color:#a5b4fc;font-size:14px;line-height:1.6;'>Our technical reviewers verify code snippets, architectural accuracy, and formatting before publication. You will receive an alert as soon as the review concludes.</div>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Article Submitted for Review 📑</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Your technical submission <strong>&ldquo;{{article_title}}&rdquo;</strong> has been placed into the TechScout editorial review queue.</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='color:#475569;font-size:14px;line-height:1.65;'>Our technical reviewers verify code snippets, architectural accuracy, and formatting before publication. You will receive an alert as soon as the review concludes.</div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Open Creator Studio &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Open Creator Studio &rarr;</a>
                 </div>",
 
             'article_rejected' => "
-                <h2 style='color:#f87171;font-size:22px;margin:0 0 16px 0;'>Submission Review Notice ✍️</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Thank you for submitting <strong>&ldquo;{{article_title}}&rdquo;</strong>. After editorial review, we are unable to publish this draft in its current format.</p>
-                <div style='background:rgba(239,68,68,0.1);border-left:4px solid #ef4444;padding:16px;border-radius:0 8px 8px 0;margin-bottom:24px;'>
-                  <div style='color:#ef4444;font-weight:700;font-size:13px;margin-bottom:4px;'>EDITORIAL BOARD FEEDBACK:</div>
-                  <div style='color:#fca5a5;font-size:14px;line-height:1.6;'>{{editorial_notes}}</div>
+                <h2 style='color:#dc2626;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Submission Review Notice ✍️</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Thank you for submitting <strong>&ldquo;{{article_title}}&rdquo;</strong>. After editorial review, we are unable to publish this draft in its current format.</p>
+                <div style='background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;padding:16px;border-radius:8px;margin-bottom:24px;'>
+                  <div style='color:#dc2626;font-weight:700;font-size:13px;margin-bottom:4px;'>EDITORIAL BOARD FEEDBACK:</div>
+                  <div style='color:#991b1b;font-size:14px;line-height:1.6;'>{{editorial_notes}}</div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#ef4444;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Revise &amp; Re-submit Draft &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#dc2626;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(220,38,38,0.25);'>Revise &amp; Re-submit Draft &rarr;</a>
                 </div>",
 
             'comment_reply_alert' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>New Technical Discussion Reply 💬</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, <strong>{{commenter_name}}</strong> replied to your discussion on <strong>&ldquo;{{article_title}}&rdquo;</strong>:</p>
-                <div style='background:#0f172a;border-left:4px solid #38bdf8;padding:16px;border-radius:0 8px 8px 0;margin-bottom:24px;color:#e2e8f0;font-size:14px;line-height:1.6;'>
+                <h2 style='color:#0284c7;font-size:22px;font-weight:800;margin:0 0 16px 0;'>New Technical Discussion Reply 💬</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, <strong>{{commenter_name}}</strong> replied to your discussion on <strong>&ldquo;{{article_title}}&rdquo;</strong>:</p>
+                <div style='background:#f0f9ff;border-left:4px solid #0284c7;border:1px solid #bae6fd;padding:16px;border-radius:8px;margin-bottom:24px;color:#0369a1;font-size:14px;line-height:1.65;'>
                   &ldquo;{{comment_snippet}}&rdquo;
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>View &amp; Reply in Discussion &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>View &amp; Reply in Discussion &rarr;</a>
                 </div>",
 
             'bookmark_collection_shared' => "
-                <h2 style='color:#a855f7;font-size:22px;margin:0 0 16px 0;'>Curated Technical Collection Shared 📑</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'><strong>{{sender_name}}</strong> has shared a curated TechScout blueprint stack with you: <strong>&ldquo;{{collection_title}}&rdquo;</strong>.</p>
+                <h2 style='color:#7c3aed;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Curated Technical Collection Shared 📑</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'><strong>{{sender_name}}</strong> has shared a curated TechScout blueprint stack with you: <strong>&ldquo;{{collection_title}}&rdquo;</strong>.</p>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#a855f7,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Inspect Curated Stack &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(124,58,237,0.25);'>Inspect Curated Stack &rarr;</a>
                 </div>",
 
             'monthly_creator_earnings_statement' => "
-                <h2 style='color:#34d399;font-size:22px;margin:0 0 16px 0;'>Creator Performance &amp; Royalty Statement 📊</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, here is your creator performance summary for <strong>{{month}}</strong>:</p>
-                <div style='background:#0f172a;border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:18px;margin-bottom:24px;'>
-                  <div style='display:grid;gap:8px;font-size:14px;color:#cbd5e1;'>
-                    <div><strong style='color:#94a3b8;'>Total Readers &amp; Views:</strong> <strong>{{total_reads}}</strong></div>
-                    <div><strong style='color:#94a3b8;'>Reader Patronage Tips:</strong> <strong>{{tips_count}}</strong></div>
-                    <div><strong style='color:#34d399;'>Net Accrued Royalties:</strong> <strong style='font-size:18px;color:#34d399;'>\${{amount}} USD</strong></div>
+                <h2 style='color:#059669;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Creator Performance &amp; Royalty Statement 📊</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, here is your creator performance summary for <strong>{{month}}</strong>:</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>
+                    <div><strong style='color:#64748b;'>Total Readers &amp; Views:</strong> <strong style='color:#0f172a;'>{{total_reads}}</strong></div>
+                    <div><strong style='color:#64748b;'>Reader Patronage Tips:</strong> <strong style='color:#0f172a;'>{{tips_count}}</strong></div>
+                    <div><strong style='color:#059669;'>Net Accrued Royalties:</strong> <strong style='font-size:18px;color:#059669;'>\${{amount}} USD</strong></div>
                   </div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#10b981;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Open Treasury &amp; Payouts &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>Open Treasury &amp; Payouts &rarr;</a>
                 </div>",
 
             'hackathon_campaign_invite' => "
-                <h2 style='color:#f59e0b;font-size:22px;margin:0 0 16px 0;'>Developer Challenge &amp; Hackathon Invitation 🏆</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, you are invited to compete in the upcoming TechScout engineering sprint:</p>
-                <div style='background:#0f172a;border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:18px;margin-bottom:24px;'>
-                  <div style='display:grid;gap:8px;font-size:14px;color:#cbd5e1;'>
-                    <div><strong style='color:#94a3b8;'>Sprint Challenge:</strong> <strong style='color:#fcd34d;'>{{campaign_title}}</strong></div>
-                    <div><strong style='color:#94a3b8;'>Prize Pool:</strong> <strong style='font-size:16px;color:#34d399;'>\${{prize_pool}} USD</strong></div>
-                    <div><strong style='color:#94a3b8;'>Submission Deadline:</strong> {{deadline}}</div>
+                <h2 style='color:#d97706;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Developer Challenge &amp; Hackathon Invitation 🏆</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, you are invited to compete in the upcoming TechScout engineering sprint:</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>
+                    <div><strong style='color:#64748b;'>Sprint Challenge:</strong> <strong style='color:#d97706;'>{{campaign_title}}</strong></div>
+                    <div><strong style='color:#64748b;'>Prize Pool:</strong> <strong style='font-size:16px;color:#059669;'>\${{prize_pool}} USD</strong></div>
+                    <div><strong style='color:#64748b;'>Submission Deadline:</strong> {{deadline}}</div>
                   </div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>View Challenge Rules &amp; Register &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#d97706,#dc2626);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(217,119,6,0.25);'>View Challenge Rules &amp; Register &rarr;</a>
                 </div>",
 
             'security_two_factor_otp' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>Security Authorization PIN 🔑</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, enter the following one-time passcode (OTP) to authorize your security request:</p>
-                <div style='text-align:center;background:#0f172a;border:1px solid rgba(56,189,248,0.3);border-radius:8px;padding:18px;margin:20px 0;'>
-                  <div style='font-size:12px;color:#94a3b8;letter-spacing:1px;text-transform:uppercase;'>Two-Factor Passcode (Expires in {{expires_in}})</div>
-                  <div style='font-size:34px;font-weight:800;color:#38bdf8;letter-spacing:8px;margin-top:6px;font-family:monospace;'>{{two_factor_otp}}</div>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Security Authorization PIN 🔑</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, enter the following one-time passcode (OTP) to authorize your security request:</p>
+                <div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>
+                  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>Two-Factor Passcode (Expires in {{expires_in}})</div>
+                  <div style='font-size:34px;font-weight:900;color:#4f46e5;letter-spacing:8px;margin-top:8px;font-family:monospace;'>{{two_factor_otp}}</div>
                   <div style='font-size:12px;color:#64748b;margin-top:8px;'>Requested from IP: {{ip_address}}</div>
                 </div>",
 
             'user_account_suspended' => "
-                <h2 style='color:#ef4444;font-size:22px;margin:0 0 16px 0;'>Account Suspension Notice ⚠️</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Your TechScout account has been temporarily suspended due to a breach of our community and publishing standards.</p>
-                <div style='background:rgba(239,68,68,0.1);border-left:4px solid #ef4444;padding:16px;border-radius:0 8px 8px 0;margin-bottom:24px;'>
-                  <div style='color:#ef4444;font-weight:700;font-size:13px;margin-bottom:4px;'>REASON FOR ACTION:</div>
-                  <div style='color:#fca5a5;font-size:14px;line-height:1.6;'>{{suspension_reason}}</div>
+                <h2 style='color:#dc2626;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Account Suspension Notice ⚠️</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Your TechScout account has been temporarily suspended due to a breach of our community and publishing standards.</p>
+                <div style='background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;padding:16px;border-radius:8px;margin-bottom:24px;'>
+                  <div style='color:#dc2626;font-weight:700;font-size:13px;margin-bottom:4px;'>REASON FOR ACTION:</div>
+                  <div style='color:#991b1b;font-size:14px;line-height:1.6;'>{{suspension_reason}}</div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{appeal_url}}' style='display:inline-block;background:#ef4444;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Contact Support &amp; Submit Appeal &rarr;</a>
+                  <a href='{{appeal_url}}' style='display:inline-block;background:#dc2626;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(220,38,38,0.25);'>Contact Support &amp; Submit Appeal &rarr;</a>
                 </div>",
 
             'user_account_reactivated' => "
-                <h2 style='color:#34d399;font-size:22px;margin:0 0 16px 0;'>Account Restored &amp; Operational 🟢</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Following a compliance review, your TechScout account privileges have been fully restored. All features, bookmarks, and author tools are accessible again.</p>
+                <h2 style='color:#059669;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Account Restored &amp; Operational 🟢</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Following a compliance review, your TechScout account privileges have been fully restored. All features, bookmarks, and author tools are accessible again.</p>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:#10b981;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Log In to Your Dashboard &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>Log In to Your Dashboard &rarr;</a>
                 </div>",
 
             'author_milestone_badge' => "
-                <h2 style='color:#f59e0b;font-size:22px;margin:0 0 16px 0;'>Creator Milestone Unlocked! 🎖️</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Congratulations! Your contributions have achieved the <strong>&ldquo;{{milestone_title}}&rdquo;</strong> honor on TechScout.</p>
-                <div style='text-align:center;background:#0f172a;border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:20px;margin:20px 0;'>
+                <h2 style='color:#d97706;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Creator Milestone Unlocked! 🎖️</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Congratulations! Your contributions have achieved the <strong>&ldquo;{{milestone_title}}&rdquo;</strong> honor on TechScout.</p>
+                <div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:20px;margin:20px 0;'>
                   <div style='font-size:36px;margin-bottom:6px;'>🌟</div>
-                  <div style='font-size:18px;font-weight:800;color:#fcd34d;'>{{milestone_title}}</div>
-                  <div style='font-size:13px;color:#94a3b8;margin-top:6px;'>Your author profile badge has been updated to reflect this milestone.</div>
+                  <div style='font-size:18px;font-weight:800;color:#d97706;'>{{milestone_title}}</div>
+                  <div style='font-size:13px;color:#64748b;margin-top:6px;'>Your author profile badge has been updated to reflect this milestone.</div>
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#f59e0b,#38bdf8);color:#020617;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>View Profile &amp; Badges &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#d97706,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(217,119,6,0.25);'>View Profile &amp; Badges &rarr;</a>
                 </div>",
 
             'newsletter_breaking_ai_radar' => "
-                <h2 style='color:#38bdf8;font-size:22px;margin:0 0 16px 0;'>⚡ Flash AI Radar: {{headline}}</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <div style='background:#0f172a;border-left:4px solid #38bdf8;padding:16px;border-radius:0 8px 8px 0;margin-bottom:24px;color:#e2e8f0;font-size:15px;line-height:1.6;'>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>⚡ Flash AI Radar: {{headline}}</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border-left:4px solid #4f46e5;border:1px solid #e2e8f0;padding:18px;border-radius:8px;margin-bottom:24px;color:#1e293b;font-size:15px;line-height:1.65;'>
                   {{message}}
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;'>Read Full Analysis on TechScout &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Read Full Analysis on TechScout &rarr;</a>
                 </div>",
 
             default => "
-                <h2 style='color:#f8fafc;font-size:22px;margin:0 0 16px 0;'>{{headline}}</h2>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px 0;'>{{message}}</p>
+                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>{{headline}}</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>{{message}}</p>
                 <div style='text-align:center;margin:28px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:13px 32px;border-radius:6px;font-size:15px;'>Read Full Update &rarr;</a>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:13px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Read Full Update &rarr;</a>
                 </div>"
         };
     }
@@ -988,6 +990,27 @@ class Mailer {
             $htmlContent = str_replace(array_keys($universalVars), array_values($universalVars), $htmlContent);
             $htmlContent = preg_replace('/\{\{[a-zA-Z0-9_-]+\}\}/', '', $htmlContent);
         }
+
+        // Strict Attachment Sanitization: Filter out non-file arrays, empty structures, or link lists
+        $cleanAttachments = [];
+        if (!empty($attachments) && is_array($attachments)) {
+            $candidateFiles = isset($attachments['files']) && is_array($attachments['files']) ? $attachments['files'] : (isset($attachments['links']) ? [] : $attachments);
+            foreach ($candidateFiles as $k => $att) {
+                if (!is_array($att)) continue;
+                if (!empty($att['content']) || (!empty($att['path']) && file_exists($att['path']))) {
+                    $cleanAttachments[] = [
+                        'name' => $att['name'] ?? 'attachment_' . (is_numeric($k) ? ($k + 1) : $k),
+                        'content' => !empty($att['content']) ? $att['content'] : file_get_contents($att['path']),
+                        'type' => $att['type'] ?? 'application/octet-stream'
+                    ];
+                }
+            }
+        }
+        $attachments = $cleanAttachments;
+
+        // Generate Comprehensive Tracking Token & Inject Telemetry (1x1 Pixel & Click Tracking)
+        $trackingToken = bin2hex(random_bytes(16));
+        $htmlContent = self::injectTracking($htmlContent, $trackingToken, $appUrl, ($category === 'newsletter' ? 'newsletter' : 'general'));
 
         if ($credProfile) {
             $fromName = !empty($overrideFromName) ? $overrideFromName : ($credProfile['from_name'] ?? $fromName);
@@ -1249,30 +1272,38 @@ class Mailer {
             $errorMessage = 'Simulated Delivery (Driver: Local Log)';
         }
 
-        // Record in mail_logs table with full body_html & attachments_json (fail-safe)
+        // Record in mail_logs table with full body_html, tracking_token & attachments_json (fail-safe)
         try {
             $attachmentsJson = !empty($attachments) ? json_encode($attachments) : null;
             $credName = !empty($credProfile['name']) ? $credProfile['name'] : strtoupper($driver);
 
-            // 1. Try modern schema with from_email, from_name, credential_name
+            // 1. Try modern schema with tracking_token, from_email, from_name, credential_name
             $inserted = Database::executeSilent(
-                "INSERT INTO mail_logs (to_email, to_name, from_email, from_name, subject, template_key, body_html, attachments_json, driver, credential_name, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-                [$toEmail, $toName, $fromEmail, $fromName, $subject, $templateKey, $htmlContent, $attachmentsJson, $driver, $credName, $status, $errorMessage]
+                "INSERT INTO mail_logs (to_email, to_name, from_email, from_name, subject, template_key, body_html, attachments_json, driver, credential_name, tracking_token, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$toEmail, $toName, $fromEmail, $fromName, $subject, $templateKey, $htmlContent, $attachmentsJson, $driver, $credName, $trackingToken, $status, $errorMessage]
             );
 
             if (!$inserted) {
                 // Auto-heal missing columns if on an older database table
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `tracking_token` VARCHAR(64) NULL AFTER `id`");
                 Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `from_email` VARCHAR(191) NULL AFTER `to_name`");
                 Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `from_name` VARCHAR(150) NULL AFTER `from_email`");
                 Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `credential_name` VARCHAR(150) NULL AFTER `driver`");
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `open_count` INT UNSIGNED NOT NULL DEFAULT 0");
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `opened_at` DATETIME NULL");
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `click_count` INT UNSIGNED NOT NULL DEFAULT 0");
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `clicked_at` DATETIME NULL");
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `last_clicked_url` TEXT NULL");
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `user_ip` VARCHAR(45) NULL");
+                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `user_agent` TEXT NULL");
 
                 // Retry insert with new columns
                 $inserted = Database::executeSilent(
-                    "INSERT INTO mail_logs (to_email, to_name, from_email, from_name, subject, template_key, body_html, attachments_json, driver, credential_name, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-                    [$toEmail, $toName, $fromEmail, $fromName, $subject, $templateKey, $htmlContent, $attachmentsJson, $driver, $credName, $status, $errorMessage]
+                    "INSERT INTO mail_logs (to_email, to_name, from_email, from_name, subject, template_key, body_html, attachments_json, driver, credential_name, tracking_token, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                    [$toEmail, $toName, $fromEmail, $fromName, $subject, $templateKey, $htmlContent, $attachmentsJson, $driver, $credName, $trackingToken, $status, $errorMessage]
                 );
 
-                // If still not inserted, fall back to legacy schema without from_* / credential_name
+                // Fallback to legacy schema if needed
                 if (!$inserted) {
                     Database::executeSilent(
                         "INSERT INTO mail_logs (to_email, to_name, subject, template_key, body_html, attachments_json, driver, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
@@ -1295,6 +1326,7 @@ class Mailer {
                 'subject' => $subject,
                 'template_key' => $templateKey,
                 'driver' => $driver,
+                'tracking_token' => $trackingToken,
                 'status' => $status,
                 'error_message' => $errorMessage,
                 'timestamp' => time()
@@ -1306,24 +1338,26 @@ class Mailer {
 
     /**
      * Injects open tracking pixel and rewrites clickable links for click tracking.
+     * Supports both general platform emails (/mail/track/...) and newsletter broadcasts (/newsletter/track/...).
      */
-    public static function injectTracking(string $htmlContent, string $trackingToken, ?string $appUrl = null): string {
+    public static function injectTracking(string $htmlContent, string $trackingToken, ?string $appUrl = null, string $type = 'general'): string {
         $appUrl = $appUrl ?: rtrim(Config::get('app_url') ?: 'http://localhost/techscout.n', '/');
+        $baseRoute = ($type === 'newsletter') ? '/newsletter/track' : '/mail/track';
 
-        // 1. Rewrite <a href="..."> links for click tracking (skip unsubscribe & tracking endpoints)
-        $trackedHtml = preg_replace_callback('/<a\s+([^>]*?)href=(["\'])(https?:\/\/[^"\']+)\2([^>]*)>/i', function($matches) use ($appUrl, $trackingToken) {
+        // 1. Rewrite <a href="..."> links for click tracking (skip unsubscribe & existing tracking endpoints)
+        $trackedHtml = preg_replace_callback('/<a\s+([^>]*?)href=(["\'])(https?:\/\/[^"\']+)\2([^>]*)>/i', function($matches) use ($appUrl, $trackingToken, $baseRoute) {
             $before = $matches[1];
             $url = $matches[3];
             $after = $matches[4];
-            if (str_contains($url, '/newsletter/unsubscribe') || str_contains($url, '/newsletter/track/')) {
+            if (str_contains($url, '/unsubscribe') || str_contains($url, '/track/')) {
                 return $matches[0];
             }
-            $trackedUrl = $appUrl . '/newsletter/track/click/' . urlencode($trackingToken) . '?url=' . urlencode($url);
+            $trackedUrl = $appUrl . $baseRoute . '/click/' . urlencode($trackingToken) . '?url=' . urlencode($url);
             return '<a ' . $before . 'href="' . $trackedUrl . '"' . $after . '>';
         }, $htmlContent);
 
         // 2. Inject transparent 1x1 tracking pixel before </body> or at end
-        $pixelUrl = $appUrl . '/newsletter/track/open/' . urlencode($trackingToken);
+        $pixelUrl = $appUrl . $baseRoute . '/open/' . urlencode($trackingToken);
         $pixelTag = '<img src="' . $pixelUrl . '" width="1" height="1" style="display:none;width:1px;height:1px;max-height:0;overflow:hidden;" alt="" />';
 
         if (stripos($trackedHtml, '</body>') !== false) {

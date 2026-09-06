@@ -24,6 +24,20 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function() {
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (tz) {
+          const match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+          const currentTz = match ? decodeURIComponent(match[2]) : null;
+          if (currentTz !== tz) {
+            document.cookie = "user_timezone=" + encodeURIComponent(tz) + ";path=/;max-age=31536000;SameSite=Lax";
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
   <title><?= htmlspecialchars($title ?? 'Admin Command Center | TechScout') ?></title>
   
   <!-- Modern Typography -->

@@ -1,6 +1,5 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /techscout.n/
 
     # Security & Performance Headers
     <IfModule mod_headers.c>

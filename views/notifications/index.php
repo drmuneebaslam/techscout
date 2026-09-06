@@ -137,7 +137,8 @@
             $rawUrl = $n['action_url'] ?? '';
             $fullUrl = '';
             if (!empty($rawUrl)) {
-              $cleanedUrl = preg_replace('#^(https?://[^/]+)?/tech(/.*)?$#i', '$1$2', $rawUrl);
+              $cleanedUrl = preg_replace('#^https?://[^/]+/(techscout\.n|tech)(/|$)#i', '/', $rawUrl);
+              $cleanedUrl = preg_replace('#^/(techscout\.n|tech)(/|$)#i', '/', $cleanedUrl);
               if (empty($cleanedUrl)) $cleanedUrl = '/';
               $fullUrl = (str_starts_with($cleanedUrl, 'http://') || str_starts_with($cleanedUrl, 'https://')) ? $cleanedUrl : url($cleanedUrl);
             }
@@ -532,8 +533,18 @@ function openNotificationViewer(id, title, type, message, actionUrl, formattedTi
   const urlText = document.getElementById('modalTargetUrlText');
 
   if (actionUrl && actionUrl.trim() !== '') {
-    let cleanUrl = actionUrl.trim().replace(/^(https?:\/\/[^\/]+)?\/tech(\/.*)?$/, (match, p1, p2) => (p1 || '') + (p2 || '/'));
-    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+    let cleanUrl = actionUrl.trim();
+    try {
+      if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+        const u = new URL(cleanUrl);
+        let p = u.pathname.replace(/^\/(techscout\.n|tech)(\/|$)/i, '/');
+        cleanUrl = window.location.origin + p + u.search + u.hash;
+      } else {
+        let p = cleanUrl.replace(/^\/(techscout\.n|tech)(\/|$)/i, '/');
+        if (!p.startsWith('/')) p = '/' + p;
+        cleanUrl = window.location.origin + p;
+      }
+    } catch(e) {
       cleanUrl = window.location.origin + (cleanUrl.startsWith('/') ? cleanUrl : '/' + cleanUrl);
     }
     actionBtn.href = cleanUrl;

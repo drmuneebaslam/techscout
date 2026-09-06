@@ -4,6 +4,60 @@ All notable changes and architectural updates to the platform are documented in 
 
 ---
 
+## [2026-09-06] - Extended Mail System, Pure Light Mode Templates, Telemetry HUD & Timezone Engine
+
+### 1. Pure Light Mode Mail Templates & Grid Lines (Zero Dark Boxes)
+- Converted all built-in email templates in [`app/Core/Mailer.php`](file:///c:/xampp/htdocs/techscout.n/app/Core/Mailer.php) (`welcome`, `email_verification`, `account_activated`, `login_alert`, `password_reset`, `security_alert`, `payout_requested`, `payout_approved`, `payout_rejected`, `tip_received`, `author_application_received`, `article_submitted`, `article_rejected`, `comment_reply_alert`, etc.) to **100% pure light mode**:
+  - Outer background: `#ffffff` with subtle indigo grid lines (`rgba(99,102,241,0.08)` 32px grid).
+  - Main container: pure white card (`#ffffff`), subtle 1px border (`#e2e8f0`), soft shadow, zero dark boxes (`#0f172a`, `#05070b`).
+  - Typography: crisp dark slate headings (`#0f172a`), neutral slate body text (`#334155`), and subtle muted captions (`#64748b`).
+  - Resource boxes & code blocks: light slate background (`#f8fafc`) with subtle grid accents and crisp borders.
+  - Live simulation frame in [`views/admin/mail.php`](file:///c:/xampp/htdocs/techscout.n/views/admin/mail.php): upgraded to pure white canvas with light header and grid lines.
+
+### 2. Comprehensive Open & Click Tracking for General Platform Mail
+- Extended tracking engine in [`app/Core/Mailer.php`](file:///c:/xampp/htdocs/techscout.n/app/Core/Mailer.php):
+  - In `Mailer::injectTracking`: now seamlessly supports both newsletter broadcasts (`/newsletter/track/...`) and general platform mail (`/mail/track/...`).
+  - Generates a unique 32-character hexadecimal tracking token (`bin2hex(random_bytes(16))`) for every single outgoing email.
+  - Injects transparent 1x1 tracking pixel and rewrites clickable links for click tracking.
+- Added unauthenticated public tracking routes in [`index.php`](file:///c:/xampp/htdocs/techscout.n/index.php):
+  - `GET /mail/track/open/{token}` -> `AdminController::trackMailOpen`: increments `open_count`, sets `opened_at`, captures `user_ip` & `user_agent`, and outputs a zero-cache 1x1 transparent GIF.
+  - `GET /mail/track/click/{token}` -> `AdminController::trackMailClick`: increments `click_count`, sets `clicked_at`, logs `last_clicked_url`, `user_ip`, `user_agent`, and redirects via 302 to destination URL.
+
+### 3. Minimized Delivery Logs Table & 10x Detailed Executive Telemetry HUD
+- **Delivery Logs Table**: Minimized and compact layout with micro engagement badges:
+  - Status column shows `SENT ✓` or `FAILED ❌` with micro badges: `👁️ 2x` (opens) and `🔗 1x` (clicks).
+  - Shows recipient email & name, subject with template key tag, sender credential channel badge, and localized dispatch time.
+- **10x Executive Telemetry Inspector Modal (`sentMailModal`)**:
+  - **Tracking Token Bar**: Displays unique token with one-click copy and live open/click summary counter.
+  - **6 Rich Metadata Cards**: Sent By (Sender & Profile), Delivered To (Recipient), Open Engagement Telemetry (First opened time, total opens, reader IP, user-agent), Click Engagement Telemetry (First clicked time, total clicks, last clicked URL), Coordinates (Log ID, MsgID, Transport), and Timing.
+  - **Subtabs**:
+    - `[👁️ Email Sandbox]`: Sandboxed pure light-mode preview rendered in an iframe with fullscreen & copy HTML tools.
+    - `[💻 Technical Payload (JSON)]`: Complete formatted JSON database record with 1-click copy.
+
+### 4. Elimination of Ghost "2 attachments • Scanned by Gmail"
+- Root Cause: Passing associative arrays (`['links' => [], 'files' => []]`) or link dictionaries to mail dispatchers caused parsers to treat associative keys as separate attachments; furthermore, pushing both `text/plain` and `text/html` without explicit alternative boundaries in edge relays caused Gmail to expose the plain text as an attachment.
+- Solution:
+  - Added strict attachment sanitization in `Mailer::send`: filters out empty arrays, links, and non-file dictionaries, strictly verifying non-empty binary content or local file paths before dispatching.
+  - Updated `waste/cloudflare_worker/worker.js` to only push HTML (or plain text fallback) rather than duplicate parts.
+
+### 5. Automatic Client-Side Timezone Detection & Dynamic Localization
+- Added automatic browser timezone detection script in [`views/layouts/admin_header.php`](file:///c:/xampp/htdocs/techscout.n/views/layouts/admin_header.php) and [`views/layouts/header.php`](file:///c:/xampp/htdocs/techscout.n/views/layouts/header.php):
+  - Reads `Intl.DateTimeFormat().resolvedOptions().timeZone` and writes `user_timezone` cookie.
+  - [`app/Core/DateHelper.php`](file:///c:/xampp/htdocs/techscout.n/app/Core/DateHelper.php) checks `$_COOKIE['user_timezone']` to dynamically render timestamps in the exact local time for any user worldwide without a 12-hour offset.
+
+### 6. Notification Left-Click 404 Resolution
+- Root Cause: Hardcoded `RewriteBase /techscout.n/` in `.htaccess` caused Apache on root domains (e.g. `funwithcoding.free.nf`) to prepend `/techscout.n/` to the rewrite target, causing 404 errors.
+- Solution:
+  - Removed hardcoded `RewriteBase` from [`.htaccess`](file:///c:/xampp/htdocs/techscout.n/.htaccess).
+  - Added URL normalization in [`views/layouts/header.php`](file:///c:/xampp/htdocs/techscout.n/views/layouts/header.php) and [`views/notifications/index.php`](file:///c:/xampp/htdocs/techscout.n/views/notifications/index.php) to safely strip stale `/tech/` or `/techscout.n/` prefixes.
+  - Added automated database auto-healing queries in [`app/Core/Database.php`](file:///c:/xampp/htdocs/techscout.n/app/Core/Database.php) and [`database/mail_tracking_upgrade.sql`](file:///c:/xampp/htdocs/techscout.n/database/mail_tracking_upgrade.sql).
+
+### 7. Mail Profile Duplication & Standalone SQL File
+- Added `duplicateMailCredential` endpoint (`POST /admin/mail/credentials/duplicate/{id}`) in [`app/Controllers/AdminController.php`](file:///c:/xampp/htdocs/techscout.n/app/Controllers/AdminController.php) and [`index.php`](file:///c:/xampp/htdocs/techscout.n/index.php).
+- Delivered production database script [`database/mail_tracking_upgrade.sql`](file:///c:/xampp/htdocs/techscout.n/database/mail_tracking_upgrade.sql) for running standalone migrations.
+
+---
+
 ## [2026-09-06] - Fix: Mail Logs Schema Auto-Healing & Fail-Safe Newsletter Dispatch
 
 ### Problem Addressed
