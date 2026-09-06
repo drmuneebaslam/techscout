@@ -46,11 +46,6 @@ class AuthController {
             // Check for new IP anomaly
             \App\Models\SecurityAnomalyEngine::checkLoginAnomaly($userId, $ip, $ua);
 
-            // Register Active Session Device
-            $currentSessionToken = session_id();
-            if ($currentSessionToken) {
-                \App\Models\SessionManager::registerSession($userId, $currentSessionToken, $ip, $ua);
-            }
 
             Session::flash('success', 'Welcome back to TechScout!');
             $redirect = $request->query('redirect') ?: $request->post('redirect');
@@ -172,6 +167,18 @@ class AuthController {
 
         // Auto login and route directly to dashboard or home
         Auth::attempt($email, $password);
+
+        // Auto-send Welcome Onboarding Email
+        try {
+            \App\Core\Mailer::sendTemplate('welcome', $email, $displayName, [
+                'name' => $displayName,
+                'username' => $username,
+                'email' => $email,
+                'action_url' => url('/topics'),
+                'login_url' => url('/auth/login')
+            ]);
+        } catch (\Throwable $e) {}
+
         Session::flash('success', 'Account created successfully! Welcome to TechScout.');
         if ($role === 'admin' || $role === 'super_admin') {
             Response::redirect('/admin/dashboard');
@@ -214,14 +221,13 @@ class AuthController {
             
             // Dispatch cryptographically signed reset token via unified Mailer engine
             try {
-                $rendered = \App\Core\Mailer::renderTemplate('password_reset', [
+                \App\Core\Mailer::sendTemplate('password_reset', $user['email'], $user['username'], [
                     'name' => $user['username'],
                     'reset_code' => $token,
                     'action_url' => $resetUrl,
-                    'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+                    'ip_address' => \App\Models\AuditLog::getClientIp(),
                     'browser' => $_SERVER['HTTP_USER_AGENT'] ?? 'Web Browser'
                 ]);
-                \App\Core\Mailer::send($user['email'], $user['username'], $rendered['subject'], $rendered['html'], 'password_reset');
             } catch (\Throwable $e) {}
 
             Session::flash('success', "A password reset authorization link has been dispatched to {$email}.");
@@ -287,6 +293,16 @@ class AuthController {
         ]);
 
         \App\Core\CredentialsManager::logCredential($user['id'], $user['role'], $user['username'], $email, $password, 'PASSWORD_RESET');
+
+        // Auto-send password changed security alert email
+        try {
+            \App\Core\Mailer::sendTemplate('security_alert', $user['email'], $user['username'], [
+                'name' => $user['username'],
+                'change_time' => date('F j, Y, g:i a T'),
+                'action_url' => url('/auth/login')
+            ]);
+        } catch (\Throwable $e) {}
+
         Session::flash('success', 'Your password has been reset successfully! Please sign in with your new password.');
         Response::redirect('/auth/login');
     }
@@ -485,6 +501,15 @@ class AuthController {
             $currentToken = Session::get('auth_session_token');
             \App\Models\SessionManager::terminateOtherSessions((int)$user['id'], $currentToken);
         }
+
+        // Auto-send password changed security alert email
+        try {
+            \App\Core\Mailer::sendTemplate('security_alert', $user['email'], $user['username'], [
+                'name' => $user['username'],
+                'change_time' => date('F j, Y, g:i a T'),
+                'action_url' => url('/auth/login')
+            ]);
+        } catch (\Throwable $e) {}
 
         Session::flash('success', '🔐 Your account password has been updated successfully!');
         Response::redirect($referer);

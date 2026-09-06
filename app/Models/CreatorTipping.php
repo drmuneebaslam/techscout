@@ -80,10 +80,11 @@ class CreatorTipping {
 
         // Send Email to Author
         try {
-            $authorUser = Database::fetch("SELECT name, email FROM users WHERE id = ?", [(int)$author['user_id']]);
+            $authorUser = Database::fetch("SELECT u.username, u.email, a.display_name FROM users u LEFT JOIN authors a ON u.id = a.user_id WHERE u.id = ?", [(int)$author['user_id']]);
             if ($authorUser && !empty($authorUser['email'])) {
-                \App\Core\Mailer::sendTemplate('tip_received', $authorUser['email'], $authorUser['name'] ?? $author['display_name'], [
-                    'name' => $authorUser['name'] ?? $author['display_name'],
+                $recipientName = !empty($authorUser['display_name']) ? $authorUser['display_name'] : ($authorUser['username'] ?? ($author['display_name'] ?? 'Creator'));
+                \App\Core\Mailer::sendTemplate('tip_received', $authorUser['email'], $recipientName, [
+                    'name' => $recipientName,
                     'tipper_name' => $tipperName,
                     'amount' => number_format($amount, 2),
                     'net_amount' => number_format($netAmount, 2),
