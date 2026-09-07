@@ -6140,7 +6140,7 @@ class AdminController {
     public function rolesAndPermissions(Request $request): void {
         $roles = \App\Models\RBAC::getRoles();
         $catalog = \App\Models\RBAC::getPermissionCatalog();
-        $staffUsers = Database::query("SELECT u.id, u.username, u.email, u.role, u.admin_role_id, ar.name as role_name FROM users u LEFT JOIN admin_roles ar ON u.admin_role_id = ar.id WHERE u.role IN ('admin', 'superadmin', 'editor') ORDER BY u.id ASC");
+        $staffUsers = Database::query("SELECT u.id, u.username, u.email, u.role, u.admin_role_id, ar.name as role_name FROM users u LEFT JOIN admin_roles ar ON u.admin_role_id = ar.id WHERE u.role IN ('admin', 'super_admin', 'superadmin', 'editor') ORDER BY u.id ASC");
 
         Response::view('admin/rbac_matrix', [
             'title' => 'Staff Roles & Permission Matrix | Admin Hub',

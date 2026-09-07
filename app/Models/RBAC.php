@@ -78,20 +78,28 @@ class RBAC {
         $user = $userId ? Database::fetch("SELECT * FROM users WHERE id = ?", [$userId]) : Auth::user();
         if (!$user) return false;
 
-        // Superadmin role has global bypass
-        if (($user['role'] ?? '') === 'superadmin') {
+        $role = $user['role'] ?? '';
+        $roleId = (int)($user['admin_role_id'] ?? 0);
+
+        // Superadmin and unrestricted Admin have universal global bypass across all capabilities
+        if (in_array($role, ['super_admin', 'superadmin'], true) || ($role === 'admin' && $roleId <= 0)) {
             return true;
         }
 
-        $roleId = (int)($user['admin_role_id'] ?? 0);
-        if ($roleId <= 0) return false;
+        // If user has no specific admin role ID, deny permission
+        if ($roleId <= 0) {
+            return false;
+        }
 
-        $has = Database::fetch(
-            "SELECT 1 FROM admin_role_permissions WHERE role_id = ? AND permission_key = ?",
-            [$roleId, $permissionKey]
-        );
-
-        return !empty($has);
+        try {
+            $has = Database::fetch(
+                "SELECT 1 FROM admin_role_permissions WHERE role_id = ? AND permission_key = ? LIMIT 1",
+                [$roleId, $permissionKey]
+            );
+            return !empty($has);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**

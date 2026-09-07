@@ -150,7 +150,13 @@
         e.preventDefault();
         const selected = document.querySelector('#adminCpResultsList .cp-item.cp-selected');
         if (selected) {
-          window.location.href = selected.getAttribute('href');
+          const href = selected.getAttribute('href');
+          closeAdminCommandPalette();
+          if (window.pjaxNavigate && href && !href.startsWith('http') && href !== '#') {
+            window.pjaxNavigate(href);
+          } else {
+            window.location.href = href;
+          }
         }
         return;
       } else if (e && e.key === 'Escape') {
@@ -231,7 +237,6 @@
       }
     }
 
-
     // Initialize Sidebar Width & Scroll Position Retention
     function initSidebarState() {
       const shell = document.getElementById('adminShell');
@@ -298,7 +303,7 @@
       }
     }
 
-    // Comprehensive Click Interceptor: Never Scroll to Top on Action Clicks
+    // Comprehensive Click Interceptor: Never Scroll to Top on Hash/Action Clicks
     document.addEventListener('click', function(e) {
       const link = e.target.closest('a');
       if (link) {
@@ -315,6 +320,261 @@
     }, { capture: true });
 
     document.addEventListener('DOMContentLoaded', initSidebarState);
+
+    /* =========================================================================
+       HIGH-PERFORMANCE SPA / PJAX SEAMLESS NAVIGATION ENGINE
+       ========================================================================= */
+    (function() {
+      let pjaxActive = false;
+      let pjaxProgressTimer = null;
+
+      function startProgress() {
+        const bar = document.getElementById('adminPjaxProgressBar');
+        if (!bar) return;
+        clearTimeout(pjaxProgressTimer);
+        bar.style.transition = 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease';
+        bar.style.opacity = '1';
+        bar.style.width = '25%';
+
+        pjaxProgressTimer = setTimeout(() => {
+          bar.style.width = '65%';
+          pjaxProgressTimer = setTimeout(() => {
+            bar.style.width = '85%';
+          }, 250);
+        }, 120);
+      }
+
+      function endProgress() {
+        const bar = document.getElementById('adminPjaxProgressBar');
+        if (!bar) return;
+        clearTimeout(pjaxProgressTimer);
+        bar.style.width = '100%';
+        pjaxProgressTimer = setTimeout(() => {
+          bar.style.opacity = '0';
+          setTimeout(() => {
+            bar.style.width = '0%';
+          }, 200);
+        }, 150);
+      }
+
+      // Re-evaluate script tags inside swapped container
+      function executeSwappedScripts(container) {
+        const scripts = Array.from(container.querySelectorAll('script'));
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement('script');
+          Array.from(oldScript.attributes).forEach(attr => {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.textContent = oldScript.textContent;
+          }
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+      }
+
+      // Synchronize active sidebar links and expand active section
+      function syncActiveNav(targetUrl) {
+        try {
+          const targetUrlObj = new URL(targetUrl, window.location.origin);
+          const targetPath = targetUrlObj.pathname;
+          const navLinks = document.querySelectorAll('#adminSidebar .admin-nav-link');
+          
+          let bestMatch = null;
+          let longestMatchLength = 0;
+
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+            if (!href) return;
+            try {
+              const linkUrl = new URL(href, window.location.origin);
+              const linkPath = linkUrl.pathname;
+              if (targetPath === linkPath) {
+                bestMatch = link;
+                longestMatchLength = linkPath.length + 1000;
+              } else if (linkPath !== '/admin' && linkPath !== '/admin/dashboard' && targetPath.startsWith(linkPath)) {
+                if (linkPath.length > longestMatchLength) {
+                  bestMatch = link;
+                  longestMatchLength = linkPath.length;
+                }
+              }
+            } catch(e) {}
+          });
+
+          if (bestMatch) {
+            bestMatch.classList.add('active');
+            const parentGroup = bestMatch.closest('.admin-nav-group');
+            if (parentGroup) {
+              parentGroup.open = true;
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Core PJAX Navigator Function
+      window.pjaxNavigate = async function(url, pushState = true) {
+        if (pjaxActive) return;
+        pjaxActive = true;
+        startProgress();
+
+        const wrapper = document.querySelector('.admin-content-wrapper');
+        if (wrapper) {
+          wrapper.classList.remove('pjax-anim-in');
+          wrapper.classList.add('pjax-anim-out');
+        }
+
+        try {
+          const response = await fetch(url, {
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-PJAX': 'true'
+            }
+          });
+
+          if (!response.ok) {
+            window.location.href = url;
+            return;
+          }
+
+          const finalUrl = response.url || url;
+          if (!finalUrl.includes('/admin')) {
+            window.location.href = finalUrl;
+            return;
+          }
+
+          const htmlText = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, 'text/html');
+
+          const newWrapper = doc.querySelector('.admin-content-wrapper');
+          if (!newWrapper || !wrapper) {
+            window.location.href = finalUrl;
+            return;
+          }
+
+          // Update Document Title
+          if (doc.title) {
+            document.title = doc.title;
+          }
+
+          // Update Browser History State
+          if (pushState) {
+            window.history.pushState({ pjax: true, url: finalUrl, title: doc.title }, doc.title, finalUrl);
+          }
+
+          // Swap Content
+          wrapper.innerHTML = newWrapper.innerHTML;
+
+          // Scroll main window smoothly to top without resetting sidebar scroll
+          window.scrollTo({ top: 0, behavior: 'instant' });
+
+          // Synchronize Active Sidebar Link
+          syncActiveNav(finalUrl);
+
+          // Close mobile drawer and command palette
+          const shell = document.getElementById('adminShell');
+          if (shell) shell.classList.remove('mobile-sidebar-open');
+          if (typeof closeAdminCommandPalette === 'function') closeAdminCommandPalette();
+
+          // Smooth Entrance Transition
+          wrapper.classList.remove('pjax-anim-out');
+          wrapper.classList.add('pjax-anim-in');
+          setTimeout(() => {
+            wrapper.classList.remove('pjax-anim-in');
+          }, 200);
+
+          // Execute embedded scripts
+          executeSwappedScripts(wrapper);
+
+          // Re-initialize Lucide Icons
+          if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+          }
+
+          // Re-initialize Table Paginators if present
+          if (typeof window.initAdminTablePaginators === 'function') {
+            window.initAdminTablePaginators();
+          }
+
+          // Retain nav group toggle listeners
+          document.querySelectorAll('.admin-nav-group').forEach(group => {
+            const id = group.getAttribute('id');
+            if (id) {
+              group.addEventListener('toggle', () => {
+                localStorage.setItem('admin_nav_' + id, group.open ? 'open' : 'closed');
+              });
+            }
+          });
+
+          // Dispatch Page Loaded Events
+          document.dispatchEvent(new CustomEvent('ts:admin:page-loaded', { detail: { url: finalUrl } }));
+          document.dispatchEvent(new Event('DOMContentLoaded'));
+
+        } catch (err) {
+          console.warn('PJAX transition fallback triggered:', err);
+          window.location.href = url;
+        } finally {
+          endProgress();
+          pjaxActive = false;
+        }
+      };
+
+      // Intercept Link Clicks for PJAX
+      document.addEventListener('click', function(e) {
+        if (e.defaultPrevented) return;
+        if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+        if (!href || href === '#' || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+        if (link.target && link.target !== '_self') return;
+        if (link.hasAttribute('download')) return;
+        if (link.getAttribute('data-no-pjax') !== null) return;
+
+        try {
+          const linkUrl = new URL(href, window.location.origin);
+          if (linkUrl.origin !== window.location.origin) return;
+
+          // Only intercept admin pages
+          if (!linkUrl.pathname.includes('/admin')) return;
+          // Skip destructive/file export endpoints
+          if (linkUrl.pathname.includes('/auth/logout') || linkUrl.searchParams.has('download') || linkUrl.searchParams.get('action') === 'download') return;
+
+          // Intercept and navigate via PJAX
+          e.preventDefault();
+          pjaxNavigate(linkUrl.href);
+        } catch (ex) {}
+      });
+
+      // Intercept GET Search & Filter Form Submissions
+      document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (!form || (form.method && form.method.toUpperCase() !== 'GET')) return;
+        if (form.getAttribute('data-no-pjax') !== null) return;
+
+        const action = form.getAttribute('action') || window.location.href;
+        try {
+          const actionUrl = new URL(action, window.location.origin);
+          if (actionUrl.origin !== window.location.origin || !actionUrl.pathname.includes('/admin')) return;
+
+          e.preventDefault();
+          const formData = new FormData(form);
+          const searchParams = new URLSearchParams(formData);
+          const targetUrl = actionUrl.pathname + '?' + searchParams.toString();
+          pjaxNavigate(targetUrl);
+        } catch (ex) {}
+      });
+
+      // Popstate Handler for Browser Back / Forward
+      window.addEventListener('popstate', function(e) {
+        pjaxNavigate(window.location.href, false);
+      });
+
+    })();
   </script>
   <script src="<?= url('/assets/js/main.js') ?>"></script>
   <script src="<?= url('/assets/js/admin_table_paginator.js') ?>"></script>

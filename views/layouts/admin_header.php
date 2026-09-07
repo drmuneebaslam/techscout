@@ -49,6 +49,34 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
   <link rel="stylesheet" href="<?= url('assets/css/admin.css') ?>">
 
+  <!-- PJAX SPA Navigation Styles -->
+  <style>
+    #adminPjaxProgressBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #06b6d4, #6366f1, #ec4899);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.8), 0 0 20px rgba(236, 72, 153, 0.6);
+      z-index: 99999999;
+      pointer-events: none;
+      transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+      opacity: 0;
+    }
+    .admin-content-wrapper {
+      transition: opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .admin-content-wrapper.pjax-anim-out {
+      opacity: 0.15;
+      transform: translateY(4px);
+    }
+    .admin-content-wrapper.pjax-anim-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+
   <!-- Toastify Notifications -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -85,6 +113,8 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   </script>
 </head>
 <body data-theme="<?= $activeAdminTheme ?>" class="admin-body <?= $activeAdminTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($adminSiteSettings['enable_bg_grid_lines']) && $adminSiteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
+  <!-- Top Slim High-Tech Progress Bar for SPA PJAX Transitions -->
+  <div id="adminPjaxProgressBar"></div>
   <?php if (\App\Core\Auth::isImpersonating()): ?>
     <?php 
       $impAdmin = \App\Core\Auth::getImpersonatorAdmin(); 
@@ -136,17 +166,21 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
       $pendingQueueCount = (int)(\App\Core\Database::fetch("SELECT COUNT(*) as c FROM contents WHERE status = 'in_review'")['c'] ?? 0);
 
       // RBAC Permission Helper for Navigation Rendering
-      $canAccess = function(string $permKey): bool {
-          return \App\Models\RBAC::hasPermission($permKey);
+      $userRole = $currentUser['role'] ?? '';
+      $adminRoleId = (int)($currentUser['admin_role_id'] ?? 0);
+      $isSuperAdmin = in_array($userRole, ['super_admin', 'superadmin'], true) || ($userRole === 'admin' && $adminRoleId <= 0);
+
+      $canAccess = function(string $permKey) use ($currentUser, $isSuperAdmin): bool {
+          if ($isSuperAdmin) return true;
+          return \App\Models\RBAC::hasPermission($permKey, (int)($currentUser['id'] ?? 0));
       };
-      $isSuperAdmin = (($currentUser['role'] ?? '') === 'superadmin');
 
       // Calculate visibility for each group
-      $showCommandGroup = $isSuperAdmin || $canAccess('articles.view') || $canAccess('authors.view');
-      $showContentGroup = $isSuperAdmin || $canAccess('articles.view') || $canAccess('articles.create') || $canAccess('articles.edit');
+      $showCommandGroup = true; // Dashboard HUD is universally accessible to any authenticated admin/staff
+      $showContentGroup = $isSuperAdmin || $canAccess('articles.view') || $canAccess('articles.create') || $canAccess('articles.edit') || $canAccess('community.moderation');
       $showMarketingGroup = $isSuperAdmin || $canAccess('revenue.view') || $canAccess('cms.settings');
-      $showLayoutGroup = $isSuperAdmin || $canAccess('cms.settings');
-      $showCommunityGroup = $isSuperAdmin || $canAccess('authors.view') || $canAccess('community.reports') || $canAccess('community.moderation') || $canAccess('support.tickets') || $canAccess('support.kb');
+      $showLayoutGroup = $isSuperAdmin || $canAccess('cms.settings') || $canAccess('system.flags');
+      $showCommunityGroup = $isSuperAdmin || $canAccess('authors.view') || $canAccess('community.reports') || $canAccess('community.moderation') || $canAccess('support.tickets') || $canAccess('support.kb') || $canAccess('support.reply');
       $showEnterpriseGroup = $isSuperAdmin || $canAccess('system.rbac') || $canAccess('security.firewall') || $canAccess('system.logs') || $canAccess('system.backups') || $canAccess('cms.settings');
       ?>
       <nav class="admin-nav" id="adminNavScrollable">
