@@ -1373,10 +1373,11 @@
 </div>
 
 <script>
-// JSON Dictionary of all templates
-const MAIL_TEMPLATES = <?= json_encode($templateLibrary, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+// JSON Dictionary of all templates (var avoids fatal identifier already declared syntax error on re-navigation)
+var MAIL_TEMPLATES = window.MAIL_TEMPLATES = <?= json_encode($templateLibrary, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
 
 function switchMailTab(tab) {
+  window.switchMailTab = switchMailTab;
   document.querySelectorAll('.mail-tab-btn').forEach(b => {
     b.classList.remove('ts-btn-primary');
     b.classList.add('ts-btn-outline');
@@ -2430,8 +2431,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const tab = urlParams.get('tab');
   if (tab) {
     switchMailTab(tab);
-  }
-});
+// Global Window Scope Function Binding (Guarantees button onclick handlers always resolve)
+window.switchMailTab = switchMailTab;
+window.toggleRecipientInput = toggleRecipientInput;
+window.toggleCustomSender = toggleCustomSender;
+window.loadTemplateToEditor = loadTemplateToEditor;
+window.previewTemplateModal = previewTemplateModal;
+window.closeTemplatePreviewModal = closeTemplatePreviewModal;
+window.closeTemplateEditorModal = closeTemplateEditorModal;
+window.inspectSentMail = inspectSentMail;
+window.closeInspectModal = closeInspectModal;
+window.switchInspectSubTab = switchInspectSubTab;
+window.copyTrackingToken = copyTrackingToken;
+window.copyInspectHtml = copyInspectHtml;
+window.copyInspectJson = copyInspectJson;
+window.recomposeFromInspect = recomposeFromInspect;
+window.openInspectFullscreen = openInspectFullscreen;
+window.openAddCredentialModal = openAddCredentialModal;
+window.closeMailCredModal = closeMailCredModal;
+window.openTestCredModal = openTestCredModal;
+window.closeTestCredModal = closeTestCredModal;
+window.submitCredTest = submitCredTest;
+window.insertTag = insertTag;
+window.insertTmplTag = insertTmplTag;
+window.insertBlockComponent = insertBlockComponent;
+window.insertSnippet = insertSnippet;
+window.addVariableOverrideRow = addVariableOverrideRow;
+window.removeVariableOverrideRow = removeVariableOverrideRow;
+window.composeToSelectedUsers = composeToSelectedUsers;
+window.clearSelectedUsers = clearSelectedUsers;
+window.composeToSingleUser = composeToSingleUser;
+window.filterTemplateCategory = filterTemplateCategory;
+window.populateTemplateForm = populateTemplateForm;
+window.setViewMode = setViewMode;
+
 </script>
 
 <!-- Add / Edit Mail Credential Modal -->

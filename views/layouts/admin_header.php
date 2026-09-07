@@ -40,6 +40,10 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   </script>
   <title><?= htmlspecialchars($title ?? 'Admin Command Center | TechScout') ?></title>
   
+  <!-- Favicon Assets -->
+  <link rel="icon" type="image/svg+xml" href="<?= url('assets/favicon.svg') ?>">
+  <link rel="alternate icon" href="<?= url('favicon.ico') ?>">
+  
   <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -206,14 +210,6 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
                 <i data-lucide="check-square"></i> <span>Content Queue</span>
                 <?php if ($pendingQueueCount > 0): ?>
                   <span class="ts-badge ts-badge-cyan" style="margin-left: auto; font-size: 0.7rem; padding: 0.1rem 0.4rem;"><?= $pendingQueueCount ?></span>
-                <?php endif; ?>
-              </a>
-            <?php endif; ?>
-            <?php if ($isSuperAdmin || $canAccess('authors.view') || $canAccess('authors.verify')): ?>
-              <a href="<?= url('/admin/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/applications') ? 'active' : '' ?>" data-tooltip="Author Applications">
-                <i data-lucide="user-check"></i> <span>Author Applications</span>
-                <?php if ($pendingAppsCount > 0): ?>
-                  <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.7rem; padding: 0.1rem 0.4rem;"><?= $pendingAppsCount ?></span>
                 <?php endif; ?>
               </a>
             <?php endif; ?>

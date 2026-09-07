@@ -89,7 +89,7 @@
           <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="alert-octagon" style="width: 15px; height: 15px; color: #f87171;"></i> System Error Logs &amp; Crash Forensics</span>
           <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">ERRORS</span>
         </a>
-        <a href="<?= url('/admin/system') ?>" class="cp-item">
+        <a href="<?= url('/admin/settings') ?>" class="cp-item">
           <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="server" style="width: 15px; height: 15px; color: #10b981;"></i> System Settings &amp; Diagnostics</span>
           <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">SYSTEM</span>
         </a>
@@ -357,20 +357,46 @@
         }, 150);
       }
 
-      // Re-evaluate script tags inside swapped container
+      // Execute script tags in global window scope and prevent duplicate identifier errors
       function executeSwappedScripts(container) {
         const scripts = Array.from(container.querySelectorAll('script'));
         scripts.forEach(oldScript => {
-          const newScript = document.createElement('script');
-          Array.from(oldScript.attributes).forEach(attr => {
-            newScript.setAttribute(attr.name, attr.value);
-          });
-          if (oldScript.src) {
-            newScript.src = oldScript.src;
-          } else {
-            newScript.textContent = oldScript.textContent;
+          const parent = oldScript.parentNode;
+          const src = oldScript.getAttribute('src');
+          let code = oldScript.text || oldScript.textContent || oldScript.innerHTML || '';
+
+          // Remove the inactive script element from the swapped container
+          if (parent) {
+            parent.removeChild(oldScript);
           }
-          oldScript.parentNode.replaceChild(newScript, oldScript);
+
+          if (src) {
+            // External script: append to head
+            const s = document.createElement('script');
+            Array.from(oldScript.attributes).forEach(attr => {
+              s.setAttribute(attr.name, attr.value);
+            });
+            document.head.appendChild(s);
+          } else if (code.trim()) {
+            // Transform root-level `const ` and `let ` to `var ` so re-navigating to the same page
+            // never throws "SyntaxError: Identifier has already been declared"
+            let safeCode = code.replace(/(^|[;\n\r])\s*(const|let)\s+([a-zA-Z0-9_$]+)/g, '$1 var $3');
+
+            try {
+              const s = document.createElement('script');
+              s.type = 'text/javascript';
+              s.appendChild(document.createTextNode(safeCode));
+              document.head.appendChild(s);
+              document.head.removeChild(s);
+            } catch (err) {
+              console.warn('Script execution fallback error:', err);
+              try {
+                (0, eval)(safeCode);
+              } catch (evalErr) {
+                console.error('Fatal script eval error:', evalErr);
+              }
+            }
+          }
         });
       }
 

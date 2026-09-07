@@ -1772,7 +1772,35 @@ window.addEventListener('DOMContentLoaded', () => {
       custom_badge_color: '#38bdf8'
     });
   }
-});
+// Global Window Scope Function Binding (Guarantees button onclick handlers always resolve)
+window.openCreateUserModal = openCreateUserModal;
+window.closeCreateUserModal = closeCreateUserModal;
+window.openEditUserModal = openEditUserModal;
+window.closeEditUserModal = closeEditUserModal;
+window.openChangePasswordModal = openChangePasswordModal;
+window.closeChangePasswordModal = closeChangePasswordModal;
+window.generateSecurePassword = generateSecurePassword;
+window.openBroadcastModal = openBroadcastModal;
+window.closeBroadcastModal = closeBroadcastModal;
+window.openSingleNotificationModal = openSingleNotificationModal;
+window.toggleNotifAudience = toggleNotifAudience;
+window.openUserDetailModal = openUserDetailModal;
+window.closeUserDetailModal = closeUserDetailModal;
+window.switchDetailSubTab = switchDetailSubTab;
+window.openAuditTrailDrawer = openAuditTrailDrawer;
+window.closeAuditTrailDrawer = closeAuditTrailDrawer;
+window.switchDrawerTab = switchDrawerTab;
+window.openMergeModal = openMergeModal;
+window.closeMergeModal = closeMergeModal;
+window.openBulkEmailModal = openBulkEmailModal;
+window.closeBulkEmailModal = closeBulkEmailModal;
+window.openStrikeModal = openStrikeModal;
+window.closeStrikeModal = closeStrikeModal;
+window.openTierBadgeModal = openTierBadgeModal;
+window.closeTierBadgeModal = closeTierBadgeModal;
+window.closeQuickResetModal = closeQuickResetModal;
+window.copyQuickInput = copyQuickInput;
+window.generateQuickResetLink = generateQuickResetLink;
 
 </script>
 

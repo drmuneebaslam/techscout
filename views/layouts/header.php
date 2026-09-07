@@ -62,6 +62,10 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   </script>
   <title><?= htmlspecialchars($title ?? 'TechScout — The Frontier of Tech, Scouted for Builders') ?></title>
   
+  <!-- Favicon Assets -->
+  <link rel="icon" type="image/svg+xml" href="<?= url('assets/favicon.svg') ?>">
+  <link rel="alternate icon" href="<?= url('favicon.ico') ?>">
+  
   <?php if (!empty($siteSettings['ad_header_code'])): ?>
     <?= $siteSettings['ad_header_code'] ?>
   <?php endif; ?>

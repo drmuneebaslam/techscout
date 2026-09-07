@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 
+// Direct High-Performance Favicon Serving (Guarantees 200 OK without 404)
+if (isset($_SERVER['REQUEST_URI']) && (str_ends_with($_SERVER['REQUEST_URI'], 'favicon.ico') || $_SERVER['REQUEST_URI'] === '/favicon.ico')) {
+    $icoPath = __DIR__ . '/favicon.ico';
+    if (file_exists($icoPath)) {
+        header('Content-Type: image/x-icon');
+        header('Content-Length: ' . filesize($icoPath));
+        header('Cache-Control: public, max-age=604800');
+        readfile($icoPath);
+        exit;
+    }
+}
+
 require_once __DIR__ . '/app/autoload.php';
 
 // Register Global Error, Exception & Fatal Crash Logger
