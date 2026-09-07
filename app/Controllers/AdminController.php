@@ -3954,7 +3954,7 @@ class AdminController {
     public function dbManager(Request $request): void {
         $dbName = Config::get('db_name');
         $tables = Database::query(
-            "SELECT TABLE_NAME, ENGINE, TABLE_ROWS, DATA_LENGTH, INDEX_LENGTH, (DATA_LENGTH + INDEX_LENGTH) as TOTAL_SIZE, UPDATE_TIME 
+            "SELECT TABLE_NAME, ENGINE, TABLE_ROWS, DATA_LENGTH, INDEX_LENGTH, (DATA_LENGTH + INDEX_LENGTH) as TOTAL_SIZE, TABLE_COLLATION, UPDATE_TIME 
              FROM information_schema.TABLES 
              WHERE TABLE_SCHEMA = ? 
              ORDER BY TOTAL_SIZE DESC",
@@ -3964,12 +3964,61 @@ class AdminController {
         $totalDbSize = array_sum(array_column($tables, 'TOTAL_SIZE'));
         $totalRows = array_sum(array_column($tables, 'TABLE_ROWS'));
 
+        // Server diagnostics
+        $mysqlVersion = Database::fetch("SELECT VERSION() as v")['v'] ?? 'Unknown';
+        
+        // Schema Health Audit
+        $healthChecks = [];
+        
+        // 1. users.verification_code
+        $userCols = Database::query("SHOW COLUMNS FROM `users` LIKE 'verification_code'");
+        $hasVerifyCode = !empty($userCols);
+        $healthChecks[] = [
+            'name' => 'Users Table OTP Column (`verification_code`)',
+            'status' => $hasVerifyCode ? 'healthy' : 'critical',
+            'description' => $hasVerifyCode ? 'Column present and active for email verification OTP' : 'Missing! Triggers SQLSTATE[42S22] registration crash',
+            'fix_available' => !$hasVerifyCode
+        ];
+
+        // 2. users.status ENUM
+        $userStatusCol = Database::query("SHOW COLUMNS FROM `users` LIKE 'status'");
+        $statusType = $userStatusCol[0]['Type'] ?? '';
+        $hasPendingStatus = str_contains($statusType, 'pending_verification');
+        $healthChecks[] = [
+            'name' => 'Users Status ENUM (`pending_verification`)',
+            'status' => $hasPendingStatus ? 'healthy' : 'warning',
+            'description' => $hasPendingStatus ? 'Contains pending_verification state' : 'Missing pending_verification enum value in MySQL schema',
+            'fix_available' => !$hasPendingStatus
+        ];
+
+        // 3. system_error_logs telemetry columns
+        $errorCols = Database::query("SHOW COLUMNS FROM `system_error_logs`");
+        $existingErrorCols = array_column($errorCols, 'Field');
+        $missingTelemetry = array_diff(['request_data', 'request_headers', 'user_details', 'location_details', 'device_details'], $existingErrorCols);
+        $hasTelemetry = empty($missingTelemetry);
+        $healthChecks[] = [
+            'name' => 'Crash Forensics Telemetry Columns (`request_data`, `device_details`, etc.)',
+            'status' => $hasTelemetry ? 'healthy' : 'warning',
+            'description' => $hasTelemetry ? 'All 5 forensic telemetry columns installed' : 'Missing: ' . implode(', ', $missingTelemetry),
+            'fix_available' => !$hasTelemetry
+        ];
+
+        $unhealthyCount = count(array_filter($healthChecks, fn($c) => $c['status'] !== 'healthy'));
+
+        $backups = \App\Models\DatabaseBackupManager::getBackups();
+        $activeTab = (string)$request->query('tab', 'tables');
+
         Response::view('admin/db_manager', [
-            'title' => 'Database Health & Table Diagnostics | Admin Hub',
+            'title' => 'Enterprise Database Management & Diagnostics | Admin Hub',
             'tables' => $tables,
             'totalDbSize' => $totalDbSize,
             'totalRows' => $totalRows,
-            'dbName' => $dbName
+            'dbName' => $dbName,
+            'mysqlVersion' => $mysqlVersion,
+            'healthChecks' => $healthChecks,
+            'unhealthyCount' => $unhealthyCount,
+            'backups' => $backups,
+            'activeTab' => $activeTab
         ]);
     }
 
@@ -3981,7 +4030,93 @@ class AdminController {
             Database::execute("OPTIMIZE TABLE `{$tName}`");
         }
         Session::flash('success', 'All database tables optimized and indices recalculated.');
-        Response::redirect('/admin/db-manager');
+        Response::redirect('/admin/db-manager?tab=tables');
+    }
+
+    public function optimizeTable(Request $request, array $params): void {
+        $tableName = preg_replace('/[^a-zA-Z0-9_]/', '', (string)($params['name'] ?? ''));
+        if (!empty($tableName)) {
+            Database::execute("OPTIMIZE TABLE `{$tableName}`");
+            Session::flash('success', "Table `{$tableName}` successfully optimized and defragmented.");
+        }
+        Response::redirect('/admin/db-manager?tab=tables');
+    }
+
+    public function checkTable(Request $request, array $params): void {
+        $tableName = preg_replace('/[^a-zA-Z0-9_]/', '', (string)($params['name'] ?? ''));
+        if (!empty($tableName)) {
+            $res = Database::query("CHECK TABLE `{$tableName}`");
+            $msgType = $res[0]['Msg_type'] ?? 'status';
+            $msgText = $res[0]['Msg_text'] ?? 'OK';
+            Session::flash('success', "CHECK TABLE `{$tableName}`: {$msgType} - {$msgText}");
+        }
+        Response::redirect('/admin/db-manager?tab=tables');
+    }
+
+    public function repairTable(Request $request, array $params): void {
+        $tableName = preg_replace('/[^a-zA-Z0-9_]/', '', (string)($params['name'] ?? ''));
+        if (!empty($tableName)) {
+            $res = Database::query("REPAIR TABLE `{$tableName}`");
+            $msgText = $res[0]['Msg_text'] ?? 'OK';
+            Session::flash('success', "REPAIR TABLE `{$tableName}`: {$msgText}");
+        }
+        Response::redirect('/admin/db-manager?tab=tables');
+    }
+
+    public function autoRepairSchema(Request $request): void {
+        try {
+            $pdo = Database::getConnection();
+            
+            // 1. Fix Users Table
+            try {
+                $pdo->exec("ALTER TABLE `users` MODIFY COLUMN `status` ENUM('pending_verification','unverified','active','suspended','banned','deleted') NOT NULL DEFAULT 'pending_verification'");
+            } catch (\Throwable $e) {}
+
+            try {
+                $pdo->exec("ALTER TABLE `users` ADD COLUMN `verification_code` VARCHAR(20) DEFAULT NULL AFTER `suspended_until`");
+            } catch (\Throwable $e) {}
+
+            // 2. Fix system_error_logs
+            \App\Core\ErrorLogger::runEmergencyMigration($pdo);
+
+            Session::flash('success', 'Database Schema Auto-Repair successfully executed! Verification columns and error telemetry restored.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Schema Auto-Repair error: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/db-manager?tab=health');
+    }
+
+    public function executeDbQuery(Request $request): void {
+        $query = trim((string)$request->post('sql_query', ''));
+        if (empty($query)) {
+            Session::flash('error', 'Please provide a SQL query.');
+            Response::redirect('/admin/db-manager?tab=query');
+            return;
+        }
+
+        // Only allow safe read-only queries from the query tab
+        $firstWord = strtoupper(strtok($query, " \t\n\r"));
+        if (!in_array($firstWord, ['SELECT', 'SHOW', 'EXPLAIN', 'DESCRIBE', 'CHECK', 'OPTIMIZE'], true)) {
+            Session::flash('error', "Safety restriction: Terminal only permits diagnostic queries (SELECT, SHOW, EXPLAIN, DESCRIBE, CHECK). For destructive schema mutations, run via phpMyAdmin or Schema Auto-Repair.");
+            Response::redirect('/admin/db-manager?tab=query');
+            return;
+        }
+
+        try {
+            $start = microtime(true);
+            $results = Database::query($query);
+            $duration = round((microtime(true) - $start) * 1000, 2);
+            Session::flash('query_results', [
+                'sql' => $query,
+                'rows' => array_slice($results, 0, 100),
+                'total_count' => count($results),
+                'duration_ms' => $duration
+            ]);
+        } catch (\Throwable $e) {
+            Session::flash('error', "SQL Error: " . $e->getMessage());
+        }
+
+        Response::redirect('/admin/db-manager?tab=query');
     }
 
     // ========================================================================
@@ -6084,7 +6219,7 @@ class AdminController {
         } catch (\Throwable $e) {
             Session::flash('error', "Backup failed: " . $e->getMessage());
         }
-        Response::redirect('/admin/system?tab=backups');
+        Response::redirect('/admin/db-manager?tab=snapshots');
     }
 
     public function downloadBackup(Request $request, array $params): void {
@@ -6092,7 +6227,7 @@ class AdminController {
         $backup = \App\Core\Database::fetch("SELECT * FROM database_backups WHERE id = ?", [$backupId]);
         if (!$backup || !file_exists($backup['filepath'])) {
             Session::flash('error', 'Backup file not found on disk.');
-            Response::redirect('/admin/system?tab=backups');
+            Response::redirect('/admin/db-manager?tab=snapshots');
             return;
         }
 
@@ -6111,14 +6246,14 @@ class AdminController {
         } catch (\Throwable $e) {
             Session::flash('error', 'Restore failed: ' . $e->getMessage());
         }
-        Response::redirect('/admin/system?tab=backups');
+        Response::redirect('/admin/db-manager?tab=snapshots');
     }
 
     public function deleteBackup(Request $request, array $params): void {
         $backupId = (int)($params['id'] ?? 0);
         \App\Models\DatabaseBackupManager::deleteBackup($backupId);
         Session::flash('success', 'Backup snapshot removed.');
-        Response::redirect('/admin/system?tab=backups');
+        Response::redirect('/admin/db-manager?tab=snapshots');
     }
 
     /**

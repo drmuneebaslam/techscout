@@ -438,6 +438,11 @@ $router->post('/admin/seo-studio/save', [AdminController::class, 'saveSeoSetting
 // Database Health, Schema Diagnostics & Table Optimizer
 $router->get('/admin/db-manager', [AdminController::class, 'dbManager'], ['admin']);
 $router->post('/admin/db-manager/optimize', [AdminController::class, 'optimizeTables'], ['admin']);
+$router->post('/admin/db-manager/optimize-table/{name}', [AdminController::class, 'optimizeTable'], ['admin']);
+$router->post('/admin/db-manager/check-table/{name}', [AdminController::class, 'checkTable'], ['admin']);
+$router->post('/admin/db-manager/repair-table/{name}', [AdminController::class, 'repairTable'], ['admin']);
+$router->post('/admin/db-manager/auto-repair-schema', [AdminController::class, 'autoRepairSchema'], ['admin']);
+$router->post('/admin/db-manager/query', [AdminController::class, 'executeDbQuery'], ['admin']);
 
 // System Error Logs, Crash Forensics & Real-time Diagnostics
 $router->get('/admin/system-logs', [AdminController::class, 'systemLogs'], ['admin']);

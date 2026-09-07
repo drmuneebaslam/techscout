@@ -321,8 +321,8 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
             <a href="<?= url('/admin/mail') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/mail') ? 'active' : '' ?>" data-tooltip="Mail & Templates">
               <i data-lucide="mail-check"></i> <span>Mail &amp; Template Studio</span>
             </a>
-            <a href="<?= url('/admin/db-manager') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/db-manager') ? 'active' : '' ?>" data-tooltip="Database Diagnostics">
-              <i data-lucide="database"></i> <span>Database Manager</span>
+            <a href="<?= url('/admin/db-manager') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/db-manager') ? 'active' : '' ?>" data-tooltip="Database Health & Snapshots">
+              <i data-lucide="database"></i> <span>Database &amp; Snapshots</span>
             </a>
             <a href="<?= url('/admin/audit-logs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/audit-logs') ? 'active' : '' ?>" data-tooltip="Audit Telemetry">
               <i data-lucide="file-clock"></i> <span>Audit Telemetry</span>
@@ -330,8 +330,8 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
             <a href="<?= url('/admin/system-logs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system-logs') || str_contains($currentPath, '/admin/error-logs') ? 'active' : '' ?>" data-tooltip="Crash Forensics & Error Logs">
               <i data-lucide="alert-octagon"></i> <span>System Error Logs</span>
             </a>
-            <a href="<?= url('/admin/system') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system') ? 'active' : '' ?>" data-tooltip="Diagnostics & Backup">
-              <i data-lucide="server"></i> <span>Diagnostics &amp; Backup</span>
+            <a href="<?= url('/admin/system') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system') ? 'active' : '' ?>" data-tooltip="Social Channels & Ad Slots">
+              <i data-lucide="share-2"></i> <span>Social Channels &amp; Ads</span>
             </a>
             <a href="<?= url('/') ?>" class="admin-nav-link" target="_blank" style="color: #38bdf8;" data-tooltip="View Live Site">
               <i data-lucide="external-link"></i> <span>Live Site ↗</span>
