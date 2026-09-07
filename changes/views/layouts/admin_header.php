@@ -134,10 +134,25 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
       <?php
       $pendingAppsCount = (int)(\App\Core\Database::fetch("SELECT COUNT(*) as c FROM author_applications WHERE status = 'pending'")['c'] ?? 0);
       $pendingQueueCount = (int)(\App\Core\Database::fetch("SELECT COUNT(*) as c FROM contents WHERE status = 'in_review'")['c'] ?? 0);
+
+      // RBAC Permission Helper for Navigation Rendering
+      $canAccess = function(string $permKey): bool {
+          return \App\Models\RBAC::hasPermission($permKey);
+      };
+      $isSuperAdmin = (($currentUser['role'] ?? '') === 'superadmin');
+
+      // Calculate visibility for each group
+      $showCommandGroup = $isSuperAdmin || $canAccess('articles.view') || $canAccess('authors.view');
+      $showContentGroup = $isSuperAdmin || $canAccess('articles.view') || $canAccess('articles.create') || $canAccess('articles.edit');
+      $showMarketingGroup = $isSuperAdmin || $canAccess('revenue.view') || $canAccess('cms.settings');
+      $showLayoutGroup = $isSuperAdmin || $canAccess('cms.settings');
+      $showCommunityGroup = $isSuperAdmin || $canAccess('authors.view') || $canAccess('community.reports') || $canAccess('community.moderation') || $canAccess('support.tickets') || $canAccess('support.kb');
+      $showEnterpriseGroup = $isSuperAdmin || $canAccess('system.rbac') || $canAccess('security.firewall') || $canAccess('system.logs') || $canAccess('system.backups') || $canAccess('cms.settings');
       ?>
       <nav class="admin-nav" id="adminNavScrollable">
         
         <!-- 1. Command & Intelligence -->
+        <?php if ($showCommandGroup): ?>
         <details class="admin-nav-group" id="group_command" open>
           <summary class="nav-section-label">
             <span>Command &amp; Intelligence</span>
@@ -147,97 +162,116 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
             <a href="<?= url('/admin/dashboard') ?>" class="admin-nav-link <?= str_contains($currentPath, '/dashboard') || $currentPath === '/admin' ? 'active' : '' ?>" data-tooltip="Dashboard HUD">
               <i data-lucide="layout-dashboard"></i> <span>Dashboard HUD</span>
             </a>
-            <a href="<?= url('/admin/analytics') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/analytics') ? 'active' : '' ?>" data-tooltip="CMS Analytics HUD">
-              <i data-lucide="bar-chart-3"></i> <span>CMS Analytics HUD</span>
-            </a>
-            <a href="<?= url('/admin/content') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/content') ? 'active' : '' ?>" data-tooltip="Content Review Queue">
-              <i data-lucide="check-square"></i> <span>Content Queue</span>
-              <?php if ($pendingQueueCount > 0): ?>
-                <span class="ts-badge ts-badge-cyan" style="margin-left: auto; font-size: 0.7rem; padding: 0.1rem 0.4rem;"><?= $pendingQueueCount ?></span>
-              <?php endif; ?>
-            </a>
-            <a href="<?= url('/admin/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/applications') ? 'active' : '' ?>" data-tooltip="Author Applications">
-              <i data-lucide="user-check"></i> <span>Author Applications</span>
-              <?php if ($pendingAppsCount > 0): ?>
-                <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.7rem; padding: 0.1rem 0.4rem;"><?= $pendingAppsCount ?></span>
-              <?php endif; ?>
-            </a>
-            <a href="<?= url('/admin/engagement-studio') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/engagement-studio') ? 'active' : '' ?>" data-tooltip="Engagement &amp; Telemetry Simulator">
-              <i data-lucide="sparkles"></i> <span>Engagement Simulator</span>
-              <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.65rem;">SIM</span>
-            </a>
+            <?php if ($isSuperAdmin || $canAccess('articles.view')): ?>
+              <a href="<?= url('/admin/analytics') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/analytics') ? 'active' : '' ?>" data-tooltip="CMS Analytics HUD">
+                <i data-lucide="bar-chart-3"></i> <span>CMS Analytics HUD</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('articles.publish') || $canAccess('articles.edit')): ?>
+              <a href="<?= url('/admin/content') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/content') ? 'active' : '' ?>" data-tooltip="Content Review Queue">
+                <i data-lucide="check-square"></i> <span>Content Queue</span>
+                <?php if ($pendingQueueCount > 0): ?>
+                  <span class="ts-badge ts-badge-cyan" style="margin-left: auto; font-size: 0.7rem; padding: 0.1rem 0.4rem;"><?= $pendingQueueCount ?></span>
+                <?php endif; ?>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('authors.view') || $canAccess('authors.verify')): ?>
+              <a href="<?= url('/admin/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/applications') ? 'active' : '' ?>" data-tooltip="Author Applications">
+                <i data-lucide="user-check"></i> <span>Author Applications</span>
+                <?php if ($pendingAppsCount > 0): ?>
+                  <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.7rem; padding: 0.1rem 0.4rem;"><?= $pendingAppsCount ?></span>
+                <?php endif; ?>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('system.flags')): ?>
+              <a href="<?= url('/admin/engagement-studio') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/engagement-studio') ? 'active' : '' ?>" data-tooltip="Engagement &amp; Telemetry Simulator">
+                <i data-lucide="sparkles"></i> <span>Engagement Simulator</span>
+                <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.65rem;">SIM</span>
+              </a>
+            <?php endif; ?>
           </div>
         </details>
+        <?php endif; ?>
 
         <!-- 2. Content CRUD Engines -->
+        <?php if ($showContentGroup): ?>
         <details class="admin-nav-group" id="group_content" open>
           <summary class="nav-section-label">
             <span>Content CRUD Engines</span>
             <i data-lucide="chevron-down" class="group-caret"></i>
           </summary>
           <div class="nav-group-items">
-            <a href="<?= url('/admin/articles') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/articles') ? 'active' : '' ?>" data-tooltip="Articles CRUD">
-              <i data-lucide="file-text"></i> <span>Articles CRUD</span>
-            </a>
-            <a href="<?= url('/admin/tools') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/tools') ? 'active' : '' ?>" data-tooltip="AI Tools CRUD">
-              <i data-lucide="cpu"></i> <span>AI Tools CRUD</span>
-            </a>
-            <a href="<?= url('/admin/prompts') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/prompts') ? 'active' : '' ?>" data-tooltip="Prompts CRUD">
-              <i data-lucide="terminal"></i> <span>Prompts CRUD</span>
-            </a>
-            <a href="<?= url('/admin/gpts') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/gpts') ? 'active' : '' ?>" data-tooltip="Custom GPTs CRUD">
-              <i data-lucide="bot"></i> <span>Custom GPTs CRUD</span>
-            </a>
-            <a href="<?= url('/admin/campaigns') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/campaigns') ? 'active' : '' ?>" data-tooltip="Campaigns & Bounties">
-              <i data-lucide="flag"></i> <span>Campaigns CRUD</span>
-            </a>
-            <a href="<?= url('/admin/jobs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/jobs') ? 'active' : '' ?>" data-tooltip="Tech Jobs Board">
-              <i data-lucide="briefcase"></i> <span>Tech Jobs Board</span>
-            </a>
-            <a href="<?= url('/admin/topics') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/topics') ? 'active' : '' ?>" data-tooltip="Topics Taxonomy">
-              <i data-lucide="layers"></i> <span>Topics Taxonomy</span>
-            </a>
-            <a href="<?= url('/admin/categories') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/categories') ? 'active' : '' ?>" data-tooltip="Categories CRUD">
-              <i data-lucide="folder-tree"></i> <span>Categories CRUD</span>
-            </a>
-            <a href="<?= url('/admin/media') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/media') ? 'active' : '' ?>" data-tooltip="Media Library &amp; DAM">
-              <i data-lucide="image"></i> <span>Media Library (DAM)</span>
-            </a>
-            <a href="<?= url('/admin/content-filters') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/content-filters') ? 'active' : '' ?>" data-tooltip="Auto-Moderation Filters">
-              <i data-lucide="filter"></i> <span>Content Blacklist</span>
-            </a>
+            <?php if ($isSuperAdmin || $canAccess('articles.view')): ?>
+              <a href="<?= url('/admin/articles') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/articles') ? 'active' : '' ?>" data-tooltip="Articles CRUD">
+                <i data-lucide="file-text"></i> <span>Articles CRUD</span>
+              </a>
+              <a href="<?= url('/admin/tools') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/tools') ? 'active' : '' ?>" data-tooltip="AI Tools CRUD">
+                <i data-lucide="cpu"></i> <span>AI Tools CRUD</span>
+              </a>
+              <a href="<?= url('/admin/prompts') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/prompts') ? 'active' : '' ?>" data-tooltip="Prompts CRUD">
+                <i data-lucide="terminal"></i> <span>Prompts CRUD</span>
+              </a>
+              <a href="<?= url('/admin/gpts') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/gpts') ? 'active' : '' ?>" data-tooltip="Custom GPTs CRUD">
+                <i data-lucide="bot"></i> <span>Custom GPTs CRUD</span>
+              </a>
+              <a href="<?= url('/admin/campaigns') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/campaigns') ? 'active' : '' ?>" data-tooltip="Campaigns & Bounties">
+                <i data-lucide="flag"></i> <span>Campaigns CRUD</span>
+              </a>
+              <a href="<?= url('/admin/jobs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/jobs') ? 'active' : '' ?>" data-tooltip="Tech Jobs Board">
+                <i data-lucide="briefcase"></i> <span>Tech Jobs Board</span>
+              </a>
+              <a href="<?= url('/admin/topics') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/topics') ? 'active' : '' ?>" data-tooltip="Topics Taxonomy">
+                <i data-lucide="layers"></i> <span>Topics Taxonomy</span>
+              </a>
+              <a href="<?= url('/admin/categories') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/categories') ? 'active' : '' ?>" data-tooltip="Categories CRUD">
+                <i data-lucide="folder-tree"></i> <span>Categories CRUD</span>
+              </a>
+              <a href="<?= url('/admin/media') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/media') ? 'active' : '' ?>" data-tooltip="Media Library &amp; DAM">
+                <i data-lucide="image"></i> <span>Media Library (DAM)</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('community.moderation')): ?>
+              <a href="<?= url('/admin/content-filters') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/content-filters') ? 'active' : '' ?>" data-tooltip="Auto-Moderation Filters">
+                <i data-lucide="filter"></i> <span>Content Blacklist</span>
+              </a>
+            <?php endif; ?>
           </div>
         </details>
+        <?php endif; ?>
 
         <!-- 3. Marketing & Communications -->
+        <?php if ($showMarketingGroup): ?>
         <details class="admin-nav-group" id="group_marketing" open>
           <summary class="nav-section-label">
             <span>Marketing &amp; Growth</span>
             <i data-lucide="chevron-down" class="group-caret"></i>
           </summary>
           <div class="nav-group-items">
-            <a href="<?= url('/admin/revenue') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/revenue') ? 'active' : '' ?>" data-tooltip="Creator Revenue & Payouts">
-              <i data-lucide="wallet"></i> <span>Creator Payouts</span>
-            </a>
-            <a href="<?= url('/admin/newsletters') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/newsletters') ? 'active' : '' ?>" data-tooltip="CMS Newsletters">
-              <i data-lucide="mail"></i> <span>CMS Newsletters</span>
-            </a>
-            <a href="<?= url('/admin/subscribers') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/subscribers') ? 'active' : '' ?>" data-tooltip="Audience Subscribers">
-              <i data-lucide="user-plus"></i> <span>Audience Subscribers</span>
-            </a>
-            <a href="<?= url('/admin/engagement-studio') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/engagement-studio') ? 'active' : '' ?>" data-tooltip="Engagement Simulator">
-              <i data-lucide="activity"></i> <span>Engagement Studio</span>
-            </a>
-            <a href="<?= url('/admin/announcements') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/announcements') ? 'active' : '' ?>" data-tooltip="Broadcast Ribbons">
-              <i data-lucide="megaphone"></i> <span>Broadcast Ribbons</span>
-            </a>
-            <a href="<?= url('/admin/ad-manager') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/ad') ? 'active' : '' ?>" data-tooltip="Ad Placements & Sponsorships">
-              <i data-lucide="badge-dollar-sign"></i> <span>Ad Placements &amp; Sponsors</span>
-            </a>
+            <?php if ($isSuperAdmin || $canAccess('revenue.view')): ?>
+              <a href="<?= url('/admin/revenue') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/revenue') ? 'active' : '' ?>" data-tooltip="Creator Revenue & Payouts">
+                <i data-lucide="wallet"></i> <span>Creator Payouts</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('cms.settings')): ?>
+              <a href="<?= url('/admin/newsletters') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/newsletters') ? 'active' : '' ?>" data-tooltip="CMS Newsletters">
+                <i data-lucide="mail"></i> <span>CMS Newsletters</span>
+              </a>
+              <a href="<?= url('/admin/subscribers') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/subscribers') ? 'active' : '' ?>" data-tooltip="Audience Subscribers">
+                <i data-lucide="user-plus"></i> <span>Audience Subscribers</span>
+              </a>
+              <a href="<?= url('/admin/announcements') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/announcements') ? 'active' : '' ?>" data-tooltip="Broadcast Ribbons">
+                <i data-lucide="megaphone"></i> <span>Broadcast Ribbons</span>
+              </a>
+              <a href="<?= url('/admin/ad-manager') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/ad') ? 'active' : '' ?>" data-tooltip="Ad Placements & Sponsorships">
+                <i data-lucide="badge-dollar-sign"></i> <span>Ad Placements &amp; Sponsors</span>
+              </a>
+            <?php endif; ?>
           </div>
         </details>
+        <?php endif; ?>
 
         <!-- 4. Navigation & Layout -->
+        <?php if ($showLayoutGroup): ?>
         <details class="admin-nav-group" id="group_layout" open>
           <summary class="nav-section-label">
             <span>Navigation &amp; Layout</span>
@@ -250,94 +284,126 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
             <a href="<?= url('/admin/navigation') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/navigation') ? 'active' : '' ?>" data-tooltip="CMS Navigation Studio">
               <i data-lucide="compass"></i> <span>Navigation Studio</span>
             </a>
+            <a href="<?= url('/admin/legal-pages') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/legal-pages') ? 'active' : '' ?>" data-tooltip="Legal &amp; Compliance CMS">
+              <i data-lucide="scale"></i> <span>Legal Pages CMS</span>
+            </a>
             <a href="<?= url('/admin/seo') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/seo') ? 'active' : '' ?>" data-tooltip="SEO Suite &amp; Sitemaps">
               <i data-lucide="trending-up"></i> <span>SEO Suite (12 Tools)</span>
             </a>
             <a href="<?= url('/admin/seo-studio') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/seo-studio') ? 'active' : '' ?>" data-tooltip="SEO Diagnostics & Sitemap">
               <i data-lucide="search-check"></i> <span>SEO Studio &amp; Robots</span>
             </a>
-            <a href="<?= url('/admin/feature-flags') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/feature-flags') ? 'active' : '' ?>" data-tooltip="Feature Flags">
-              <i data-lucide="toggle-left"></i> <span>Feature Flags</span>
-            </a>
+            <?php if ($isSuperAdmin || $canAccess('system.flags')): ?>
+              <a href="<?= url('/admin/feature-flags') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/feature-flags') ? 'active' : '' ?>" data-tooltip="Feature Flags">
+                <i data-lucide="toggle-left"></i> <span>Feature Flags</span>
+              </a>
+            <?php endif; ?>
           </div>
         </details>
+        <?php endif; ?>
 
         <!-- 5. Community & Support -->
+        <?php if ($showCommunityGroup): ?>
         <details class="admin-nav-group" id="group_community" open>
           <summary class="nav-section-label">
             <span>Community &amp; Support</span>
             <i data-lucide="chevron-down" class="group-caret"></i>
           </summary>
           <div class="nav-group-items">
-            <a href="<?= url('/admin/users') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/users') ? 'active' : '' ?>" data-tooltip="Users & Creators">
-              <i data-lucide="users"></i> <span>Users &amp; Creators</span>
-            </a>
-            <a href="<?= url('/admin/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/applications') ? 'active' : '' ?>" data-tooltip="Author Applications">
-              <i data-lucide="award"></i> <span>Author Applications</span>
-              <?php if (!empty($pendingAppsCount)): ?>
-                <span class="ts-badge ts-badge-red" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; margin-left: auto;"><?= $pendingAppsCount ?></span>
-              <?php endif; ?>
-            </a>
-            <a href="<?= url('/admin/jobs/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/jobs/applications') ? 'active' : '' ?>" data-tooltip="Job Candidates">
-              <i data-lucide="user-check"></i> <span>Job Candidates</span>
-            </a>
-            <a href="<?= url('/admin/contact-messages') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/contact-messages') ? 'active' : '' ?>" data-tooltip="Inbox Inquiries">
-              <i data-lucide="inbox"></i> <span>Inbox Inquiries</span>
-            </a>
-            <a href="<?= url('/admin/moderation') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/moderation') ? 'active' : '' ?>" data-tooltip="Moderation Station">
-              <i data-lucide="shield"></i> <span>Moderation Station</span>
-            </a>
-            <a href="<?= url('/admin/tickets') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/tickets') ? 'active' : '' ?>" data-tooltip="Support Tickets">
-              <i data-lucide="life-buoy"></i> <span>Support Tickets</span>
-            </a>
-            <a href="<?= url('/admin/support/categories') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/support/categories') ? 'active' : '' ?>" data-tooltip="Support Categories &amp; SLAs">
-              <i data-lucide="layers"></i> <span>Support Categories &amp; SLAs</span>
-            </a>
+            <?php if ($isSuperAdmin || $canAccess('authors.view')): ?>
+              <a href="<?= url('/admin/users') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/users') ? 'active' : '' ?>" data-tooltip="Users & Creators">
+                <i data-lucide="users"></i> <span>Users &amp; Creators</span>
+              </a>
+              <a href="<?= url('/admin/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/applications') ? 'active' : '' ?>" data-tooltip="Author Applications">
+                <i data-lucide="award"></i> <span>Author Applications</span>
+                <?php if (!empty($pendingAppsCount)): ?>
+                  <span class="ts-badge ts-badge-red" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; margin-left: auto;"><?= $pendingAppsCount ?></span>
+                <?php endif; ?>
+              </a>
+              <a href="<?= url('/admin/jobs/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/jobs/applications') ? 'active' : '' ?>" data-tooltip="Job Candidates">
+                <i data-lucide="user-check"></i> <span>Job Candidates</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('support.reply')): ?>
+              <a href="<?= url('/admin/contact-messages') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/contact-messages') ? 'active' : '' ?>" data-tooltip="Inbox Inquiries">
+                <i data-lucide="inbox"></i> <span>Inbox Inquiries</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('community.reports') || $canAccess('community.moderation')): ?>
+              <a href="<?= url('/admin/moderation') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/moderation') ? 'active' : '' ?>" data-tooltip="Moderation Station">
+                <i data-lucide="shield"></i> <span>Moderation Station</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('support.tickets')): ?>
+              <a href="<?= url('/admin/tickets') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/tickets') ? 'active' : '' ?>" data-tooltip="Support Tickets">
+                <i data-lucide="life-buoy"></i> <span>Support Tickets</span>
+              </a>
+              <a href="<?= url('/admin/support/categories') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/support/categories') ? 'active' : '' ?>" data-tooltip="Support Categories &amp; SLAs">
+                <i data-lucide="layers"></i> <span>Support Categories &amp; SLAs</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('support.kb')): ?>
+              <a href="<?= url('/admin/help-articles') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/help-articles') ? 'active' : '' ?>" data-tooltip="Help Center Articles CMS">
+                <i data-lucide="book-open"></i> <span>Help Articles CMS</span>
+              </a>
+            <?php endif; ?>
           </div>
         </details>
+        <?php endif; ?>
 
         <!-- 6. Enterprise, Security & API -->
+        <?php if ($showEnterpriseGroup): ?>
         <details class="admin-nav-group" id="group_enterprise" open>
           <summary class="nav-section-label">
             <span>System &amp; Enterprise</span>
             <i data-lucide="chevron-down" class="group-caret"></i>
           </summary>
           <div class="nav-group-items">
-            <a href="<?= url('/admin/settings') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/settings') ? 'active' : '' ?>" data-tooltip="CMS System Settings">
-              <i data-lucide="sliders"></i> <span>CMS System Settings</span>
-            </a>
-            <a href="<?= url('/admin/roles') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/roles') ? 'active' : '' ?>" data-tooltip="Staff RBAC & Roles">
-              <i data-lucide="shield-check"></i> <span>Staff Roles &amp; RBAC</span>
-            </a>
-            <a href="<?= url('/admin/security') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/security') || str_contains($currentPath, '/admin/firewall') ? 'active' : '' ?>" data-tooltip="Cyber Firewall">
-              <i data-lucide="shield-alert"></i> <span>Cyber Firewall &amp; WAF</span>
-            </a>
-            <a href="<?= url('/admin/api-keys') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/api-keys') ? 'active' : '' ?>" data-tooltip="REST API Keys">
-              <i data-lucide="key"></i> <span>Developer API Keys</span>
-            </a>
-            <a href="<?= url('/admin/webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/webhooks') ? 'active' : '' ?>" data-tooltip="Webhooks Engine">
-              <i data-lucide="webhook"></i> <span>Webhooks Engine</span>
-            </a>
-            <a href="<?= url('/admin/mail') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/mail') ? 'active' : '' ?>" data-tooltip="Mail & Templates">
-              <i data-lucide="mail-check"></i> <span>Mail &amp; Template Studio</span>
-            </a>
-            <a href="<?= url('/admin/db-manager') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/db-manager') ? 'active' : '' ?>" data-tooltip="Database Health & Snapshots">
-              <i data-lucide="database"></i> <span>Database &amp; Snapshots</span>
-            </a>
-            <a href="<?= url('/admin/audit-logs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/audit-logs') ? 'active' : '' ?>" data-tooltip="Audit Telemetry">
-              <i data-lucide="file-clock"></i> <span>Audit Telemetry</span>
-            </a>
-            <a href="<?= url('/admin/system-logs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system-logs') || str_contains($currentPath, '/admin/error-logs') ? 'active' : '' ?>" data-tooltip="Crash Forensics & Error Logs">
-              <i data-lucide="alert-octagon"></i> <span>System Error Logs</span>
-            </a>
-            <a href="<?= url('/admin/system') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system') ? 'active' : '' ?>" data-tooltip="Social Channels & Ad Slots">
-              <i data-lucide="share-2"></i> <span>Social Channels &amp; Ads</span>
-            </a>
+            <?php if ($isSuperAdmin || $canAccess('cms.settings')): ?>
+              <a href="<?= url('/admin/settings') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/settings') ? 'active' : '' ?>" data-tooltip="CMS System Settings">
+                <i data-lucide="sliders"></i> <span>CMS System Settings</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('system.rbac')): ?>
+              <a href="<?= url('/admin/roles') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/roles') ? 'active' : '' ?>" data-tooltip="Staff RBAC & Roles">
+                <i data-lucide="shield-check"></i> <span>Staff Roles &amp; RBAC</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('security.firewall')): ?>
+              <a href="<?= url('/admin/security') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/security') || str_contains($currentPath, '/admin/firewall') ? 'active' : '' ?>" data-tooltip="Cyber Firewall">
+                <i data-lucide="shield-alert"></i> <span>Cyber Firewall &amp; WAF</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('cms.settings')): ?>
+              <a href="<?= url('/admin/api-keys') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/api-keys') ? 'active' : '' ?>" data-tooltip="REST API Keys">
+                <i data-lucide="key"></i> <span>Developer API Keys</span>
+              </a>
+              <a href="<?= url('/admin/webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/webhooks') ? 'active' : '' ?>" data-tooltip="Webhooks Engine">
+                <i data-lucide="webhook"></i> <span>Webhooks Engine</span>
+              </a>
+              <a href="<?= url('/admin/mail') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/mail') ? 'active' : '' ?>" data-tooltip="Mail & Templates">
+                <i data-lucide="mail-check"></i> <span>Mail &amp; Template Studio</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('system.backups')): ?>
+              <a href="<?= url('/admin/db-manager') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/db-manager') ? 'active' : '' ?>" data-tooltip="Database Health & Snapshots">
+                <i data-lucide="database"></i> <span>Database &amp; Snapshots</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('system.logs')): ?>
+              <a href="<?= url('/admin/audit-logs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/audit-logs') ? 'active' : '' ?>" data-tooltip="Audit Telemetry">
+                <i data-lucide="file-clock"></i> <span>Audit Telemetry</span>
+              </a>
+              <a href="<?= url('/admin/system-logs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system-logs') || str_contains($currentPath, '/admin/error-logs') ? 'active' : '' ?>" data-tooltip="Crash Forensics & Error Logs">
+                <i data-lucide="alert-octagon"></i> <span>System Error Logs</span>
+              </a>
+            <?php endif; ?>
             <a href="<?= url('/') ?>" class="admin-nav-link" target="_blank" style="color: #38bdf8;" data-tooltip="View Live Site">
               <i data-lucide="external-link"></i> <span>Live Site ↗</span>
             </a>
           </div>
         </details>
+        <?php endif; ?>
 
       </nav>
     </aside>

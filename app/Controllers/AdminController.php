@@ -6873,6 +6873,289 @@ class AdminController {
             'message' => "⭐ Assigned editorial badge '{$badgeName}' to article."
         ]);
     }
+
+    // =========================================================================
+    // 25. HELP ARTICLE MANAGEMENT CMS (Extensive Knowledge Base Hub)
+    // =========================================================================
+    public function helpArticles(Request $request): void {
+        $search = trim((string)$request->query('q', ''));
+        $category = trim((string)$request->query('cat', ''));
+        $status = trim((string)$request->query('status', ''));
+
+        $sql = "SELECT * FROM help_articles WHERE 1=1";
+        $params = [];
+
+        if (!empty($search)) {
+            $sql .= " AND (title LIKE ? OR summary LIKE ? OR slug LIKE ? OR category_name LIKE ?)";
+            $wild = "%{$search}%";
+            $params = array_merge($params, [$wild, $wild, $wild, $wild]);
+        }
+
+        if (!empty($category)) {
+            $sql .= " AND category_slug = ?";
+            $params[] = $category;
+        }
+
+        if ($status === 'published') {
+            $sql .= " AND is_published = 1";
+        } elseif ($status === 'draft') {
+            $sql .= " AND is_published = 0";
+        }
+
+        $sql .= " ORDER BY sort_order ASC, id DESC";
+        $articles = Database::query($sql, $params);
+
+        $categories = Database::query("SELECT DISTINCT category_slug, category_name, category_icon, category_color FROM help_articles ORDER BY category_name ASC");
+
+        Response::view('admin/help_articles', [
+            'title' => 'Help Center Article CMS | Admin Hub',
+            'articles' => $articles,
+            'categories' => $categories,
+            'search' => $search,
+            'selectedCategory' => $category,
+            'selectedStatus' => $status
+        ]);
+    }
+
+    public function editHelpArticle(Request $request, array $params = []): void {
+        $id = (int)($params['id'] ?? 0);
+        $article = null;
+
+        if ($id > 0) {
+            $article = Database::fetch("SELECT * FROM help_articles WHERE id = ?", [$id]);
+            if (!$article) {
+                Session::flash('error', 'Help article not found.');
+                Response::redirect('/admin/help-articles');
+                return;
+            }
+        }
+
+        // Fetch existing categories for suggestion autocomplete
+        $existingCategories = Database::query("SELECT DISTINCT category_slug, category_name, category_icon, category_color, category_desc FROM help_articles ORDER BY category_name ASC");
+
+        Response::view('admin/help_article_editor', [
+            'title' => ($article ? 'Edit: ' . $article['title'] : 'Create New Help Article') . ' | Help CMS',
+            'article' => $article,
+            'existingCategories' => $existingCategories
+        ]);
+    }
+
+    public function saveHelpArticle(Request $request): void {
+        $id = (int)$request->post('id', 0);
+        $title = trim((string)$request->post('title', ''));
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', (string)$request->post('slug', '')), '-'));
+        if (empty($slug) && !empty($title)) {
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title), '-'));
+        }
+
+        $categorySlug = trim((string)$request->post('category_slug', 'getting_started'));
+        $categoryName = trim((string)$request->post('category_name', 'Getting Started & Account'));
+        $categoryIcon = trim((string)$request->post('category_icon', 'sparkles'));
+        $categoryColor = trim((string)$request->post('category_color', '#6366f1'));
+        $categoryDesc = trim((string)$request->post('category_desc', ''));
+        $badge = trim((string)$request->post('badge', 'GUIDE'));
+        $readTime = trim((string)$request->post('read_time', '3 min read'));
+        $summary = trim((string)$request->post('summary', ''));
+        $keyTakeaway = trim((string)$request->post('key_takeaway', ''));
+        $contentHtml = (string)$request->post('content_html', '');
+        $isFeatured = !empty($request->post('is_featured')) ? 1 : 0;
+        $isPublished = isset($_POST['is_published']) ? ((int)$request->post('is_published') === 1 ? 1 : 0) : 1;
+        $sortOrder = (int)$request->post('sort_order', 0);
+
+        // Process step items
+        $stepTitles = (array)$request->post('step_titles', []);
+        $stepDescs = (array)$request->post('step_descs', []);
+        $steps = [];
+        for ($i = 0; $i < count($stepTitles); $i++) {
+            $st = trim((string)($stepTitles[$i] ?? ''));
+            $sd = trim((string)($stepDescs[$i] ?? ''));
+            if (!empty($st) || !empty($sd)) {
+                $steps[] = ['title' => $st, 'desc' => $sd];
+            }
+        }
+        $stepsJson = !empty($steps) ? json_encode($steps, JSON_UNESCAPED_UNICODE) : null;
+
+        // Process FAQ items
+        $faqQuestions = (array)$request->post('faq_questions', []);
+        $faqAnswers = (array)$request->post('faq_answers', []);
+        $faqs = [];
+        for ($i = 0; $i < count($faqQuestions); $i++) {
+            $fq = trim((string)($faqQuestions[$i] ?? ''));
+            $fa = trim((string)($faqAnswers[$i] ?? ''));
+            if (!empty($fq) || !empty($fa)) {
+                $faqs[] = ['q' => $fq, 'a' => $fa];
+            }
+        }
+        $faqsJson = !empty($faqs) ? json_encode($faqs, JSON_UNESCAPED_UNICODE) : null;
+
+        if (empty($title) || empty($slug)) {
+            Session::flash('error', 'Article Title and Slug are required.');
+            Response::redirect($id > 0 ? "/admin/help-articles/edit/{$id}" : '/admin/help-articles/create');
+            return;
+        }
+
+        try {
+            if ($id > 0) {
+                Database::execute(
+                    "UPDATE help_articles SET 
+                        category_slug = ?, category_name = ?, category_icon = ?, category_color = ?, category_desc = ?,
+                        slug = ?, title = ?, badge = ?, summary = ?, key_takeaway = ?, content_html = ?,
+                        steps_json = ?, faqs_json = ?, read_time = ?, is_featured = ?, is_published = ?, sort_order = ?
+                     WHERE id = ?",
+                    [
+                        $categorySlug, $categoryName, $categoryIcon, $categoryColor, $categoryDesc,
+                        $slug, $title, $badge, $summary, $keyTakeaway, $contentHtml,
+                        $stepsJson, $faqsJson, $readTime, $isFeatured, $isPublished, $sortOrder, $id
+                    ]
+                );
+                AuditLog::log('help_article.update', 'help_articles', $id, ['title' => $title]);
+                Session::flash('success', "Help article '{$title}' updated successfully.");
+            } else {
+                Database::execute(
+                    "INSERT INTO help_articles 
+                        (category_slug, category_name, category_icon, category_color, category_desc,
+                         slug, title, badge, summary, key_takeaway, content_html,
+                         steps_json, faqs_json, read_time, is_featured, is_published, sort_order)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [
+                        $categorySlug, $categoryName, $categoryIcon, $categoryColor, $categoryDesc,
+                        $slug, $title, $badge, $summary, $keyTakeaway, $contentHtml,
+                        $stepsJson, $faqsJson, $readTime, $isFeatured, $isPublished, $sortOrder
+                    ]
+                );
+                $newId = (int)Database::lastInsertId();
+                AuditLog::log('help_article.create', 'help_articles', $newId, ['title' => $title]);
+                Session::flash('success', "New help article '{$title}' created successfully.");
+            }
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Database error: ' . $e->getMessage());
+        }
+
+        Response::redirect('/admin/help-articles');
+    }
+
+    public function deleteHelpArticle(Request $request, array $params = []): void {
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0) {
+            $article = Database::fetch("SELECT * FROM help_articles WHERE id = ?", [$id]);
+            Database::execute("DELETE FROM help_articles WHERE id = ?", [$id]);
+            AuditLog::log('help_article.delete', 'help_articles', $id, ['title' => $article['title'] ?? '']);
+            Session::flash('success', 'Help article removed.');
+        }
+        Response::redirect('/admin/help-articles');
+    }
+
+    // =========================================================================
+    // 26. LEGAL & COMPLIANCE PAGES CMS
+    // =========================================================================
+    public function legalPages(Request $request): void {
+        $pages = Database::query("SELECT * FROM legal_pages ORDER BY id ASC");
+        Response::view('admin/legal_pages', [
+            'title' => 'Legal & Compliance Pages CMS | Admin Hub',
+            'pages' => $pages
+        ]);
+    }
+
+    public function editLegalPage(Request $request, array $params = []): void {
+        $id = (int)($params['id'] ?? 0);
+        $page = Database::fetch("SELECT * FROM legal_pages WHERE id = ?", [$id]);
+
+        if (!$page) {
+            Session::flash('error', 'Legal page record not found.');
+            Response::redirect('/admin/legal-pages');
+            return;
+        }
+
+        Response::view('admin/legal_page_editor', [
+            'title' => "Edit Legal Page: {$page['title']} | CMS",
+            'page' => $page
+        ]);
+    }
+
+    public function saveLegalPage(Request $request): void {
+        $id = (int)$request->post('id', 0);
+        $title = trim((string)$request->post('title', ''));
+        $subtitle = trim((string)$request->post('subtitle', ''));
+        $badge = trim((string)$request->post('badge', 'LEGAL & COMPLIANCE'));
+        $badgeColor = trim((string)$request->post('badge_color', 'indigo'));
+        $version = trim((string)$request->post('version', '1.0'));
+        $effectiveDate = trim((string)$request->post('effective_date', date('F Y')));
+        $contentHtml = (string)$request->post('content_html', '');
+        $metaDescription = trim((string)$request->post('meta_description', ''));
+        $isPublished = isset($_POST['is_published']) ? ((int)$request->post('is_published') === 1 ? 1 : 0) : 1;
+        $adminId = (int)(Auth::id() ?? 0);
+
+        if ($id <= 0 || empty($title) || empty($contentHtml)) {
+            Session::flash('error', 'Title and Content HTML are required.');
+            Response::redirect($id > 0 ? "/admin/legal-pages/edit/{$id}" : '/admin/legal-pages');
+            return;
+        }
+
+        try {
+            Database::execute(
+                "UPDATE legal_pages SET 
+                    title = ?, subtitle = ?, badge = ?, badge_color = ?, version = ?,
+                    effective_date = ?, content_html = ?, meta_description = ?,
+                    is_published = ?, updated_by = ?
+                 WHERE id = ?",
+                [
+                    $title, $subtitle, $badge, $badgeColor, $version,
+                    $effectiveDate, $contentHtml, $metaDescription,
+                    $isPublished, $adminId, $id
+                ]
+            );
+
+            AuditLog::log('legal_page.update', 'legal_pages', $id, ['title' => $title, 'version' => $version]);
+            Session::flash('success', "Legal page '{$title}' (v{$version}) saved successfully.");
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Database error: ' . $e->getMessage());
+        }
+
+        Response::redirect('/admin/legal-pages');
+    }
+
+    // =========================================================================
+    // 27. FULL-PAGE SCROLLABLE MAIL TEMPLATE STUDIO (New Tab Canvas)
+    // =========================================================================
+    public function mailTemplateEditor(Request $request): void {
+        $templateKey = trim((string)$request->query('key', ''));
+        $templateId = (int)$request->query('id', 0);
+
+        // Fetch mail credentials for provider mapping
+        $mailCredentials = Database::query("SELECT * FROM mail_credentials ORDER BY is_default DESC, id ASC");
+
+        // Load custom template if ID or key passed
+        $template = null;
+        if ($templateId > 0) {
+            $template = Database::fetch("SELECT * FROM custom_mail_templates WHERE id = ?", [$templateId]);
+        } elseif (!empty($templateKey)) {
+            $template = Database::fetch("SELECT * FROM custom_mail_templates WHERE template_key = ?", [$templateKey]);
+        }
+
+        // If not in custom table, check if it exists in system templates
+        if (!$template && !empty($templateKey)) {
+            $systemLibrary = \App\Core\Mailer::getTemplateLibrary();
+            if (isset($systemLibrary[$templateKey])) {
+                $sys = $systemLibrary[$templateKey];
+                $template = [
+                    'id' => null,
+                    'template_key' => $templateKey,
+                    'name' => $sys['name'] ?? $templateKey,
+                    'subject' => $sys['subject'] ?? '',
+                    'description' => $sys['description'] ?? '',
+                    'html_body' => $sys['html'] ?? '',
+                    'assigned_credential_id' => $sys['assigned_credential_id'] ?? null,
+                    'is_custom' => 0
+                ];
+            }
+        }
+
+        Response::view('admin/mail_template_editor', [
+            'title' => ($template ? 'Edit Template: ' . ($template['name'] ?? $templateKey) : 'New HTML Mail Template') . ' | Mail Studio',
+            'template' => $template,
+            'mailCredentials' => $mailCredentials
+        ]);
+    }
 }
 
 

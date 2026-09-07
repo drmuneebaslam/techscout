@@ -10,74 +10,72 @@ class PageController {
     // ========================================================================
     // 1. LEGAL & COMPLIANCE HUB
     // ========================================================================
+    private function renderLegalPage(string $slug, string $fallbackTitle, string $fallbackView): void {
+        try {
+            $page = Database::fetch("SELECT * FROM legal_pages WHERE slug = ? AND is_published = 1", [$slug]);
+            if ($page) {
+                Response::view('pages/legal_page', [
+                    'title' => ($page['title'] ?? $fallbackTitle) . ' | TechScout Legal',
+                    'page' => $page,
+                    'updatedAt' => $page['effective_date'] ?? 'September 2026'
+                ]);
+                return;
+            }
+        } catch (\Throwable $e) {}
+
+        Response::view($fallbackView, [
+            'title' => $fallbackTitle . ' | TechScout',
+            'updatedAt' => 'September 2026'
+        ]);
+    }
+
     public function legal(Request $request): void {
+        $legalPages = [];
+        try {
+            $legalPages = Database::query("SELECT id, slug, title, subtitle, badge, badge_color, version, effective_date FROM legal_pages WHERE is_published = 1 ORDER BY id ASC");
+        } catch (\Throwable $e) {}
+
         Response::view('pages/legal', [
             'title' => 'Legal & Compliance Center | TechScout Policies',
-            'updatedAt' => 'August 2026'
+            'updatedAt' => 'September 2026',
+            'legalPages' => $legalPages
         ]);
     }
 
     public function privacy(Request $request): void {
-        Response::view('pages/privacy', [
-            'title' => 'Privacy Policy & Data Protection | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('privacy', 'Privacy Policy & Data Protection', 'pages/privacy');
     }
 
     public function terms(Request $request): void {
-        Response::view('pages/terms', [
-            'title' => 'Terms of Service & Usage Agreement | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('terms', 'Terms of Service & Usage Agreement', 'pages/terms');
     }
 
     public function cookies(Request $request): void {
-        Response::view('pages/cookies', [
-            'title' => 'Cookie & Tracking Technologies Policy | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('cookies', 'Cookie & Tracking Technologies Policy', 'pages/cookies');
     }
 
     public function communityGuidelines(Request $request): void {
-        Response::view('pages/community_guidelines', [
-            'title' => 'Community Guidelines & Code of Conduct | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('community-guidelines', 'Community Guidelines & Code of Conduct', 'pages/community_guidelines');
     }
 
     public function copyright(Request $request): void {
-        Response::view('pages/copyright', [
-            'title' => 'DMCA & Copyright Policy | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('copyright', 'DMCA & Copyright Policy', 'pages/copyright');
     }
 
     public function accessibility(Request $request): void {
-        Response::view('pages/accessibility', [
-            'title' => 'Accessibility Statement (WCAG 2.1 AA) | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('accessibility', 'Accessibility Statement (WCAG 2.1 AA)', 'pages/accessibility');
     }
 
     public function acceptableUse(Request $request): void {
-        Response::view('pages/acceptable_use', [
-            'title' => 'Acceptable Use Policy | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('acceptable-use', 'Acceptable Use Policy', 'pages/acceptable_use');
     }
 
     public function securityPolicy(Request $request): void {
-        Response::view('pages/security_policy', [
-            'title' => 'Security Policy & Vulnerability Disclosure | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('security', 'Security Policy & Vulnerability Disclosure', 'pages/security_policy');
     }
 
     public function disclosure(Request $request): void {
-        Response::view('pages/disclosure', [
-            'title' => 'Affiliate & Sponsored Content Disclosure | TechScout',
-            'updatedAt' => 'August 2026'
-        ]);
+        $this->renderLegalPage('disclosure', 'Affiliate & Sponsored Content Disclosure', 'pages/disclosure');
     }
 
     // ========================================================================

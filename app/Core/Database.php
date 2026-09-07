@@ -1494,10 +1494,24 @@ class Database {
                 $pdo->exec("UPDATE `notifications` SET `action_url` = REPLACE(`action_url`, '/techscout.n/', '/') WHERE `action_url` LIKE '%/techscout.n/%'");
                 $pdo->exec("UPDATE `notifications` SET `action_url` = REPLACE(`action_url`, 'http://localhost/techscout.n', 'https://funwithcoding.free.nf') WHERE `action_url` LIKE '%http://localhost/techscout.n%'");
             } catch (Throwable $e) {}
+
+            // 30. Help Articles & Legal Pages Dynamic CMS Migration
+            try {
+                $upgradeScript = __DIR__ . '/../../database/help_legal_upgrade.sql';
+                if (file_exists($upgradeScript)) {
+                    $hasHelp = $pdo->query("SHOW TABLES LIKE 'help_articles'")->fetchAll();
+                    $hasLegal = $pdo->query("SHOW TABLES LIKE 'legal_pages'")->fetchAll();
+                    if (empty($hasHelp) || empty($hasLegal)) {
+                        $sql = file_get_contents($upgradeScript);
+                        $pdo->exec($sql);
+                    }
+                }
+            } catch (Throwable $e) {}
         } catch (Throwable $e) {
             // Ignore minor migration conflicts
         }
     }
+
 
     public static function query(string $sql, array $params = []): array {
         try {

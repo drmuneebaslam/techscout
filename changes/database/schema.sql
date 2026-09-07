@@ -1389,5 +1389,59 @@ CREATE TABLE `webhooks` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `help_articles`;
+CREATE TABLE `help_articles` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `category_slug` varchar(60) NOT NULL DEFAULT 'getting_started',
+  `category_name` varchar(100) NOT NULL DEFAULT 'Getting Started & Account',
+  `category_icon` varchar(50) NOT NULL DEFAULT 'sparkles',
+  `category_color` varchar(20) NOT NULL DEFAULT '#6366f1',
+  `category_desc` text DEFAULT NULL,
+  `slug` varchar(120) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `badge` varchar(50) DEFAULT 'GUIDE',
+  `summary` text DEFAULT NULL,
+  `key_takeaway` text DEFAULT NULL,
+  `content_html` longtext DEFAULT NULL,
+  `steps_json` longtext DEFAULT NULL,
+  `faqs_json` longtext DEFAULT NULL,
+  `read_time` varchar(30) DEFAULT '3 min read',
+  `is_featured` tinyint(1) NOT NULL DEFAULT 0,
+  `is_published` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `views_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `helpful_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `unhelpful_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_help_slug` (`slug`),
+  KEY `idx_help_cat` (`category_slug`),
+  KEY `idx_help_featured` (`is_featured`),
+  KEY `idx_help_published` (`is_published`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `legal_pages`;
+CREATE TABLE `legal_pages` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(60) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `subtitle` text DEFAULT NULL,
+  `badge` varchar(60) DEFAULT 'LEGAL & COMPLIANCE',
+  `badge_color` varchar(30) DEFAULT 'indigo',
+  `version` varchar(20) NOT NULL DEFAULT '1.0',
+  `effective_date` varchar(50) NOT NULL DEFAULT 'September 2026',
+  `content_html` longtext NOT NULL,
+  `meta_description` text DEFAULT NULL,
+  `is_published` tinyint(1) NOT NULL DEFAULT 1,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_legal_slug` (`slug`),
+  KEY `idx_legal_published` (`is_published`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET SQL_MODE=@OLD_SQL_MODE;
+

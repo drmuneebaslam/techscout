@@ -256,6 +256,56 @@
     ]
   ];
 
+  // Dynamically load from database if help_articles table exists and has rows
+  try {
+    $dbArticles = \App\Core\Database::query("SELECT * FROM help_articles WHERE is_published = 1 ORDER BY sort_order ASC, id ASC");
+    if (!empty($dbArticles)) {
+      $dbCategories = [];
+      foreach ($dbArticles as $row) {
+        $cSlug = $row['category_slug'] ?: 'general';
+        if (!isset($dbCategories[$cSlug])) {
+          $dbCategories[$cSlug] = [
+            'id' => $cSlug,
+            'title' => $row['category_name'] ?: 'General Knowledge',
+            'icon' => $row['category_icon'] ?: 'help-circle',
+            'color' => $row['category_color'] ?: '#6366f1',
+            'desc' => $row['category_desc'] ?: '',
+            'articles' => []
+          ];
+        }
+
+        $steps = [];
+        if (!empty($row['steps_json'])) {
+          $decoded = json_decode($row['steps_json'], true);
+          if (is_array($decoded)) $steps = $decoded;
+        }
+
+        $faqs = [];
+        if (!empty($row['faqs_json'])) {
+          $decoded = json_decode($row['faqs_json'], true);
+          if (is_array($decoded)) $faqs = $decoded;
+        }
+
+        $dbCategories[$cSlug]['articles'][] = [
+          'id' => (int)$row['id'],
+          'slug' => $row['slug'],
+          'title' => $row['title'],
+          'badge' => $row['badge'] ?: 'GUIDE',
+          'summary' => $row['summary'] ?: '',
+          'read_time' => $row['read_time'] ?: '3 min read',
+          'key_takeaway' => $row['key_takeaway'] ?: '',
+          'content_html' => $row['content_html'] ?: '',
+          'steps' => $steps,
+          'faqs' => $faqs,
+          'is_featured' => (int)($row['is_featured'] ?? 0)
+        ];
+      }
+      if (!empty($dbCategories)) {
+        $helpCategories = $dbCategories;
+      }
+    }
+  } catch (\Throwable $e) {}
+
   // Flatten all articles for quick slug lookup
   $allArticles = [];
   foreach ($helpCategories as $catKey => $cat) {
@@ -495,26 +545,35 @@
             </div>
           </div>
 
-          <!-- Step-by-Step Walkthrough Section -->
-          <h2 style="font-size: 1.35rem; color: var(--ts-text-primary); margin: 0 0 1rem 0; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
-            <i data-lucide="list-ordered" style="color: #38bdf8;"></i> Step-by-Step Instructions
-          </h2>
+          <!-- Rich In-Depth Content (if provided) -->
+          <?php if (!empty($selectedArticle['content_html'])): ?>
+            <div id="artContentHtml" class="ts-card" style="background: var(--ts-card-bg); border-color: var(--ts-border-subtle); padding: 2rem; margin-bottom: 2rem; line-height: 1.75; font-size: 0.95rem;">
+              <?= $selectedArticle['content_html'] ?>
+            </div>
+          <?php endif; ?>
 
-          <div id="artStepsContainer">
-            <?php foreach ($selectedArticle['steps'] as $idx => $step): ?>
-              <div class="yt-step-box">
-                <div class="yt-step-num"><?= $idx + 1 ?></div>
-                <div style="flex: 1;">
-                  <h3 style="font-size: 1.05rem; color: var(--ts-text-primary); margin: 0 0 0.35rem 0; font-weight: 700;">
-                    <?= htmlspecialchars($step['title']) ?>
-                  </h3>
-                  <div style="color: var(--ts-text-secondary); font-size: 0.9rem; line-height: 1.6;">
-                    <?= htmlspecialchars($step['desc']) ?>
+          <!-- Step-by-Step Walkthrough Section -->
+          <?php if (!empty($selectedArticle['steps'])): ?>
+            <h2 style="font-size: 1.35rem; color: var(--ts-text-primary); margin: 0 0 1rem 0; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="list-ordered" style="color: #38bdf8;"></i> Step-by-Step Instructions
+            </h2>
+
+            <div id="artStepsContainer">
+              <?php foreach ($selectedArticle['steps'] as $idx => $step): ?>
+                <div class="yt-step-box">
+                  <div class="yt-step-num"><?= $idx + 1 ?></div>
+                  <div style="flex: 1;">
+                    <h3 style="font-size: 1.05rem; color: var(--ts-text-primary); margin: 0 0 0.35rem 0; font-weight: 700;">
+                      <?= htmlspecialchars($step['title']) ?>
+                    </h3>
+                    <div style="color: var(--ts-text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                      <?= htmlspecialchars($step['desc']) ?>
+                    </div>
                   </div>
                 </div>
-              </div>
-            <?php endforeach; ?>
-          </div>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
 
           <!-- In-Article Frequently Asked Questions (Accordions) -->
           <?php if (!empty($selectedArticle['faqs'])): ?>
@@ -790,11 +849,14 @@ function loadArticleDetail(slug) {
       </div>
     </div>
 
-    <h2 style="font-size: 1.35rem; color: var(--ts-text-primary); margin: 0 0 1rem 0; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
-      <i data-lucide="list-ordered" style="color: #38bdf8;"></i> Step-by-Step Instructions
-    </h2>
+    ${art.content_html ? `<div class="ts-card" style="background: var(--ts-card-bg); border-color: var(--ts-border-subtle); padding: 2rem; margin-bottom: 2rem; line-height: 1.75; font-size: 0.95rem;">${art.content_html}</div>` : ''}
 
-    <div>${stepsHtml}</div>
+    ${stepsHtml ? `
+      <h2 style="font-size: 1.35rem; color: var(--ts-text-primary); margin: 0 0 1rem 0; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="list-ordered" style="color: #38bdf8;"></i> Step-by-Step Instructions
+      </h2>
+      <div>${stepsHtml}</div>
+    ` : ''}
     ${faqsHtml}
 
     <div class="ts-card" style="background: var(--ts-card-bg); border: 1px solid var(--ts-border-subtle); border-radius: 12px; padding: 1.5rem 2rem; margin: 2.5rem 0; text-align: center;">

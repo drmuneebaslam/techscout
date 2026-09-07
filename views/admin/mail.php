@@ -720,9 +720,9 @@
         </div>
 
         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-          <button type="button" onclick="openCreateTemplateModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #a855f7, #6366f1); border-color: #a855f7; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
-            <i data-lucide="plus-circle"></i> Create Template ➕
-          </button>
+          <a href="<?= url('/admin/mail/template/editor') ?>" target="_blank" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #a855f7, #6366f1); border-color: #a855f7; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <i data-lucide="plus-circle"></i> Create Template (New Tab) ➕
+          </a>
           <button type="submit" form="batchTemplatesCredentialsForm" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #10b981; border-color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
             <i data-lucide="save"></i> Save Mappings 💾
           </button>
@@ -796,8 +796,11 @@
                 <button type="button" onclick="previewTemplateModal('<?= $key ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #38bdf8;" title="Preview Email Rendering">
                   👁️ Preview
                 </button>
-                <button type="button" onclick="populateTemplateForm('<?= $key ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #a855f7;" title="Edit or Clone Template">
-                  ✏️ Edit
+                <a href="<?= url('/admin/mail/template/editor?key=' . urlencode($key)) ?>" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #c084fc; border-color: rgba(192,132,252,0.4);" title="Edit in Full-Page New Tab">
+                  ✏️ Edit (New Tab) ↗
+                </a>
+                <button type="button" onclick="populateTemplateForm('<?= $key ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #94a3b8;" title="Quick Edit Modal">
+                  Modal
                 </button>
               </div>
 

@@ -380,6 +380,7 @@ $router->post('/admin/contact-messages/delete/{id}', [AdminController::class, 'd
 
 // Mail Provider API, Multi-Provider Credentials & HTML Template Center
 $router->get('/admin/mail', [AdminController::class, 'mailCenter'], ['admin']);
+$router->get('/admin/mail/template/editor', [AdminController::class, 'mailTemplateEditor'], ['admin']);
 $router->post('/admin/mail/settings', [AdminController::class, 'saveMailSettings'], ['admin']);
 $router->post('/admin/mail/send', [AdminController::class, 'sendCustomMail'], ['admin']);
 $router->post('/admin/mail/test', [AdminController::class, 'sendTestMail'], ['admin']);
@@ -395,6 +396,18 @@ $router->post('/admin/mail/credentials/duplicate/{id}', [AdminController::class,
 $router->post('/admin/mail/credentials/delete/{id}', [AdminController::class, 'deleteMailCredential'], ['admin']);
 $router->post('/admin/mail/credentials/set-default/{id}', [AdminController::class, 'setDefaultMailCredential'], ['admin']);
 $router->post('/admin/mail/credentials/test', [AdminController::class, 'testMailCredential'], ['admin']);
+
+// Help Center & Knowledge Base Article CMS
+$router->get('/admin/help-articles', [AdminController::class, 'helpArticles'], ['admin']);
+$router->get('/admin/help-articles/create', [AdminController::class, 'editHelpArticle'], ['admin']);
+$router->get('/admin/help-articles/edit/{id}', [AdminController::class, 'editHelpArticle'], ['admin']);
+$router->post('/admin/help-articles/save', [AdminController::class, 'saveHelpArticle'], ['admin']);
+$router->post('/admin/help-articles/delete/{id}', [AdminController::class, 'deleteHelpArticle'], ['admin']);
+
+// Legal & Compliance Content Management CMS
+$router->get('/admin/legal-pages', [AdminController::class, 'legalPages'], ['admin']);
+$router->get('/admin/legal-pages/edit/{id}', [AdminController::class, 'editLegalPage'], ['admin']);
+$router->post('/admin/legal-pages/save', [AdminController::class, 'saveLegalPage'], ['admin']);
 
 // Feature Flags & Dynamic Capability Controls
 $router->get('/admin/feature-flags', [AdminController::class, 'featureFlags'], ['admin']);
