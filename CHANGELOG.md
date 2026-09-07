@@ -4,6 +4,47 @@ All notable changes and architectural updates to the platform are documented in 
 
 ---
 
+## [2026-09-08] - Enterprise Documentation Portal, Host Diagnostic Isolation & Comprehensive Log Audit
+
+### 1. Enterprise Web Documentation Reader & QA Portal
+- **`documentation/index.php`**:
+  - Integrated server-side PHP Markdown rendering engine supporting GitHub alert callouts (`> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`), task checklists, scroll-spy TOC, and syntax-highlighted code blocks.
+  - Added reading progress indicator, dark/light mode toggle with theme sync, font scaling (`sm`/`md`/`lg`), distraction-free focus mode, and interactive command palette search (`Ctrl+K`).
+- **Documentation Reference Suite**:
+  - Added full reference suites in `documentation/`, `documentation/project/`, and `documentation/qa/` covering core architecture, controller mappings, database schemas, symbol catalogs, and master QA testing specifications.
+
+### 2. Host Diagnostics & Fail-Safe Database Recovery Engine
+- **`app/Core/Database.php`**:
+  - Enhanced connection diagnostic exception handler (`renderDetailedError`) with detailed SQL state diagnostics, host telemetry, source location tracking, and auto-repair hooks.
+  - Prevents continuous reconnect loops and memory exhaustion when remote host DNS resolution fails.
+
+---
+
+## [2026-09-07] - Favicon 404 Resolution, Global Script Scope Bindings & Navigation Enhancements
+
+### 1. Favicon 404 Elimination & Binary Favicon Generation
+- **`favicon.ico` & `assets/favicon.svg`**:
+  - Generated high-resolution binary `favicon.ico` and SVG favicon assets.
+- **`index.php`**:
+  - Added direct 200 stream binary header response for `/favicon.ico` requests, preventing 404 favicon logs across admin and client portals.
+- **`views/layouts/admin_header.php` & `views/layouts/header.php`**:
+  - Added explicit `<link rel="icon">` and `<link rel="shortcut icon">` tags referencing SVG and ICO assets.
+
+### 2. Admin Sidebar & Navigation Optimization
+- **`views/layouts/admin_header.php`**:
+  - Streamlined sidebar hierarchy by eliminating duplicate *Author Applications* link from *Command & Intelligence*, confining it strictly to *Community & Support*.
+  - Restored uniform navigation visibility and permission access for all admin roles (`admin`, `super_admin`, `superadmin`).
+
+### 3. PJAX Script Evaluator & Scope Isolation Fixes
+- **`views/layouts/admin_footer.php`**:
+  - Upgraded PJAX script evaluator to inject scripts via `document.head` and replace top-level `const`/`let` with `var`, avoiding duplicate identifier syntax errors on repeated PJAX page switches.
+- **`views/admin/mail.php`**:
+  - Bound `MAIL_TEMPLATES`, `switchMailTab`, and modal handlers directly to `window` scope.
+- **`views/admin/users.php`**:
+  - Explicitly attached `openUserDetailModal`, `openAuditTrailDrawer`, and all modal/drawer handlers to `window` scope.
+
+---
+
 ## [2026-09-06] - Admin Single-Record Table Deletion, Post-Signup OTP Email Verification, Click-to-Reset Password Link & Responsive Notification Center
 
 ### 1. Granular Admin Single-Record Deletion Across All Tables
