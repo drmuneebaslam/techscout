@@ -1931,6 +1931,7 @@ class AdminController {
             'mailLogs' => $mailLogs,
             'mailCredentials' => $mailCredentials,
             'eventTriggers' => $eventTriggers,
+            'customTriggers' => \App\Core\EventTriggerEngine::getCustomTriggers(),
             'stats' => $stats
         ]);
     }
@@ -2525,6 +2526,67 @@ class AdminController {
             'success' => $res,
             'message' => $res ? "Event trigger '{$eventKey}' fired successfully! Email sent to {$testEmail}." : "Failed to fire event trigger '{$eventKey}'."
         ]);
+    }
+
+    public function createCustomTrigger(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+        $name = trim((string)$request->post('name', ''));
+        $type = trim((string)$request->post('type', 'event'));
+        $keyOrPattern = trim((string)$request->post('key_or_pattern', ''));
+        $tmplKey = trim((string)$request->post('template_key', 'welcome'));
+        $desc = trim((string)$request->post('description', ''));
+        $subject = trim((string)$request->post('subject_override', ''));
+        $singleDelivery = !empty($request->post('single_delivery'));
+        $id = trim((string)$request->post('id', ''));
+
+        if (empty($name) || empty($keyOrPattern)) {
+            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                Response::json(['success' => false, 'message' => 'Trigger name and key/URL pattern are required.']);
+                return;
+            }
+            Session::flash('error', 'Trigger name and key/URL pattern are required.');
+            Response::redirect('/admin/mail?tab=triggers');
+            return;
+        }
+
+        $res = \App\Core\EventTriggerEngine::saveCustomTrigger([
+            'id' => $id,
+            'name' => $name,
+            'type' => $type,
+            'key_or_pattern' => $keyOrPattern,
+            'description' => $desc,
+            'template_key' => $tmplKey,
+            'subject_override' => $subject,
+            'single_delivery' => $singleDelivery,
+            'is_active' => true
+        ]);
+
+        AuditLog::log('admin.create_custom_trigger', 'site_settings', 0, ['trigger_name' => $name, 'key_or_pattern' => $keyOrPattern]);
+
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            Response::json(['success' => true, 'message' => "Custom trigger '{$name}' created successfully!", 'trigger' => $res['trigger'] ?? null]);
+            return;
+        }
+
+        Session::flash('success', "Custom trigger '{$name}' saved!");
+        Response::redirect('/admin/mail?tab=triggers');
+    }
+
+    public function deleteCustomTrigger(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+        $id = trim((string)$request->post('id', ''));
+        if (!empty($id)) {
+            \App\Core\EventTriggerEngine::deleteCustomTrigger($id);
+            AuditLog::log('admin.delete_custom_trigger', 'site_settings', 0, ['trigger_id' => $id]);
+        }
+
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            Response::json(['success' => true, 'message' => 'Custom trigger deleted successfully.']);
+            return;
+        }
+
+        Session::flash('success', 'Custom trigger deleted.');
+        Response::redirect('/admin/mail?tab=triggers');
     }
 
     public function trackMailOpen(Request $request, array $params): void {

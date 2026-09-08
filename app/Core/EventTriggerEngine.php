@@ -103,6 +103,131 @@ class EventTriggerEngine {
     }
 
     /**
+     * Get all admin-configured custom triggers (Event Key & URL Pattern triggers).
+     */
+    public static function getCustomTriggers(): array {
+        try {
+            $row = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'custom_mail_triggers'");
+            if (!empty($row['key_value'])) {
+                $decoded = json_decode($row['key_value'], true);
+                if (is_array($decoded)) {
+                    return $decoded;
+                }
+            }
+        } catch (\Throwable $e) {}
+        return [];
+    }
+
+    /**
+     * Save or Update a Custom Dynamic Trigger (Event or URL Pattern based).
+     */
+    public static function saveCustomTrigger(array $data): array {
+        $triggers = self::getCustomTriggers();
+        $id = !empty($data['id']) ? trim($data['id']) : ('trig_' . time() . '_' . substr(bin2hex(random_bytes(3)), 0, 6));
+
+        $newTrigger = [
+            'id' => $id,
+            'name' => trim((string)($data['name'] ?? 'Custom Automation Trigger')),
+            'type' => in_array($data['type'] ?? '', ['event', 'url_pattern'], true) ? $data['type'] : 'event',
+            'key_or_pattern' => trim((string)($data['key_or_pattern'] ?? '')),
+            'description' => trim((string)($data['description'] ?? '')),
+            'template_key' => trim((string)($data['template_key'] ?? 'community_broadcast')),
+            'subject_override' => trim((string)($data['subject_override'] ?? '')),
+            'recipient_rule' => trim((string)($data['recipient_rule'] ?? 'payload')),
+            'single_delivery' => !empty($data['single_delivery']),
+            'is_active' => isset($data['is_active']) ? (bool)$data['is_active'] : true,
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        if (empty($newTrigger['key_or_pattern'])) {
+            return ['success' => false, 'error' => 'Trigger key or URL pattern is required.'];
+        }
+
+        // Replace or Append
+        $found = false;
+        foreach ($triggers as $idx => $t) {
+            if ($t['id'] === $id || ($t['key_or_pattern'] === $newTrigger['key_or_pattern'] && $t['type'] === $newTrigger['type'])) {
+                $triggers[$idx] = array_merge($t, $newTrigger);
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $triggers[] = $newTrigger;
+        }
+
+        $jsonStr = json_encode($triggers, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        Database::execute(
+            "INSERT INTO site_settings (key_name, key_value, updated_at) VALUES ('custom_mail_triggers', ?, NOW()) 
+             ON DUPLICATE KEY UPDATE key_value = ?, updated_at = NOW()",
+            [$jsonStr, $jsonStr]
+        );
+
+        return ['success' => true, 'trigger' => $newTrigger];
+    }
+
+    /**
+     * Delete a Custom Dynamic Trigger by ID.
+     */
+    public static function deleteCustomTrigger(string $id): bool {
+        $triggers = self::getCustomTriggers();
+        $filtered = array_filter($triggers, fn($t) => ($t['id'] ?? '') !== $id);
+        $jsonStr = json_encode(array_values($filtered), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        Database::execute(
+            "INSERT INTO site_settings (key_name, key_value, updated_at) VALUES ('custom_mail_triggers', ?, NOW()) 
+             ON DUPLICATE KEY UPDATE key_value = ?, updated_at = NOW()",
+            [$jsonStr, $jsonStr]
+        );
+        return true;
+    }
+
+    /**
+     * Evaluates incoming request URL against registered URL-pattern triggers and dispatches mapped emails automatically.
+     */
+    public static function evaluateUrlTriggers(string $requestUri, array $payload = []): int {
+        $customTriggers = self::getCustomTriggers();
+        $dispatchedCount = 0;
+
+        foreach ($customTriggers as $trig) {
+            if (empty($trig['is_active']) || ($trig['type'] ?? '') !== 'url_pattern' || empty($trig['key_or_pattern'])) {
+                continue;
+            }
+
+            $pattern = trim($trig['key_or_pattern']);
+            if (str_contains($requestUri, $pattern) || fnmatch("*{$pattern}*", $requestUri)) {
+                $toEmail = trim((string)($payload['email'] ?? ($payload['to_email'] ?? ($payload['user_email'] ?? ''))));
+                if (empty($toEmail)) {
+                    $currUser = Auth::user();
+                    $toEmail = $currUser['email'] ?? '';
+                    if (empty($payload['name'])) {
+                        $payload['name'] = $currUser['display_name'] ?? ($currUser['username'] ?? 'Member');
+                    }
+                }
+
+                if (!empty($toEmail)) {
+                    $tmplKey = $trig['template_key'] ?? 'community_broadcast';
+                    $toName = $payload['name'] ?? ($payload['to_name'] ?? 'Valued User');
+                    
+                    if (!empty($trig['subject_override'])) {
+                        $payload['subject_override'] = $trig['subject_override'];
+                    }
+
+                    if (!empty($trig['single_delivery'])) {
+                        if (self::isDuplicateDelivery($toEmail, $tmplKey)) {
+                            continue;
+                        }
+                    }
+
+                    $sent = Mailer::sendTemplate($tmplKey, $toEmail, $toName, $payload);
+                    if ($sent) $dispatchedCount++;
+                }
+            }
+        }
+
+        return $dispatchedCount;
+    }
+
+    /**
      * Resolves configured template key for an event.
      * Admins can reassign event mappings via site_settings or custom event mapping.
      */

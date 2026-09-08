@@ -19,13 +19,8 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
         ? 'dark'
         : ((isset($_COOKIE['ts_theme']) && $_COOKIE['ts_theme'] === 'light') ? 'light' : 'dark'));
 
-// High-Speed PJAX Fast Path: Return ONLY .admin-content-wrapper if requested via X-PJAX header
-$isPjax = !empty($_SERVER['HTTP_X_PJAX']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' && isset($_GET['_pjax']));
-if ($isPjax) {
-    echo '<title>' . htmlspecialchars($title ?? 'Admin Command Center | TechScout') . '</title>';
-    echo '<div class="admin-content-wrapper">';
-    return;
-}
+// Admin Top Header
+
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?= $activeAdminTheme ?>" class="<?= $activeAdminTheme === 'light' ? 'theme-light' : '' ?>">
@@ -434,6 +429,11 @@ if ($isPjax) {
               </a>
               <a href="<?= url('/admin/system-logs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system-logs') || str_contains($currentPath, '/admin/error-logs') ? 'active' : '' ?>" data-tooltip="Crash Forensics & Error Logs">
                 <i data-lucide="alert-octagon"></i> <span>System Error Logs</span>
+              </a>
+            <?php endif; ?>
+            <?php if ($isSuperAdmin || $canAccess('system.flags') || $canAccess('cms.settings')): ?>
+              <a href="<?= url('/admin/system') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system') ? 'active' : '' ?>" data-tooltip="System Settings & Diagnostics">
+                <i data-lucide="cpu"></i> <span>System Diagnostics</span>
               </a>
             <?php endif; ?>
             <a href="<?= url('/') ?>" class="admin-nav-link" target="_blank" style="color: #38bdf8;" data-tooltip="View Live Site">

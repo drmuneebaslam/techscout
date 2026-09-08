@@ -13,5 +13,5 @@ Always follow this mandatory workflow for every prompt and code modification in 
    - DO NOT copy scratch, waste, temporary, skill, or system configuration files (e.g., `scratch/`, `waste/`, `skills/`, `.system_generated/`, etc.) into `changes/`.
    - Preserve exact relative directory structure for all copied project files.
 
-4. **Git Commit Every Change**:
-   Execute a `git commit` detailing each and every change made in the commit message.
+4. **Git Commit & Push Every Change**:
+   Execute a `git commit` detailing each and every change made in the commit message, and push to remote repository (`https://github.com/drmuneebaslam/techscout.git` branch `main`).

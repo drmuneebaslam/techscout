@@ -1184,6 +1184,80 @@
           <?php endif; ?>
         </tbody>
       </table>
+
+      <!-- Custom Triggers Header & Table -->
+      <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(148,163,184,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h4 style="font-size: 1.1rem; color: #38bdf8; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="compass"></i> Dynamic Custom &amp; URL Pattern Triggers
+            </h4>
+            <p style="color: #94a3b8; font-size: 0.82rem; margin: 0.2rem 0 0 0;">
+              Configure custom URL pattern triggers (e.g. <code>/admin/revenue/process-payout</code>, <code>/auth/register</code>) or custom event keys directly from the UI without writing PHP code.
+            </p>
+          </div>
+          <button type="button" onclick="openCreateCustomTriggerModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-weight: 700;">
+            ➕ Add Custom Trigger
+          </button>
+        </div>
+
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Trigger Name &amp; Type</th>
+              <th>Pattern / Event Key</th>
+              <th>Assigned Template</th>
+              <th>Subject Line Override</th>
+              <th>Policy</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if (!empty($customTriggers)): ?>
+              <?php foreach ($customTriggers as $ct): ?>
+                <tr>
+                  <td>
+                    <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">
+                      <?= htmlspecialchars($ct['name']) ?>
+                    </div>
+                    <span class="ts-badge <?= ($ct['type'] === 'url_pattern') ? 'ts-badge-cyan' : 'ts-badge-pink' ?>" style="font-size: 0.65rem;">
+                      <?= ($ct['type'] === 'url_pattern') ? '🌐 URL PATTERN' : '⚡ CUSTOM EVENT' ?>
+                    </span>
+                  </td>
+                  <td>
+                    <code style="font-size: 0.75rem; color: #38bdf8; font-family: monospace;">
+                      <?= htmlspecialchars($ct['key_or_pattern']) ?>
+                    </code>
+                  </td>
+                  <td>
+                    <span style="font-weight: 700; color: #c084fc; font-size: 0.82rem;">
+                      <?= htmlspecialchars($ct['template_key']) ?>
+                    </span>
+                  </td>
+                  <td style="font-size: 0.8rem; color: #94a3b8;">
+                    <?= !empty($ct['subject_override']) ? htmlspecialchars($ct['subject_override']) : '<em style="opacity:0.6;">(Default template subject)</em>' ?>
+                  </td>
+                  <td>
+                    <?= !empty($ct['single_delivery']) ? '<span class="ts-badge ts-badge-cyan" style="font-size:0.65rem;">🔒 SINGLE</span>' : '<span class="ts-badge ts-badge-green" style="font-size:0.65rem;">🔄 MULTI</span>' ?>
+                  </td>
+                  <td style="text-align: center;">
+                    <div style="display: flex; gap: 0.35rem; justify-content: center;">
+                      <button type="button" onclick="openTestEventTriggerModal('<?= htmlspecialchars(addslashes($ct['key_or_pattern'])) ?>', '<?= htmlspecialchars(addslashes($ct['name'])) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #38bdf8;">Test ⚡</button>
+                      <button type="button" onclick="deleteCustomTrigger('<?= htmlspecialchars($ct['id']) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">Delete 🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="6" style="text-align: center; color: #64748b; padding: 1.5rem;">
+                  No custom dynamic triggers created yet. Click "Add Custom Trigger" above to link URL patterns to templates!
+                </td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Developer & Admin Architecture Guide Box -->
@@ -1340,16 +1414,67 @@
             </div>
           </div>
 
-          <!-- HTML Code Editor Area -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-            <label class="admin-modal-label" style="margin: 0; color: #cbd5e1;">HTML Body Template Code</label>
-            <div style="display: flex; gap: 0.25rem;">
-              <button type="button" onclick="insertTmplTag('{{name}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.12rem 0.4rem; font-size: 0.66rem; font-family: monospace;">+ {{name}}</button>
-              <button type="button" onclick="insertTmplTag('{{action_url}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.12rem 0.4rem; font-size: 0.66rem; font-family: monospace;">+ {{action_url}}</button>
-              <button type="button" onclick="insertTmplTag('{{headline}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.12rem 0.4rem; font-size: 0.66rem; font-family: monospace;">+ {{headline}}</button>
+          <!-- Visual Editor Mode Switcher & Rich Formatting Toolbar -->
+          <div style="background: rgba(15,23,42,0.9); border: 1px solid rgba(168,85,247,0.3); border-radius: 8px 8px 0 0; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="display: flex; gap: 0.25rem;">
+                <button type="button" onclick="switchTmplEditMode('wysiwyg')" id="btn-tmpl-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: #a855f7; border-color: #a855f7;">🎨 Visual WYSIWYG Editor</button>
+                <button type="button" onclick="switchTmplEditMode('html')" id="btn-tmpl-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">💻 Raw HTML Code</button>
+              </div>
+              
+              <!-- Dynamic Variable Selector Dropdown -->
+              <select onchange="if(this.value){ insertTmplTag(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #c084fc; width: auto; max-width: 240px; font-weight: 700; border-color: rgba(168,85,247,0.4);">
+                <option value="">⚡ Insert Dynamic Token... ▾</option>
+                <?php foreach ($availableVariables as $vCat => $vList): ?>
+                  <optgroup label="<?= htmlspecialchars($vCat) ?>">
+                    <?php foreach ($vList as $vTag => $vDesc): ?>
+                      <option value="<?= htmlspecialchars($vTag) ?>"><?= htmlspecialchars($vTag) ?> - <?= htmlspecialchars($vDesc) ?></option>
+                    <?php endforeach; ?>
+                  </optgroup>
+                <?php endforeach; ?>
+              </select>
+            </div>
+
+            <!-- WYSIWYG Formatting Buttons Bar -->
+            <div id="tmpl_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #05070b; padding: 0.35rem; border-radius: 6px; border: 1px solid rgba(148,163,184,0.15);">
+              <button type="button" onclick="execTmplWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800;" title="Bold"><b>B</b></button>
+              <button type="button" onclick="execTmplWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic;" title="Italic"><i>I</i></button>
+              <button type="button" onclick="execTmplWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline;" title="Underline"><u>U</u></button>
+              <button type="button" onclick="execTmplWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through;" title="Strikethrough"><s>S</s></button>
+              <span style="color: rgba(148,163,184,0.3);">|</span>
+              <select onchange="execTmplWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #0b0f19;">
+                <option value="">Header ▾</option>
+                <option value="H1">H1 Main Heading</option>
+                <option value="H2">H2 Sub Heading</option>
+                <option value="H3">H3 Section Title</option>
+                <option value="P">Paragraph</option>
+                <option value="BLOCKQUOTE">Blockquote</option>
+              </select>
+              <span style="color: rgba(148,163,184,0.3);">|</span>
+              <button type="button" onclick="execTmplWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Left">⬅️</button>
+              <button type="button" onclick="execTmplWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Center">↔️</button>
+              <button type="button" onclick="execTmplWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Right">➡️</button>
+              <span style="color: rgba(148,163,184,0.3);">|</span>
+              <button type="button" onclick="execTmplWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Bullet List">• List</button>
+              <button type="button" onclick="execTmplWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Numbered List">1. List</button>
+              <span style="color: rgba(148,163,184,0.3);">|</span>
+              <button type="button" onclick="promptTmplLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #38bdf8;" title="Insert Link">🔗 Link</button>
+              <button type="button" onclick="insertTmplCtaButton()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #a855f7;" title="Insert Primary CTA Button">🔘 Button</button>
+              <button type="button" onclick="execTmplWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444;" title="Clear Formatting">🧹 Clear</button>
             </div>
           </div>
-          <textarea name="html_content" id="tmpl_html_input" oninput="updateTmplModalPreview()" rows="14" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" class="admin-modal-textarea" style="font-family: var(--admin-font-mono); font-size: 0.84rem; flex: 1; min-height: 280px; resize: vertical;" required></textarea>
+
+          <!-- Visual WYSIWYG Editable Canvas -->
+          <div id="tmpl_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid rgba(168,85,247,0.3); border-top: none; border-radius: 0 0 8px 8px; padding: 1rem; min-height: 280px; max-height: 480px; overflow-y: auto; flex: 1;">
+            <div id="tmpl_wysiwyg_editor" contenteditable="true" oninput="syncWysiwygToCode()" style="outline: none; min-height: 260px; font-family: 'Inter', sans-serif; font-size: 0.92rem; line-height: 1.6;">
+              <h2 style="color: #0f172a; margin-top: 0;">Hello {{name}}!</h2>
+              <p style="color: #475569;">Welcome to TechScout Intelligence. We are thrilled to have you on board.</p>
+              <p>{{message}}</p>
+            </div>
+          </div>
+
+          <!-- HTML Code Editor Textarea (Hidden when in WYSIWYG mode) -->
+          <textarea name="html_content" id="tmpl_html_input" oninput="syncCodeToWysiwyg()" rows="14" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" class="admin-modal-textarea" style="display: none; font-family: var(--admin-font-mono); font-size: 0.84rem; flex: 1; min-height: 280px; resize: vertical; border-radius: 0 0 8px 8px; border-top: none;" required></textarea>
         </div>
 
         <!-- RIGHT COLUMN: REAL-TIME RENDERED LIVE HTML PREVIEW IFRAME -->
@@ -1415,6 +1540,72 @@
         <button type="button" onclick="closeTestEventTriggerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
         <button type="submit" id="btnTestEventSubmit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #a855f7; border-color: #a855f7; font-weight: 700;">
           Fire Event Trigger 🚀
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: CREATE CUSTOM AUTOMATION TRIGGER -->
+<!-- ========================================================================= -->
+<div id="createCustomTriggerModal" class="admin-modal-overlay" style="display: none;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 580px; width: 95%;">
+    <div class="admin-modal-header">
+      <h3 class="admin-modal-title" style="color: #38bdf8;">➕ Create Custom Trigger &amp; URL Automation</h3>
+      <button type="button" onclick="closeCreateCustomTriggerModal()" class="admin-modal-close">✕</button>
+    </div>
+    <form id="createCustomTriggerForm" onsubmit="submitCreateCustomTrigger(event)">
+      <div style="margin-bottom: 1rem;">
+        <label class="admin-modal-label">Trigger Name <span style="color:#ef4444;">*</span></label>
+        <input type="text" id="ct_name" placeholder="e.g. Payout Disbursement URL Trigger" class="admin-modal-input" required>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label class="admin-modal-label">Trigger Type</label>
+          <select id="ct_type" class="admin-modal-select" onchange="toggleCustomTriggerTypeNotice(this.value)">
+            <option value="url_pattern">🌐 Specific URL Path Pattern</option>
+            <option value="event">⚡ Custom Event Key</option>
+          </select>
+        </div>
+        <div>
+          <label class="admin-modal-label">Pattern or Event Key <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="ct_key_or_pattern" placeholder="e.g. /admin/revenue/process-payout" class="admin-modal-input" style="font-family: monospace;" required>
+        </div>
+      </div>
+
+      <div id="ct_type_notice" style="font-size: 0.76rem; color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 1rem;">
+        Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>process-payout</code>) and automatically dispatches assigned HTML template!
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label class="admin-modal-label">Assigned Target HTML Email Template <span style="color:#ef4444;">*</span></label>
+        <select id="ct_template_key" class="admin-modal-select" required>
+          <?php foreach ($templateLibrary as $tKey => $tVal): ?>
+            <option value="<?= htmlspecialchars($tKey) ?>">
+              <?= htmlspecialchars($tVal['name']) ?> (<?= htmlspecialchars($tKey) ?>)
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label class="admin-modal-label">Subject Line Override (Optional)</label>
+        <input type="text" id="ct_subject_override" placeholder="Leave blank to use template default subject" class="admin-modal-input">
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.84rem; cursor: pointer;">
+          <input type="checkbox" id="ct_single_delivery" value="1" style="width: 16px; height: 16px; accent-color: #38bdf8;">
+          <span>🔒 Enforce Single Delivery Only (prevent duplicate delivery to same email)</span>
+        </label>
+      </div>
+
+      <div class="admin-modal-footer">
+        <button type="button" onclick="closeCreateCustomTriggerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+        <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #38bdf8; color: #000; font-weight: 700;">
+          Save Custom Trigger 🚀
         </button>
       </div>
     </form>
@@ -2616,7 +2807,162 @@ function submitTestEventTrigger(e) {
     if (btn) btn.disabled = false;
     resBox.className = 'ts-badge ts-badge-pink';
     resBox.innerText = 'Network error during trigger test fire.';
+// Custom Dynamic Trigger Functions
+function openCreateCustomTriggerModal() {
+  const modal = document.getElementById('createCustomTriggerModal');
+  if (modal) {
+    document.getElementById('createCustomTriggerForm').reset();
+    modal.style.display = 'flex';
+  }
+}
+
+function closeCreateCustomTriggerModal() {
+  const modal = document.getElementById('createCustomTriggerModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function toggleCustomTriggerTypeNotice(type) {
+  const notice = document.getElementById('ct_type_notice');
+  const input = document.getElementById('ct_key_or_pattern');
+  if (notice && input) {
+    if (type === 'url_pattern') {
+      notice.innerHTML = 'Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>process-payout</code>) and automatically dispatches assigned HTML template!';
+      input.placeholder = 'e.g. /admin/revenue/process-payout';
+    } else {
+      notice.innerHTML = 'Fires when <code>\\App\\Core\\EventTriggerEngine::fire("key", $payload)</code> is called in PHP code!';
+      input.placeholder = 'e.g. custom_user_signup';
+    }
+  }
+}
+
+function submitCreateCustomTrigger(e) {
+  e.preventDefault();
+  const name = document.getElementById('ct_name').value.trim();
+  const type = document.getElementById('ct_type').value;
+  const keyOrPattern = document.getElementById('ct_key_or_pattern').value.trim();
+  const templateKey = document.getElementById('ct_template_key').value;
+  const subjectOverride = document.getElementById('ct_subject_override').value.trim();
+  const singleDelivery = document.getElementById('ct_single_delivery').checked ? '1' : '';
+
+  if (!name || !keyOrPattern || !templateKey) {
+    alert('Please complete all required fields.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('type', type);
+  formData.append('key_or_pattern', keyOrPattern);
+  formData.append('template_key', templateKey);
+  formData.append('subject_override', subjectOverride);
+  formData.append('single_delivery', singleDelivery);
+
+  fetch('<?= url('/admin/mail/trigger/create') ?>', {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    body: formData
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      alert(d.message || 'Custom trigger saved successfully!');
+      closeCreateCustomTriggerModal();
+      window.location.reload();
+    } else {
+      alert(d.message || 'Failed to save custom trigger.');
+    }
+  })
+  .catch(err => {
+    alert('Network error while saving custom trigger.');
   });
+}
+
+function deleteCustomTrigger(id) {
+  if (!confirm('Are you sure you want to delete this custom trigger?')) return;
+  const formData = new FormData();
+  formData.append('id', id);
+
+  fetch('<?= url('/admin/mail/trigger/delete') ?>', {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    body: formData
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      window.location.reload();
+    } else {
+      alert(d.message || 'Failed to delete custom trigger.');
+    }
+  })
+  .catch(err => alert('Network error.'));
+}
+
+// Visual WYSIWYG Editor Sync Functions
+function switchTmplEditMode(mode) {
+  const wysiwygCont = document.getElementById('tmpl_wysiwyg_container');
+  const wysiwygTool = document.getElementById('tmpl_wysiwyg_toolbar');
+  const htmlInput = document.getElementById('tmpl_html_input');
+  const btnWysiwyg = document.getElementById('btn-tmpl-mode-wysiwyg');
+  const btnHtml = document.getElementById('btn-tmpl-mode-html');
+
+  if (mode === 'wysiwyg') {
+    syncCodeToWysiwyg();
+    if (wysiwygCont) wysiwygCont.style.display = 'block';
+    if (wysiwygTool) wysiwygTool.style.display = 'flex';
+    if (htmlInput) htmlInput.style.display = 'none';
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#a855f7'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; }
+  } else {
+    syncWysiwygToCode();
+    if (wysiwygCont) wysiwygCont.style.display = 'none';
+    if (wysiwygTool) wysiwygTool.style.display = 'none';
+    if (htmlInput) htmlInput.style.display = 'block';
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#a855f7'; }
+  }
+}
+
+function execTmplWysiwyg(cmd, value = null) {
+  document.execCommand(cmd, false, value);
+  syncWysiwygToCode();
+}
+
+function syncWysiwygToCode() {
+  const wysiwyg = document.getElementById('tmpl_wysiwyg_editor');
+  const htmlInput = document.getElementById('tmpl_html_input');
+  if (wysiwyg && htmlInput) {
+    htmlInput.value = wysiwyg.innerHTML;
+    if (typeof updateTmplModalPreview === 'function') {
+      updateTmplModalPreview();
+    }
+  }
+}
+
+function syncCodeToWysiwyg() {
+  const wysiwyg = document.getElementById('tmpl_wysiwyg_editor');
+  const htmlInput = document.getElementById('tmpl_html_input');
+  if (wysiwyg && htmlInput) {
+    wysiwyg.innerHTML = htmlInput.value || '<p>Start typing template content...</p>';
+    if (typeof updateTmplModalPreview === 'function') {
+      updateTmplModalPreview();
+    }
+  }
+}
+
+function promptTmplLink() {
+  const url = prompt('Enter URL link:', 'https://');
+  if (url) execTmplWysiwyg('createLink', url);
+}
+
+function insertTmplCtaButton() {
+  const btnHtml = '<div style="margin:20px 0; text-align:center;"><a href="{{action_url}}" style="display:inline-block; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#ffffff; padding:12px 28px; border-radius:8px; font-weight:bold; text-decoration:none; font-size:15px; box-shadow:0 4px 12px rgba(99,102,241,0.3);">Primary Call-to-Action Button &rarr;</a></div>';
+  const wysiwyg = document.getElementById('tmpl_wysiwyg_editor');
+  if (wysiwyg) {
+    wysiwyg.focus();
+    document.execCommand('insertHTML', false, btnHtml);
+    syncWysiwygToCode();
+  }
 }
 
 function previewTemplateModal(key) {

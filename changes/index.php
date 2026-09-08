@@ -410,6 +410,8 @@ $router->post('/admin/mail/credentials/set-default/{id}', [AdminController::clas
 $router->post('/admin/mail/credentials/test', [AdminController::class, 'testMailCredential'], ['admin']);
 $router->post('/admin/mail/event-triggers/save', [AdminController::class, 'saveEventTriggerMap'], ['admin']);
 $router->post('/admin/mail/event-triggers/test', [AdminController::class, 'testEventTrigger'], ['admin']);
+$router->post('/admin/mail/trigger/create', [AdminController::class, 'createCustomTrigger'], ['admin']);
+$router->post('/admin/mail/trigger/delete', [AdminController::class, 'deleteCustomTrigger'], ['admin']);
 
 // Help Center & Knowledge Base Article CMS
 $router->get('/admin/help-articles', [AdminController::class, 'helpArticles'], ['admin']);

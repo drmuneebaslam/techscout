@@ -204,18 +204,67 @@ $allVariableCategories = [
           </div>
         </div>
 
-        <!-- HTML Code Editor -->
+        <!-- HTML Code & Visual WYSIWYG Editor Workspace -->
         <div class="admin-table-wrap" style="padding: 1.25rem; background: rgba(15,23,42,0.85);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-            <h3 style="font-size: 1.05rem; color: #f8fafc; margin: 0; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-              <i data-lucide="code-2" style="color: #38bdf8;"></i> Responsive HTML Template Body
-            </h3>
-            <button type="button" onclick="loadStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #38bdf8;">
-              Insert Boilerplate ⚡
-            </button>
+            <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <button type="button" onclick="switchSaEditMode('wysiwyg')" id="btn-sa-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.75rem; background: #10b981; border-color: #10b981;">🎨 Visual WYSIWYG Editor</button>
+              <button type="button" onclick="switchSaEditMode('html')" id="btn-sa-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.75rem;">💻 Raw HTML Code</button>
+            </div>
+
+            <div style="display: flex; gap: 0.35rem;">
+              <select onchange="if(this.value){ insertVariable(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #10b981; width: auto; max-width: 240px; font-weight: 700;">
+                <option value="">⚡ Insert Dynamic Token... ▾</option>
+                <?php foreach ($allVariableCategories as $vCat => $vList): ?>
+                  <optgroup label="<?= htmlspecialchars($vCat) ?>">
+                    <?php foreach ($vList as $vTag => $vDesc): ?>
+                      <option value="<?= htmlspecialchars($vTag) ?>"><?= htmlspecialchars($vTag) ?> - <?= htmlspecialchars($vDesc) ?></option>
+                    <?php endforeach; ?>
+                  </optgroup>
+                <?php endforeach; ?>
+              </select>
+              <button type="button" onclick="loadStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #38bdf8;">
+                Boilerplate ⚡
+              </button>
+            </div>
           </div>
 
-          <textarea name="html_content" id="templateHtmlBody" oninput="updateStandaloneLivePreview()" rows="22" class="admin-modal-input" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre; background: #05070b; border-color: rgba(99,102,241,0.35); height: 480px; resize: vertical;" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" required><?= htmlspecialchars($template['html_content'] ?? ($template['html_body'] ?? '')) ?></textarea>
+          <!-- WYSIWYG Formatting Buttons Toolbar -->
+          <div id="sa_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #05070b; padding: 0.4rem; border-radius: 6px; border: 1px solid rgba(148,163,184,0.15); margin-bottom: 0.5rem;">
+            <button type="button" onclick="execSaWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800;" title="Bold"><b>B</b></button>
+            <button type="button" onclick="execSaWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic;" title="Italic"><i>I</i></button>
+            <button type="button" onclick="execSaWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline;" title="Underline"><u>U</u></button>
+            <button type="button" onclick="execSaWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through;" title="Strikethrough"><s>S</s></button>
+            <span style="color: rgba(148,163,184,0.3);">|</span>
+            <select onchange="execSaWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #0b0f19;">
+              <option value="">Header ▾</option>
+              <option value="H1">H1 Main Heading</option>
+              <option value="H2">H2 Sub Heading</option>
+              <option value="H3">H3 Section Title</option>
+              <option value="P">Paragraph</option>
+              <option value="BLOCKQUOTE">Blockquote</option>
+            </select>
+            <span style="color: rgba(148,163,184,0.3);">|</span>
+            <button type="button" onclick="execSaWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Left">⬅️</button>
+            <button type="button" onclick="execSaWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Center">↔️</button>
+            <button type="button" onclick="execSaWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Right">➡️</button>
+            <span style="color: rgba(148,163,184,0.3);">|</span>
+            <button type="button" onclick="execSaWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Bullet List">• List</button>
+            <button type="button" onclick="execSaWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Numbered List">1. List</button>
+            <span style="color: rgba(148,163,184,0.3);">|</span>
+            <button type="button" onclick="promptSaLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #38bdf8;" title="Insert Link">🔗 Link</button>
+            <button type="button" onclick="insertSaCtaButton()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #10b981;" title="Insert Primary CTA Button">🔘 Button</button>
+            <button type="button" onclick="execSaWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444;" title="Clear Formatting">🧹 Clear</button>
+          </div>
+
+          <!-- Visual WYSIWYG Editable Canvas -->
+          <div id="sa_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 1.25rem; min-height: 440px; max-height: 520px; overflow-y: auto;">
+            <div id="sa_wysiwyg_editor" contenteditable="true" oninput="syncSaWysiwygToCode()" style="outline: none; min-height: 420px; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6;">
+              <?= $template ? ($template['html_content'] ?? ($template['html_body'] ?? '')) : '<h2 style="color:#0f172a;">Hello {{name}}!</h2><p>Start composing your email content visually...</p>' ?>
+            </div>
+          </div>
+
+          <textarea name="html_content" id="templateHtmlBody" oninput="syncSaCodeToWysiwyg()" rows="22" class="admin-modal-input" style="display: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre; background: #05070b; border-color: rgba(99,102,241,0.35); height: 480px; resize: vertical;" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" required><?= htmlspecialchars($template['html_content'] ?? ($template['html_body'] ?? '')) ?></textarea>
         </div>
       </div>
 
@@ -740,6 +789,73 @@ function loadStarterBoilerplate() {
   </table>
 </body>
 </html>`;
+}
+
+// Standalone Visual WYSIWYG Editor Sync Functions
+function switchSaEditMode(mode) {
+  const wysiwygCont = document.getElementById('sa_wysiwyg_container');
+  const wysiwygTool = document.getElementById('sa_wysiwyg_toolbar');
+  const htmlInput = document.getElementById('templateHtmlBody');
+  const btnWysiwyg = document.getElementById('btn-sa-mode-wysiwyg');
+  const btnHtml = document.getElementById('btn-sa-mode-html');
+
+  if (mode === 'wysiwyg') {
+    syncSaCodeToWysiwyg();
+    if (wysiwygCont) wysiwygCont.style.display = 'block';
+    if (wysiwygTool) wysiwygTool.style.display = 'flex';
+    if (htmlInput) htmlInput.style.display = 'none';
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#10b981'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; }
+  } else {
+    syncSaWysiwygToCode();
+    if (wysiwygCont) wysiwygCont.style.display = 'none';
+    if (wysiwygTool) wysiwygTool.style.display = 'none';
+    if (htmlInput) htmlInput.style.display = 'block';
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#10b981'; }
+  }
+}
+
+function execSaWysiwyg(cmd, value = null) {
+  document.execCommand(cmd, false, value);
+  syncSaWysiwygToCode();
+}
+
+function syncSaWysiwygToCode() {
+  const wysiwyg = document.getElementById('sa_wysiwyg_editor');
+  const htmlInput = document.getElementById('templateHtmlBody');
+  if (wysiwyg && htmlInput) {
+    htmlInput.value = wysiwyg.innerHTML;
+    if (typeof updateStandaloneLivePreview === 'function') {
+      updateStandaloneLivePreview();
+    }
+  }
+}
+
+function syncSaCodeToWysiwyg() {
+  const wysiwyg = document.getElementById('sa_wysiwyg_editor');
+  const htmlInput = document.getElementById('templateHtmlBody');
+  if (wysiwyg && htmlInput) {
+    wysiwyg.innerHTML = htmlInput.value || '<p>Start typing template content...</p>';
+    if (typeof updateStandaloneLivePreview === 'function') {
+      updateStandaloneLivePreview();
+    }
+  }
+}
+
+function promptSaLink() {
+  const url = prompt('Enter URL link:', 'https://');
+  if (url) execSaWysiwyg('createLink', url);
+}
+
+function insertSaCtaButton() {
+  const btnHtml = '<div style="margin:20px 0; text-align:center;"><a href="{{action_url}}" style="display:inline-block; background:linear-gradient(135deg,#10b981,#059669); color:#ffffff; padding:12px 28px; border-radius:8px; font-weight:bold; text-decoration:none; font-size:15px; box-shadow:0 4px 12px rgba(16,185,129,0.3);">Primary Call-to-Action Button &rarr;</a></div>';
+  const wysiwyg = document.getElementById('sa_wysiwyg_editor');
+  if (wysiwyg) {
+    wysiwyg.focus();
+    document.execCommand('insertHTML', false, btnHtml);
+    syncSaWysiwygToCode();
+  }
 }
 </script>
 
