@@ -5676,16 +5676,16 @@ class AdminController {
                         ];
                     }
 
-                    if ($action === 'paid') {
+                    if ($action === 'paid' || $action === 'approved') {
                         \App\Core\Mailer::sendTemplate('payout_approved', $authorUser['email'], $recipientName, [
                             'name' => $recipientName,
                             'amount' => number_format($amountUsd, 2),
                             'net_amount' => number_format($netAmount, 2),
                             'fee_deducted' => number_format($feeDeducted, 2),
                             'payout_id' => (string)$payoutId,
-                            'transaction_ref' => (string)($txRef ?: 'TXN-' . bin2hex(random_bytes(4))),
+                            'transaction_ref' => (string)($txRef ?: 'TXN-' . strtoupper(bin2hex(random_bytes(4)))),
                             'receipt_url' => (string)($receiptUrl ? \App\Core\Config::url($receiptUrl) : ''),
-                            'destination' => (string)($payout['payout_address'] ?? 'Verified Destination'),
+                            'destination' => (string)($payout['payout_address'] ?? 'Verified Destination Account'),
                             'action_url' => url('/author/rewards')
                         ], $mailAttachments);
                     } elseif ($action === 'rejected') {
@@ -5693,12 +5693,26 @@ class AdminController {
                             'name' => $recipientName,
                             'amount' => number_format($amountUsd, 2),
                             'payout_id' => (string)$payoutId,
-                            'admin_notes' => (string)($adminNotes ?: 'Compliance verification requirements not met.'),
+                            'admin_notes' => (string)($adminNotes ?: 'Compliance verification requirements not met. Deducted credits have been 100% restored to your balance.'),
+                            'action_url' => url('/author/rewards')
+                        ], $mailAttachments);
+                    } elseif ($action === 'processing' || $action === 'pending') {
+                        \App\Core\Mailer::sendTemplate('payout_requested', $authorUser['email'], $recipientName, [
+                            'name' => $recipientName,
+                            'amount' => number_format($amountUsd, 2),
+                            'net_amount' => number_format($netAmount, 2),
+                            'fee_deducted' => number_format($feeDeducted, 2),
+                            'payout_id' => (string)$payoutId,
+                            'ref_no' => (string)($txRef ?: 'PAY-' . strtoupper(bin2hex(random_bytes(4)))),
+                            'method_type' => (string)($payout['payout_method'] ?? 'Bank Wire / Wallet'),
+                            'destination' => (string)($payout['payout_address'] ?? 'Verified Account'),
                             'action_url' => url('/author/rewards')
                         ], $mailAttachments);
                     }
                 }
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+                error_log("Failed to dispatch payout transaction notification email: " . $e->getMessage());
+            }
         }
 
         Session::flash('success', "Payout #{$payoutId} updated to " . strtoupper($action) . " successfully.");
@@ -7127,9 +7141,9 @@ class AdminController {
         // Load custom template if ID or key passed
         $template = null;
         if ($templateId > 0) {
-            $template = Database::fetch("SELECT * FROM custom_mail_templates WHERE id = ?", [$templateId]);
+            $template = Database::fetch("SELECT * FROM mail_templates WHERE id = ?", [$templateId]);
         } elseif (!empty($templateKey)) {
-            $template = Database::fetch("SELECT * FROM custom_mail_templates WHERE template_key = ?", [$templateKey]);
+            $template = Database::fetch("SELECT * FROM mail_templates WHERE template_key = ?", [$templateKey]);
         }
 
         // If not in custom table, check if it exists in system templates

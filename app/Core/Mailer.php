@@ -247,6 +247,10 @@ class Mailer {
         return $builtIn;
     }
 
+    public static function getTemplateLibrary(): array {
+        return self::getTemplates();
+    }
+
     public static function assignTemplateCredential(string $templateKey, ?int $credentialId): bool {
         $key = preg_replace('/[^a-z0-9_-]/i', '_', strtolower(trim($templateKey)));
         if (empty($key)) return false;
@@ -1319,7 +1323,7 @@ class Mailer {
 
         // Record in mail_logs table with full body_html, tracking_token & attachments_json (fail-safe)
         try {
-            $attachmentsJson = !empty($attachments) ? json_encode($attachments) : null;
+            $attachmentsJson = json_encode(!empty($attachments) ? $attachments : []);
             $credName = !empty($credProfile['name']) ? $credProfile['name'] : strtoupper($driver);
 
             // 1. Try modern schema with tracking_token, from_email, from_name, credential_name
@@ -1329,32 +1333,11 @@ class Mailer {
             );
 
             if (!$inserted) {
-                // Auto-heal missing columns if on an older database table
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `tracking_token` VARCHAR(64) NULL AFTER `id`");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `from_email` VARCHAR(191) NULL AFTER `to_name`");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `from_name` VARCHAR(150) NULL AFTER `from_email`");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `credential_name` VARCHAR(150) NULL AFTER `driver`");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `open_count` INT UNSIGNED NOT NULL DEFAULT 0");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `opened_at` DATETIME NULL");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `click_count` INT UNSIGNED NOT NULL DEFAULT 0");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `clicked_at` DATETIME NULL");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `last_clicked_url` TEXT NULL");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `user_ip` VARCHAR(45) NULL");
-                Database::executeSilent("ALTER TABLE `mail_logs` ADD COLUMN `user_agent` TEXT NULL");
-
-                // Retry insert with new columns
-                $inserted = Database::executeSilent(
-                    "INSERT INTO mail_logs (to_email, to_name, from_email, from_name, subject, template_key, body_html, attachments_json, driver, credential_name, tracking_token, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-                    [$toEmail, $toName, $fromEmail, $fromName, $subject, $templateKey, $htmlContent, $attachmentsJson, $driver, $credName, $trackingToken, $status, $errorMessage]
-                );
-
                 // Fallback to legacy schema if needed
-                if (!$inserted) {
-                    Database::executeSilent(
-                        "INSERT INTO mail_logs (to_email, to_name, subject, template_key, body_html, attachments_json, driver, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-                        [$toEmail, $toName, $subject, $templateKey, $htmlContent, $attachmentsJson, $driver, $status, $errorMessage]
-                    );
-                }
+                Database::executeSilent(
+                    "INSERT INTO mail_logs (to_email, to_name, subject, template_key, body_html, attachments_json, driver, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                    [$toEmail, $toName, $subject, $templateKey, $htmlContent, $attachmentsJson, $driver, $status, $errorMessage]
+                );
             }
         } catch (\Throwable $e) {
             // Absolute fail-safe: logging failure must never disrupt dispatch

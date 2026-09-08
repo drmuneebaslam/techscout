@@ -1557,8 +1557,13 @@ class Database {
             $stmt = $conn->prepare($sql);
             return $stmt->execute($params);
         } catch (Throwable $e) {
+            $msg = $e->getMessage();
+            // Suppress benign duplicate column/index errors during auto-migrations
+            if (str_contains($msg, '1060') || str_contains($msg, '42S21') || str_contains($msg, '1061') || str_contains($msg, 'Duplicate column')) {
+                return false;
+            }
             if (class_exists('\\App\\Core\\ErrorLogger')) {
-                \App\Core\ErrorLogger::log('DATABASE_SILENT_ERROR', $e->getMessage() . ($sql ? " | SQL: " . substr($sql, 0, 200) : ""));
+                \App\Core\ErrorLogger::log('DATABASE_SILENT_ERROR', $msg . ($sql ? " | SQL: " . substr($sql, 0, 200) : ""));
             }
             return false;
         }
