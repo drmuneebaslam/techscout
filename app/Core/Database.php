@@ -1225,6 +1225,20 @@ class Database {
               INDEX `idx_analytics_author` (`author_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
+            // 19c. Post Views Telemetry Engine
+            $pdo->exec("CREATE TABLE IF NOT EXISTS `post_views` (
+              `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+              `content_id` BIGINT UNSIGNED NOT NULL,
+              `user_id` BIGINT UNSIGNED NULL,
+              `ip_address` VARCHAR(45) NULL,
+              `user_agent` VARCHAR(255) NULL,
+              `referrer` VARCHAR(255) NULL,
+              `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              INDEX `idx_pv_content` (`content_id`),
+              INDEX `idx_pv_created` (`created_at`),
+              INDEX `idx_pv_user` (`user_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
             // 20. Revenue Records & Creator Payout Ledger
             $pdo->exec("CREATE TABLE IF NOT EXISTS `revenue_records` (
               `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,

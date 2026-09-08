@@ -876,6 +876,21 @@ CREATE TABLE `mail_logs` (
   KEY `idx_ml_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `post_views`;
+CREATE TABLE `post_views` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `content_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `referrer` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_pv_content` (`content_id`),
+  KEY `idx_pv_created` (`created_at`),
+  KEY `idx_pv_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS `mail_templates`;
 CREATE TABLE `mail_templates` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

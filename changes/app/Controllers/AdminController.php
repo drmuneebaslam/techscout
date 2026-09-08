@@ -6704,15 +6704,26 @@ class AdminController {
             Database::execute("UPDATE authors SET total_views = total_views + ? WHERE id = (SELECT author_id FROM contents WHERE id = ?)", [$amount, $contentId]);
 
             // Distributed synthetic IP views for hourly/daily chart telemetry (without user_id)
+            Database::executeSilent("CREATE TABLE IF NOT EXISTS post_views (
+              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+              content_id BIGINT UNSIGNED NOT NULL,
+              user_id BIGINT UNSIGNED NULL,
+              ip_address VARCHAR(45) NULL,
+              user_agent VARCHAR(255) NULL,
+              referrer VARCHAR(255) NULL,
+              created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              INDEX idx_pv_content (content_id),
+              INDEX idx_pv_created (created_at),
+              INDEX idx_pv_user (user_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
             for ($i = 0; $i < min(10, $amount); $i++) {
                 $daysAgo = rand(0, 6);
                 $randIp = rand(10, 240) . '.' . rand(1, 250) . '.' . rand(1, 250) . '.' . rand(1, 250);
-                try {
-                    Database::execute("
-                        INSERT INTO post_views (content_id, ip_address, created_at)
-                        VALUES (?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
-                    ", [$contentId, $randIp, $daysAgo]);
-                } catch (\Throwable $e) {}
+                Database::executeSilent("
+                    INSERT INTO post_views (content_id, ip_address, created_at)
+                    VALUES (?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
+                ", [$contentId, $randIp, $daysAgo]);
             }
 
             Session::flash('success', "⚡ Successfully boosted view counter by +" . number_format($amount) . " reads! (Display counter updated without adding fake member accounts)");
@@ -6739,6 +6750,22 @@ class AdminController {
             $internalPages = ['/search', '/directory/tools', '/directory/articles', '/directory/prompts', '/directory/gpts', '/campaigns', '/home', '/topic/artificial-intelligence', '/topic/llm-engineering'];
             $externalDomains = ['twitter.com / x.com', 'github.com', 'news.ycombinator.com', 'google.com', 'reddit.com/r/programming', 'linkedin.com'];
 
+            Database::executeSilent("CREATE TABLE IF NOT EXISTS analytics_events (
+              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+              event_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              event_type VARCHAR(50) NOT NULL,
+              content_id BIGINT UNSIGNED NULL,
+              author_id BIGINT UNSIGNED NULL,
+              user_id BIGINT UNSIGNED NULL,
+              referrer_domain VARCHAR(150) NULL,
+              device_type ENUM('desktop', 'mobile', 'tablet', 'bot') NOT NULL DEFAULT 'desktop',
+              duration_seconds INT UNSIGNED NULL DEFAULT 0,
+              metadata_json JSON NULL,
+              INDEX idx_analytics_type_time (event_type, event_time),
+              INDEX idx_analytics_content (content_id),
+              INDEX idx_analytics_author (author_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
             for ($i = 0; $i < min(25, $readCount); $i++) {
                 $seconds = rand(45, 420);
                 $daysAgo = rand(0, 5);
@@ -6752,12 +6779,10 @@ class AdminController {
                 }
 
                 // Insert into analytics_events with user_id = NULL so real member accounts are never polluted
-                try {
-                    Database::execute("
-                        INSERT INTO analytics_events (event_type, content_id, user_id, referrer_domain, device_type, duration_seconds, event_time)
-                        VALUES ('read_10s', ?, NULL, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
-                    ", [$contentId, $source, (rand(0, 1) ? 'desktop' : 'mobile'), $seconds, $daysAgo]);
-                } catch (\Throwable $e) {}
+                Database::executeSilent("
+                    INSERT INTO analytics_events (event_type, content_id, user_id, referrer_domain, device_type, duration_seconds, event_time)
+                    VALUES ('read_10s', ?, NULL, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
+                ", [$contentId, $source, (rand(0, 1) ? 'desktop' : 'mobile'), $seconds, $daysAgo]);
             }
 
             Database::execute("UPDATE contents SET view_count = view_count + ? WHERE id = ?", [$readCount, $contentId]);
