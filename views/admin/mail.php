@@ -2431,6 +2431,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const tab = urlParams.get('tab');
   if (tab) {
     switchMailTab(tab);
+  }
+});
+
 // Global Window Scope Function Binding (Guarantees button onclick handlers always resolve)
 window.switchMailTab = switchMailTab;
 window.toggleRecipientInput = toggleRecipientInput;
@@ -2464,7 +2467,16 @@ window.composeToSingleUser = composeToSingleUser;
 window.filterTemplateCategory = filterTemplateCategory;
 window.populateTemplateForm = populateTemplateForm;
 window.setViewMode = setViewMode;
-
+window.filterUserDirectory = filterUserDirectory;
+window.filterMailLogsLive = filterMailLogsLive;
+window.filterTemplateCardsLive = filterTemplateCardsLive;
+window.onTemplateCredChanged = onTemplateCredChanged;
+window.submitBatchTemplateCredentials = submitBatchTemplateCredentials;
+window.openCreateTemplateModal = openCreateTemplateModal;
+window.resetTemplateForm = resetTemplateForm;
+window.toggleProviderFields = toggleProviderFields;
+window.toggleSelectAllUsers = toggleSelectAllUsers;
+window.updateSelectedUserCount = updateSelectedUserCount;
 </script>
 
 <!-- Add / Edit Mail Credential Modal -->

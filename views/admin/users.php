@@ -1772,6 +1772,8 @@ window.addEventListener('DOMContentLoaded', () => {
       custom_badge_color: '#38bdf8'
     });
   }
+});
+
 // Global Window Scope Function Binding (Guarantees button onclick handlers always resolve)
 window.openCreateUserModal = openCreateUserModal;
 window.closeCreateUserModal = closeCreateUserModal;
