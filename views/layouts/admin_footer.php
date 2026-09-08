@@ -1,3 +1,10 @@
+<?php
+$isPjax = !empty($_SERVER['HTTP_X_PJAX']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' && isset($_GET['_pjax']));
+if ($isPjax) {
+    echo '</div>';
+    return;
+}
+?>
       </div>
     </main>
   </div>
@@ -381,6 +388,8 @@
             // Transform root-level `const ` and `let ` to `var ` so re-navigating to the same page
             // never throws "SyntaxError: Identifier has already been declared"
             let safeCode = code.replace(/(^|[;\n\r])\s*(const|let)\s+([a-zA-Z0-9_$]+)/g, '$1 var $3');
+            // Auto-bind function declarations to global window scope so button onclick handlers resolve instantly
+            safeCode = safeCode.replace(/(^|[;\n\r])\s*function\s+([a-zA-Z0-9_$]+)\s*\(/g, '$1 var $2 = window.$2 = function $2(');
 
             try {
               const s = document.createElement('script');

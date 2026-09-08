@@ -4493,26 +4493,96 @@ class AdminController {
 
         // 5. Reference Variables Dictionary
         $availableVariables = [
-            'Subscriber' => [
-                '{{name}}' => 'Subscriber display name (fallback: handle or email prefix)',
-                '{{username}}' => 'Linked user account handle (@username)',
-                '{{email}}' => 'Subscriber email address',
-                '{{role}}' => 'User role if registered (Member, Author, Admin)'
+            '👤 User & Account' => [
+                '{{name}}' => 'Recipient display name or email handle',
+                '{{username}}' => 'Linked handle (@username)',
+                '{{email}}' => 'Recipient email address',
+                '{{role}}' => 'Account role (Member, Author, Admin)',
+                '{{user_id}}' => 'Unique user ID',
+                '{{verification_code}}' => 'Sign up OTP verification PIN',
+                '{{registered_at}}' => 'User registration timestamp',
+                '{{ip_address}}' => 'Last active client IP address',
+                '{{browser}}' => 'Client browser & device details'
             ],
-            'Digest & Content' => [
-                '{{headline}}' => 'Main digest title or announcement headline',
-                '{{message}}' => 'Custom editorial message or lead paragraph',
-                '{{article_title}}' => 'Featured article or tool review title',
-                '{{digest_summary}}' => 'Key digest takeaways / bullet points',
-                '{{action_url}}' => 'Primary destination Call-to-Action button link',
-                '{{action_text}}' => 'Call-to-Action button label text'
+            '💳 Payouts & Treasury' => [
+                '{{amount}}' => 'Gross requested payout amount ($)',
+                '{{net_amount}}' => 'Net disburseable amount ($)',
+                '{{fee_deducted}}' => 'Platform & bank fee ($)',
+                '{{tax_deducted}}' => 'Tax withholding ($)',
+                '{{payout_id}}' => 'Payout claim ID',
+                '{{ref_no}}' => 'Internal claim reference number',
+                '{{transaction_ref}}' => 'Bank / Tx reference hash',
+                '{{method_type}}' => 'Payment method (PayPal, Wire, Crypto)',
+                '{{destination}}' => 'Payout destination address/account',
+                '{{receipt_url}}' => 'Payment proof receipt file link'
             ],
-            'System & Links' => [
+            '📰 Editorial & Articles' => [
+                '{{article_title}}' => 'Publication / article headline',
+                '{{article_slug}}' => 'URL slug of the article',
+                '{{article_url}}' => 'Full permalink to published post',
+                '{{category_name}}' => 'Content category',
+                '{{word_count}}' => 'Total article word count',
+                '{{read_time}}' => 'Estimated read time in minutes',
+                '{{editorial_notes}}' => 'Peer review feedback & notes',
+                '{{quality_score}}' => 'AI & Editorial quality rating'
+            ],
+            '🎫 Support & Helpdesk' => [
+                '{{ticket_id}}' => 'Support ticket ID',
+                '{{ticket_number}}' => 'Formatted ticket # (e.g. #1001)',
+                '{{ticket_subject}}' => 'Helpdesk ticket topic',
+                '{{ticket_status}}' => 'Current status (Open, Pending, Resolved)',
+                '{{reply_message}}' => 'Staff answer or response text',
+                '{{agent_name}}' => 'Assigned support engineer name'
+            ],
+            '⚙️ System & Platform' => [
                 '{{site_name}}' => 'Platform brand name (TechScout)',
-                '{{app_url}}' => 'Platform base URL',
-                '{{unsubscribe_url}}' => 'One-click unsubscribe URL with secure token',
-                '{{date}}' => 'Formatted broadcast date (e.g. ' . date('F j, Y') . ')',
-                '{{year}}' => date('Y')
+                '{{app_url}}' => 'Base platform URL',
+                '{{login_url}}' => 'Secure account sign-in link',
+                '{{register_url}}' => 'Account registration link',
+                '{{unsubscribe_url}}' => 'One-click unsubscribe URL',
+                '{{support_email}}' => 'Official support contact email',
+                '{{date}}' => 'Formatted date (' . date('F j, Y') . ')',
+                '{{year}}' => date('Y'),
+                '{{timestamp}}' => date('Y-m-d H:i:s T')
+            ],
+            '🎁 Community & Patronage' => [
+                '{{tipper_name}}' => 'Donor / patron supporter name',
+                '{{donor_name}}' => 'Patron supporter name',
+                '{{commenter_name}}' => 'Replying community member name',
+                '{{comment_snippet}}' => 'Snippet of reply comment',
+                '{{collection_title}}' => 'Curated stack collection name',
+                '{{sender_name}}' => 'Sharing user name',
+                '{{milestone_title}}' => 'Community milestone award'
+            ],
+            '🔒 Security & Auth' => [
+                '{{reset_code}}' => 'Password reset security token',
+                '{{two_factor_otp}}' => '2FA one-time passcode PIN',
+                '{{expires_in}}' => 'Token expiration window',
+                '{{change_time}}' => 'Security settings update timestamp',
+                '{{suspension_reason}}' => 'Account governance notice reason',
+                '{{appeal_url}}' => 'Governance appeal URL'
+            ],
+            '📢 Newsletter & Radar' => [
+                '{{headline}}' => 'Main broadcast or radar title',
+                '{{message}}' => 'Lead announcement body text',
+                '{{announcement_body}}' => 'Full newsletter story text',
+                '{{digest_summary}}' => 'Bullet points summary',
+                '{{campaign_title}}' => 'Hackathon or challenge name',
+                '{{prize_pool}}' => 'Total campaign prize pool ($)',
+                '{{deadline}}' => 'Event submission deadline'
+            ],
+            '🌟 Author & Guild' => [
+                '{{badge_title}}' => 'Author rank or guild badge',
+                '{{total_reads}}' => 'Total accumulated readership views',
+                '{{tips_count}}' => 'Total patronage tips received',
+                '{{month}}' => 'Statement period month (' . date('F Y') . ')',
+                '{{rank_title}}' => 'Scout rank title'
+            ],
+            '🎨 Custom Dynamic Tags' => [
+                '{{action_url}}' => 'Primary Call-to-Action button link',
+                '{{action_text}}' => 'Primary Call-to-Action button text',
+                '{{custom_var_1}}' => 'Custom admin override token 1',
+                '{{custom_var_2}}' => 'Custom admin override token 2'
             ]
         ];
 

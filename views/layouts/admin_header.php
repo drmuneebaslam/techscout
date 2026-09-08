@@ -18,6 +18,14 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
     : ((!empty($_GET['theme']) && $_GET['theme'] === 'dark')
         ? 'dark'
         : ((isset($_COOKIE['ts_theme']) && $_COOKIE['ts_theme'] === 'light') ? 'light' : 'dark'));
+
+// High-Speed PJAX Fast Path: Return ONLY .admin-content-wrapper if requested via X-PJAX header
+$isPjax = !empty($_SERVER['HTTP_X_PJAX']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' && isset($_GET['_pjax']));
+if ($isPjax) {
+    echo '<title>' . htmlspecialchars($title ?? 'Admin Command Center | TechScout') . '</title>';
+    echo '<div class="admin-content-wrapper">';
+    return;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?= $activeAdminTheme ?>" class="<?= $activeAdminTheme === 'light' ? 'theme-light' : '' ?>">

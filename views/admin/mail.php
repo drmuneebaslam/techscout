@@ -340,7 +340,7 @@
                   <i data-lucide="code" style="width: 14px; height: 14px;"></i>
                   Dynamic Variables Palette (Click tag to insert into Editor)
                 </span>
-                <span style="font-size: 0.7rem; color: #64748b;">24 Tokens ▾</span>
+                <span style="font-size: 0.7rem; color: #64748b;">10 Categories &bull; 60+ Tokens ▾</span>
               </summary>
               <div style="margin-top: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.75rem; max-height: 220px; overflow-y: auto;">
                 <?php foreach ($availableVariables as $cat => $vars): ?>
@@ -1376,8 +1376,7 @@
 // JSON Dictionary of all templates (var avoids fatal identifier already declared syntax error on re-navigation)
 var MAIL_TEMPLATES = window.MAIL_TEMPLATES = <?= json_encode($templateLibrary, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
 
-function switchMailTab(tab) {
-  window.switchMailTab = switchMailTab;
+var switchMailTab = window.switchMailTab = function switchMailTab(tab) {
   document.querySelectorAll('.mail-tab-btn').forEach(b => {
     b.classList.remove('ts-btn-primary');
     b.classList.add('ts-btn-outline');

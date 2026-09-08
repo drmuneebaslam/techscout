@@ -2622,10 +2622,19 @@ pre {
 /* ==========================================================================
    UNIVERSAL TABLE & CELL BORDER SPECIFICATIONS
    ========================================================================== */
+.admin-table-responsive, .ts-table-container, .table-responsive, div:has(> table) {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-width: 100% !important;
+  margin-bottom: 1rem;
+}
+
 table, .ts-table, .admin-table {
   border-collapse: collapse !important;
   border-spacing: 0 !important;
   width: 100%;
+  min-width: 640px;
   border: 1px solid rgba(148, 163, 184, 0.22) !important;
 }
 

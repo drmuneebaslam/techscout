@@ -108,9 +108,9 @@ require __DIR__ . '/../layouts/admin_header.php';
                 $rawType = trim((string)($log['error_type'] ?? ''));
                 $displayType = !empty($rawType) ? $rawType : 'SYSTEM_ERROR';
                 
-                $isFatal = in_array($displayType, ['FATAL_ERROR', 'E_ERROR', 'E_COMPILE_ERROR'], true);
-                $isDb = $displayType === 'DATABASE_ERROR' || str_contains($displayType, 'PDO') || str_contains($displayType, 'SQL');
-                $isWarning = in_array($displayType, ['E_WARNING', 'E_USER_WARNING'], true);
+                $isFatal = in_array($displayType, ['FATAL_ERROR', 'E_ERROR', 'E_COMPILE_ERROR'], true) || str_contains($displayType, 'FATAL');
+                $isDb = str_contains($displayType, 'DATABASE') || str_contains($displayType, 'PDO') || str_contains($displayType, 'SQL') || str_contains($displayType, 'DB');
+                $isWarning = in_array($displayType, ['E_WARNING', 'E_USER_WARNING'], true) || str_contains($displayType, 'WARN');
                 $isNotice = in_array($displayType, ['E_NOTICE', 'E_USER_NOTICE', 'E_DEPRECATED'], true);
                 $isResolved = (int)($log['resolved'] ?? 0) === 1;
 
