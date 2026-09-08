@@ -1913,6 +1913,16 @@ class AdminController {
             'today_count' => (int)(Database::fetch("SELECT COUNT(*) as c FROM mail_logs WHERE created_at >= CURDATE()")['c'] ?? 0)
         ];
 
+        $supportedEvents = \App\Core\EventTriggerEngine::getSupportedEvents();
+        $eventTriggers = [];
+        foreach ($supportedEvents as $eKey => $eVal) {
+            $mappedTmpl = \App\Core\EventTriggerEngine::getMappedTemplate($eKey);
+            $eventTriggers[$eKey] = array_merge($eVal, [
+                'event_key' => $eKey,
+                'mapped_template' => $mappedTmpl
+            ]);
+        }
+
         Response::view('admin/mail', [
             'title' => 'Mail Provider API & HTML Template Center | Admin Hub',
             'settings' => $settings,
@@ -1920,6 +1930,7 @@ class AdminController {
             'users' => $users,
             'mailLogs' => $mailLogs,
             'mailCredentials' => $mailCredentials,
+            'eventTriggers' => $eventTriggers,
             'stats' => $stats
         ]);
     }
@@ -2457,6 +2468,62 @@ class AdminController {
         Response::json([
             'success' => $res,
             'message' => $res ? "Connection verified! Test email delivered to {$testEmail} via {$cred['name']}." : "Connection test failed. Verify host, port, credentials or API key."
+        ]);
+    }
+
+    public function saveEventTriggerMap(Request $request): void {
+        $eventKey = trim((string)$request->post('event_key', ''));
+        $templateKey = trim((string)$request->post('template_key', ''));
+
+        if (!empty($eventKey) && !empty($templateKey)) {
+            $settingKey = 'event_mail_map_' . $eventKey;
+            $existing = Database::fetch("SELECT id FROM site_settings WHERE key_name = ?", [$settingKey]);
+            if ($existing) {
+                Database::execute("UPDATE site_settings SET key_value = ? WHERE key_name = ?", [$templateKey, $settingKey]);
+            } else {
+                Database::execute("INSERT INTO site_settings (key_name, key_value, created_at) VALUES (?, ?, NOW())", [$settingKey, $templateKey]);
+            }
+            AuditLog::log('admin.save_event_trigger_map', 'site_settings', 0, ['event_key' => $eventKey, 'template_key' => $templateKey]);
+        }
+
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            Response::json(['success' => true, 'message' => "Event trigger '{$eventKey}' successfully mapped to template '{$templateKey}'."]);
+            return;
+        }
+
+        Session::flash('success', "Event trigger '{$eventKey}' mapped to template '{$templateKey}'.");
+        Response::redirect('/admin/mail?tab=triggers');
+    }
+
+    public function testEventTrigger(Request $request): void {
+        $eventKey = trim((string)$request->post('event_key', ''));
+        $testEmail = trim((string)$request->post('test_email', ''));
+        $testName = trim((string)$request->post('test_name', 'Test Recipient'));
+
+        if (empty($eventKey) || empty($testEmail) || !filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
+            Response::json(['success' => false, 'message' => 'Event key and valid recipient email are required.']);
+            return;
+        }
+
+        $payload = [
+            'email' => $testEmail,
+            'name' => $testName,
+            'username' => strtolower(str_replace(' ', '_', $testName)),
+            'action_url' => url('/blog'),
+            'headline' => '⚡ Event Trigger Test Fire: ' . ucwords(str_replace('_', ' ', $eventKey)),
+            'message' => 'This is a simulated transactional event payload fired live via EventTriggerEngine.',
+            'verification_code' => '948201',
+            'amount' => '250.00',
+            'payout_id' => '1001',
+            'ticket_number' => '5042',
+            'suspension_reason' => 'Test event trigger policy simulation'
+        ];
+
+        $res = \App\Core\EventTriggerEngine::fire($eventKey, $payload, true);
+
+        Response::json([
+            'success' => $res,
+            'message' => $res ? "Event trigger '{$eventKey}' fired successfully! Email sent to {$testEmail}." : "Failed to fire event trigger '{$eventKey}'."
         ]);
     }
 

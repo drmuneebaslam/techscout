@@ -408,6 +408,8 @@ $router->post('/admin/mail/credentials/duplicate/{id}', [AdminController::class,
 $router->post('/admin/mail/credentials/delete/{id}', [AdminController::class, 'deleteMailCredential'], ['admin']);
 $router->post('/admin/mail/credentials/set-default/{id}', [AdminController::class, 'setDefaultMailCredential'], ['admin']);
 $router->post('/admin/mail/credentials/test', [AdminController::class, 'testMailCredential'], ['admin']);
+$router->post('/admin/mail/event-triggers/save', [AdminController::class, 'saveEventTriggerMap'], ['admin']);
+$router->post('/admin/mail/event-triggers/test', [AdminController::class, 'testEventTrigger'], ['admin']);
 
 // Help Center & Knowledge Base Article CMS
 $router->get('/admin/help-articles', [AdminController::class, 'helpArticles'], ['admin']);

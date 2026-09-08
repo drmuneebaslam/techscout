@@ -76,7 +76,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- TechScout Design System (High Priority Stylesheet) -->
-  <link rel="stylesheet" href="<?= url('/assets/css/style.css') ?>">
+  <link rel="stylesheet" href="<?= url('/assets/css/style.css?v=' . time()) ?>">
   
   <!-- Local High-Performance Lucide Icons with CDN Fallback -->
   <script src="<?= url('/assets/js/lucide.min.js') ?>" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js';"></script>

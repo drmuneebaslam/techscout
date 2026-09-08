@@ -162,6 +162,9 @@
     <button type="button" onclick="switchMailTab('config')" class="ts-btn ts-btn-sm ts-btn-outline mail-tab-btn" id="mtab-btn-config">
       ⚙️ API &amp; SMTP Provider Setup
     </button>
+    <button type="button" onclick="switchMailTab('triggers')" class="ts-btn ts-btn-sm ts-btn-outline mail-tab-btn" id="mtab-btn-triggers">
+      ⚡ Event Triggers &amp; Automations (<?= count($eventTriggers ?? []) ?>)
+    </button>
   </div>
 
   <!-- ========================================================================= -->
@@ -1093,29 +1096,171 @@
       </form>
     </div>
   </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB 6: EVENT TRIGGERS & AUTOMATION MANAGEMENT -->
+  <!-- ========================================================================= -->
+  <div class="mail-tab-content" id="mail-tab-triggers" style="display: none;">
+    <div class="admin-table-wrap" style="padding: 2rem; border-color: rgba(168,85,247,0.35); margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 1rem;">
+        <div>
+          <h3 style="font-size: 1.25rem; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="zap" style="color: #c084fc;"></i> System Event Triggers &amp; Email Automations
+          </h3>
+          <p style="color: #94a3b8; font-size: 0.85rem; margin: 0.25rem 0 0 0;">
+            Map any system event (user signup, payout approval, article submission, etc.) to any custom HTML email template and configure duplicate delivery protection.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" onclick="openTestEventTriggerModal('user_registered', 'User Account Registration')" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #a855f7, #6366f1); font-weight: 700;">
+            ⚡ Test Fire Event Trigger
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Matrix of Event Triggers -->
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>System Event &amp; Trigger Key</th>
+            <th>Event Description</th>
+            <th>Delivery Policy</th>
+            <th>Assigned HTML Template</th>
+            <th style="text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (!empty($eventTriggers)): ?>
+            <?php foreach ($eventTriggers as $eKey => $eInfo): ?>
+              <tr>
+                <td>
+                  <div style="font-weight: 700; color: #f8fafc; font-size: 0.92rem; display: flex; align-items: center; gap: 0.35rem;">
+                    <span>⚡ <?= htmlspecialchars($eInfo['name']) ?></span>
+                  </div>
+                  <code style="font-size: 0.72rem; color: #c084fc; font-family: monospace; margin-top: 2px; display: inline-block;">
+                    <?= htmlspecialchars($eKey) ?>
+                  </code>
+                </td>
+
+                <td style="font-size: 0.82rem; color: #cbd5e1; max-width: 320px;">
+                  <?= htmlspecialchars($eInfo['description']) ?>
+                </td>
+
+                <td>
+                  <?php if (!empty($eInfo['single_delivery'])): ?>
+                    <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem;" title="Prevents sending duplicate emails for the same event to the same user">
+                      🔒 SINGLE DELIVERY ONLY
+                    </span>
+                  <?php else: ?>
+                    <span class="ts-badge ts-badge-green" style="font-size: 0.68rem;">
+                      🔄 MULTI-DISPATCH ALLOWED
+                    </span>
+                  <?php endif; ?>
+                </td>
+
+                <td>
+                  <select id="event_tmpl_select_<?= htmlspecialchars($eKey) ?>" class="admin-modal-select" style="padding: 0.35rem 0.65rem; font-size: 0.82rem; border-color: rgba(168,85,247,0.4); color: #c084fc; font-weight: 700;">
+                    <?php foreach ($templateLibrary as $tKey => $tVal): ?>
+                      <option value="<?= htmlspecialchars($tKey) ?>" <?= ($eInfo['mapped_template'] === $tKey) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($tVal['name']) ?> (<?= htmlspecialchars($tKey) ?>)
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                </td>
+
+                <td style="text-align: center;">
+                  <div style="display: flex; gap: 0.35rem; justify-content: center;">
+                    <button type="button" onclick="saveEventTriggerMapping('<?= htmlspecialchars($eKey) ?>', 'event_tmpl_select_<?= htmlspecialchars($eKey) ?>')" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; background: #a855f7; border-color: #a855f7; font-weight: 700;">
+                      Save 💾
+                    </button>
+                    <button type="button" onclick="openTestEventTriggerModal('<?= htmlspecialchars($eKey) ?>', '<?= htmlspecialchars(addslashes($eInfo['name'])) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #38bdf8; border-color: rgba(56,189,248,0.35);" title="Test Fire Trigger">
+                      Test ⚡
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Developer & Admin Architecture Guide Box -->
+    <div style="background: rgba(15,23,42,0.9); border: 1px solid rgba(56,189,248,0.35); border-radius: 12px; padding: 1.75rem;">
+      <h4 style="font-size: 1.1rem; color: #38bdf8; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="book-open"></i> Developer Guide: How &amp; Where to Create Custom Triggers &amp; Assign Templates
+      </h4>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+        <!-- Step 1 -->
+        <div style="background: #05070b; border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 1.1rem;">
+          <strong style="color: #38bdf8; display: block; margin-bottom: 0.4rem; font-size: 0.92rem;">
+            1. Assigning Templates to Triggers in UI
+          </strong>
+          Select any system event in the table above and choose your desired HTML email template from the dropdown menu. Click <strong>Save 💾</strong>. The mapping is saved dynamically in the <code>site_settings</code> table under <code>event_mail_map_{event_key}</code>.
+        </div>
+
+        <!-- Step 2 -->
+        <div style="background: #05070b; border: 1px solid rgba(168,85,247,0.2); border-radius: 8px; padding: 1.1rem;">
+          <strong style="color: #c084fc; display: block; margin-bottom: 0.4rem; font-size: 0.92rem;">
+            2. Triggering Events in PHP Code
+          </strong>
+          Call <code>\App\Core\EventTriggerEngine::fire($eventKey, $payload)</code> from any controller, model, or service in the backend:
+          <pre style="background: #030712; border: 1px solid rgba(148,163,184,0.15); padding: 0.6rem; border-radius: 6px; font-family: monospace; font-size: 0.72rem; color: #38bdf8; margin-top: 0.4rem; overflow-x: auto;"><code>\App\Core\EventTriggerEngine::fire('payout_approved', [
+  'email' => $author['email'],
+  'name' => $author['name'],
+  'amount' => '$150.00',
+  'payout_id' => '1042',
+  'transaction_ref' => 'tx_987654321'
+]);</code></pre>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="background: #05070b; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; padding: 1.1rem;">
+          <strong style="color: #34d399; display: block; margin-bottom: 0.4rem; font-size: 0.92rem;">
+            3. Registering New Custom Event Keys
+          </strong>
+          To add a new custom trigger key to the platform, simply add its entry to <code>getSupportedEvents()</code> in <code>app/Core/EventTriggerEngine.php</code> or fire custom keys directly. The engine automatically checks single-delivery protection!
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ========================================================================= -->
 <!-- MODAL: CREATE & EDIT HTML EMAIL TEMPLATE -->
 <!-- ========================================================================= -->
+<!-- ========================================================================= -->
+<!-- MODAL: CREATE & EDIT HTML EMAIL TEMPLATE (FULL SCREEN 2-COLUMN DISPLAY) -->
+<!-- ========================================================================= -->
 <div id="templateEditorModal" class="admin-modal-overlay" style="display: none;">
-  <div class="admin-modal-box modal-purple" style="max-width: 840px; max-height: 92vh; display: flex; flex-direction: column;">
-    <div class="admin-modal-header">
+  <div class="admin-modal-box modal-purple" style="width: 98vw; max-width: 1550px; height: 94vh; max-height: 94vh; margin: 2vh auto; display: flex; flex-direction: column; background: #0b0f19; border: 1px solid rgba(168,85,247,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.8);">
+    <div class="admin-modal-header" style="padding-bottom: 0.75rem; border-bottom: 1px solid rgba(148,163,184,0.15);">
       <div>
-        <h3 class="admin-modal-title" style="color: #c084fc;" id="tmplBuilderTitle">
+        <h3 class="admin-modal-title" style="color: #c084fc; font-size: 1.25rem;" id="tmplBuilderTitle">
           <i data-lucide="layout-template"></i> Create &amp; Save Custom HTML Email Template
         </h3>
-        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem;">
-          Design responsive HTML templates with dynamic tags: {{name}}, {{action_url}}, {{headline}}, etc.
+        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.2rem;">
+          Design responsive HTML templates with 10 categories of dynamic tokens &amp; real-time visual preview iframe.
         </div>
       </div>
-      <button type="button" onclick="closeTemplateEditorModal()" class="admin-modal-close" title="Close Modal">✕</button>
+      
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <div style="display: flex; gap: 0.25rem; background: #05070b; padding: 4px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.15);">
+          <button type="button" onclick="setModalTmplViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-tmpl-modal-split" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">🌓 Split View</button>
+          <button type="button" onclick="setModalTmplViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-editor" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">📝 Editor Only</button>
+          <button type="button" onclick="setModalTmplViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-preview" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">👁️ Preview Only</button>
+        </div>
+        <button type="button" onclick="closeTemplateEditorModal()" class="admin-modal-close" title="Close Modal">✕</button>
+      </div>
     </div>
 
-    <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="templateBuilderForm" style="display: flex; flex-direction: column; flex: 1; overflow-y: auto; padding: 0.5rem;">
+    <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="templateBuilderForm" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding: 0.75rem;">
       <input type="hidden" name="id" id="tmpl_id_input" value="">
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <!-- Top Metadata Strip -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem; background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
         <div>
           <label class="admin-modal-label">Template Key (Unique Identifier)</label>
           <input type="text" name="template_key" id="tmpl_key_input" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace;" required>
@@ -1124,17 +1269,9 @@
           <label class="admin-modal-label">Template Display Name</label>
           <input type="text" name="name" id="tmpl_name_input" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" required>
         </div>
-      </div>
-
-      <div style="margin-bottom: 1rem;">
-        <label class="admin-modal-label">Default Subject Line</label>
-        <input type="text" name="subject" id="tmpl_subject_input" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" required>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div>
-          <label class="admin-modal-label">Template Description / Notes</label>
-          <input type="text" name="description" id="tmpl_desc_input" placeholder="e.g. Broadcast update for new models" class="admin-modal-input">
+          <label class="admin-modal-label">Default Subject Line</label>
+          <input type="text" name="subject" id="tmpl_subject_input" oninput="updateTmplModalPreview()" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" required>
         </div>
         <div>
           <label class="admin-modal-label">Assigned Mail Credential Profile</label>
@@ -1145,82 +1282,139 @@
             <?php endforeach; ?>
           </select>
         </div>
+        <div style="grid-column: span 2;">
+          <label class="admin-modal-label">Template Description / Notes</label>
+          <input type="text" name="description" id="tmpl_desc_input" placeholder="e.g. Broadcast update for new models..." class="admin-modal-input">
+        </div>
       </div>
 
-      <!-- Palette -->
-      <details style="margin-bottom: 0.85rem; background: #05070b; border: 1px solid rgba(168,85,247,0.3); border-radius: 8px; padding: 0.55rem 0.75rem;">
-        <summary style="cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #c084fc; display: flex; align-items: center; justify-content: space-between;">
-          <span><i data-lucide="variable" style="width: 14px; height: 14px; vertical-align: -2px;"></i> Dynamic Variables Palette</span>
-          <span style="font-size: 0.7rem; color: #a855f7;">Click tag to insert ▾</span>
-        </summary>
-        <div style="margin-top: 0.6rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; max-height: 180px; overflow-y: auto;">
-          <?php foreach ($availableVariables as $cat => $vars): ?>
-            <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.1); border-radius: 6px; padding: 0.4rem;">
-              <div style="font-size: 0.68rem; font-weight: 700; color: #c084fc; text-transform: uppercase; margin-bottom: 0.3rem;"><?= htmlspecialchars($cat) ?></div>
-              <div style="display: flex; flex-direction: column; gap: 0.2rem;">
-                <?php foreach ($vars as $tag => $desc): ?>
-                  <button type="button" onclick="insertTmplTag('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.2); padding: 0.15rem 0.35rem; border-radius: 4px; color: #cbd5e1; font-size: 0.68rem; cursor: pointer;">
-                    <code style="color: #c084fc; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
-                    <span style="color: #94a3b8; font-size: 0.62rem; margin-left: 0.3rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
-                  </button>
-                <?php endforeach; ?>
+      <!-- SPLIT 2-COLUMN WORKSPACE: LEFT EDITOR & PALETTE + RIGHT LIVE IFRAME PREVIEW -->
+      <div id="tmpl-modal-workspace-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; flex: 1; min-height: 0;">
+        
+        <!-- LEFT COLUMN: ALL 10 CATEGORIES PALETTE, BLOCK COMPONENTS & CODE EDITOR -->
+        <div id="tmpl-modal-col-editor" style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 0.25rem;">
+          <!-- Collapsible 10 Categories Dynamic Variables Matrix -->
+          <details open style="margin-bottom: 0.75rem; background: #05070b; border: 1px solid rgba(168,85,247,0.3); border-radius: 8px; padding: 0.55rem 0.75rem;">
+            <summary style="cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #c084fc; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+              <span style="display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="variable" style="width: 14px; height: 14px;"></i>
+                Dynamic Variables Palette (10 Categories &bull; 60+ Tokens)
+              </span>
+              <span style="font-size: 0.7rem; color: #a855f7;">Click tag to insert ▾</span>
+            </summary>
+            <div style="margin-top: 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; max-height: 200px; overflow-y: auto; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.6rem;">
+              <?php foreach ($availableVariables as $cat => $vars): ?>
+                <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.1); border-radius: 6px; padding: 0.4rem;">
+                  <div style="font-size: 0.68rem; font-weight: 700; color: #c084fc; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></div>
+                  <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                    <?php foreach ($vars as $tag => $desc): ?>
+                      <button type="button" onclick="insertTmplTag('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.2); padding: 0.15rem 0.35rem; border-radius: 4px; color: #cbd5e1; font-size: 0.68rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(168,85,247,0.2)'" onmouseout="this.style.background='rgba(168,85,247,0.06)'" title="Insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
+                        <code style="color: #c084fc; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
+                        <span style="color: #94a3b8; font-size: 0.62rem; margin-left: 0.3rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
+                      </button>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </details>
+
+          <!-- Modern Block Component Library -->
+          <div style="margin-bottom: 0.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.65rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="font-size: 0.78rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
+                <i data-lucide="blocks" style="width: 14px; height: 14px; color: #6366f1;"></i> 
+                <span>Universal Block Component Library</span>
+              </div>
+              <span style="font-size: 0.68rem; color: #64748b;">1-Click insert responsive components</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.3rem;">
+              <button type="button" onclick="insertBlockComponent('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #f5f3ff;">✨ Hero Header</button>
+              <button type="button" onclick="insertBlockComponent('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">ℹ️ Info Callout</button>
+              <button type="button" onclick="insertBlockComponent('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;">✅ Success Box</button>
+              <button type="button" onclick="insertBlockComponent('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #d97706; border-color: #fde68a; background: #fffbeb;">⚠️ Warning Box</button>
+              <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;">🔘 Primary CTA</button>
+              <button type="button" onclick="insertBlockComponent('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">💰 Disbursal CTA</button>
+              <button type="button" onclick="insertBlockComponent('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;">📊 Data Grid</button>
+              <button type="button" onclick="insertBlockComponent('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;">🔑 OTP Badge</button>
+            </div>
+          </div>
+
+          <!-- HTML Code Editor Area -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label class="admin-modal-label" style="margin: 0; color: #cbd5e1;">HTML Body Template Code</label>
+            <div style="display: flex; gap: 0.25rem;">
+              <button type="button" onclick="insertTmplTag('{{name}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.12rem 0.4rem; font-size: 0.66rem; font-family: monospace;">+ {{name}}</button>
+              <button type="button" onclick="insertTmplTag('{{action_url}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.12rem 0.4rem; font-size: 0.66rem; font-family: monospace;">+ {{action_url}}</button>
+              <button type="button" onclick="insertTmplTag('{{headline}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.12rem 0.4rem; font-size: 0.66rem; font-family: monospace;">+ {{headline}}</button>
+            </div>
+          </div>
+          <textarea name="html_content" id="tmpl_html_input" oninput="updateTmplModalPreview()" rows="14" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" class="admin-modal-textarea" style="font-family: var(--admin-font-mono); font-size: 0.84rem; flex: 1; min-height: 280px; resize: vertical;" required></textarea>
+        </div>
+
+        <!-- RIGHT COLUMN: REAL-TIME RENDERED LIVE HTML PREVIEW IFRAME -->
+        <div id="tmpl-modal-col-preview" style="display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label class="admin-modal-label" style="margin: 0; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
+              <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Live Real-Time Visual Preview Sandbox
+            </label>
+            <span style="font-size: 0.7rem; color: #64748b;">Simulated Recipient: Alex Rivera</span>
+          </div>
+
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex: 1; min-height: 420px; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <!-- Simulated Email Header -->
+            <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; font-size: 0.76rem;">
+              <div style="color: #0f172a; font-weight: 700;" id="tmplModalSimSubject">Subject: TechScout Intelligence Update</div>
+              <div style="color: #64748b; font-size: 0.68rem; margin-top: 0.15rem;">
+                From: <strong style="color: #334155;">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
               </div>
             </div>
-          <?php endforeach; ?>
-        </div>
-      </details>
 
-      <!-- Modern Block-Based Component Library Palette -->
-      <div style="margin-bottom: 0.85rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-          <div style="font-size: 0.8rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
-            <i data-lucide="blocks" style="width: 15px; height: 15px; color: #6366f1;"></i> 
-            <span>Universal Block Component Library (Light Mode)</span>
+            <!-- Frame Canvas (Pure Light Mode Grid Envelope) -->
+            <iframe id="tmplModalLivePreviewFrame" style="width: 100%; height: 100%; border: none; background: #ffffff; flex: 1;"></iframe>
           </div>
-          <span style="font-size: 0.7rem; color: #64748b;">1-Click insert pre-styled, high-contrast blocks</span>
-        </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
-          <button type="button" onclick="insertBlockComponent('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f5f3ff;">
-            ✨ Hero Header
-          </button>
-          <button type="button" onclick="insertBlockComponent('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">
-            ℹ️ Info Callout
-          </button>
-          <button type="button" onclick="insertBlockComponent('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;">
-            ✅ Success Box
-          </button>
-          <button type="button" onclick="insertBlockComponent('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #d97706; border-color: #fde68a; background: #fffbeb;">
-            ⚠️ Warning Box
-          </button>
-          <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;">
-            🔘 Primary CTA Button
-          </button>
-          <button type="button" onclick="insertBlockComponent('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">
-            💰 Disbursal / Action Button
-          </button>
-          <button type="button" onclick="insertBlockComponent('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;">
-            📊 Key-Value Data Grid
-          </button>
-          <button type="button" onclick="insertBlockComponent('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;">
-            🔑 OTP PIN Badge
-          </button>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-        <label class="admin-modal-label" style="margin: 0;">HTML Content Template (Wrapped Automatically with Universal White &amp; Grid Shell)</label>
-        <div style="display: flex; gap: 0.3rem;">
-          <button type="button" onclick="insertTmplTag('{{name}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; font-family: monospace;">+ {{name}}</button>
-          <button type="button" onclick="insertTmplTag('{{action_url}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; font-family: monospace;">+ {{action_url}}</button>
-          <button type="button" onclick="insertTmplTag('{{headline}}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; font-family: monospace;">+ {{headline}}</button>
-        </div>
-      </div>
-      <textarea name="html_content" id="tmpl_html_input" rows="8" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p style='color:#334155;'>{{message}}</p><div style='text-align:center;'><a href='{{action_url}}' style='background:#6366f1;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;'>Read Digest &rarr;</a></div>" class="admin-modal-textarea" style="font-family: var(--admin-font-mono); font-size: 0.84rem;" required></textarea>
-
-      <div class="admin-modal-footer" style="padding-top: 1rem; margin-top: 1rem; border-top: 1px solid rgba(148,163,184,0.15); display: flex; justify-content: flex-end; gap: 0.5rem;">
+      <div class="admin-modal-footer" style="padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid rgba(148,163,184,0.15); display: flex; justify-content: flex-end; gap: 0.5rem;">
         <button type="button" onclick="closeTemplateEditorModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
-        <button type="submit" id="tmplSubmitBtn" class="ts-btn ts-btn-primary" style="background: #a855f7; border-color: #a855f7; font-weight: 700;">
+        <button type="submit" id="tmplSubmitBtn" class="ts-btn ts-btn-primary" style="background: #a855f7; border-color: #a855f7; font-weight: 700; padding: 0.6rem 1.75rem;">
           <i data-lucide="save"></i> Save HTML Template 💾
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: TEST FIRE EVENT TRIGGER -->
+<!-- ========================================================================= -->
+<div id="testEventTriggerModal" class="admin-modal-overlay" style="display: none;">
+  <div class="admin-modal-box modal-purple" style="max-width: 520px; width: 95%;">
+    <div class="admin-modal-header">
+      <h3 class="admin-modal-title" style="color: #c084fc;" id="testEventTriggerTitle">⚡ Test Fire Event Trigger</h3>
+      <button type="button" onclick="closeTestEventTriggerModal()" class="admin-modal-close">✕</button>
+    </div>
+    <form id="testEventTriggerForm" onsubmit="submitTestEventTrigger(event)">
+      <input type="hidden" id="test_event_key" value="">
+      <div style="margin-bottom: 1rem;">
+        <label class="admin-modal-label">Target System Event Key</label>
+        <input type="text" id="test_event_key_display" readonly class="admin-modal-input" style="font-family: monospace; color: #c084fc; font-weight: 700; background: #05070b;">
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label class="admin-modal-label">Simulated Recipient Name</label>
+        <input type="text" id="test_event_recipient_name" value="Alex Rivera" class="admin-modal-input" required>
+      </div>
+      <div style="margin-bottom: 1.25rem;">
+        <label class="admin-modal-label">Recipient Email Address <span style="color:#ef4444;">*</span></label>
+        <input type="email" id="test_event_recipient_email" placeholder="tester@example.com" class="admin-modal-input" required>
+        <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.25rem;">Dispatches transactional email payload directly through configured event trigger mapping.</div>
+      </div>
+      <div id="test_event_result" style="display: none; margin-bottom: 1.25rem; font-size: 0.85rem; padding: 0.65rem; border-radius: 6px;"></div>
+      <div class="admin-modal-footer">
+        <button type="button" onclick="closeTestEventTriggerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+        <button type="submit" id="btnTestEventSubmit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #a855f7; border-color: #a855f7; font-weight: 700;">
+          Fire Event Trigger 🚀
         </button>
       </div>
     </form>
@@ -2147,6 +2341,7 @@ function openCreateTemplateModal() {
   document.getElementById('tmplBuilderTitle').innerHTML = '<i data-lucide="layout-template"></i> Create & Save Custom HTML Email Template';
   document.getElementById('tmplSubmitBtn').innerHTML = '<i data-lucide="save"></i> Save HTML Template 💾';
   document.getElementById('templateEditorModal').style.display = 'flex';
+  updateTmplModalPreview();
   if (window.lucide) lucide.createIcons();
 }
 
@@ -2171,6 +2366,7 @@ function populateTemplateForm(key) {
   document.getElementById('tmplBuilderTitle').innerHTML = '<i data-lucide="edit-3"></i> Edit Template: ' + (tmpl.name || key);
   document.getElementById('tmplSubmitBtn').innerHTML = '<i data-lucide="save"></i> Update Template 💾';
   document.getElementById('templateEditorModal').style.display = 'flex';
+  updateTmplModalPreview();
   if (window.lucide) lucide.createIcons();
 }
 
@@ -2185,6 +2381,7 @@ function resetTemplateForm() {
   if (document.getElementById('tmpl_cred_id_input')) {
     document.getElementById('tmpl_cred_id_input').value = '';
   }
+  updateTmplModalPreview();
 }
 
 function insertTmplTag(tag) {
@@ -2196,6 +2393,7 @@ function insertTmplTag(tag) {
   textarea.value = text.substring(0, start) + tag + text.substring(end);
   textarea.selectionStart = textarea.selectionEnd = start + tag.length;
   textarea.focus();
+  updateTmplModalPreview();
 }
 
 function insertBlockComponent(type) {
@@ -2222,6 +2420,203 @@ function insertBlockComponent(type) {
   textarea.value = text.substring(0, start) + snippet + text.substring(end);
   textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
   textarea.focus();
+  updateTmplModalPreview();
+}
+
+function updateTmplModalPreview() {
+  const textarea = document.getElementById('tmpl_html_input');
+  const subjectInput = document.getElementById('tmpl_subject_input');
+  const simSubject = document.getElementById('tmplModalSimSubject');
+  const frame = document.getElementById('tmplModalLivePreviewFrame');
+
+  if (!textarea || !frame) return;
+
+  let subject = (subjectInput && subjectInput.value) ? subjectInput.value : 'TechScout Intelligence Update';
+  if (simSubject) simSubject.textContent = 'Subject: ' + subject;
+
+  let rawHtml = textarea.value || '';
+  let renderedHtml = rawHtml
+    .replace(/\{\{name\}\}/g, 'Alex Rivera')
+    .replace(/\{\{username\}\}/g, 'alex_dev')
+    .replace(/\{\{action_url\}\}/g, window.location.origin)
+    .replace(/\{\{headline\}\}/g, subject)
+    .replace(/\{\{message\}\}/g, 'Here is the customized communication content previewed live in real-time...')
+    .replace(/\{\{verification_code\}\}/g, '948201')
+    .replace(/\{\{amount\}\}/g, '250.00')
+    .replace(/\{\{payout_id\}\}/g, '1001')
+    .replace(/\{\{site_name\}\}/g, 'TechScout')
+    .replace(/\{\{year\}\}/g, new Date().getFullYear());
+
+  const fullEnvelope = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body {
+  margin: 0;
+  padding: 24px 12px;
+  background-color: #ffffff;
+  background-image: linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #0f172a;
+}
+.card {
+  max-width: 580px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+.head {
+  background: #ffffff;
+  background-image: linear-gradient(to right, rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  padding: 22px 28px;
+  border-bottom: 2px solid #6366f1;
+  text-align: center;
+}
+.body {
+  padding: 28px 26px;
+  color: #1e293b;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.foot {
+  border-top: 1px solid #e2e8f0;
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+  background: #f8fafc;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <div style="font-size:22px;font-weight:900;color:#0f172a;letter-spacing:-0.5px;">Tech<span style="color:#6366f1;">Scout</span> <span style="font-size:11px;background:#6366f1;color:#ffffff;padding:2px 7px;border-radius:4px;vertical-align:middle;margin-left:4px;letter-spacing:1px;font-weight:700;">TEMPLATE PREVIEW</span></div>
+    <div style="font-size:11px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-top:4px;">Developer Intelligence Network</div>
+  </div>
+  <div class="body">
+    ${renderedHtml}
+  </div>
+  <div class="foot">
+    &copy; ${new Date().getFullYear()} TechScout &bull; Developer Intelligence Network
+  </div>
+</div>
+</body>
+</html>`;
+
+  try {
+    const doc = frame.contentWindow.document;
+    doc.open();
+    doc.write(fullEnvelope);
+    doc.close();
+  } catch (e) {}
+}
+
+function setModalTmplViewMode(mode) {
+  const colEditor = document.getElementById('tmpl-modal-col-editor');
+  const colPreview = document.getElementById('tmpl-modal-col-preview');
+  const grid = document.getElementById('tmpl-modal-workspace-grid');
+
+  document.getElementById('btn-tmpl-modal-split').className = 'ts-btn ts-btn-sm ts-btn-outline';
+  document.getElementById('btn-tmpl-modal-editor').className = 'ts-btn ts-btn-sm ts-btn-outline';
+  document.getElementById('btn-tmpl-modal-preview').className = 'ts-btn ts-btn-sm ts-btn-outline';
+  document.getElementById(`btn-tmpl-modal-${mode}`).className = 'ts-btn ts-btn-sm ts-btn-primary';
+
+  if (mode === 'split') {
+    grid.style.gridTemplateColumns = '1fr 1fr';
+    colEditor.style.display = 'flex';
+    colPreview.style.display = 'flex';
+  } else if (mode === 'editor') {
+    grid.style.gridTemplateColumns = '1fr';
+    colEditor.style.display = 'flex';
+    colPreview.style.display = 'none';
+  } else if (mode === 'preview') {
+    grid.style.gridTemplateColumns = '1fr';
+    colEditor.style.display = 'none';
+    colPreview.style.display = 'flex';
+  }
+}
+
+function saveEventTriggerMapping(eventKey, selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  const templateKey = select.value;
+
+  const formData = new FormData();
+  formData.append('event_key', eventKey);
+  formData.append('template_key', templateKey);
+
+  fetch('<?= url('/admin/mail/event-triggers/save') ?>', {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      alert(`Event trigger '${eventKey}' mapped to template '${templateKey}' successfully! 💾`);
+    } else {
+      alert(data.message || 'Failed to update mapping.');
+    }
+  })
+  .catch(() => alert('Network error updating event trigger mapping.'));
+}
+
+function openTestEventTriggerModal(eventKey, eventName) {
+  document.getElementById('test_event_key').value = eventKey;
+  document.getElementById('test_event_key_display').value = `${eventKey} (${eventName || ''})`;
+  document.getElementById('test_event_result').style.display = 'none';
+  document.getElementById('testEventTriggerModal').style.display = 'flex';
+}
+
+function closeTestEventTriggerModal() {
+  document.getElementById('testEventTriggerModal').style.display = 'none';
+}
+
+function submitTestEventTrigger(e) {
+  e.preventDefault();
+  const eventKey = document.getElementById('test_event_key').value;
+  const recipName = document.getElementById('test_event_recipient_name').value;
+  const recipEmail = document.getElementById('test_event_recipient_email').value;
+  const resBox = document.getElementById('test_event_result');
+  const btn = document.getElementById('btnTestEventSubmit');
+
+  if (!recipEmail) {
+    alert('Please enter a valid recipient email address.');
+    return;
+  }
+
+  resBox.style.display = 'block';
+  resBox.className = 'ts-badge ts-badge-cyan';
+  resBox.innerText = 'Firing event trigger & resolving template... ⏳';
+  if (btn) btn.disabled = true;
+
+  const formData = new FormData();
+  formData.append('event_key', eventKey);
+  formData.append('test_name', recipName);
+  formData.append('test_email', recipEmail);
+
+  fetch('<?= url('/admin/mail/event-triggers/test') ?>', {
+    method: 'POST',
+    body: formData
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (btn) btn.disabled = false;
+    resBox.className = data.success ? 'ts-badge ts-badge-green' : 'ts-badge ts-badge-pink';
+    resBox.innerText = data.message || (data.success ? 'Event fired successfully!' : 'Failed.');
+  })
+  .catch(() => {
+    if (btn) btn.disabled = false;
+    resBox.className = 'ts-badge ts-badge-pink';
+    resBox.innerText = 'Network error during trigger test fire.';
+  });
 }
 
 function previewTemplateModal(key) {
@@ -2476,6 +2871,12 @@ window.resetTemplateForm = resetTemplateForm;
 window.toggleProviderFields = toggleProviderFields;
 window.toggleSelectAllUsers = toggleSelectAllUsers;
 window.updateSelectedUserCount = updateSelectedUserCount;
+window.updateTmplModalPreview = updateTmplModalPreview;
+window.setModalTmplViewMode = setModalTmplViewMode;
+window.saveEventTriggerMapping = saveEventTriggerMapping;
+window.openTestEventTriggerModal = openTestEventTriggerModal;
+window.closeTestEventTriggerModal = closeTestEventTriggerModal;
+window.submitTestEventTrigger = submitTestEventTrigger;
 </script>
 
 <!-- Add / Edit Mail Credential Modal -->
