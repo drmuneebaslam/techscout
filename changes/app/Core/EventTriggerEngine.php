@@ -122,6 +122,96 @@ class EventTriggerEngine {
                 'description' => 'Fired when a project entry is submitted to an AI challenge.',
                 'default_template' => 'campaign_submission_received',
                 'single_delivery' => false
+            ],
+            'account_email_verify' => [
+                'name' => 'Email Address Verification',
+                'description' => 'Fired when a user initiates verification with an activation link or code.',
+                'default_template' => 'account_email_verify',
+                'single_delivery' => false
+            ],
+            'magic_login_link' => [
+                'name' => 'Passwordless Magic Login Link',
+                'description' => 'Fired when a member requests a passwordless 1-click login link.',
+                'default_template' => 'magic_login_link',
+                'single_delivery' => false
+            ],
+            'new_device_login_alert' => [
+                'name' => 'Unfamiliar Device Sign-in Alert',
+                'description' => 'Fired when an account access event occurs from an unrecognized device or IP.',
+                'default_template' => 'new_device_login_alert',
+                'single_delivery' => false
+            ],
+            'security_password_changed' => [
+                'name' => 'Security: Password Updated Confirmation',
+                'description' => 'Fired immediately following a successful account password alteration.',
+                'default_template' => 'security_password_changed',
+                'single_delivery' => false
+            ],
+            'security_email_changed' => [
+                'name' => 'Security: Primary Email Changed',
+                'description' => 'Fired when a member updates their account email address.',
+                'default_template' => 'security_email_changed',
+                'single_delivery' => false
+            ],
+            'data_export_ready' => [
+                'name' => 'GDPR / Privacy Data Archive Ready',
+                'description' => 'Fired when requested user data export archive is ready for secure download.',
+                'default_template' => 'data_export_ready',
+                'single_delivery' => false
+            ],
+            'article_trending_alert' => [
+                'name' => 'Editorial: Article Trending Milestone',
+                'description' => 'Fired when an author publication achieves significant velocity or top rankings.',
+                'default_template' => 'article_trending_alert',
+                'single_delivery' => false
+            ],
+            'editorial_review_started' => [
+                'name' => 'Editorial: Staff Review Started',
+                'description' => 'Fired when an editor picks up an author draft for peer evaluation.',
+                'default_template' => 'editorial_review_started',
+                'single_delivery' => false
+            ],
+            'article_archived_notice' => [
+                'name' => 'Editorial: Publication Archived',
+                'description' => 'Fired when an article has been retired or moved to archival status.',
+                'default_template' => 'article_archived_notice',
+                'single_delivery' => false
+            ],
+            'comment_mention_alert' => [
+                'name' => 'Community: @Mention in Discussion',
+                'description' => 'Fired when a user or author is tagged in an insight discussion thread.',
+                'default_template' => 'comment_mention_alert',
+                'single_delivery' => false
+            ],
+            'new_follower_alert' => [
+                'name' => 'Community: New Author Subscriber',
+                'description' => 'Fired when a reader begins following an author or intelligence analyst.',
+                'default_template' => 'new_follower_alert',
+                'single_delivery' => false
+            ],
+            'tip_sent_confirmation' => [
+                'name' => 'Patronage: Tip Receipt Confirmation',
+                'description' => 'Fired to the supporter acknowledging a reader tip donation.',
+                'default_template' => 'tip_sent_confirmation',
+                'single_delivery' => false
+            ],
+            'creator_tier_promoted' => [
+                'name' => 'Creator: Guild Tier Milestone Achieved',
+                'description' => 'Fired when an author or contributor levels up their creator status tier.',
+                'default_template' => 'creator_tier_promoted',
+                'single_delivery' => false
+            ],
+            'payout_failed_alert' => [
+                'name' => 'Creator: Payout Transfer Failed / Action Needed',
+                'description' => 'Fired if bank or payment gateway processing encounters a disbursement issue.',
+                'default_template' => 'payout_failed_alert',
+                'single_delivery' => false
+            ],
+            'weekly_digest_roundup' => [
+                'name' => 'Marketing: Weekly Intelligence Digest Roundup',
+                'description' => 'Fired on weekly dispatch containing top articles, tools, and community spotlights.',
+                'default_template' => 'weekly_digest_roundup',
+                'single_delivery' => false
             ]
         ];
     }

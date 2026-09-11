@@ -242,6 +242,111 @@ class Mailer {
                 'description' => 'Sent to participants upon submitting a project to an active AI campaign or sprint.',
                 'vars' => ['name', 'campaign_title', 'project_title', 'action_url'],
                 'is_custom' => false
+            ],
+            'account_email_verify' => [
+                'name' => '✉️ Security: Email Address Verification PIN',
+                'subject' => 'Verify Your TechScout Account: {{verification_code}}',
+                'description' => 'Sent when a user signs up or requests email verification.',
+                'vars' => ['name', 'verification_code', 'expires_in', 'action_url'],
+                'is_custom' => false
+            ],
+            'magic_login_link' => [
+                'name' => '🪄 Authentication: 1-Click Magic Login Access',
+                'subject' => 'Your 1-Click Secure Login Link for TechScout',
+                'description' => 'Sent when a member requests passwordless magic link sign-in.',
+                'vars' => ['name', 'action_url', 'expires_in', 'ip_address', 'browser'],
+                'is_custom' => false
+            ],
+            'new_device_login_alert' => [
+                'name' => '🛡️ Security Alert: New Device Sign-in Detected',
+                'subject' => 'Security Alert: New Sign-in from {{device_name}} ({{ip_address}})',
+                'description' => 'Sent when an account is accessed from an unfamiliar browser or device.',
+                'vars' => ['name', 'device_name', 'ip_address', 'browser', 'timestamp', 'action_url'],
+                'is_custom' => false
+            ],
+            'security_password_changed' => [
+                'name' => '🔒 Security: Account Password Updated',
+                'subject' => 'Security Confirmation: Your TechScout Password Was Changed',
+                'description' => 'Sent immediately following a successful account password change.',
+                'vars' => ['name', 'timestamp', 'ip_address', 'browser', 'action_url'],
+                'is_custom' => false
+            ],
+            'security_email_changed' => [
+                'name' => '📧 Security Notice: Email Modification Confirmation',
+                'subject' => 'Security Alert: Email Address Updated on Your Account',
+                'description' => 'Sent to confirm when a user modifies their account email address.',
+                'vars' => ['name', 'email', 'timestamp', 'action_url'],
+                'is_custom' => false
+            ],
+            'data_export_ready' => [
+                'name' => '📦 Governance: Telemetry & Data Archive Ready',
+                'subject' => 'Your Requested TechScout Data Export Archive is Ready',
+                'description' => 'Sent when a user\'s privacy and telemetry archive has finished generating.',
+                'vars' => ['name', 'action_url', 'expires_in'],
+                'is_custom' => false
+            ],
+            'article_trending_alert' => [
+                'name' => '🔥 Radar: Article Trending on TechScout Frontpage',
+                'subject' => 'Trending on TechScout Radar: {{article_title}} 🚀',
+                'description' => 'Sent to author when their article surges into top trending rank.',
+                'vars' => ['name', 'article_title', 'total_reads', 'action_url'],
+                'is_custom' => false
+            ],
+            'editorial_review_started' => [
+                'name' => '🔍 Editorial: Submission Under Active Review',
+                'subject' => 'Your Article "{{article_title}}" is Now Under Editorial Review',
+                'description' => 'Sent to authors when an editor begins reviewing their manuscript.',
+                'vars' => ['name', 'article_title', 'action_url'],
+                'is_custom' => false
+            ],
+            'article_archived_notice' => [
+                'name' => '📁 Publication Archive: Article Moved to Archive',
+                'subject' => 'Publication Notice: {{article_title}} Has Been Archived',
+                'description' => 'Sent when an outdated or deprecated technical publication is archived.',
+                'vars' => ['name', 'article_title', 'action_url'],
+                'is_custom' => false
+            ],
+            'tip_sent_confirmation' => [
+                'name' => '☕ Patron Receipt: Author Tip Confirmation',
+                'subject' => 'Receipt: You tipped ${{amount}} USD to {{creator_name}} ☕',
+                'description' => 'Sent to reader/patron after awarding a tip to a creator.',
+                'vars' => ['name', 'creator_name', 'amount', 'article_title', 'action_url'],
+                'is_custom' => false
+            ],
+            'creator_tier_promoted' => [
+                'name' => '👑 Creator Guild: Status Tier Promotion',
+                'subject' => 'Level Up! You Have Been Promoted to {{creator_tier}} Creator 🌟',
+                'description' => 'Sent when an author unlocks higher revenue shares or guild rank.',
+                'vars' => ['name', 'creator_tier', 'total_reads', 'action_url'],
+                'is_custom' => false
+            ],
+            'payout_failed_alert' => [
+                'name' => '⚠️ Treasury: Payout Disbursement Notice',
+                'subject' => 'Action Required: Payout Transfer #{{payout_id}} Could Not Be Completed',
+                'description' => 'Sent when a banking or crypto transfer encounters an account routing error.',
+                'vars' => ['name', 'amount', 'payout_id', 'method_type', 'action_url'],
+                'is_custom' => false
+            ],
+            'comment_mention_alert' => [
+                'name' => '💬 Discussion: You Were Mentioned in a Post',
+                'subject' => '{{mentioner_name}} mentioned you in a discussion on {{article_title}}',
+                'description' => 'Sent when a community member @mentions another user in discussion comments.',
+                'vars' => ['name', 'mentioner_name', 'article_title', 'comment_snippet', 'action_url'],
+                'is_custom' => false
+            ],
+            'new_follower_alert' => [
+                'name' => '👥 Community: New Follower on Your Creator Profile',
+                'subject' => '{{follower_name}} started following your publications on TechScout',
+                'description' => 'Sent when a community member follows an author or engineer.',
+                'vars' => ['name', 'follower_name', 'action_url'],
+                'is_custom' => false
+            ],
+            'weekly_digest_roundup' => [
+                'name' => '⚡ Intelligence Digest: Weekly Platform Roundup',
+                'subject' => 'TechScout Weekly Digest: Top 10 Frontier Models, Tools & Deep Dives',
+                'description' => 'Weekly digest sent to opted-in subscribers and developers.',
+                'vars' => ['name', 'headline', 'message', 'action_url', 'unsubscribe_url'],
+                'is_custom' => false
             ]
         ];
 
@@ -927,6 +1032,203 @@ class Mailer {
                   <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#d97706,#ea580c);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(217,119,6,0.25);'>View Submission in Campaign &rarr;</a>
                 </div>",
 
+            'account_email_verify' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>🔒 Security Verification</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>Verify Your Email Address</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Hello <strong>{{name}}</strong>, please enter this single-use code to confirm your email address and unlock full platform capabilities.</p>
+                </div>
+                <div style='text-align:center;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>
+                  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>Email Confirmation PIN Code (Expires in {{expires_in}})</div>
+                  <div style='font-size:36px;font-weight:900;color:#4f46e5;letter-spacing:10px;margin:10px 0 6px 0;font-family:Consolas,Monaco,monospace;'>{{verification_code}}</div>
+                  <div style='font-size:12px;color:#94a3b8;'>Do not disclose this confidential verification PIN to anyone.</div>
+                </div>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);'>Confirm Email Address &rarr;</a>
+                </div>",
+
+            'magic_login_link' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>🪄 1-Click Authentication</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>Your Secure Login Link</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Hello <strong>{{name}}</strong>, click below to sign in instantly to your TechScout account without entering a password.</p>
+                </div>
+                <div style='text-align:center;margin:32px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;font-size:16px;box-shadow:0 4px 14px rgba(79,70,229,0.25);'>Sign In to TechScout Now &rarr;</a>
+                </div>
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin:22px 0;font-size:13px;color:#64748b;'>
+                  This login link expires in <strong>{{expires_in}}</strong>. Triggered from IP <code>{{ip_address}}</code>. If you did not request this link, you can safely ignore this email.
+                </div>",
+
+            'new_device_login_alert' => "
+                <div style='background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:8px;padding:16px 18px;color:#b91c1c;font-size:14px;line-height:1.6;margin:18px 0;'>
+                  <div style='font-weight:700;color:#dc2626;margin-bottom:4px;font-size:16px;'>🚨 Security Notice: Unrecognized Device Sign-in</div>
+                  <div style='color:#0f172a;'>Hello <strong>{{name}}</strong>, your TechScout account was recently accessed from a new or unrecognized browser/device.</div>
+                </div>
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin:20px 0;'>
+                  <table role='presentation' width='100%' cellpadding='0' cellspacing='0' style='font-size:14px;border-collapse:collapse;'>
+                    <tr style='border-bottom:1px solid #e2e8f0;'><td style='padding:8px 0;color:#64748b;'>Device / Client</td><td style='padding:8px 0;text-align:right;color:#0f172a;font-weight:700;'>{{device_name}}</td></tr>
+                    <tr style='border-bottom:1px solid #e2e8f0;'><td style='padding:8px 0;color:#64748b;'>IP Address</td><td style='padding:8px 0;text-align:right;'><code style='color:#4f46e5;'>{{ip_address}}</code></td></tr>
+                    <tr><td style='padding:8px 0;color:#64748b;'>Timestamp</td><td style='padding:8px 0;text-align:right;color:#0f172a;'>{{timestamp}}</td></tr>
+                  </table>
+                </div>
+                <div style='text-align:center;margin:24px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#dc2626;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;box-shadow:0 4px 12px rgba(220,38,38,0.25);'>Review Sessions &amp; Secure Account &rarr;</a>
+                </div>",
+
+            'security_password_changed' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#ecfdf5;color:#059669;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>🛡️ Security Confirmation</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>Password Successfully Changed</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Hello <strong>{{name}}</strong>, the password for your TechScout account was recently modified on {{timestamp}}.</p>
+                </div>
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:20px 0;font-size:14px;color:#334155;'>
+                  If you performed this action, no further steps are needed. If you did NOT initiate this password change, please lock your account immediately:
+                </div>
+                <div style='text-align:center;margin:24px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;'>Manage Account Security &rarr;</a>
+                </div>",
+
+            'security_email_changed' => "
+                <div style='background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:8px;padding:16px 18px;color:#b45309;font-size:14px;line-height:1.6;margin:18px 0;'>
+                  <div style='font-weight:700;color:#d97706;margin-bottom:4px;font-size:15px;'>⚠️ Security Alert: Email Address Modification</div>
+                  <div style='color:#0f172a;'>Hello <strong>{{name}}</strong>, your TechScout registered email was changed to <strong>{{email}}</strong>.</div>
+                </div>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:20px 0;'>If you authorized this change, you are all set. If you suspect unauthorized activity, please contact support immediately.</p>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;'>Review Security Settings &rarr;</a>
+                </div>",
+
+            'data_export_ready' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>📦 Data Governance</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>Your Data Archive is Ready</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Hello <strong>{{name}}</strong>, your requested account data archive (publications, bookmarks, comments, telemetry) is compiled and ready for download.</p>
+                </div>
+                <div style='text-align:center;margin:32px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(5,150,105,0.25);'>Download ZIP Data Archive ⬇</a>
+                </div>
+                <div style='font-size:13px;color:#64748b;text-align:center;'>This download link remains active for {{expires_in}} before expiring.</div>",
+
+            'article_trending_alert' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#fef3c7;color:#d97706;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>🔥 Radar Milestone</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>Your Article is Trending! 🚀</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Congratulations <strong>{{name}}</strong>, your publication is currently climbing the top trending leaderboard on the TechScout frontpage!</p>
+                </div>
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin:20px 0;'>
+                  <div style='font-size:16px;font-weight:800;color:#0f172a;margin-bottom:6px;'>&ldquo;{{article_title}}&rdquo;</div>
+                  <div style='font-size:13px;color:#64748b;'>Total Verified Reads: <strong style='color:#4f46e5;'>{{total_reads}}</strong></div>
+                </div>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);'>View Article &amp; Community Analytics &rarr;</a>
+                </div>",
+
+            'editorial_review_started' => "
+                <div style='background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px 18px;color:#0369a1;font-size:14px;line-height:1.6;margin:18px 0;'>
+                  <div style='font-weight:700;color:#0284c7;margin-bottom:4px;font-size:15px;'>🔍 Editorial Peer Review Commenced</div>
+                  <div style='color:#0f172a;'>Hello <strong>{{name}}</strong>, a TechScout editor has begun peer reviewing your submission: <strong>&ldquo;{{article_title}}&rdquo;</strong>.</div>
+                </div>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:20px 0;'>Our review board verifies code snippets, architecture clarity, and benchmark reproducibility. We will notify you once review notes are complete.</p>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;'>Open Editorial Workspace &rarr;</a>
+                </div>",
+
+            'article_archived_notice' => "
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #64748b;border-radius:8px;padding:16px 18px;color:#475569;font-size:14px;line-height:1.6;margin:18px 0;'>
+                  <div style='font-weight:700;color:#0f172a;margin-bottom:4px;font-size:15px;'>📁 Publication Notice: Article Archived</div>
+                  <div style='color:#334155;'>Hello <strong>{{name}}</strong>, your technical article <strong>&ldquo;{{article_title}}&rdquo;</strong> has been moved to the historical archive.</div>
+                </div>
+                <p style='color:#475569;font-size:14px;line-height:1.65;margin:16px 0;'>Archived publications remain accessible via direct URL for permanent reference but are unindexed from main frontpage feeds.</p>
+                <div style='text-align:center;margin:24px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#ffffff;border:1px solid #cbd5e1;color:#334155;font-weight:600;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:14px;'>View Archived Article &rarr;</a>
+                </div>",
+
+            'tip_sent_confirmation' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#ecfdf5;color:#059669;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>☕ Patronage Receipt</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>Thank You for Supporting Creators!</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Hello <strong>{{name}}</strong>, your patronage tip has been delivered to <strong>{{creator_name}}</strong>.</p>
+                </div>
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin:20px 0;'>
+                  <table role='presentation' width='100%' cellpadding='0' cellspacing='0' style='font-size:14px;border-collapse:collapse;'>
+                    <tr style='border-bottom:1px solid #e2e8f0;'><td style='padding:8px 0;color:#64748b;'>Author Supported</td><td style='padding:8px 0;text-align:right;color:#0f172a;font-weight:700;'>{{creator_name}}</td></tr>
+                    <tr style='border-bottom:1px solid #e2e8f0;'><td style='padding:8px 0;color:#64748b;'>Amount Contributed</td><td style='padding:8px 0;text-align:right;color:#059669;font-weight:800;font-size:16px;'>\${{amount}} USD</td></tr>
+                    <tr><td style='padding:8px 0;color:#64748b;'>Article Context</td><td style='padding:8px 0;text-align:right;color:#0f172a;'>{{article_title}}</td></tr>
+                  </table>
+                </div>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;'>Return to Publication &rarr;</a>
+                </div>",
+
+            'creator_tier_promoted' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>👑 Creator Guild Promotion</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>Congratulations, {{name}}!</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>You have been elevated to the prestigious <strong>{{creator_tier}}</strong> Guild Tier on TechScout based on exceptional publication readership and community impact.</p>
+                </div>
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin:20px 0;'>
+                  <div style='font-size:14px;font-weight:700;color:#4f46e5;margin-bottom:8px;'>🌟 Unlocked Tier Benefits:</div>
+                  <ul style='color:#334155;font-size:14px;line-height:1.65;margin:0;padding-left:20px;'>
+                    <li>Priority editorial review queue for newly submitted guides</li>
+                    <li>Enhanced creator revenue pool weighting &amp; reduced payout transaction fees</li>
+                    <li>Verified author badge displayed across community threads</li>
+                  </ul>
+                </div>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);'>View Creator Dashboard &rarr;</a>
+                </div>",
+
+            'payout_failed_alert' => "
+                <div style='background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:8px;padding:16px 18px;color:#b91c1c;font-size:14px;line-height:1.6;margin:18px 0;'>
+                  <div style='font-weight:700;color:#dc2626;margin-bottom:4px;font-size:15px;'>⚠️ Payout Routing Issue Notice</div>
+                  <div style='color:#0f172a;'>Hello <strong>{{name}}</strong>, your payout disbursement #{{payout_id}} for <strong>\${{amount}} USD</strong> could not be processed by the recipient bank/network.</div>
+                </div>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:20px 0;'>Your creator funds have been safely restored to your available credit balance. Please verify or update your <strong>{{method_type}}</strong> details.</p>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;'>Update Payout Method &rarr;</a>
+                </div>",
+
+            'comment_mention_alert' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>💬 Discussion Mention</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>{{mentioner_name}} mentioned you!</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>You were mentioned in a technical discussion on <strong>&ldquo;{{article_title}}&rdquo;</strong>.</p>
+                </div>
+                <blockquote style='margin:20px 0;padding:16px 20px;background:#f8fafc;border-left:4px solid #4f46e5;border-radius:0 8px 8px 0;color:#334155;font-size:14px;line-height:1.6;font-style:italic;'>
+                  &ldquo;{{comment_snippet}}&rdquo;
+                  <div style='margin-top:8px;font-weight:700;color:#0f172a;font-style:normal;font-size:13px;'>&mdash; {{mentioner_name}}</div>
+                </blockquote>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;box-shadow:0 4px 14px rgba(79,70,229,0.25);'>Jump to Discussion &rarr;</a>
+                </div>",
+
+            'new_follower_alert' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>👥 Community Growth</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>New Follower on TechScout</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Hello <strong>{{name}}</strong>, <strong>{{follower_name}}</strong> has started following your engineering publications and prompt collections.</p>
+                </div>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px;'>View Member Profile &rarr;</a>
+                </div>",
+
+            'weekly_digest_roundup' => "
+                <div style='text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;'>
+                  <span style='display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;'>⚡ Weekly Intelligence Digest</span>
+                  <h2 style='color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;'>{{headline}}</h2>
+                  <p style='color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;'>Hello <strong>{{name}}</strong>, here is your curated weekly briefing of top frontier AI models, architecture deep-dives, and tools on TechScout.</p>
+                </div>
+                <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin:20px 0;color:#334155;font-size:15px;line-height:1.65;'>
+                  {{message}}
+                </div>
+                <div style='text-align:center;margin:32px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;font-size:16px;box-shadow:0 4px 14px rgba(79,70,229,0.25);'>Explore Full Weekly Digest &rarr;</a>
+                </div>
+                <div style='border-top:1px solid #e2e8f0;padding-top:16px;margin-top:28px;text-align:center;font-size:12px;color:#94a3b8;'>
+                  To manage weekly newsletter preferences, <a href='{{unsubscribe_url}}' style='color:#4f46e5;'>click here</a>.
+                </div>",
+
             default => "
                 <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>{{headline}}</h2>
                 <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
@@ -939,9 +1241,9 @@ class Mailer {
 
     public static function getTemplateCategory(?string $templateKey): string {
         return match ($templateKey) {
-            'welcome', 'email_verification', 'account_activated', 'login_alert', 'password_reset', 'security_alert' => 'auth_security',
-            'payout_requested', 'payout_approved', 'payout_rejected', 'tip_received' => 'billing_payouts',
-            'article_approved', 'editorial_revisions', 'author_approved' => 'notifications_editorial',
+            'welcome', 'email_verification', 'account_activated', 'login_alert', 'password_reset', 'security_alert', 'account_email_verify', 'magic_login_link', 'new_device_login_alert', 'security_password_changed', 'security_email_changed', 'data_export_ready', 'security_two_factor_otp', 'user_account_suspended', 'user_account_reactivated' => 'auth_security',
+            'payout_requested', 'payout_approved', 'payout_rejected', 'tip_received', 'tip_sent_confirmation', 'creator_tier_promoted', 'payout_failed_alert', 'payout_method_linked', 'payout_method_removed', 'monthly_creator_earnings_statement' => 'billing_payouts',
+            'article_approved', 'editorial_revisions', 'author_approved', 'article_submitted', 'article_rejected', 'author_application_received', 'article_trending_alert', 'editorial_review_started', 'article_archived_notice', 'comment_reply_alert', 'comment_mention_alert', 'new_follower_alert', 'author_milestone_badge', 'author_profile_updated' => 'notifications_editorial',
             'ticket_reply', 'contact_reply' => 'support_tickets',
             default => 'marketing_broadcast'
         };

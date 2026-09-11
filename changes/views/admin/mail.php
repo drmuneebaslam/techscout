@@ -1309,47 +1309,47 @@
 <!-- MODAL: CREATE & EDIT HTML EMAIL TEMPLATE (FULL SCREEN 2-COLUMN DISPLAY) -->
 <!-- ========================================================================= -->
 <div id="templateEditorModal" class="admin-modal-overlay" style="display: none;">
-  <div class="admin-modal-box modal-purple" style="width: 98vw; max-width: 1550px; height: 94vh; max-height: 94vh; margin: 2vh auto; display: flex; flex-direction: column; background: #0b0f19; border: 1px solid rgba(168,85,247,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.8);">
-    <div class="admin-modal-header" style="padding-bottom: 0.75rem; border-bottom: 1px solid rgba(148,163,184,0.15);">
+  <div class="admin-modal-box" style="width: 98vw; max-width: 1550px; height: 94vh; max-height: 94vh; margin: 2vh auto; display: flex; flex-direction: column; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.3); overflow: hidden;">
+    <div class="admin-modal-header" style="padding: 0.85rem 1.25rem; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
       <div>
-        <h3 class="admin-modal-title" style="color: #c084fc; font-size: 1.25rem;" id="tmplBuilderTitle">
-          <i data-lucide="layout-template"></i> Create &amp; Save Custom HTML Email Template
+        <h3 class="admin-modal-title" style="color: #0f172a; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;" id="tmplBuilderTitle">
+          <i data-lucide="layout-template" style="color: #4f46e5;"></i> Create &amp; Save Custom HTML Email Template
         </h3>
-        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.2rem;">
-          Design responsive HTML templates with 10 categories of dynamic tokens &amp; real-time visual preview iframe.
+        <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">
+          Design responsive HTML templates with 10 categories of dynamic tokens &amp; real-time live light visual preview.
         </div>
       </div>
       
       <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <div style="display: flex; gap: 0.25rem; background: #05070b; padding: 4px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.15);">
-          <button type="button" onclick="setModalTmplViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-tmpl-modal-split" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">🌓 Split View</button>
-          <button type="button" onclick="setModalTmplViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-editor" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">📝 Editor Only</button>
-          <button type="button" onclick="setModalTmplViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-preview" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">👁️ Preview Only</button>
+        <div style="display: flex; gap: 0.25rem; background: #f1f5f9; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <button type="button" onclick="setModalTmplViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-tmpl-modal-split" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; background: #4f46e5; border-color: #4f46e5;">🌓 Split View</button>
+          <button type="button" onclick="setModalTmplViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-editor" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #475569;">📝 Editor Only</button>
+          <button type="button" onclick="setModalTmplViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-preview" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #475569;">👁️ Preview Only</button>
         </div>
-        <button type="button" onclick="closeTemplateEditorModal()" class="admin-modal-close" title="Close Modal">✕</button>
+        <button type="button" onclick="closeTemplateEditorModal()" class="admin-modal-close" style="color: #64748b; font-size: 1.2rem;" title="Close Modal">✕</button>
       </div>
     </div>
 
-    <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="templateBuilderForm" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding: 0.75rem;">
+    <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="templateBuilderForm" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding: 1rem; background: #f8fafc;">
       <input type="hidden" name="id" id="tmpl_id_input" value="">
 
       <!-- Top Metadata Strip -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem; background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem; background: #ffffff; padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
         <div>
-          <label class="admin-modal-label">Template Key (Unique Identifier)</label>
-          <input type="text" name="template_key" id="tmpl_key_input" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace;" required>
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Key (Unique Identifier) <span style="color:#ef4444;">*</span></label>
+          <input type="text" name="template_key" id="tmpl_key_input" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace; background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
         </div>
         <div>
-          <label class="admin-modal-label">Template Display Name</label>
-          <input type="text" name="name" id="tmpl_name_input" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" required>
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Display Name <span style="color:#ef4444;">*</span></label>
+          <input type="text" name="name" id="tmpl_name_input" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
         </div>
         <div>
-          <label class="admin-modal-label">Default Subject Line</label>
-          <input type="text" name="subject" id="tmpl_subject_input" oninput="updateTmplModalPreview()" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" required>
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Default Subject Line <span style="color:#ef4444;">*</span></label>
+          <input type="text" name="subject" id="tmpl_subject_input" oninput="updateTmplModalPreview()" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
         </div>
         <div>
-          <label class="admin-modal-label">Assigned Mail Credential Profile</label>
-          <select name="assigned_credential_id" id="tmpl_cred_id_input" class="admin-modal-select">
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Assigned Outbound Sender Account</label>
+          <select name="assigned_credential_id" id="tmpl_cred_id_input" class="admin-modal-select" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
             <option value="">-- Default Outbound System Provider --</option>
             <?php foreach ($mailCredentials as $mc): ?>
               <option value="<?= $mc['id'] ?>"><?= htmlspecialchars($mc['name']) ?> (<?= htmlspecialchars(strtoupper($mc['provider'])) ?>) <?= $mc['is_default'] ? '★ [DEFAULT]' : '' ?></option>
@@ -1357,8 +1357,8 @@
           </select>
         </div>
         <div style="grid-column: span 2;">
-          <label class="admin-modal-label">Template Description / Notes</label>
-          <input type="text" name="description" id="tmpl_desc_input" placeholder="e.g. Broadcast update for new models..." class="admin-modal-input">
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Description / Notes</label>
+          <input type="text" name="description" id="tmpl_desc_input" placeholder="e.g. Broadcast update for new frontier models..." class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
         </div>
       </div>
 
@@ -1367,24 +1367,25 @@
         
         <!-- LEFT COLUMN: ALL 10 CATEGORIES PALETTE, BLOCK COMPONENTS & CODE EDITOR -->
         <div id="tmpl-modal-col-editor" style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 0.25rem;">
+          
           <!-- Collapsible 10 Categories Dynamic Variables Matrix -->
-          <details open style="margin-bottom: 0.75rem; background: #05070b; border: 1px solid rgba(168,85,247,0.3); border-radius: 8px; padding: 0.55rem 0.75rem;">
-            <summary style="cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #c084fc; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          <details open style="margin-bottom: 0.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.65rem 0.85rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <summary style="cursor: pointer; font-size: 0.82rem; font-weight: 800; color: #4f46e5; display: flex; align-items: center; justify-content: space-between; user-select: none;">
               <span style="display: flex; align-items: center; gap: 0.4rem;">
-                <i data-lucide="variable" style="width: 14px; height: 14px;"></i>
+                <i data-lucide="variable" style="width: 15px; height: 15px; color: #4f46e5;"></i>
                 Dynamic Variables Palette (10 Categories &bull; 60+ Tokens)
               </span>
-              <span style="font-size: 0.7rem; color: #a855f7;">Click tag to insert ▾</span>
+              <span style="font-size: 0.72rem; color: #6366f1; font-weight: 600;">Click token to insert into caret ▾</span>
             </summary>
-            <div style="margin-top: 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; max-height: 200px; overflow-y: auto; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.6rem;">
+            <div style="margin-top: 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; max-height: 200px; overflow-y: auto; border-top: 1px solid #f1f5f9; padding-top: 0.6rem;">
               <?php foreach ($availableVariables as $cat => $vars): ?>
-                <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.1); border-radius: 6px; padding: 0.4rem;">
-                  <div style="font-size: 0.68rem; font-weight: 700; color: #c084fc; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.45rem;">
+                  <div style="font-size: 0.68rem; font-weight: 800; color: #4338ca; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></div>
                   <div style="display: flex; flex-direction: column; gap: 0.2rem;">
                     <?php foreach ($vars as $tag => $desc): ?>
-                      <button type="button" onclick="insertTmplTag('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.2); padding: 0.15rem 0.35rem; border-radius: 4px; color: #cbd5e1; font-size: 0.68rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(168,85,247,0.2)'" onmouseout="this.style.background='rgba(168,85,247,0.06)'" title="Insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
-                        <code style="color: #c084fc; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
-                        <span style="color: #94a3b8; font-size: 0.62rem; margin-left: 0.3rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
+                      <button type="button" onclick="insertTmplTag('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: #ffffff; border: 1px solid #e2e8f0; padding: 0.2rem 0.4rem; border-radius: 4px; color: #334155; font-size: 0.68rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.borderColor='#818cf8'; this.style.background='#eef2ff';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#ffffff';" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
+                        <code style="color: #4f46e5; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
+                        <span style="color: #64748b; font-size: 0.62rem; margin-left: 0.3rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
                       </button>
                     <?php endforeach; ?>
                   </div>
@@ -1393,56 +1394,67 @@
             </div>
           </details>
 
-          <!-- Modern Block Component Library -->
-          <div style="margin-bottom: 0.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.65rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.5rem;">
-              <div style="font-size: 0.78rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
-                <i data-lucide="blocks" style="width: 14px; height: 14px; color: #6366f1;"></i> 
-                <span>Universal Block Component Library</span>
+          <!-- Modern Block Component Library (14 Responsive Email Blocks) -->
+          <div style="margin-bottom: 0.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem 0.85rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="font-size: 0.8rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
+                <i data-lucide="blocks" style="width: 15px; height: 15px; color: #4f46e5;"></i> 
+                <span>1-Click Universal Responsive Email Blocks</span>
               </div>
-              <span style="font-size: 0.68rem; color: #64748b;">1-Click insert responsive components</span>
+              <span style="font-size: 0.68rem; color: #10b981; font-weight: 700;">⚡ 14 Ready-to-use Email Blocks</span>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 0.3rem;">
-              <button type="button" onclick="insertBlockComponent('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #f5f3ff;">✨ Hero Header</button>
-              <button type="button" onclick="insertBlockComponent('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">ℹ️ Info Callout</button>
-              <button type="button" onclick="insertBlockComponent('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;">✅ Success Box</button>
-              <button type="button" onclick="insertBlockComponent('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #d97706; border-color: #fde68a; background: #fffbeb;">⚠️ Warning Box</button>
-              <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;">🔘 Primary CTA</button>
-              <button type="button" onclick="insertBlockComponent('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">💰 Disbursal CTA</button>
-              <button type="button" onclick="insertBlockComponent('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;">📊 Data Grid</button>
-              <button type="button" onclick="insertBlockComponent('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;">🔑 OTP Badge</button>
+              <button type="button" onclick="insertBlockComponent('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #eef2ff;" title="Hero Header with Badge">✨ Hero Header</button>
+              <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;" title="Primary Action CTA Button">🔘 Primary CTA</button>
+              <button type="button" onclick="insertBlockComponent('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Disbursal / Financial CTA">💰 Disbursal CTA</button>
+              <button type="button" onclick="insertBlockComponent('cta_secondary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Outline Action Button">🔗 Outline Button</button>
+              <button type="button" onclick="insertBlockComponent('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;" title="Technical Info Callout">ℹ️ Info Callout</button>
+              <button type="button" onclick="insertBlockComponent('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;" title="Verified Success Box">✅ Success Box</button>
+              <button type="button" onclick="insertBlockComponent('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #d97706; border-color: #fde68a; background: #fffbeb;" title="Action Required Warning Box">⚠️ Warning Box</button>
+              <button type="button" onclick="insertBlockComponent('callout_critical')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #dc2626; border-color: #fecaca; background: #fef2f2;" title="Critical Security Alert Box">🚨 Critical Alert</button>
+              <button type="button" onclick="insertBlockComponent('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Key-Value Data Grid">📊 Data Grid</button>
+              <button type="button" onclick="insertBlockComponent('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;" title="OTP Verification Badge">🔑 OTP Badge</button>
+              <button type="button" onclick="insertBlockComponent('two_col_card')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #ffffff;" title="2-Column Metric Cards">⚖️ 2-Col Cards</button>
+              <button type="button" onclick="insertBlockComponent('quote')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Community Discussion Quote">💬 Quote</button>
+              <button type="button" onclick="insertBlockComponent('checklist')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Styled Checklist">📋 Checklist</button>
+              <button type="button" onclick="insertBlockComponent('divider')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #64748b; border-color: #e2e8f0; background: #f8fafc;" title="Section Divider Line">➖ Divider</button>
             </div>
           </div>
 
           <!-- Visual Editor Mode Switcher & Rich Formatting Toolbar -->
-          <div style="background: rgba(15,23,42,0.9); border: 1px solid rgba(168,85,247,0.3); border-radius: 8px 8px 0 0; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0;">
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px 10px 0 0; padding: 0.65rem 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
               <div style="display: flex; gap: 0.25rem;">
-                <button type="button" onclick="switchTmplEditMode('wysiwyg')" id="btn-tmpl-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: #a855f7; border-color: #a855f7;">🎨 Visual WYSIWYG Editor</button>
-                <button type="button" onclick="switchTmplEditMode('html')" id="btn-tmpl-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">💻 Raw HTML Code</button>
+                <button type="button" onclick="switchTmplEditMode('wysiwyg')" id="btn-tmpl-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: #4f46e5; border-color: #4f46e5;">🎨 Visual WYSIWYG Editor</button>
+                <button type="button" onclick="switchTmplEditMode('html')" id="btn-tmpl-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; color: #475569;">💻 Raw HTML Code</button>
               </div>
               
-              <!-- Dynamic Variable Selector Dropdown -->
-              <select onchange="if(this.value){ insertTmplTag(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #c084fc; width: auto; max-width: 240px; font-weight: 700; border-color: rgba(168,85,247,0.4);">
-                <option value="">⚡ Insert Dynamic Token... ▾</option>
-                <?php foreach ($availableVariables as $vCat => $vList): ?>
-                  <optgroup label="<?= htmlspecialchars($vCat) ?>">
-                    <?php foreach ($vList as $vTag => $vDesc): ?>
-                      <option value="<?= htmlspecialchars($vTag) ?>"><?= htmlspecialchars($vTag) ?> - <?= htmlspecialchars($vDesc) ?></option>
-                    <?php endforeach; ?>
-                  </optgroup>
-                <?php endforeach; ?>
-              </select>
+              <div style="display: flex; gap: 0.35rem; align-items: center;">
+                <!-- Dynamic Variable Selector Dropdown -->
+                <select onchange="if(this.value){ insertTmplTag(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.22rem 0.5rem; font-size: 0.72rem; color: #4f46e5; width: auto; max-width: 220px; font-weight: 700; border-color: #cbd5e1; background: #f8fafc;">
+                  <option value="">⚡ Quick Token Insert... ▾</option>
+                  <?php foreach ($availableVariables as $vCat => $vList): ?>
+                    <optgroup label="<?= htmlspecialchars($vCat) ?>">
+                      <?php foreach ($vList as $vTag => $vDesc): ?>
+                        <option value="<?= htmlspecialchars($vTag) ?>"><?= htmlspecialchars($vTag) ?> - <?= htmlspecialchars($vDesc) ?></option>
+                      <?php endforeach; ?>
+                    </optgroup>
+                  <?php endforeach; ?>
+                </select>
+                <button type="button" onclick="loadTmplStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff; font-weight: 700;" title="Load Clean White Responsive Email Starter Boilerplate">
+                  ⚡ Light Boilerplate
+                </button>
+              </div>
             </div>
 
             <!-- WYSIWYG Formatting Buttons Bar -->
-            <div id="tmpl_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #05070b; padding: 0.35rem; border-radius: 6px; border: 1px solid rgba(148,163,184,0.15);">
-              <button type="button" onclick="execTmplWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800;" title="Bold"><b>B</b></button>
-              <button type="button" onclick="execTmplWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic;" title="Italic"><i>I</i></button>
-              <button type="button" onclick="execTmplWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline;" title="Underline"><u>U</u></button>
-              <button type="button" onclick="execTmplWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through;" title="Strikethrough"><s>S</s></button>
-              <span style="color: rgba(148,163,184,0.3);">|</span>
-              <select onchange="execTmplWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #0b0f19;">
+            <div id="tmpl_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #f8fafc; padding: 0.4rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+              <button type="button" onclick="execTmplWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800; color: #0f172a; background: #fff;" title="Bold"><b>B</b></button>
+              <button type="button" onclick="execTmplWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic; color: #0f172a; background: #fff;" title="Italic"><i>I</i></button>
+              <button type="button" onclick="execTmplWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline; color: #0f172a; background: #fff;" title="Underline"><u>U</u></button>
+              <button type="button" onclick="execTmplWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through; color: #0f172a; background: #fff;" title="Strikethrough"><s>S</s></button>
+              <span style="color: #cbd5e1;">|</span>
+              <select onchange="execTmplWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #ffffff; border-color: #cbd5e1; color: #0f172a;">
                 <option value="">Header ▾</option>
                 <option value="H1">H1 Main Heading</option>
                 <option value="H2">H2 Sub Heading</option>
@@ -1450,45 +1462,41 @@
                 <option value="P">Paragraph</option>
                 <option value="BLOCKQUOTE">Blockquote</option>
               </select>
-              <span style="color: rgba(148,163,184,0.3);">|</span>
-              <button type="button" onclick="execTmplWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Left">⬅️</button>
-              <button type="button" onclick="execTmplWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Center">↔️</button>
-              <button type="button" onclick="execTmplWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Right">➡️</button>
-              <span style="color: rgba(148,163,184,0.3);">|</span>
-              <button type="button" onclick="execTmplWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Bullet List">• List</button>
-              <button type="button" onclick="execTmplWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Numbered List">1. List</button>
-              <span style="color: rgba(148,163,184,0.3);">|</span>
-              <button type="button" onclick="promptTmplLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #38bdf8;" title="Insert Link">🔗 Link</button>
-              <button type="button" onclick="insertTmplCtaButton()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #a855f7;" title="Insert Primary CTA Button">🔘 Button</button>
-              <button type="button" onclick="execTmplWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444;" title="Clear Formatting">🧹 Clear</button>
+              <span style="color: #cbd5e1;">|</span>
+              <button type="button" onclick="execTmplWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Left">⬅️</button>
+              <button type="button" onclick="execTmplWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Center">↔️</button>
+              <button type="button" onclick="execTmplWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Right">➡️</button>
+              <span style="color: #cbd5e1;">|</span>
+              <button type="button" onclick="execTmplWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Bullet List">• List</button>
+              <button type="button" onclick="execTmplWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Numbered List">1. List</button>
+              <span style="color: #cbd5e1;">|</span>
+              <button type="button" onclick="promptTmplLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #0284c7; background: #fff;" title="Insert Link">🔗 Link</button>
+              <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #4f46e5; background: #fff;" title="Insert Primary CTA Button">🔘 Button</button>
+              <button type="button" onclick="execTmplWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444; background: #fff;" title="Clear Formatting">🧹 Clear</button>
             </div>
           </div>
 
           <!-- Visual WYSIWYG Editable Canvas -->
-          <div id="tmpl_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid rgba(168,85,247,0.3); border-top: none; border-radius: 0 0 8px 8px; padding: 1rem; min-height: 280px; max-height: 480px; overflow-y: auto; flex: 1;">
-            <div id="tmpl_wysiwyg_editor" contenteditable="true" oninput="syncWysiwygToCode()" style="outline: none; min-height: 260px; font-family: 'Inter', sans-serif; font-size: 0.92rem; line-height: 1.6;">
-              <h2 style="color: #0f172a; margin-top: 0;">Hello {{name}}!</h2>
-              <p style="color: #475569;">Welcome to TechScout Intelligence. We are thrilled to have you on board.</p>
-              <p>{{message}}</p>
-            </div>
+          <div id="tmpl_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-top: none; border-radius: 0 0 10px 10px; padding: 1.25rem; min-height: 280px; max-height: 480px; overflow-y: auto; flex: 1; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
+            <div id="tmpl_wysiwyg_editor" contenteditable="true" oninput="syncWysiwygToCode()" style="outline: none; min-height: 260px; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.65; color: #0f172a;"></div>
           </div>
 
           <!-- HTML Code Editor Textarea (Hidden when in WYSIWYG mode) -->
-          <textarea name="html_content" id="tmpl_html_input" oninput="syncCodeToWysiwyg()" rows="14" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" class="admin-modal-textarea" style="display: none; font-family: var(--admin-font-mono); font-size: 0.84rem; flex: 1; min-height: 280px; resize: vertical; border-radius: 0 0 8px 8px; border-top: none;" required></textarea>
+          <textarea name="html_content" id="tmpl_html_input" oninput="syncCodeToWysiwyg()" rows="14" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" class="admin-modal-textarea" style="display: none; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 0.85rem; flex: 1; min-height: 280px; resize: vertical; border-radius: 0 0 10px 10px; border-top: none; background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required></textarea>
         </div>
 
         <!-- RIGHT COLUMN: REAL-TIME RENDERED LIVE HTML PREVIEW IFRAME -->
         <div id="tmpl-modal-col-preview" style="display: flex; flex-direction: column;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-            <label class="admin-modal-label" style="margin: 0; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
-              <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Live Real-Time Visual Preview Sandbox
+            <label class="admin-modal-label" style="margin: 0; color: #4f46e5; display: flex; align-items: center; gap: 0.35rem; font-weight: 700;">
+              <i data-lucide="eye" style="width: 15px; height: 15px;"></i> Live Delivery Simulation Sandbox (Light Mode)
             </label>
             <span style="font-size: 0.7rem; color: #64748b;">Simulated Recipient: Alex Rivera</span>
           </div>
 
-          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex: 1; min-height: 420px; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; flex: 1; min-height: 420px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
             <!-- Simulated Email Header -->
-            <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; font-size: 0.76rem;">
+            <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 0.85rem; font-size: 0.78rem;">
               <div style="color: #0f172a; font-weight: 700;" id="tmplModalSimSubject">Subject: TechScout Intelligence Update</div>
               <div style="color: #64748b; font-size: 0.68rem; margin-top: 0.15rem;">
                 From: <strong style="color: #334155;">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
@@ -1501,9 +1509,9 @@
         </div>
       </div>
 
-      <div class="admin-modal-footer" style="padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid rgba(148,163,184,0.15); display: flex; justify-content: flex-end; gap: 0.5rem;">
-        <button type="button" onclick="closeTemplateEditorModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
-        <button type="submit" id="tmplSubmitBtn" class="ts-btn ts-btn-primary" style="background: #a855f7; border-color: #a855f7; font-weight: 700; padding: 0.6rem 1.75rem;">
+      <div class="admin-modal-footer" style="padding: 0.85rem 1rem 0 1rem; margin-top: 0.75rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 0.5rem; background: #ffffff; border-radius: 0 0 12px 12px;">
+        <button type="button" onclick="closeTemplateEditorModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #64748b; border-color: #cbd5e1;">Cancel</button>
+        <button type="submit" id="tmplSubmitBtn" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 800; padding: 0.65rem 1.85rem; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
           <i data-lucide="save"></i> Save HTML Template 💾
         </button>
       </div>
@@ -1975,11 +1983,11 @@ function insertTag(tag) {
 function insertSnippet(type) {
   let snippet = '';
   if (type === 'button') {
-    snippet = `<div style="text-align:center;margin:24px 0;"><a href="{{action_url}}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#38bdf8);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;">Action Button &rarr;</a></div>`;
+    snippet = `<div style="text-align:center;margin:28px 0;"><a href="{{action_url}}" style="display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);">Explore Platform &rarr;</a></div>`;
   } else if (type === 'card') {
-    snippet = `<div style="background:#0f172a;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:16px;margin:20px 0;"><strong style="color:#38bdf8;display:block;margin-bottom:6px;">⚡ Key Highlight:</strong><p style="color:#cbd5e1;font-size:14px;margin:0;">Highlight note content goes here...</p></div>`;
+    snippet = `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #6366f1;border-radius:8px;padding:16px 18px;margin:20px 0;"><strong style="color:#4f46e5;display:block;margin-bottom:6px;font-size:15px;">⚡ Key Platform Highlight:</strong><p style="color:#334155;font-size:14px;line-height:1.6;margin:0;">Highlight note content or briefing excerpt goes here...</p></div>`;
   } else if (type === 'code') {
-    snippet = `<pre style="background:#030712;border:1px solid rgba(148,163,184,0.2);padding:14px;border-radius:6px;color:#38bdf8;font-family:monospace;font-size:13px;overflow-x:auto;"><code>// Example code snippet\nconst response = await fetch('/api/v1/scout');</code></pre>`;
+    snippet = `<pre style="background:#f8fafc;border:1px solid #cbd5e1;padding:14px;border-radius:8px;color:#0f172a;font-family:Consolas,Monaco,monospace;font-size:13px;overflow-x:auto;line-height:1.5;"><code>// Example technical snippet\nconst scout = await TechScout.query();</code></pre>`;
   }
   insertTag(snippet);
 }
@@ -2654,12 +2662,31 @@ function submitBatchTemplateCredentials(event) {
   });
 }
 
+function showTmplToast(msg) {
+  let box = document.getElementById('tmplToastBox');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'tmplToastBox';
+    box.style.cssText = 'position: fixed; top: 24px; right: 24px; z-index: 999999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;';
+    document.body.appendChild(box);
+  }
+  const t = document.createElement('div');
+  t.style.cssText = 'background: #0f172a; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 8px; pointer-events: auto; animation: saFadeIn 0.2s ease forwards;';
+  t.innerHTML = msg;
+  box.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => t.remove(), 300);
+  }, 2200);
+}
+
 function openCreateTemplateModal() {
   resetTemplateForm();
-  document.getElementById('tmplBuilderTitle').innerHTML = '<i data-lucide="layout-template"></i> Create & Save Custom HTML Email Template';
+  document.getElementById('tmplBuilderTitle').innerHTML = '<i data-lucide="layout-template" style="color:#4f46e5;"></i> Create & Save Custom HTML Email Template';
   document.getElementById('tmplSubmitBtn').innerHTML = '<i data-lucide="save"></i> Save HTML Template 💾';
   document.getElementById('templateEditorModal').style.display = 'flex';
-  updateTmplModalPreview();
+  loadTmplStarterBoilerplate(false);
   if (window.lucide) lucide.createIcons();
 }
 
@@ -2681,7 +2708,12 @@ function populateTemplateForm(key) {
     document.getElementById('tmpl_cred_id_input').value = tmpl.assigned_credential_id || '';
   }
 
-  document.getElementById('tmplBuilderTitle').innerHTML = '<i data-lucide="edit-3"></i> Edit Template: ' + (tmpl.name || key);
+  const wysiwyg = document.getElementById('tmpl_wysiwyg_editor');
+  if (wysiwyg) {
+    wysiwyg.innerHTML = tmpl.html || '';
+  }
+
+  document.getElementById('tmplBuilderTitle').innerHTML = '<i data-lucide="edit-3" style="color:#4f46e5;"></i> Edit Template: ' + (tmpl.name || key);
   document.getElementById('tmplSubmitBtn').innerHTML = '<i data-lucide="save"></i> Update Template 💾';
   document.getElementById('templateEditorModal').style.display = 'flex';
   updateTmplModalPreview();
@@ -2696,6 +2728,8 @@ function resetTemplateForm() {
   document.getElementById('tmpl_subject_input').value = '';
   document.getElementById('tmpl_desc_input').value = '';
   document.getElementById('tmpl_html_input').value = '';
+  const wysiwyg = document.getElementById('tmpl_wysiwyg_editor');
+  if (wysiwyg) wysiwyg.innerHTML = '';
   if (document.getElementById('tmpl_cred_id_input')) {
     document.getElementById('tmpl_cred_id_input').value = '';
   }
@@ -2703,42 +2737,146 @@ function resetTemplateForm() {
 }
 
 function insertTmplTag(tag) {
+  const wysiwygCont = document.getElementById('tmpl_wysiwyg_container');
+  const wysiwygEditor = document.getElementById('tmpl_wysiwyg_editor');
   const textarea = document.getElementById('tmpl_html_input');
-  if (!textarea) return;
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const text = textarea.value;
-  textarea.value = text.substring(0, start) + tag + text.substring(end);
-  textarea.selectionStart = textarea.selectionEnd = start + tag.length;
-  textarea.focus();
-  updateTmplModalPreview();
+  const isWysiwyg = wysiwygCont && wysiwygCont.style.display !== 'none';
+
+  if (isWysiwyg && wysiwygEditor) {
+    wysiwygEditor.focus();
+    const sel = window.getSelection();
+    let inserted = false;
+    if (sel && sel.rangeCount > 0 && wysiwygEditor.contains(sel.anchorNode)) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const node = document.createTextNode(tag);
+      range.insertNode(node);
+      range.setStartAfter(node);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      inserted = true;
+    }
+    if (!inserted) {
+      wysiwygEditor.innerHTML += ' ' + tag + ' ';
+    }
+    syncWysiwygToCode();
+  } else if (textarea) {
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + tag + text.substring(end);
+    textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+    textarea.focus();
+    syncCodeToWysiwyg();
+  }
+  showTmplToast(`Token <code>${tag}</code> inserted! ⚡`);
 }
 
 function insertBlockComponent(type) {
+  const wysiwygCont = document.getElementById('tmpl_wysiwyg_container');
+  const wysiwygEditor = document.getElementById('tmpl_wysiwyg_editor');
   const textarea = document.getElementById('tmpl_html_input');
-  if (!textarea) return;
+  const isWysiwyg = wysiwygCont && wysiwygCont.style.display !== 'none';
 
   const blocks = {
-    hero: `\n<h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>{{headline}}</h2>\n<p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, here is your latest intelligence briefing from TechScout.</p>\n`,
-    callout_info: `\n<div style='background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px;color:#0369a1;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#0284c7;'>💡 Technical Briefing:</strong> {{message}}\n</div>\n`,
-    callout_success: `\n<div style='background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid #059669;border-radius:8px;padding:16px;color:#065f46;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#059669;'>✓ Verified & Approved:</strong> Your submission or transaction has been processed successfully.\n</div>\n`,
-    callout_warning: `\n<div style='background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:8px;padding:16px;color:#92400e;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#d97706;'>⚠️ Attention Required:</strong> Please review and adjust the requested parameters.\n</div>\n`,
-    cta_primary: `\n<div style='text-align:center;margin:28px 0;'>\n  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Explore TechScout Intelligence &rarr;</a>\n</div>\n`,
-    cta_green: `\n<div style='text-align:center;margin:28px 0;'>\n  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>View Disbursed Payout Ledger &rarr;</a>\n</div>\n`,
-    datagrid: `\n<div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin:20px 0;'>\n  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>\n    <div><strong style='color:#64748b;'>Reference ID:</strong> <span style='color:#0f172a;font-weight:600;'>#{{payout_id}}</span></div>\n    <div><strong style='color:#64748b;'>Transaction Amount:</strong> <strong style='font-size:16px;color:#059669;'>\${{amount}} USD</strong></div>\n    <div><strong style='color:#64748b;'>Status:</strong> <span style='background:#ecfdf5;color:#059669;padding:2px 8px;border-radius:4px;font-weight:700;font-size:12px;border:1px solid #a7f3d0;'>COMPLETED</span></div>\n  </div>\n</div>\n`,
-    otp_box: `\n<div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>\n  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>One-Time Authorization PIN (Expires in {{expires_in}})</div>\n  <div style='font-size:34px;font-weight:900;color:#4f46e5;letter-spacing:8px;margin-top:8px;font-family:monospace;'>{{verification_code}}</div>\n</div>\n`
+    hero: `\n<div style="text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:16px 0;">\n  <span style="display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;">🌟 Platform Intelligence</span>\n  <h2 style="color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;">{{headline}}</h2>\n  <p style="color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;">Hello <strong>{{name}}</strong>, here is your latest personalized briefing from TechScout.</p>\n</div>\n`,
+    callout_info: `\n<div style="background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px 18px;color:#0369a1;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#0284c7;margin-bottom:4px;">💡 Technical Briefing:</div>\n  <div style="color:#0f172a;">{{message}}</div>\n</div>\n`,
+    callout_success: `\n<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid #16a34a;border-radius:8px;padding:16px 18px;color:#15803d;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#16a34a;margin-bottom:4px;">✅ Verified &amp; Confirmed:</div>\n  <div style="color:#0f172a;">Your submission or transaction has been processed successfully.</div>\n</div>\n`,
+    callout_warning: `\n<div style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:8px;padding:16px 18px;color:#b45309;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#d97706;margin-bottom:4px;">⚠️ Action Required:</div>\n  <div style="color:#0f172a;">Please review your account parameters or adjust your submission details.</div>\n</div>\n`,
+    callout_critical: `\n<div style="background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:8px;padding:16px 18px;color:#b91c1c;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#dc2626;margin-bottom:4px;">🚨 Critical Security Alert:</div>\n  <div style="color:#0f172a;">A new security event occurred from IP <strong>{{ip_address}}</strong> ({{browser}}). If this was not you, please secure your account immediately.</div>\n</div>\n`,
+    cta_primary: `\n<div style="text-align:center;margin:28px 0;">\n  <a href="{{action_url}}" style="display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);letter-spacing:0.2px;">Explore TechScout Intelligence &rarr;</a>\n</div>\n`,
+    cta_green: `\n<div style="text-align:center;margin:28px 0;">\n  <a href="{{action_url}}" style="display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(5,150,105,0.25);letter-spacing:0.2px;">View Disbursed Payout Ledger &rarr;</a>\n</div>\n`,
+    cta_secondary: `\n<div style="text-align:center;margin:20px 0;">\n  <a href="{{action_url}}" style="display:inline-block;background:#ffffff;color:#334155;border:1px solid #cbd5e1;font-weight:600;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:14px;">Review Activity Details &rarr;</a>\n</div>\n`,
+    datagrid: `\n<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin:20px 0;">\n  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse;">\n    <tr style="border-bottom:1px solid #e2e8f0;">\n      <td style="padding:10px 0;color:#64748b;font-weight:500;">Reference ID</td>\n      <td style="padding:10px 0;text-align:right;color:#0f172a;font-weight:700;font-family:monospace;">#{{payout_id}}</td>\n    </tr>\n    <tr style="border-bottom:1px solid #e2e8f0;">\n      <td style="padding:10px 0;color:#64748b;font-weight:500;">Transaction Amount</td>\n      <td style="padding:10px 0;text-align:right;color:#059669;font-weight:800;font-size:16px;">\${{amount}} USD</td>\n    </tr>\n    <tr>\n      <td style="padding:10px 0;color:#64748b;font-weight:500;">Status</td>\n      <td style="padding:10px 0;text-align:right;"><span style="display:inline-block;background:#ecfdf5;color:#059669;font-weight:700;font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid #a7f3d0;text-transform:uppercase;">COMPLETED</span></td>\n    </tr>\n  </table>\n</div>\n`,
+    otp_box: `\n<div style="text-align:center;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;">\n  <div style="font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;">One-Time Authorization Code (Valid {{expires_in}})</div>\n  <div style="font-size:36px;font-weight:900;color:#4f46e5;letter-spacing:10px;margin:10px 0 6px 0;font-family:Consolas,Monaco,monospace;">{{verification_code}}</div>\n  <div style="font-size:12px;color:#94a3b8;">Do not share this confidential verification PIN with anyone.</div>\n</div>\n`,
+    two_col_card: `\n<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-collapse:separate;border-spacing:12px 0;">\n  <tr>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:6px;">📈 Performance</div>\n      <div style="font-size:20px;font-weight:800;color:#0f172a;">{{total_reads}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Total Article Reads</div>\n    </td>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;margin-bottom:6px;">💎 Earnings</div>\n      <div style="font-size:20px;font-weight:800;color:#059669;">\${{amount}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Disbursed to date</div>\n    </td>\n  </tr>\n</table>\n`,
+    quote: `\n<blockquote style="margin:20px 0;padding:16px 20px;background:#f8fafc;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;color:#334155;font-size:14px;line-height:1.6;font-style:italic;">\n  &ldquo;{{comment_snippet}}&rdquo;\n  <div style="margin-top:8px;font-weight:700;color:#0f172a;font-style:normal;font-size:13px;">&mdash; {{commenter_name}}</div>\n</blockquote>\n`,
+    checklist: `\n<div style="margin:20px 0;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;">\n  <div style="font-weight:700;color:#0f172a;margin-bottom:10px;font-size:14px;">Next Recommended Steps:</div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Complete your author profile and developer bio\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Connect your preferred creator payout method\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Submit your first technical breakdown or AI workflow\n  </div>\n</div>\n`,
+    divider: `\n<hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0;">\n`
   };
 
   const snippet = blocks[type] || '';
   if (!snippet) return;
 
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const text = textarea.value;
-  textarea.value = text.substring(0, start) + snippet + text.substring(end);
-  textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
-  textarea.focus();
+  if (isWysiwyg && wysiwygEditor) {
+    wysiwygEditor.focus();
+    const sel = window.getSelection();
+    let inserted = false;
+    if (sel && sel.rangeCount > 0 && wysiwygEditor.contains(sel.anchorNode)) {
+      try {
+        inserted = document.execCommand('insertHTML', false, snippet);
+      } catch (e) { inserted = false; }
+    }
+    if (!inserted) {
+      const div = document.createElement('div');
+      div.innerHTML = snippet;
+      if (sel && sel.rangeCount > 0 && wysiwygEditor.contains(sel.anchorNode)) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        const frag = document.createDocumentFragment();
+        let child, lastChild;
+        while ((child = div.firstChild)) {
+          lastChild = frag.appendChild(child);
+        }
+        range.insertNode(frag);
+        if (lastChild) {
+          range.setStartAfter(lastChild);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      } else {
+        wysiwygEditor.innerHTML += snippet;
+      }
+    }
+    syncWysiwygToCode();
+  } else if (textarea) {
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + snippet + text.substring(end);
+    textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+    textarea.focus();
+    syncCodeToWysiwyg();
+  }
+  showTmplToast('Responsive email block inserted! ✨');
+}
+
+function loadTmplStarterBoilerplate(confirmPrompt = true) {
+  const textarea = document.getElementById('tmpl_html_input');
+  const wysiwyg = document.getElementById('tmpl_wysiwyg_editor');
+  const current = (textarea ? textarea.value : '').trim();
+  if (confirmPrompt && current && !confirm('Replace current editor contents with modern clean white responsive boilerplate?')) {
+    return;
+  }
+  const cleanBoilerplate = `<div style="text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;">
+  <span style="display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;">🌟 Intelligence Dispatch</span>
+  <h2 style="color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;">{{headline}}</h2>
+  <p style="color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;">Hello <strong>{{name}}</strong>, here is your customized briefing from TechScout.</p>
+</div>
+
+<div style="color:#334155;font-size:15px;line-height:1.65;margin:20px 0;">
+  <p>We are writing to keep you up-to-date with essential developer intelligence and platform activity.</p>
+  <p>{{message}}</p>
+</div>
+
+<div style="background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px 18px;color:#0369a1;font-size:14px;line-height:1.6;margin:22px 0;">
+  <strong style="color:#0284c7;">💡 Technical Briefing:</strong> You can manage your notification preferences and credentials anytime from your account settings.
+</div>
+
+<div style="text-align:center;margin:32px 0;">
+  <a href="{{action_url}}" style="display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);">Explore Dashboard &rarr;</a>
+</div>
+
+<div style="border-top:1px solid #e2e8f0;padding-top:18px;margin-top:28px;font-size:13px;color:#64748b;line-height:1.6;">
+  Need assistance? Contact our engineering team at <a href="mailto:{{support_email}}" style="color:#4f46e5;text-decoration:none;">{{support_email}}</a>.
+</div>`;
+
+  if (textarea) textarea.value = cleanBoilerplate;
+  if (wysiwyg) wysiwyg.innerHTML = cleanBoilerplate;
   updateTmplModalPreview();
+  showTmplToast('Clean white boilerplate loaded! ⚡');
 }
 
 function updateTmplModalPreview() {
@@ -3097,15 +3235,15 @@ function switchTmplEditMode(mode) {
     if (wysiwygCont) wysiwygCont.style.display = 'block';
     if (wysiwygTool) wysiwygTool.style.display = 'flex';
     if (htmlInput) htmlInput.style.display = 'none';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#a855f7'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#4f46e5'; btnWysiwyg.style.borderColor='#4f46e5'; btnWysiwyg.style.color='#ffffff'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; btnHtml.style.color='#475569'; }
   } else {
     syncWysiwygToCode();
     if (wysiwygCont) wysiwygCont.style.display = 'none';
     if (wysiwygTool) wysiwygTool.style.display = 'none';
     if (htmlInput) htmlInput.style.display = 'block';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#a855f7'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; btnWysiwyg.style.color='#475569'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#4f46e5'; btnHtml.style.borderColor='#4f46e5'; btnHtml.style.color='#ffffff'; }
   }
 }
 

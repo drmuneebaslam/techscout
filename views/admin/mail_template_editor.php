@@ -1,5 +1,5 @@
 <?php
-$title = ($template ? 'Edit Template: ' . htmlspecialchars($template['name']) : 'Create Custom HTML Email Template') . ' | TechScout Mail Studio';
+$title = ($template ? 'Edit Template: ' . htmlspecialchars($template['name'] ?? '') : 'Create Custom HTML Email Template') . ' | TechScout Mail Studio';
 require __DIR__ . '/../layouts/admin_header.php';
 
 $allVariableCategories = [
@@ -25,11 +25,14 @@ $allVariableCategories = [
         '{{editorial_notes}}' => 'Editorial feedback and reviewer revision request notes',
         '{{commenter_name}}' => 'Name of community member replying in discussions',
         '{{comment_snippet}}' => 'Excerpt of new reply on discussion thread',
+        '{{mentioner_name}}' => 'User who mentioned recipient in discussion',
+        '{{follower_name}}' => 'New user following author profile',
         '{{collection_title}}' => 'Title of shared bookmark stack or technical blueprint',
         '{{sender_name}}' => 'Sender name sharing resource stack'
     ],
     'Campaigns & Hackathons' => [
         '{{campaign_title}}' => 'Title of AI Hackathon or Developer Sprint',
+        '{{project_title}}' => 'Title of submitted project entry',
         '{{prize_pool}}' => 'Prize money amount available for challenge',
         '{{deadline}}' => 'Challenge submission deadline timestamp'
     ],
@@ -43,6 +46,8 @@ $allVariableCategories = [
         '{{destination}}' => 'Masked account destination info',
         '{{transaction_ref}}' => 'External bank or blockchain transaction hash',
         '{{tipper_name}}' => 'Community patron awarding a tip',
+        '{{creator_name}}' => 'Author receiving reader tip or patronage',
+        '{{creator_tier}}' => 'Creator Guild status tier (Rising, Partner, Elite)',
         '{{month}}' => 'Statement calendar month (e.g. September 2026)',
         '{{total_reads}}' => 'Total read count across creator publications',
         '{{tips_count}}' => 'Total number of patronage tips received',
@@ -62,6 +67,7 @@ $allVariableCategories = [
         '{{expires_in}}' => 'Passcode expiration duration (e.g. 15 minutes)',
         '{{ip_address}}' => 'Client IP address triggered during security event',
         '{{browser}}' => 'Client browser and device user agent string',
+        '{{device_name}}' => 'Recognized client device model or browser',
         '{{timestamp}}' => 'Precise formatted event timestamp',
         '{{suspension_reason}}' => 'Policy violation explanation for suspension'
     ],
@@ -74,32 +80,35 @@ $allVariableCategories = [
 ];
 ?>
 
-<div class="admin-content-inner" style="max-width: 1550px; margin: 0 auto;">
+<!-- Embedded Notification Toast Container -->
+<div id="saToastBox" style="position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;"></div>
+
+<div class="admin-content-inner" style="max-width: 1600px; margin: 0 auto; padding-bottom: 3rem;">
   <!-- Page Header Strip -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 1rem;">
     <div>
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-        <a href="<?= url('/admin/mail?tab=templates') ?>" style="color: #38bdf8; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+        <a href="<?= url('/admin/mail?tab=templates') ?>" style="color: #6366f1; text-decoration: none; font-size: 0.82rem; font-weight: 700;">
           &larr; Back to Mail &amp; Template Studio
         </a>
-        <span style="color: #64748b;">&bull;</span>
-        <span class="ts-badge ts-badge-purple" style="font-size: 0.68rem; font-weight: 800;">FULL-PAGE CANVAS &amp; LIVE SANDBOX</span>
+        <span style="color: #94a3b8;">&bull;</span>
+        <span class="ts-badge ts-badge-purple" style="font-size: 0.68rem; font-weight: 800; background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe;">FULL-SCREEN TEMPLATE STUDIO</span>
       </div>
-      <h1 style="font-size: 1.6rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
-        <?= $template ? '✏️ Edit Template: ' . htmlspecialchars($template['name'] ?? '') : '➕ Create New HTML Email Template' ?>
+      <h1 style="font-size: 1.65rem; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+        <?= $template ? '✏️ Edit Template: ' . htmlspecialchars($template['name'] ?? '') : '➕ Create Custom HTML Email Template' ?>
       </h1>
-      <p style="color: #94a3b8; font-size: 0.85rem; margin: 0.2rem 0 0 0;">
-        Interactive 2-column workspace for drafting responsive HTML layouts with live real-time visual simulation.
+      <p style="color: #64748b; font-size: 0.85rem; margin: 0.2rem 0 0 0;">
+        Responsive email studio with 1-click blocks, dynamic token insertion, and real-time live light delivery preview.
       </p>
     </div>
 
     <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
-      <div style="display: flex; gap: 0.25rem; background: #05070b; padding: 4px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.15);">
-        <button type="button" onclick="setStandaloneViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-sa-split" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">🌓 Split View</button>
-        <button type="button" onclick="setStandaloneViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-editor" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">📝 Editor Only</button>
-        <button type="button" onclick="setStandaloneViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-preview" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">👁️ Preview Only</button>
+      <div style="display: flex; gap: 0.25rem; background: #f1f5f9; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <button type="button" onclick="setStandaloneViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-sa-split" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; background: #4f46e5; border-color: #4f46e5;">🌓 Split View</button>
+        <button type="button" onclick="setStandaloneViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-editor" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; color: #475569;">📝 Editor Only</button>
+        <button type="button" onclick="setStandaloneViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-preview" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; color: #475569;">👁️ Preview Only</button>
       </div>
-      <button type="submit" form="mailTemplateEditorForm" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.65rem 1.75rem;">
+      <button type="submit" form="mailTemplateEditorForm" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.65rem 1.75rem; border: none; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
         <i data-lucide="save"></i> Save Template 💾
       </button>
     </div>
@@ -108,26 +117,26 @@ $allVariableCategories = [
   <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="mailTemplateEditorForm">
     <input type="hidden" name="id" value="<?= htmlspecialchars($template['id'] ?? '') ?>">
 
-    <!-- Top Metadata Configuration Grid -->
-    <div class="admin-table-wrap" style="padding: 1.5rem; margin-bottom: 1.25rem; background: rgba(15,23,42,0.85);">
-      <h3 style="font-size: 1.05rem; color: #f8fafc; margin: 0 0 1rem 0; font-weight: 700; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.5rem;">
-        ⚙️ Template Parameters &amp; Outbound Account Binding
+    <!-- Top Metadata Configuration Card -->
+    <div style="padding: 1.5rem; margin-bottom: 1.25rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <h3 style="font-size: 1rem; color: #0f172a; margin: 0 0 1rem 0; font-weight: 800; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>⚙️</span> Template Configuration &amp; Credential Binding
       </h3>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
         <div>
-          <label class="admin-modal-label">Template Unique Key <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="template_key" value="<?= htmlspecialchars($template['template_key'] ?? '') ?>" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace;" required>
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Unique Key <span style="color: #ef4444;">*</span></label>
+          <input type="text" name="template_key" value="<?= htmlspecialchars($template['template_key'] ?? '') ?>" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace; background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
         </div>
 
         <div>
-          <label class="admin-modal-label">Display Name <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="name" value="<?= htmlspecialchars($template['name'] ?? '') ?>" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" required>
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Display Name <span style="color: #ef4444;">*</span></label>
+          <input type="text" name="name" value="<?= htmlspecialchars($template['name'] ?? '') ?>" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
         </div>
 
         <div>
-          <label class="admin-modal-label">Assigned Mail Outbound Account Profile</label>
-          <select name="assigned_credential_id" class="admin-modal-select">
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Assigned Outbound Sender Account</label>
+          <select name="assigned_credential_id" class="admin-modal-select" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
             <option value="">-- Platform Default Outbound Provider --</option>
             <?php foreach ($mailCredentials as $mc): ?>
               <option value="<?= $mc['id'] ?>" <?= (!empty($template['assigned_credential_id']) && (int)$template['assigned_credential_id'] === (int)$mc['id']) ? 'selected' : '' ?>>
@@ -140,13 +149,13 @@ $allVariableCategories = [
 
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
         <div>
-          <label class="admin-modal-label">Default Email Subject Line <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="subject" id="sa_subject_input" oninput="updateStandaloneLivePreview()" value="<?= htmlspecialchars($template['subject'] ?? '') ?>" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" required>
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Default Email Subject Line <span style="color: #ef4444;">*</span></label>
+          <input type="text" name="subject" id="sa_subject_input" oninput="updateStandaloneLivePreview()" value="<?= htmlspecialchars($template['subject'] ?? '') ?>" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
         </div>
 
         <div>
-          <label class="admin-modal-label">Template Notes / Description</label>
-          <input type="text" name="description" value="<?= htmlspecialchars($template['description'] ?? '') ?>" placeholder="e.g. Sent to users when new models drop..." class="admin-modal-input">
+          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Notes / Description</label>
+          <input type="text" name="description" value="<?= htmlspecialchars($template['description'] ?? '') ?>" placeholder="e.g. Dispatched when new models drop..." class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
         </div>
       </div>
     </div>
@@ -156,25 +165,26 @@ $allVariableCategories = [
       
       <!-- LEFT COLUMN: VARIABLE PALETTE, BLOCK COMPONENTS & CODE EDITOR -->
       <div id="sa-col-editor">
+        
         <!-- 10 Categories Dynamic Tag Palette Accordion -->
-        <details open style="margin-bottom: 0.85rem; background: #05070b; border: 1px solid rgba(168,85,247,0.3); border-radius: 8px; padding: 0.65rem 0.85rem;">
-          <summary style="cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #c084fc; display: flex; align-items: center; justify-content: space-between; user-select: none;">
-            <span style="display: flex; align-items: center; gap: 0.4rem;">
-              <i data-lucide="variable" style="width: 14px; height: 14px;"></i>
-              Comprehensive Dynamic Variables Palette (10 Categories)
+        <details open style="margin-bottom: 0.85rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+          <summary style="cursor: pointer; font-size: 0.82rem; font-weight: 800; color: #4f46e5; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+            <span style="display: flex; align-items: center; gap: 0.45rem;">
+              <i data-lucide="variable" style="width: 15px; height: 15px; color: #4f46e5;"></i>
+              Dynamic Variables Palette (10 Categories &bull; 60+ Tokens)
             </span>
-            <span style="font-size: 0.7rem; color: #a855f7;">Click tag to insert ▾</span>
+            <span style="font-size: 0.72rem; color: #6366f1; font-weight: 600;">Click token to insert into caret ▾</span>
           </summary>
 
-          <div style="margin-top: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.75rem; max-height: 240px; overflow-y: auto;">
+          <div style="margin-top: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; border-top: 1px solid #f1f5f9; padding-top: 0.75rem; max-height: 230px; overflow-y: auto;">
             <?php foreach ($allVariableCategories as $cat => $vars): ?>
-              <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.1); border-radius: 6px; padding: 0.45rem;">
-                <div style="font-size: 0.68rem; font-weight: 700; color: #c084fc; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></div>
-                <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem;">
+                <div style="font-size: 0.68rem; font-weight: 800; color: #4338ca; text-transform: uppercase; margin-bottom: 0.35rem; letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></div>
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                   <?php foreach ($vars as $tag => $desc): ?>
-                    <button type="button" onclick="insertVariable('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.2); padding: 0.18rem 0.4rem; border-radius: 4px; color: #cbd5e1; font-size: 0.68rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(168,85,247,0.2)'" onmouseout="this.style.background='rgba(168,85,247,0.06)'" title="Insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
-                      <code style="color: #c084fc; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
-                      <span style="color: #94a3b8; font-size: 0.62rem; margin-left: 0.3rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
+                    <button type="button" onclick="insertVariable('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: #ffffff; border: 1px solid #e2e8f0; padding: 0.25rem 0.45rem; border-radius: 5px; color: #334155; font-size: 0.7rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.borderColor='#818cf8'; this.style.background='#eef2ff';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#ffffff';" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
+                      <code style="color: #4f46e5; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
+                      <span style="color: #64748b; font-size: 0.62rem; margin-left: 0.35rem; max-width: 125px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
                     </button>
                   <?php endforeach; ?>
                 </div>
@@ -183,38 +193,45 @@ $allVariableCategories = [
           </div>
         </details>
 
-        <!-- Block Component Library Toolbar -->
-        <div style="margin-bottom: 0.85rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="font-size: 0.8rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
-              <i data-lucide="blocks" style="width: 15px; height: 15px; color: #6366f1;"></i> 
-              <span>Universal Block Component Library</span>
+        <!-- Modern Block Component Library (14 Responsive Email Blocks) -->
+        <div style="margin-bottom: 0.85rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.55rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="font-size: 0.82rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.4rem;">
+              <i data-lucide="blocks" style="width: 16px; height: 16px; color: #4f46e5;"></i> 
+              <span>1-Click Universal Responsive Email Blocks</span>
             </div>
-            <span style="font-size: 0.7rem; color: #64748b;">1-Click insert responsive email blocks</span>
+            <span style="font-size: 0.7rem; color: #10b981; font-weight: 700;">⚡ 14 Ready-to-use Email Blocks</span>
           </div>
+          
           <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
-            <button type="button" onclick="insertBlock('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f5f3ff;">✨ Hero Header</button>
-            <button type="button" onclick="insertBlock('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">ℹ️ Info Callout</button>
-            <button type="button" onclick="insertBlock('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;">✅ Success Box</button>
-            <button type="button" onclick="insertBlock('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #d97706; border-color: #fde68a; background: #fffbeb;">⚠️ Warning Box</button>
-            <button type="button" onclick="insertBlock('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;">🔘 Primary CTA Button</button>
-            <button type="button" onclick="insertBlock('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">💰 Disbursal Button</button>
-            <button type="button" onclick="insertBlock('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;">📊 Key-Value Data Grid</button>
-            <button type="button" onclick="insertBlock('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;">🔑 OTP PIN Badge</button>
+            <button type="button" onclick="insertBlock('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #eef2ff;" title="Insert Responsive Hero Header Banner">✨ Hero Header</button>
+            <button type="button" onclick="insertBlock('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;" title="Insert Primary Deep Indigo Action CTA">🔘 Primary CTA</button>
+            <button type="button" onclick="insertBlock('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Insert Emerald Disbursal / Financial CTA">💰 Disbursal CTA</button>
+            <button type="button" onclick="insertBlock('cta_secondary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Insert Light Outline Action Button">🔗 Outline Button</button>
+            <button type="button" onclick="insertBlock('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;" title="Insert Sky Blue Technical Info Box">ℹ️ Info Callout</button>
+            <button type="button" onclick="insertBlock('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;" title="Insert Mint Verified Success Box">✅ Success Box</button>
+            <button type="button" onclick="insertBlock('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #d97706; border-color: #fde68a; background: #fffbeb;" title="Insert Warm Attention Warning Box">⚠️ Warning Box</button>
+            <button type="button" onclick="insertBlock('callout_critical')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #dc2626; border-color: #fecaca; background: #fef2f2;" title="Insert Urgent Security Alert Box">🚨 Critical Alert</button>
+            <button type="button" onclick="insertBlock('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Insert 2-Column Responsive Data Grid">📊 Data Grid</button>
+            <button type="button" onclick="insertBlock('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;" title="Insert Large Monospace OTP Verification Badge">🔑 OTP PIN Badge</button>
+            <button type="button" onclick="insertBlock('two_col_card')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #ffffff;" title="Insert 2-Column Stat Cards">⚖️ 2-Col Cards</button>
+            <button type="button" onclick="insertBlock('quote')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Insert Formatted Community Quote">💬 Quote</button>
+            <button type="button" onclick="insertBlock('checklist')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Insert Styled Checklist">📋 Checklist</button>
+            <button type="button" onclick="insertBlock('divider')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #64748b; border-color: #e2e8f0; background: #f8fafc;" title="Insert Elegant Section Divider">➖ Divider</button>
           </div>
         </div>
 
         <!-- HTML Code & Visual WYSIWYG Editor Workspace -->
-        <div class="admin-table-wrap" style="padding: 1.25rem; background: rgba(15,23,42,0.85);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
             <div style="display: flex; gap: 0.35rem; align-items: center;">
-              <button type="button" onclick="switchSaEditMode('wysiwyg')" id="btn-sa-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.75rem; background: #10b981; border-color: #10b981;">🎨 Visual WYSIWYG Editor</button>
-              <button type="button" onclick="switchSaEditMode('html')" id="btn-sa-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.75rem;">💻 Raw HTML Code</button>
+              <button type="button" onclick="switchSaEditMode('wysiwyg')" id="btn-sa-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.75rem; background: #4f46e5; border-color: #4f46e5;">🎨 Visual WYSIWYG Editor</button>
+              <button type="button" onclick="switchSaEditMode('html')" id="btn-sa-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.75rem; color: #475569;">💻 Raw HTML Code</button>
             </div>
 
-            <div style="display: flex; gap: 0.35rem;">
-              <select onchange="if(this.value){ insertVariable(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #10b981; width: auto; max-width: 240px; font-weight: 700;">
-                <option value="">⚡ Insert Dynamic Token... ▾</option>
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <select onchange="if(this.value){ insertVariable(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; color: #4f46e5; width: auto; max-width: 220px; font-weight: 700; background: #f8fafc; border-color: #cbd5e1;">
+                <option value="">⚡ Quick Token Insert... ▾</option>
                 <?php foreach ($allVariableCategories as $vCat => $vList): ?>
                   <optgroup label="<?= htmlspecialchars($vCat) ?>">
                     <?php foreach ($vList as $vTag => $vDesc): ?>
@@ -223,20 +240,20 @@ $allVariableCategories = [
                   </optgroup>
                 <?php endforeach; ?>
               </select>
-              <button type="button" onclick="loadStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #38bdf8;">
-                Boilerplate ⚡
+              <button type="button" onclick="loadStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff; font-weight: 700;" title="Load Clean White Responsive Email Starter Boilerplate">
+                ⚡ Light Boilerplate
               </button>
             </div>
           </div>
 
           <!-- WYSIWYG Formatting Buttons Toolbar -->
-          <div id="sa_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #05070b; padding: 0.4rem; border-radius: 6px; border: 1px solid rgba(148,163,184,0.15); margin-bottom: 0.5rem;">
-            <button type="button" onclick="execSaWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800;" title="Bold"><b>B</b></button>
-            <button type="button" onclick="execSaWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic;" title="Italic"><i>I</i></button>
-            <button type="button" onclick="execSaWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline;" title="Underline"><u>U</u></button>
-            <button type="button" onclick="execSaWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through;" title="Strikethrough"><s>S</s></button>
-            <span style="color: rgba(148,163,184,0.3);">|</span>
-            <select onchange="execSaWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #0b0f19;">
+          <div id="sa_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #f8fafc; padding: 0.45rem; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 0.65rem;">
+            <button type="button" onclick="execSaWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800; color: #0f172a; background: #fff;" title="Bold"><b>B</b></button>
+            <button type="button" onclick="execSaWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic; color: #0f172a; background: #fff;" title="Italic"><i>I</i></button>
+            <button type="button" onclick="execSaWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline; color: #0f172a; background: #fff;" title="Underline"><u>U</u></button>
+            <button type="button" onclick="execSaWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through; color: #0f172a; background: #fff;" title="Strikethrough"><s>S</s></button>
+            <span style="color: #cbd5e1;">|</span>
+            <select onchange="execSaWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #ffffff; border-color: #cbd5e1; color: #0f172a;">
               <option value="">Header ▾</option>
               <option value="H1">H1 Main Heading</option>
               <option value="H2">H2 Sub Heading</option>
@@ -244,42 +261,43 @@ $allVariableCategories = [
               <option value="P">Paragraph</option>
               <option value="BLOCKQUOTE">Blockquote</option>
             </select>
-            <span style="color: rgba(148,163,184,0.3);">|</span>
-            <button type="button" onclick="execSaWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Left">⬅️</button>
-            <button type="button" onclick="execSaWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Center">↔️</button>
-            <button type="button" onclick="execSaWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Align Right">➡️</button>
-            <span style="color: rgba(148,163,184,0.3);">|</span>
-            <button type="button" onclick="execSaWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Bullet List">• List</button>
-            <button type="button" onclick="execSaWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem;" title="Numbered List">1. List</button>
-            <span style="color: rgba(148,163,184,0.3);">|</span>
-            <button type="button" onclick="promptSaLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #38bdf8;" title="Insert Link">🔗 Link</button>
-            <button type="button" onclick="insertSaCtaButton()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #10b981;" title="Insert Primary CTA Button">🔘 Button</button>
-            <button type="button" onclick="execSaWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444;" title="Clear Formatting">🧹 Clear</button>
+            <span style="color: #cbd5e1;">|</span>
+            <button type="button" onclick="execSaWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Left">⬅️</button>
+            <button type="button" onclick="execSaWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Center">↔️</button>
+            <button type="button" onclick="execSaWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Right">➡️</button>
+            <span style="color: #cbd5e1;">|</span>
+            <button type="button" onclick="execSaWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Bullet List">• List</button>
+            <button type="button" onclick="execSaWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Numbered List">1. List</button>
+            <span style="color: #cbd5e1;">|</span>
+            <button type="button" onclick="promptSaLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #0284c7; background: #fff;" title="Insert Link">🔗 Link</button>
+            <button type="button" onclick="insertBlock('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #4f46e5; background: #fff;" title="Insert Action CTA Button">🔘 Button</button>
+            <button type="button" onclick="execSaWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444; background: #fff;" title="Clear Formatting">🧹 Clear</button>
           </div>
 
           <!-- Visual WYSIWYG Editable Canvas -->
-          <div id="sa_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 1.25rem; min-height: 440px; max-height: 520px; overflow-y: auto;">
-            <div id="sa_wysiwyg_editor" contenteditable="true" oninput="syncSaWysiwygToCode()" style="outline: none; min-height: 420px; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6;">
-              <?= $template ? ($template['html_content'] ?? ($template['html_body'] ?? '')) : '<h2 style="color:#0f172a;">Hello {{name}}!</h2><p>Start composing your email content visually...</p>' ?>
+          <div id="sa_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem; min-height: 440px; max-height: 520px; overflow-y: auto; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
+            <div id="sa_wysiwyg_editor" contenteditable="true" oninput="syncSaWysiwygToCode()" style="outline: none; min-height: 420px; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.65; color: #0f172a;">
+              <?= $template ? ($template['html_content'] ?? ($template['html_body'] ?? '')) : '' ?>
             </div>
           </div>
 
-          <textarea name="html_content" id="templateHtmlBody" oninput="syncSaCodeToWysiwyg()" rows="22" class="admin-modal-input" style="display: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre; background: #05070b; border-color: rgba(99,102,241,0.35); height: 480px; resize: vertical;" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" required><?= htmlspecialchars($template['html_content'] ?? ($template['html_body'] ?? '')) ?></textarea>
+          <!-- Raw HTML Code Editor (Hidden when in WYSIWYG mode) -->
+          <textarea name="html_content" id="templateHtmlBody" oninput="syncSaCodeToWysiwyg()" rows="22" class="admin-modal-input" style="display: none; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre; background: #f8fafc; border-color: #cbd5e1; color: #0f172a; height: 480px; resize: vertical;" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" required><?= htmlspecialchars($template['html_content'] ?? ($template['html_body'] ?? '')) ?></textarea>
         </div>
       </div>
 
       <!-- RIGHT COLUMN: REAL-TIME LIVE EMAIL PREVIEW IFRAME -->
       <div id="sa-col-preview">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-          <label class="admin-modal-label" style="margin: 0; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
-            <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Live Delivery Simulation Canvas (Light Mode)
+          <label class="admin-modal-label" style="margin: 0; color: #4f46e5; display: flex; align-items: center; gap: 0.35rem; font-weight: 700;">
+            <i data-lucide="eye" style="width: 15px; height: 15px;"></i> Live Delivery Simulation Canvas (Light Mode)
           </label>
-          <span style="font-size: 0.72rem; color: #64748b;">Recipient: Alex Rivera</span>
+          <span style="font-size: 0.72rem; color: #64748b;">Simulated Recipient: Alex Rivera</span>
         </div>
 
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; height: 680px; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; height: 680px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
           <!-- Simulated Email Client Header -->
-          <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 0.85rem; font-size: 0.78rem;">
+          <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.65rem 0.95rem; font-size: 0.78rem;">
             <div style="color: #0f172a; font-weight: 700;" id="saSimSubject">Subject: TechScout Intelligence Update</div>
             <div style="color: #64748b; font-size: 0.7rem; margin-top: 0.15rem;">
               From: <strong style="color: #334155;">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
@@ -293,21 +311,21 @@ $allVariableCategories = [
     </div>
 
     <!-- Bottom Action Bar -->
-    <div style="padding: 1.25rem 2rem; background: rgba(15,23,42,0.95); border: 1px solid rgba(16,185,129,0.4); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div style="padding: 1.25rem 1.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
       <div>
-        <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
+        <div style="font-weight: 800; color: #0f172a; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
           <i data-lucide="check-circle" style="color: #10b981;"></i> Ready to deploy HTML email template?
         </div>
-        <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">
-          Template edits take effect instantly across platform triggers and broadcast composers.
+        <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">
+          Template updates take effect instantly across platform automated triggers and broadcast composers.
         </div>
       </div>
 
       <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <a href="<?= url('/admin/mail?tab=templates') ?>" class="ts-btn ts-btn-outline" style="color: #94a3b8;">
+        <a href="<?= url('/admin/mail?tab=templates') ?>" class="ts-btn ts-btn-outline" style="color: #64748b; border-color: #cbd5e1;">
           Cancel &amp; Return
         </a>
-        <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.75rem 2.25rem; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(16,185,129,0.35);">
+        <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.75rem 2.25rem; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(16,185,129,0.3); border: none;">
           <i data-lucide="save"></i> Save Template 💾
         </button>
       </div>
@@ -316,45 +334,168 @@ $allVariableCategories = [
 </div>
 
 <script>
-function insertVariable(tag) {
-  const textarea = document.getElementById('templateHtmlBody');
-  if (!textarea) return;
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const text = textarea.value;
-  textarea.value = text.substring(0, start) + tag + text.substring(end);
-  textarea.selectionStart = textarea.selectionEnd = start + tag.length;
-  textarea.focus();
-  updateStandaloneLivePreview();
+// Micro-toast helper
+function showSaToast(msg) {
+  const box = document.getElementById('saToastBox');
+  if (!box) return;
+  const t = document.createElement('div');
+  t.style.cssText = 'background: #0f172a; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 8px; pointer-events: auto; animation: saFadeIn 0.2s ease forwards;';
+  t.innerHTML = msg;
+  box.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => t.remove(), 300);
+  }, 2200);
 }
 
-function insertBlock(type) {
+// 1-Click Dynamic Tag Insertion
+function insertVariable(tag) {
+  const wysiwygCont = document.getElementById('sa_wysiwyg_container');
+  const wysiwygEditor = document.getElementById('sa_wysiwyg_editor');
   const textarea = document.getElementById('templateHtmlBody');
-  if (!textarea) return;
+  const isWysiwyg = wysiwygCont && wysiwygCont.style.display !== 'none';
+
+  if (isWysiwyg && wysiwygEditor) {
+    wysiwygEditor.focus();
+    const sel = window.getSelection();
+    let inserted = false;
+    if (sel && sel.rangeCount > 0 && wysiwygEditor.contains(sel.anchorNode)) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const node = document.createTextNode(tag);
+      range.insertNode(node);
+      range.setStartAfter(node);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      inserted = true;
+    }
+    if (!inserted) {
+      wysiwygEditor.innerHTML += ' ' + tag + ' ';
+    }
+    syncSaWysiwygToCode();
+  } else if (textarea) {
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + tag + text.substring(end);
+    textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+    textarea.focus();
+    syncSaCodeToWysiwyg();
+  }
+  showSaToast(`Token <code>${tag}</code> inserted! ⚡`);
+}
+
+// 1-Click Universal Responsive Email Blocks Library (14 Blocks)
+function insertBlock(type) {
+  const wysiwygCont = document.getElementById('sa_wysiwyg_container');
+  const wysiwygEditor = document.getElementById('sa_wysiwyg_editor');
+  const textarea = document.getElementById('templateHtmlBody');
+  const isWysiwyg = wysiwygCont && wysiwygCont.style.display !== 'none';
 
   const blocks = {
-    hero: `\n<h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>{{headline}}</h2>\n<p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>, here is your latest intelligence briefing from TechScout.</p>\n`,
-    callout_info: `\n<div style='background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px;color:#0369a1;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#0284c7;'>💡 Technical Briefing:</strong> {{message}}\n</div>\n`,
-    callout_success: `\n<div style='background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid #059669;border-radius:8px;padding:16px;color:#065f46;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#059669;'>✓ Verified & Approved:</strong> Your submission or transaction has been processed successfully.\n</div>\n`,
-    callout_warning: `\n<div style='background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:8px;padding:16px;color:#92400e;font-size:14px;line-height:1.65;margin:20px 0;'>\n  <strong style='color:#d97706;'>⚠️ Attention Required:</strong> Please review and adjust the requested parameters.\n</div>\n`,
-    cta_primary: `\n<div style='text-align:center;margin:28px 0;'>\n  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Explore TechScout Intelligence &rarr;</a>\n</div>\n`,
-    cta_green: `\n<div style='text-align:center;margin:28px 0;'>\n  <a href='{{action_url}}' style='display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>View Disbursed Payout Ledger &rarr;</a>\n</div>\n`,
-    datagrid: `\n<div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin:20px 0;'>\n  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>\n    <div><strong style='color:#64748b;'>Reference ID:</strong> <span style='color:#0f172a;font-weight:600;'>#{{payout_id}}</span></div>\n    <div><strong style='color:#64748b;'>Transaction Amount:</strong> <strong style='font-size:16px;color:#059669;'>\${{amount}} USD</strong></div>\n    <div><strong style='color:#64748b;'>Status:</strong> <span style='background:#ecfdf5;color:#059669;padding:2px 8px;border-radius:4px;font-weight:700;font-size:12px;border:1px solid #a7f3d0;'>COMPLETED</span></div>\n  </div>\n</div>\n`,
-    otp_box: `\n<div style='text-align:center;background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;'>\n  <div style='font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;'>One-Time Authorization PIN (Expires in {{expires_in}})</div>\n  <div style='font-size:34px;font-weight:900;color:#4f46e5;letter-spacing:8px;margin-top:8px;font-family:monospace;'>{{verification_code}}</div>\n</div>\n`
+    hero: `\n<div style="text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:16px 0;">\n  <span style="display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;">🌟 Platform Intelligence</span>\n  <h2 style="color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;">{{headline}}</h2>\n  <p style="color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;">Hello <strong>{{name}}</strong>, here is your latest personalized briefing from TechScout.</p>\n</div>\n`,
+    callout_info: `\n<div style="background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px 18px;color:#0369a1;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#0284c7;margin-bottom:4px;">💡 Technical Briefing:</div>\n  <div style="color:#0f172a;">{{message}}</div>\n</div>\n`,
+    callout_success: `\n<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid #16a34a;border-radius:8px;padding:16px 18px;color:#15803d;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#16a34a;margin-bottom:4px;">✅ Verified &amp; Confirmed:</div>\n  <div style="color:#0f172a;">Your submission or transaction has been processed successfully.</div>\n</div>\n`,
+    callout_warning: `\n<div style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:8px;padding:16px 18px;color:#b45309;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#d97706;margin-bottom:4px;">⚠️ Action Required:</div>\n  <div style="color:#0f172a;">Please review your account parameters or adjust your submission details.</div>\n</div>\n`,
+    callout_critical: `\n<div style="background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:8px;padding:16px 18px;color:#b91c1c;font-size:14px;line-height:1.6;margin:18px 0;">\n  <div style="font-weight:700;color:#dc2626;margin-bottom:4px;">🚨 Critical Security Alert:</div>\n  <div style="color:#0f172a;">A new security event occurred from IP <strong>{{ip_address}}</strong> ({{browser}}). If this was not you, please secure your account immediately.</div>\n</div>\n`,
+    cta_primary: `\n<div style="text-align:center;margin:28px 0;">\n  <a href="{{action_url}}" style="display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);letter-spacing:0.2px;">Explore TechScout Intelligence &rarr;</a>\n</div>\n`,
+    cta_green: `\n<div style="text-align:center;margin:28px 0;">\n  <a href="{{action_url}}" style="display:inline-block;background:#059669;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(5,150,105,0.25);letter-spacing:0.2px;">View Disbursed Payout Ledger &rarr;</a>\n</div>\n`,
+    cta_secondary: `\n<div style="text-align:center;margin:20px 0;">\n  <a href="{{action_url}}" style="display:inline-block;background:#ffffff;color:#334155;border:1px solid #cbd5e1;font-weight:600;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:14px;">Review Activity Details &rarr;</a>\n</div>\n`,
+    datagrid: `\n<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin:20px 0;">\n  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse;">\n    <tr style="border-bottom:1px solid #e2e8f0;">\n      <td style="padding:10px 0;color:#64748b;font-weight:500;">Reference ID</td>\n      <td style="padding:10px 0;text-align:right;color:#0f172a;font-weight:700;font-family:monospace;">#{{payout_id}}</td>\n    </tr>\n    <tr style="border-bottom:1px solid #e2e8f0;">\n      <td style="padding:10px 0;color:#64748b;font-weight:500;">Transaction Amount</td>\n      <td style="padding:10px 0;text-align:right;color:#059669;font-weight:800;font-size:16px;">\${{amount}} USD</td>\n    </tr>\n    <tr>\n      <td style="padding:10px 0;color:#64748b;font-weight:500;">Status</td>\n      <td style="padding:10px 0;text-align:right;"><span style="display:inline-block;background:#ecfdf5;color:#059669;font-weight:700;font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid #a7f3d0;text-transform:uppercase;">COMPLETED</span></td>\n    </tr>\n  </table>\n</div>\n`,
+    otp_box: `\n<div style="text-align:center;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;">\n  <div style="font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;">One-Time Authorization Code (Valid {{expires_in}})</div>\n  <div style="font-size:36px;font-weight:900;color:#4f46e5;letter-spacing:10px;margin:10px 0 6px 0;font-family:Consolas,Monaco,monospace;">{{verification_code}}</div>\n  <div style="font-size:12px;color:#94a3b8;">Do not share this confidential verification PIN with anyone.</div>\n</div>\n`,
+    two_col_card: `\n<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-collapse:separate;border-spacing:12px 0;">\n  <tr>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:6px;">📈 Performance</div>\n      <div style="font-size:20px;font-weight:800;color:#0f172a;">{{total_reads}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Total Article Reads</div>\n    </td>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;margin-bottom:6px;">💎 Earnings</div>\n      <div style="font-size:20px;font-weight:800;color:#059669;">\${{amount}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Disbursed to date</div>\n    </td>\n  </tr>\n</table>\n`,
+    quote: `\n<blockquote style="margin:20px 0;padding:16px 20px;background:#f8fafc;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;color:#334155;font-size:14px;line-height:1.6;font-style:italic;">\n  &ldquo;{{comment_snippet}}&rdquo;\n  <div style="margin-top:8px;font-weight:700;color:#0f172a;font-style:normal;font-size:13px;">&mdash; {{commenter_name}}</div>\n</blockquote>\n`,
+    checklist: `\n<div style="margin:20px 0;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;">\n  <div style="font-weight:700;color:#0f172a;margin-bottom:10px;font-size:14px;">Next Recommended Steps:</div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Complete your author profile and developer bio\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Connect your preferred creator payout method\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Submit your first technical breakdown or AI workflow\n  </div>\n</div>\n`,
+    divider: `\n<hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0;">\n`
   };
 
   const snippet = blocks[type] || '';
   if (!snippet) return;
 
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const text = textarea.value;
-  textarea.value = text.substring(0, start) + snippet + text.substring(end);
-  textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
-  textarea.focus();
-  updateStandaloneLivePreview();
+  if (isWysiwyg && wysiwygEditor) {
+    wysiwygEditor.focus();
+    const sel = window.getSelection();
+    let inserted = false;
+    if (sel && sel.rangeCount > 0 && wysiwygEditor.contains(sel.anchorNode)) {
+      try {
+        inserted = document.execCommand('insertHTML', false, snippet);
+      } catch (e) { inserted = false; }
+    }
+    if (!inserted) {
+      const div = document.createElement('div');
+      div.innerHTML = snippet;
+      if (sel && sel.rangeCount > 0 && wysiwygEditor.contains(sel.anchorNode)) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        const frag = document.createDocumentFragment();
+        let child, lastChild;
+        while ((child = div.firstChild)) {
+          lastChild = frag.appendChild(child);
+        }
+        range.insertNode(frag);
+        if (lastChild) {
+          range.setStartAfter(lastChild);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      } else {
+        wysiwygEditor.innerHTML += snippet;
+      }
+    }
+    syncSaWysiwygToCode();
+  } else if (textarea) {
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + snippet + text.substring(end);
+    textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+    textarea.focus();
+    syncSaCodeToWysiwyg();
+  }
+  showSaToast('Responsive email block inserted! ✨');
 }
 
+// Starter Clean White Responsive Boilerplate
+function loadStarterBoilerplate() {
+  const textarea = document.getElementById('templateHtmlBody');
+  const wysiwyg = document.getElementById('sa_wysiwyg_editor');
+  const current = (textarea ? textarea.value : '').trim();
+  if (current && !confirm('Replace current editor contents with modern clean white responsive boilerplate?')) {
+    return;
+  }
+  const cleanBoilerplate = `<div style="text-align:center;padding:24px 16px;background:linear-gradient(180deg,#f8fafc,#ffffff);border-radius:12px;border:1px solid #e2e8f0;margin:0 0 20px 0;">
+  <span style="display:inline-block;padding:4px 12px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;">🌟 Intelligence Dispatch</span>
+  <h2 style="color:#0f172a;font-size:24px;font-weight:800;line-height:1.3;margin:0 0 10px 0;letter-spacing:-0.5px;">{{headline}}</h2>
+  <p style="color:#475569;font-size:15px;line-height:1.6;margin:0;max-width:480px;display:inline-block;">Hello <strong>{{name}}</strong>, here is your customized briefing from TechScout.</p>
+</div>
+
+<div style="color:#334155;font-size:15px;line-height:1.65;margin:20px 0;">
+  <p>We are writing to keep you up-to-date with essential developer intelligence and platform activity.</p>
+  <p>{{message}}</p>
+</div>
+
+<div style="background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px 18px;color:#0369a1;font-size:14px;line-height:1.6;margin:22px 0;">
+  <strong style="color:#0284c7;">💡 Technical Briefing:</strong> You can manage your notification preferences and credentials anytime from your account settings.
+</div>
+
+<div style="text-align:center;margin:32px 0;">
+  <a href="{{action_url}}" style="display:inline-block;background:#4f46e5;color:#ffffff;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;box-shadow:0 4px 14px rgba(79,70,229,0.25);">Explore Dashboard &rarr;</a>
+</div>
+
+<div style="border-top:1px solid #e2e8f0;padding-top:18px;margin-top:28px;font-size:13px;color:#64748b;line-height:1.6;">
+  Need assistance? Contact our engineering team at <a href="mailto:{{support_email}}" style="color:#4f46e5;text-decoration:none;">{{support_email}}</a>.
+</div>`;
+
+  if (textarea) textarea.value = cleanBoilerplate;
+  if (wysiwyg) wysiwyg.innerHTML = cleanBoilerplate;
+  updateStandaloneLivePreview();
+  showSaToast('Clean white boilerplate loaded! ⚡');
+}
+
+// Live Real-Time Delivery Simulation Preview (Pure Light Mode Grid Envelope)
 function updateStandaloneLivePreview() {
   const textarea = document.getElementById('templateHtmlBody');
   const subjectInput = document.getElementById('sa_subject_input');
@@ -376,6 +517,11 @@ function updateStandaloneLivePreview() {
     .replace(/\{\{verification_code\}\}/g, '948201')
     .replace(/\{\{amount\}\}/g, '250.00')
     .replace(/\{\{payout_id\}\}/g, '1001')
+    .replace(/\{\{total_reads\}\}/g, '14,820')
+    .replace(/\{\{commenter_name\}\}/g, 'Sarah Jenkins')
+    .replace(/\{\{comment_snippet\}\}/g, 'Great breakdown on quantized transformer inference!')
+    .replace(/\{\{expires_in\}\}/g, '15 minutes')
+    .replace(/\{\{support_email\}\}/g, 'support@techscout.online')
     .replace(/\{\{site_name\}\}/g, 'TechScout')
     .replace(/\{\{year\}\}/g, new Date().getFullYear());
 
@@ -383,6 +529,7 @@ function updateStandaloneLivePreview() {
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
   margin: 0;
@@ -429,7 +576,7 @@ body {
 <body>
 <div class="card">
   <div class="head">
-    <div style="font-size:22px;font-weight:900;color:#0f172a;letter-spacing:-0.5px;">Tech<span style="color:#6366f1;">Scout</span> <span style="font-size:11px;background:#6366f1;color:#ffffff;padding:2px 7px;border-radius:4px;vertical-align:middle;margin-left:4px;letter-spacing:1px;font-weight:700;">EDITOR PREVIEW</span></div>
+    <div style="font-size:22px;font-weight:900;color:#0f172a;letter-spacing:-0.5px;">Tech<span style="color:#6366f1;">Scout</span> <span style="font-size:11px;background:#6366f1;color:#ffffff;padding:2px 7px;border-radius:4px;vertical-align:middle;margin-left:4px;letter-spacing:1px;font-weight:700;">TEMPLATE PREVIEW</span></div>
     <div style="font-size:11px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-top:4px;">Developer Intelligence Network</div>
   </div>
   <div class="body">
@@ -450,6 +597,7 @@ body {
   } catch (e) {}
 }
 
+// Split / Editor / Preview View Modes
 function setStandaloneViewMode(mode) {
   const colEditor = document.getElementById('sa-col-editor');
   const colPreview = document.getElementById('sa-col-preview');
@@ -475,323 +623,7 @@ function setStandaloneViewMode(mode) {
   }
 }
 
-function loadStarterBoilerplate() {
-  const current = document.getElementById('templateHtmlBody').value.trim();
-  if (current && !confirm('Replace current editor contents with modern email boilerplate?')) {
-    return;
-  }
-  document.getElementById('templateHtmlBody').value = `<h2 style="color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;">{{headline}}</h2>
-<p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;">Hello <strong>{{name}}</strong>, here is your customized intelligence update.</p>
-<div style="background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:8px;padding:16px;color:#0369a1;font-size:14px;margin:20px 0;">
-  <strong>💡 Notice:</strong> {{message}}
-</div>
-<div style="text-align:center;margin:28px 0;">
-  <a href="{{action_url}}" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;">Access Dashboard &rarr;</a>
-</div>`;
-  updateStandaloneLivePreview();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  updateStandaloneLivePreview();
-});
-</script>
-
-<?php require __DIR__ . '/../layouts/admin_footer.php'; ?>
-
-
-<div class="admin-content-inner" style="max-width: 1400px; margin: 0 auto;">
-  <!-- Page Header Strip -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 1.25rem;">
-    <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-        <a href="<?= url('/admin/mail') ?>" style="color: #38bdf8; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
-          &larr; Back to Mail &amp; Template Studio
-        </a>
-        <span style="color: #64748b;">&bull;</span>
-        <span class="ts-badge ts-badge-purple" style="font-size: 0.68rem; font-weight: 800;">UNCONSTRAINED FULL-PAGE CANVAS</span>
-      </div>
-      <h1 style="font-size: 1.75rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
-        <?= $template ? '✏️ Edit Template: ' . htmlspecialchars($template['name']) : '➕ Create New HTML Email Template' ?>
-      </h1>
-      <p style="color: #94a3b8; font-size: 0.88rem; margin: 0.25rem 0 0 0;">
-        Full-screen scrollable workspace for drafting responsive HTML email layouts, dynamic parameters, and direct credential bindings.
-      </p>
-    </div>
-
-    <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
-      <button type="button" onclick="previewStandaloneHtml()" class="ts-btn ts-btn-outline" style="color: #38bdf8; border-color: rgba(56,189,248,0.35); font-weight: 700;">
-        <i data-lucide="eye"></i> Live HTML Preview 👁️
-      </button>
-      <button type="submit" form="mailTemplateEditorForm" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.6rem 1.75rem;">
-        <i data-lucide="save"></i> Save Template 💾
-      </button>
-    </div>
-  </div>
-
-  <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="mailTemplateEditorForm">
-    <input type="hidden" name="id" value="<?= htmlspecialchars($template['id'] ?? '') ?>">
-
-    <!-- Top Metadata Configuration Grid -->
-    <div class="admin-table-wrap" style="padding: 1.75rem; margin-bottom: 1.75rem; background: rgba(15,23,42,0.85);">
-      <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0; font-weight: 700; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.75rem;">
-        ⚙️ Template Parameters &amp; Outbound Account
-      </h3>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
-        <div>
-          <label class="admin-modal-label">Template Unique Key <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="template_key" value="<?= htmlspecialchars($template['template_key'] ?? '') ?>" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace;" required>
-          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem;">Used by backend triggers and Mailer dispatch calls.</div>
-        </div>
-
-        <div>
-          <label class="admin-modal-label">Display Name <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="name" value="<?= htmlspecialchars($template['name'] ?? '') ?>" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" required>
-        </div>
-
-        <div>
-          <label class="admin-modal-label">Assigned Mail Outbound Account</label>
-          <select name="assigned_credential_id" class="admin-modal-select">
-            <option value="">-- Platform Default Outbound Provider --</option>
-            <?php foreach ($mailCredentials as $mc): ?>
-              <option value="<?= $mc['id'] ?>" <?= (!empty($template['assigned_credential_id']) && (int)$template['assigned_credential_id'] === (int)$mc['id']) ? 'selected' : '' ?>>
-                🔑 <?= htmlspecialchars($mc['name']) ?> (<?= htmlspecialchars($mc['from_email']) ?> &bull; <?= strtoupper($mc['provider']) ?>) <?= !empty($mc['is_default']) ? '★ [DEFAULT]' : '' ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem;">Manual binding for this template.</div>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem;">
-        <div>
-          <label class="admin-modal-label">Default Email Subject Line <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="subject" value="<?= htmlspecialchars($template['subject'] ?? '') ?>" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" required>
-        </div>
-
-        <div>
-          <label class="admin-modal-label">Template Notes / Description</label>
-          <input type="text" name="description" value="<?= htmlspecialchars($template['description'] ?? '') ?>" placeholder="e.g. Sent to users when new models drop..." class="admin-modal-input">
-        </div>
-      </div>
-    </div>
-
-    <!-- Dynamic Tag Palette Bar -->
-    <div style="background: rgba(13,19,34,0.9); border: 1px solid rgba(168,85,247,0.3); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.75rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-        <span style="font-size: 0.85rem; font-weight: 700; color: #c084fc; display: flex; align-items: center; gap: 0.4rem;">
-          <i data-lucide="variable" style="width: 16px; height: 16px;"></i> Click-to-Copy Dynamic Variables Palette
-        </span>
-        <span style="font-size: 0.75rem; color: #94a3b8;">Click any variable pill to copy into clipboard or insert at cursor:</span>
-      </div>
-
-      <div style="display: flex; flex-wrap: wrap; gap: 0.45rem;">
-        <?php 
-          $sampleVars = [
-            '{{name}}' => 'Recipient Name',
-            '{{email}}' => 'Recipient Email',
-            '{{action_url}}' => 'Primary Call-to-Action Link',
-            '{{headline}}' => 'Dynamic Broadcast Headline',
-            '{{message}}' => 'Body Paragraph Content',
-            '{{verification_code}}' => '6-Digit Auth OTP PIN',
-            '{{reset_url}}' => 'Password Reset Secure Link',
-            '{{amount}}' => 'Payout / Reward Amount',
-            '{{article_title}}' => 'Publication Title',
-            '{{site_name}}' => 'TechScout Platform Name',
-            '{{year}}' => 'Current Year (e.g. 2026)'
-          ];
-          foreach ($sampleVars as $tag => $label):
-        ?>
-          <button type="button" onclick="insertVariable('<?= $tag ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-family: monospace; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-color: rgba(168,85,247,0.3); color: #c084fc;" title="<?= $label ?>">
-            <?= $tag ?> <span style="opacity: 0.7; font-family: sans-serif; font-size: 0.68rem;">(<?= $label ?>)</span>
-          </button>
-        <?php endforeach; ?>
-      </div>
-    </div>
-
-    <!-- Full-Screen Scrollable HTML Code Editor -->
-    <div class="admin-table-wrap" style="padding: 1.75rem; margin-bottom: 2rem; background: rgba(15,23,42,0.85);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-        <div>
-          <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-            <i data-lucide="code-2" style="color: #38bdf8;"></i> Responsive HTML Template Body
-          </h3>
-          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0.2rem 0 0 0;">
-            Completely unconstrained height — write full table layouts with inline CSS, responsive styles, and web-safe fonts.
-          </p>
-        </div>
-
-        <div style="display: flex; gap: 0.5rem;">
-          <button type="button" onclick="loadStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; color: #38bdf8;">
-            Insert Modern Dark Boilerplate ⚡
-          </button>
-        </div>
-      </div>
-
-      <textarea name="html_body" id="templateHtmlBody" rows="32" class="admin-modal-input" style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.6; white-space: pre; background: #05070b; border-color: rgba(99,102,241,0.35); min-height: 550px; resize: vertical;" placeholder="<!DOCTYPE html><html><head>...</head><body>...</body></html>" required><?= htmlspecialchars($template['html_body'] ?? '') ?></textarea>
-    </div>
-
-    <!-- Bottom Action Bar (Sticky or Scrollable) -->
-    <div style="padding: 1.5rem 2rem; background: rgba(15,23,42,0.95); border: 1px solid rgba(16,185,129,0.4); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-      <div>
-        <div style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
-          <i data-lucide="check-circle" style="color: #10b981;"></i> Ready to deploy email template?
-        </div>
-        <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">
-          Changes are immediately available to the automated system and custom broadcast composer.
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <a href="<?= url('/admin/mail') ?>" class="ts-btn ts-btn-outline" style="color: #94a3b8;">
-          Cancel &amp; Return
-        </a>
-        <button type="button" onclick="previewStandaloneHtml()" class="ts-btn ts-btn-outline" style="color: #38bdf8; border-color: rgba(56,189,248,0.4);">
-          Preview 👁️
-        </button>
-        <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.75rem 2.25rem; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(16,185,129,0.35);">
-          <i data-lucide="save"></i> Save Template 💾
-        </button>
-      </div>
-    </div>
-  </form>
-</div>
-
-<!-- Modal for Live Preview in New Window / Floating Drawer -->
-<div id="fullPreviewModal" class="admin-modal-overlay" style="display: none;">
-  <div class="admin-modal-box" style="max-width: 820px; width: 95vw; height: 90vh; display: flex; flex-direction: column; background: #0b0f19; border: 1px solid rgba(56,189,248,0.4);">
-    <div class="admin-modal-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid rgba(148,163,184,0.15); display: flex; justify-content: space-between; align-items: center;">
-      <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i data-lucide="monitor" style="color: #38bdf8;"></i> Responsive Email Sandbox Preview
-      </div>
-      <button type="button" onclick="document.getElementById('fullPreviewModal').style.display = 'none'" class="admin-modal-close" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
-    </div>
-    <div style="flex: 1; background: #ffffff; padding: 0;">
-      <iframe id="previewIframe" style="width: 100%; height: 100%; border: none;"></iframe>
-    </div>
-  </div>
-</div>
-
-<script>
-function insertVariable(tag) {
-  const textarea = document.getElementById('templateHtmlBody');
-  if (!textarea) return;
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const text = textarea.value;
-  textarea.value = text.substring(0, start) + tag + text.substring(end);
-  textarea.selectionStart = textarea.selectionEnd = start + tag.length;
-  textarea.focus();
-}
-
-function previewStandaloneHtml() {
-  const html = document.getElementById('templateHtmlBody').value;
-  const iframe = document.getElementById('previewIframe');
-  const modal = document.getElementById('fullPreviewModal');
-  
-  // Sample interpolation for preview
-  const interpolated = html
-    .replace(/\{\{name\}\}/g, 'Alex Rivers')
-    .replace(/\{\{email\}\}/g, 'alex.rivers@example.com')
-    .replace(/\{\{action_url\}\}/g, 'https://techscout.online/verify?token=sample_demo')
-    .replace(/\{\{headline\}\}/g, 'DeepSeek-V3 Benchmark Telemetry Released')
-    .replace(/\{\{message\}\}/g, 'This is a live rendered preview of your email template with simulated variables.')
-    .replace(/\{\{verification_code\}\}/g, '849201')
-    .replace(/\{\{amount\}\}/g, '$145.00 USD')
-    .replace(/\{\{article_title\}\}/g, 'Optimizing High-Throughput Relational Systems')
-    .replace(/\{\{site_name\}\}/g, 'TechScout')
-    .replace(/\{\{year\}\}/g, '2026');
-
-  modal.style.display = 'flex';
-  iframe.contentWindow.document.open();
-  iframe.contentWindow.document.write(interpolated);
-  iframe.contentWindow.document.close();
-}
-
-function loadStarterBoilerplate() {
-  const current = document.getElementById('templateHtmlBody').value.trim();
-  if (current && !confirm('Replace current editor contents with modern dark email boilerplate?')) {
-    return;
-  }
-  document.getElementById('templateHtmlBody').value = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{headline}}</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #030712; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f9fafb;">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #030712; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #0f172a; border-radius: 16px; border: 1px solid #1e293b; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-          <!-- Header Banner -->
-          <tr>
-            <td style="padding: 32px 40px; background: linear-gradient(135deg, #1e1b4b, #0f172a); border-bottom: 1px solid #312e81;">
-              <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td>
-                    <div style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
-                      TechScout <span style="color: #38bdf8;">HQ</span>
-                    </div>
-                    <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">
-                      High-Performance Engineering Platform
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Main Body -->
-          <tr>
-            <td style="padding: 40px;">
-              <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #f8fafc; line-height: 1.3;">
-                {{headline}}
-              </h1>
-              
-              <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #94a3b8;">
-                Hello {{name}},
-              </p>
-              
-              <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
-                {{message}}
-              </p>
-
-              <!-- Call to Action Button -->
-              <table border="0" cellspacing="0" cellpadding="0" style="margin: 32px 0;">
-                <tr>
-                  <td align="center" style="border-radius: 8px; background: linear-gradient(135deg, #38bdf8, #6366f1);">
-                    <a href="{{action_url}}" target="_blank" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 14px 28px; display: inline-block;">
-                      Access Platform &rarr;
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #64748b;">
-                If you did not initiate this request, you can safely ignore this automated dispatch.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 24px 40px; background-color: #090d16; border-top: 1px solid #1e293b; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: #64748b;">
-                &copy; {{year}} TechScout Platform. All rights reserved.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-// Standalone Visual WYSIWYG Editor Sync Functions
+// WYSIWYG vs Raw HTML Switching & Bi-directional Synchronization
 function switchSaEditMode(mode) {
   const wysiwygCont = document.getElementById('sa_wysiwyg_container');
   const wysiwygTool = document.getElementById('sa_wysiwyg_toolbar');
@@ -804,15 +636,15 @@ function switchSaEditMode(mode) {
     if (wysiwygCont) wysiwygCont.style.display = 'block';
     if (wysiwygTool) wysiwygTool.style.display = 'flex';
     if (htmlInput) htmlInput.style.display = 'none';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#10b981'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#4f46e5'; btnWysiwyg.style.borderColor='#4f46e5'; btnWysiwyg.style.color='#ffffff'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; btnHtml.style.color='#475569'; }
   } else {
     syncSaWysiwygToCode();
     if (wysiwygCont) wysiwygCont.style.display = 'none';
     if (wysiwygTool) wysiwygTool.style.display = 'none';
     if (htmlInput) htmlInput.style.display = 'block';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#10b981'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; btnWysiwyg.style.color='#475569'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#4f46e5'; btnHtml.style.borderColor='#4f46e5'; btnHtml.style.color='#ffffff'; }
   }
 }
 
@@ -826,9 +658,7 @@ function syncSaWysiwygToCode() {
   const htmlInput = document.getElementById('templateHtmlBody');
   if (wysiwyg && htmlInput) {
     htmlInput.value = wysiwyg.innerHTML;
-    if (typeof updateStandaloneLivePreview === 'function') {
-      updateStandaloneLivePreview();
-    }
+    updateStandaloneLivePreview();
   }
 }
 
@@ -836,27 +666,35 @@ function syncSaCodeToWysiwyg() {
   const wysiwyg = document.getElementById('sa_wysiwyg_editor');
   const htmlInput = document.getElementById('templateHtmlBody');
   if (wysiwyg && htmlInput) {
-    wysiwyg.innerHTML = htmlInput.value || '<p>Start typing template content...</p>';
-    if (typeof updateStandaloneLivePreview === 'function') {
-      updateStandaloneLivePreview();
-    }
+    wysiwyg.innerHTML = htmlInput.value || '';
+    updateStandaloneLivePreview();
   }
 }
 
 function promptSaLink() {
-  const url = prompt('Enter URL link:', 'https://');
+  const url = prompt('Enter URL destination:', 'https://');
   if (url) execSaWysiwyg('createLink', url);
 }
 
-function insertSaCtaButton() {
-  const btnHtml = '<div style="margin:20px 0; text-align:center;"><a href="{{action_url}}" style="display:inline-block; background:linear-gradient(135deg,#10b981,#059669); color:#ffffff; padding:12px 28px; border-radius:8px; font-weight:bold; text-decoration:none; font-size:15px; box-shadow:0 4px 12px rgba(16,185,129,0.3);">Primary Call-to-Action Button &rarr;</a></div>';
+document.addEventListener('DOMContentLoaded', () => {
+  const textarea = document.getElementById('templateHtmlBody');
   const wysiwyg = document.getElementById('sa_wysiwyg_editor');
-  if (wysiwyg) {
-    wysiwyg.focus();
-    document.execCommand('insertHTML', false, btnHtml);
-    syncSaWysiwygToCode();
+  if (wysiwyg && textarea) {
+    if (!wysiwyg.innerHTML.trim() && !textarea.value.trim()) {
+      loadStarterBoilerplate();
+    } else if (textarea.value.trim() && !wysiwyg.innerHTML.trim()) {
+      syncSaCodeToWysiwyg();
+    }
   }
-}
+  updateStandaloneLivePreview();
+});
 </script>
+
+<style>
+@keyframes saFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
 
 <?php require __DIR__ . '/../layouts/admin_footer.php'; ?>

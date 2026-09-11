@@ -91,6 +91,22 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-09: Dual-Mode WYSIWYG & HTML Editor Insertion Failure & View Duplication
+* **Root Cause:** 
+  - Template editors containing both a visual WYSIWYG canvas (`contenteditable`) and a raw HTML `<textarea>` only manipulated `textarea.value` with `selectionStart`/`selectionEnd`. When in visual WYSIWYG mode (where the textarea is hidden), clicks on 1-click blocks or dynamic variable tags failed invisibly because the caret was in the WYSIWYG canvas, and subsequent edits wiped out textarea changes.
+  - Duplicated layout HTML concatenated at the end of view templates resulted in duplicate DOM IDs (`#tmpl_html_input`, `#tmpl_wysiwyg_editor`), causing JavaScript to target orphaned nodes.
+* **Consequences:**
+  - "1-Click Insert Responsive Email Blocks" and "Click to Insert Tag" appeared completely broken to users in visual mode.
+  - Dark mode and light mode discrepancies caused jarring visual contrast across template studio canvases and modals.
+* **Mandatory Rule:**
+  - All template insertion helpers (`insertTag`, `insertBlockComponent`) must support dual-mode caret insertion:
+    - If WYSIWYG is active: insert HTML at the cursor using `window.getSelection()` and `Range` API with fallback, then immediately sync from WYSIWYG to the raw HTML textarea.
+    - If raw HTML mode is active: insert into `textarea.value` at `selectionStart`, advance caret, and immediately sync from textarea to the WYSIWYG canvas.
+  - Maintain clean light-theme visual consistency across all studio modals, toolbars, and preview canvases without dark/white theme conflicts.
+  - Always verify template view files to ensure no duplicated template markup or ID collisions exist.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -101,4 +117,6 @@ At the conclusion of any code generation, the agent must cross-check every modif
 6. [ ] **Syntax-Verified Scripts**: Are all JavaScript view scripts and inline blocks verified with a JS parser to prevent `SyntaxError` and `ReferenceError`?
 7. [ ] **Idempotent Reaction Toggling**: Do user reaction/helpful counters maintain state via user/IP tracking with toggle (add/undo) functionality?
 8. [ ] **Branded Dynamic Error Pages**: Are error pages written as dynamic PHP scripts incorporating official header/footer layouts?
+9. [ ] **Dual-Mode Editor Insertion & Cohesive Theme**: Do editor tag/block insertion tools support both WYSIWYG caret and raw HTML textarea modes with light theme consistency?
+
 
