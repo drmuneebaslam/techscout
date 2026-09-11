@@ -145,7 +145,7 @@ class ApiController {
         ], 201);
     }
 
-    // Upvote Comment
+    // Upvote / Helpful Comment Toggle with Undo Support
     public function upvoteComment(Request $request, array $params): void {
         $commentId = (int)($params['id'] ?? 0);
         if ($commentId <= 0) {
@@ -153,12 +153,45 @@ class ApiController {
             return;
         }
 
+        $userId = Auth::id() ? (int)Auth::id() : null;
+        $ip = Request::ip();
+
         try {
-            Database::execute("UPDATE comments SET reaction_count = reaction_count + 1 WHERE id = ?", [$commentId]);
+            // Check if user or guest IP already reacted to this comment
+            $existing = null;
+            if ($userId) {
+                $existing = Database::fetch("SELECT id FROM comment_reactions WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
+            } else {
+                $existing = Database::fetch("SELECT id FROM comment_reactions WHERE comment_id = ? AND user_id IS NULL AND ip_address = ?", [$commentId, $ip]);
+            }
+
+            $action = 'added';
+            $upvoted = true;
+
+            if ($existing) {
+                // Toggle OFF: Remove existing vote and decrement count
+                Database::execute("DELETE FROM comment_reactions WHERE id = ?", [$existing['id']]);
+                Database::execute("UPDATE comments SET reaction_count = GREATEST(0, reaction_count - 1) WHERE id = ?", [$commentId]);
+                $action = 'removed';
+                $upvoted = false;
+            } else {
+                // Toggle ON: Add vote and increment count
+                Database::execute(
+                    "INSERT INTO comment_reactions (comment_id, user_id, ip_address, reaction_type) VALUES (?, ?, ?, 'helpful')",
+                    [$commentId, $userId, $ip]
+                );
+                Database::execute("UPDATE comments SET reaction_count = reaction_count + 1 WHERE id = ?", [$commentId]);
+                $action = 'added';
+                $upvoted = true;
+            }
+
             $comment = Database::fetch("SELECT reaction_count FROM comments WHERE id = ?", [$commentId]);
-            $count = (int)($comment['reaction_count'] ?? 1);
+            $count = (int)($comment['reaction_count'] ?? 0);
+
             Response::json([
                 'success' => true,
+                'action' => $action,
+                'upvoted' => $upvoted,
                 'upvotes' => $count
             ]);
         } catch (\Throwable $e) {
@@ -1186,6 +1219,54 @@ class ApiController {
         }
 
         Response::json(['error' => 'Invalid check type. Specify type=username or type=email.'], 400);
+    }
+
+    /**
+     * Ingest Client-Side JavaScript Uncaught Exceptions & Console Errors
+     */
+    public function logClientError(Request $request): void {
+        // Read raw input payload if beacon sent application/json
+        $raw = file_get_contents('php://input');
+        $json = !empty($raw) ? json_decode($raw, true) : null;
+
+        $message = trim((string)($json['message'] ?? $request->post('message', 'Unknown Client JS Error')));
+        $source = trim((string)($json['source'] ?? $request->post('source', '')));
+        $line = (int)($json['lineno'] ?? $request->post('lineno', 0));
+        $col = (int)($json['colno'] ?? $request->post('colno', 0));
+        $stack = trim((string)($json['stack'] ?? $request->post('stack', '')));
+        $url = trim((string)($json['url'] ?? $request->post('url', ($_SERVER['HTTP_REFERER'] ?? '/'))));
+
+        if (empty($message) || $message === 'Script error.' || str_contains($message, 'Extension context invalidated')) {
+            Response::json(['received' => true, 'logged' => false]);
+            return;
+        }
+
+        // Deduplicate flood: limit identical error reports within 30 seconds
+        $cacheKey = 'js_err_' . md5($message . $source . $line);
+        if (isset($_SESSION[$cacheKey]) && (time() - $_SESSION[$cacheKey]) < 30) {
+            Response::json(['received' => true, 'logged' => false, 'reason' => 'rate_limited']);
+            return;
+        }
+        $_SESSION[$cacheKey] = time();
+
+        $errorDetails = [
+            'client_url' => $url,
+            'source_file' => $source,
+            'column' => $col,
+            'screen' => $json['screen'] ?? null,
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ];
+
+        \App\Core\ErrorLogger::log(
+            'JAVASCRIPT_ERROR',
+            $message . ($source ? " (at {$source}:{$line}:{$col})" : ""),
+            $source ?: ($url ?: 'client.js'),
+            $line > 0 ? $line : null,
+            $stack ?: "Client JS Error on URL: {$url}",
+            $errorDetails
+        );
+
+        Response::json(['received' => true, 'logged' => true]);
     }
 }
 

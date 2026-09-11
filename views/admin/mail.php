@@ -2807,6 +2807,9 @@ function submitTestEventTrigger(e) {
     if (btn) btn.disabled = false;
     resBox.className = 'ts-badge ts-badge-pink';
     resBox.innerText = 'Network error during trigger test fire.';
+  });
+}
+
 // Custom Dynamic Trigger Functions
 function openCreateCustomTriggerModal() {
   const modal = document.getElementById('createCustomTriggerModal');

@@ -19,14 +19,14 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
-### 🔴 MISTAKE-02: Logging `DATABASE_SILENT_ERROR` into Database Error Table
-* **Root Cause:** `Database::executeSilent()` was catching query failures and calling `\App\Core\ErrorLogger::log('DATABASE_SILENT_ERROR', ...)`.
+### 🔴 MISTAKE-02: Silent Database Error Logging & Root-Cause Elimination
+* **Root Cause:** Queries in `Database::executeSilent()` or fallback paths failed due to unmigrated columns, non-canonical table names, or duplicate index definitions, while either completely hiding genuine database corruptions or polluting error tables with benign warnings.
 * **Consequences:**
-  - Non-critical telemetry queries (or fallback queries) flooded the database `system_error_logs` table with "DATABASE_SILENT_ERROR" entries.
-  - Turned non-critical, expected fallback operations into alarming red badges in the Admin System Diagnostics UI.
+  - Masking errors completely leaves developers unaware when queries are broken.
+  - Logging non-fatal, expected idempotent operations (such as duplicate indexes) creates noise.
 * **Mandatory Rule:**
-  - `Database::executeSilent()` must be truly silent. It must **NEVER** log to the user-facing `system_error_logs` database table.
-  - If low-level tracing is needed, write to standard PHP `error_log()`, never creating database error records for silent operations.
+  - **Eliminate Root Causes First:** Ensure schema, column names, and queries are verified so that silent errors do not occur in normal application flow.
+  - **Selective Telemetry Logging:** `Database::executeSilent()` should log genuine, unexpected query failures to `system_error_logs` with contextual SQL and error details, but benign idempotent DDL warnings (e.g., duplicate index/column) should be filtered so production logs only contain actionable defects.
 
 ---
 
@@ -60,10 +60,35 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-06: Unclosed JavaScript Blocks Breaking View Execution Scope
+* **Root Cause:** Inline `<script>` tags in PHP view templates containing unclosed `try...catch` blocks or orphaned brackets (e.g., `views/admin/mail.php` line 2806 and `views/layouts/admin_footer.php` line 448).
+* **Consequences:**
+  - Causes browser parsing failures: `Uncaught SyntaxError: Unexpected end of input` or `Unexpected token ')'`.
+  - Halts script execution before global window methods are exported (`window.switchMailTab`, `window.loadTemplateToEditor`), leading to cascading HTML inline handler failures (`ReferenceError: switchMailTab is not defined`).
+* **Mandatory Rule:**
+  - All JavaScript written inside PHP view files must be syntax-checked with Node.js parser (`node -c`) before staging.
+  - Global functions called by inline HTML attributes (`onclick`, `onchange`) must be explicitly declared and protected against parsing halts.
+
+---
+
+### 🔴 MISTAKE-07: Unchecked Reaction Counters Lacking Idempotent Toggle / Undo
+* **Root Cause:** Comment upvote/helpful actions simply ran `UPDATE comments SET reaction_count = reaction_count + 1` without recording individual user or guest IP associations.
+* **Consequences:**
+  - A single user or spammer clicking the helpful button multiple times caused the counter to increase infinitely.
+  - Users had no ability to undo or revoke an accidental reaction.
+* **Mandatory Rule:**
+  - All reaction and helpful interactions must maintain a relational record (e.g., `comment_reactions` with `comment_id`, `user_id`, and `ip_address`).
+  - The API endpoint must act as an idempotent toggle: if a record exists for the user/IP, remove it and decrement the counter (`GREATEST(0, count - 1)`); if not, insert it and increment the counter.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
-2. [ ] **No Silent Error Generation**: Does `executeSilent` or any helper generate database error log records?
+2. [ ] **No Unchecked Silent Errors**: Are database operations verified so silent errors do not occur, while keeping meaningful error logging intact?
 3. [ ] **Safe JSON Handling**: Are all JSON column values guaranteed to be valid JSON strings (defaulting to `'[]'` or valid JSON, never `false` or empty string)?
 4. [ ] **Graceful Telemetry Operations**: Are auxiliary telemetry queries (like `post_views`) guarded so they never crash requests?
 5. [ ] **Non-Destructive Upgrade SQL Provided**: Has an upgrade SQL script been provided for any database schema changes that preserves all existing data?
+6. [ ] **Syntax-Verified Scripts**: Are all JavaScript view scripts and inline blocks verified with a JS parser to prevent `SyntaxError` and `ReferenceError`?
+7. [ ] **Idempotent Reaction Toggling**: Do user reaction/helpful counters maintain state via user/IP tracking with toggle (add/undo) functionality?
+

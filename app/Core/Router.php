@@ -78,6 +78,23 @@ class Router {
 
         // 404 Route Not Found
         http_response_code(404);
+        try {
+            if (class_exists('\\App\\Core\\ErrorLogger')) {
+                $uri = $request->uri();
+                $method = $request->method();
+                $ref = $_SERVER['HTTP_REFERER'] ?? 'direct';
+                // Avoid logging static asset probes or browser noise
+                if (!in_array($uri, ['/favicon.ico', '/robots.txt', '/apple-touch-icon.png', '/sitemap.xml'], true) && !str_starts_with($uri, '/assets/')) {
+                    \App\Core\ErrorLogger::log(
+                        'NOT_FOUND_404',
+                        "404 Route Not Found: {$method} {$uri} (Referrer: {$ref})",
+                        __FILE__,
+                        __LINE__,
+                        "Unmatched URL route requested by client."
+                    );
+                }
+            }
+        } catch (\Throwable $e) {}
         Response::view('errors/404', ['title' => 'Page Not Found | TechScout']);
     }
 

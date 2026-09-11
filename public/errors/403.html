@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Forbidden | Access Restricted — TechScout</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #05070c;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background-image: 
+        radial-gradient(ellipse at top, rgba(244,63,94,0.12) 0%, transparent 60%),
+        radial-gradient(circle at bottom right, rgba(99,102,241,0.08) 0%, transparent 50%);
+    }
+    .error-card {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(244, 63, 94, 0.1);
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      margin-bottom: 1.25rem;
+    }
+    .error-code {
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #fda4af 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.75rem;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.4rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.45);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.04);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .meta-box {
+      border-top: 1px solid rgba(148, 163, 184, 0.12);
+      padding-top: 1.25rem;
+      font-family: monospace;
+      font-size: 0.76rem;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-card">
+    <div class="badge">🛡️ Security Perimeter Enforced</div>
+    <div class="error-code">403</div>
+    <h1>Access Restricted / Forbidden</h1>
+    <p>Your current session or client IP does not have clearance to inspect this resource. Ensure you are signed in with the appropriate permissions, or contact support if you believe this is in error.</p>
+    
+    <div class="action-group">
+      <a href="/" class="btn btn-primary">Return to Homepage</a>
+      <a href="/auth/login" class="btn btn-outline">Sign In</a>
+      <a href="/contact" class="btn btn-outline">Contact Desk</a>
+    </div>
+
+    <div class="meta-box">
+      <span id="target-path">Target: /</span>
+      <span id="timestamp">Timestamp: --</span>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('target-path').textContent = 'Target: ' + window.location.pathname;
+    document.getElementById('timestamp').textContent = 'UTC: ' + new Date().toISOString().replace('T', ' ').substring(0, 19);
+  </script>
+</body>
+</html>

@@ -115,4 +115,19 @@ INSERT IGNORE INTO `mail_templates` (`template_key`, `name`, `subject`, `descrip
 ('payout_rejected', 'Author Payout Request Rejected', 'Important Update on your {{platform_name}} Payout Request #{{payout_id}}', 'Dispatched when payout request is rejected and credits are restored.', '<!-- Payout Rejected Email --><div style=\"font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;\"><h2 style=\"color:#ef4444;\">Payout Update</h2><p>Hi {{name}},</p><p>Your withdrawal request #{{payout_id}} could not be processed at this time.</p><p><strong>Reason:</strong> {{admin_notes}}</p><p>Any deducted credits have been fully restored to your account balance.</p><p><a href=\"{{action_url}}\" style=\"display:inline-block;background:#6366f1;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px;\">Check Balance</a></p></div>', NOW()),
 ('payout_requested', 'Author Payout Withdrawal Claim Received', 'We received your payout request for ${{amount}} USD 💳', 'Dispatched immediately when an author submits a withdrawal claim.', '<!-- Payout Requested Email --><div style=\"font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;\"><h2 style=\"color:#6366f1;\">Withdrawal Request Received</h2><p>Hi {{name}},</p><p>We received your payout claim for <strong>${{amount}} USD</strong>.</p><p>Our finance team will review and process your transfer shortly.</p></div>', NOW());
 
+-- ------------------------------------------------------------------------------
+-- 6. Comment Reactions (Helpful / Like / Emoji Reactions with Idempotent Toggle)
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `comment_reactions` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `comment_id` INT UNSIGNED NOT NULL,
+  `user_id` INT UNSIGNED NULL,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `reaction_type` VARCHAR(32) NOT NULL DEFAULT 'helpful',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_cr_comment_user` (`comment_id`, `user_id`),
+  INDEX `idx_cr_comment_ip` (`comment_id`, `ip_address`),
+  INDEX `idx_cr_reaction` (`reaction_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Upgrade complete. Safe for repeated runs.

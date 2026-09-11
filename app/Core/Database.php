@@ -1575,8 +1575,15 @@ class Database {
             $stmt = $conn->prepare($sql);
             return $stmt->execute($params);
         } catch (Throwable $e) {
-            // Truly silent execution: log to standard PHP server log only, never pollute system_error_logs database table
-            error_log("Database::executeSilent suppressed: " . $e->getMessage());
+            $msg = $e->getMessage();
+            // Suppress benign duplicate column/index notifications
+            if (str_contains($msg, '1060') || str_contains($msg, '42S21') || str_contains($msg, '1061') || str_contains($msg, 'Duplicate column')) {
+                return false;
+            }
+            if (class_exists('\\App\\Core\\ErrorLogger')) {
+                \App\Core\ErrorLogger::log('DATABASE_SILENT_ERROR', $msg . ($sql ? " | SQL: " . substr($sql, 0, 200) : ""));
+            }
+            error_log("Database::executeSilent: " . $msg);
             return false;
         }
     }

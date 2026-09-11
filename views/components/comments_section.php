@@ -12,14 +12,36 @@ $contentAuthorId = (int)($contentItem['author_id'] ?? 0);
 $totalComments = count($comments);
 $currentUser = \App\Core\Auth::user();
 
+// Query current user / IP upvoted comments for toggle state tracking
+$userUpvotedCommentIds = [];
+try {
+    $currentUserId = \App\Core\Auth::id();
+    $clientIp = \App\Core\Request::ip();
+    if ($currentUserId) {
+        $rows = \App\Core\Database::query(
+            "SELECT comment_id FROM comment_reactions WHERE user_id = ?",
+            [$currentUserId]
+        );
+    } else {
+        $rows = \App\Core\Database::query(
+            "SELECT comment_id FROM comment_reactions WHERE user_id IS NULL AND ip_address = ?",
+            [$clientIp]
+        );
+    }
+    $userUpvotedCommentIds = array_map('intval', array_column($rows, 'comment_id'));
+} catch (\Throwable $e) {
+    $userUpvotedCommentIds = [];
+}
+
 if (!function_exists('renderRedditCommentNode')) {
-    function renderRedditCommentNode(array $c, int $contentId, int $contentAuthorId, ?array $currentUser, int $depth = 0): void {
+    function renderRedditCommentNode(array $c, int $contentId, int $contentAuthorId, ?array $currentUser, int $depth = 0, array $userUpvotedCommentIds = []): void {
         $isAuthorComment = ($contentAuthorId && (int)$c['user_id'] === $contentAuthorId);
         $upvotes = (int)($c['reaction_count'] ?? 0);
         $commentId = (int)$c['id'];
         $hasReplies = !empty($c['replies']);
         $replyCount = $hasReplies ? count($c['replies']) : 0;
         $maxDepthIndent = min($depth * 0.85, 3.5); // compact visual boundary
+        $isUpvoted = in_array($commentId, $userUpvotedCommentIds, true);
         ?>
         <div class="comment-node-wrapper <?= $depth === 0 ? 'comment-item' : 'comment-reply-node' ?>" 
              id="comment-node-<?= $commentId ?>" 
@@ -62,7 +84,7 @@ if (!function_exists('renderRedditCommentNode')) {
 
               <!-- Bottom Action Bar (Upvote, Reply, Delete) -->
               <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.45rem;">
-                <button type="button" onclick="upvoteComment(<?= $commentId ?>)" class="ts-badge ts-badge-cyan" id="upvote-badge-<?= $commentId ?>" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; padding: 0.15rem 0.5rem;">
+                <button type="button" onclick="upvoteComment(<?= $commentId ?>)" class="ts-badge <?= $isUpvoted ? 'ts-badge-green' : 'ts-badge-cyan' ?>" id="upvote-badge-<?= $commentId ?>" data-upvoted="<?= $isUpvoted ? '1' : '0' ?>" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; padding: 0.15rem 0.5rem; <?= $isUpvoted ? 'background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.5); color: #34d399;' : '' ?>" title="<?= $isUpvoted ? 'Click to undo helpful vote' : 'Mark as helpful' ?>">
                   <i data-lucide="thumbs-up" style="width: 11px; height: 11px;"></i> Helpful (<span id="upvote-count-<?= $commentId ?>"><?= $upvotes ?></span>)
                 </button>
 
@@ -104,7 +126,7 @@ if (!function_exists('renderRedditCommentNode')) {
               <div id="replies-container-<?= $commentId ?>" class="replies-sub-tree">
                 <?php if ($hasReplies): ?>
                   <?php foreach ($c['replies'] as $subReply): ?>
-                    <?php renderRedditCommentNode($subReply, $contentId, $contentAuthorId, $currentUser, $depth + 1); ?>
+                    <?php renderRedditCommentNode($subReply, $contentId, $contentAuthorId, $currentUser, $depth + 1, $userUpvotedCommentIds); ?>
                   <?php endforeach; ?>
                 <?php endif; ?>
               </div>
@@ -192,7 +214,7 @@ if (!function_exists('renderRedditCommentNode')) {
     <?php if (!empty($comments)): ?>
       <?php foreach ($comments as $index => $c): ?>
         <div class="root-comment-wrapper" style="<?= $index >= 10 ? 'display:none;' : '' ?>">
-          <?php renderRedditCommentNode($c, $contentId, $contentAuthorId, $currentUser, 0); ?>
+          <?php renderRedditCommentNode($c, $contentId, $contentAuthorId, $currentUser, 0, $userUpvotedCommentIds); ?>
         </div>
       <?php endforeach; ?>
 
@@ -398,17 +420,39 @@ async function upvoteComment(commentId) {
       if (countEl) countEl.innerText = data.upvotes;
       const nodeWrapper = document.getElementById('comment-node-' + commentId);
       if (nodeWrapper) nodeWrapper.setAttribute('data-upvotes', data.upvotes);
+      const badgeEl = document.getElementById('upvote-badge-' + commentId);
+      if (badgeEl) {
+        if (data.upvoted) {
+          badgeEl.className = 'ts-badge ts-badge-green';
+          badgeEl.setAttribute('data-upvoted', '1');
+          badgeEl.style.background = 'rgba(16,185,129,0.2)';
+          badgeEl.style.border = '1px solid rgba(16,185,129,0.5)';
+          badgeEl.style.color = '#34d399';
+          badgeEl.title = 'Click to undo helpful vote';
+        } else {
+          badgeEl.className = 'ts-badge ts-badge-cyan';
+          badgeEl.setAttribute('data-upvoted', '0');
+          badgeEl.style.background = '';
+          badgeEl.style.border = '';
+          badgeEl.style.color = '';
+          badgeEl.title = 'Mark as helpful';
+        }
+      }
       if (typeof showToast === 'function') {
-        showToast('Helpful upvote registered! 💡', 'success');
+        if (data.upvoted) {
+          showToast('Marked comment as helpful! 💡', 'success');
+        } else {
+          showToast('Helpful vote removed (undone).', 'info');
+        }
       }
     } else {
       if (typeof showToast === 'function') {
-        showToast(data.error || 'Error upvoting comment', 'error');
+        showToast(data.error || 'Error updating comment vote', 'error');
       }
     }
   } catch (err) {
     if (typeof showToast === 'function') {
-      showToast('Error upvoting comment: ' + err.message, 'error');
+      showToast('Error updating comment vote: ' + err.message, 'error');
     }
   }
 }

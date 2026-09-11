@@ -608,6 +608,7 @@ $router->post('/api/v1/upload/image', [ApiController::class, 'uploadImage']);
 $router->post('/api/v1/analytics/event', [ApiController::class, 'trackEvent']);
 $router->post('/api/v1/content/read-ping', [ApiController::class, 'recordReadDwellPing']);
 $router->post('/api/v1/track', [ApiController::class, 'trackEvent']);
+$router->post('/api/v1/telemetry/client-error', [ApiController::class, 'logClientError']);
 $router->post('/api/v1/report', [ApiController::class, 'submitReport']);
 $router->get('/api/v1/notifications', [ApiController::class, 'getNotifications']);
 $router->post('/api/v1/notifications/read', [ApiController::class, 'markNotificationRead']);

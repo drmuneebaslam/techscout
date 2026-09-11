@@ -58,8 +58,10 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
       } else {
         document.documentElement.classList.remove('theme-light');
       }
+      window.TS_BASE_URL = '<?= rtrim(\App\Core\Config::url('/'), '/') ?>';
     })();
   </script>
+  <script src="<?= url('/assets/js/telemetry-error-logger.js') ?>"></script>
   <title><?= htmlspecialchars($title ?? 'TechScout — The Frontier of Tech, Scouted for Builders') ?></title>
   
   <!-- Favicon Assets -->

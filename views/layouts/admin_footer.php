@@ -444,9 +444,6 @@
         } catch (e) {}
       }
 
-      // Core PJAX Navigator Function
-      window.pjaxNavigate = async function(url, pushState = true) {
-        if (pjaxActive) return;
       // Standard Navigation Engine (Full-page reload on screen transitions, async AJAX for same-page actions)
       window.pjaxNavigate = function(url) {
         if (url) window.location.href = url;

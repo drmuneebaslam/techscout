@@ -485,6 +485,20 @@ CREATE TABLE `comments` (
   CONSTRAINT `fk_comments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `comment_reactions`;
+CREATE TABLE `comment_reactions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `comment_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `reaction_type` varchar(32) NOT NULL DEFAULT 'helpful',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_cr_comment_user` (`comment_id`, `user_id`),
+  KEY `idx_cr_comment_ip` (`comment_id`, `ip_address`),
+  KEY `idx_cr_reaction` (`reaction_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS `contact_messages`;
 CREATE TABLE `contact_messages` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

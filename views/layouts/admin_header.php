@@ -39,8 +39,10 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
           }
         }
       } catch (e) {}
+      window.TS_BASE_URL = '<?= rtrim(\App\Core\Config::url('/'), '/') ?>';
     })();
   </script>
+  <script src="<?= url('/assets/js/telemetry-error-logger.js') ?>"></script>
   <title><?= htmlspecialchars($title ?? 'Admin Command Center | TechScout') ?></title>
   
   <!-- Favicon Assets -->
