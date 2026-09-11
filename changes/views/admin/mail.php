@@ -1309,56 +1309,58 @@
 <!-- MODAL: CREATE & EDIT HTML EMAIL TEMPLATE (FULL SCREEN 2-COLUMN DISPLAY) -->
 <!-- ========================================================================= -->
 <div id="templateEditorModal" class="admin-modal-overlay" style="display: none;">
-  <div class="admin-modal-box" style="width: 98vw; max-width: 1550px; height: 94vh; max-height: 94vh; margin: 2vh auto; display: flex; flex-direction: column; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.3); overflow: hidden;">
-    <div class="admin-modal-header" style="padding: 0.85rem 1.25rem; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+  <div class="admin-modal-box" style="width: 98vw; max-width: 1550px; height: 94vh; max-height: 94vh; margin: 2vh auto; display: flex; flex-direction: column; overflow: hidden;">
+    <div class="admin-modal-header" style="padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
       <div>
-        <h3 class="admin-modal-title" style="color: #0f172a; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;" id="tmplBuilderTitle">
-          <i data-lucide="layout-template" style="color: #4f46e5;"></i> Create &amp; Save Custom HTML Email Template
+        <h3 class="admin-modal-title" style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;" id="tmplBuilderTitle">
+          <i data-lucide="layout-template" style="color: var(--admin-primary);"></i> Create &amp; Save Custom HTML Email Template
         </h3>
-        <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">
+        <div style="font-size: 0.8rem; color: var(--admin-text-secondary); margin-top: 0.2rem;">
           Design responsive HTML templates with 10 categories of dynamic tokens &amp; real-time live light visual preview.
         </div>
       </div>
       
       <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <div style="display: flex; gap: 0.25rem; background: #f1f5f9; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <button type="button" onclick="setModalTmplViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-tmpl-modal-split" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; background: #4f46e5; border-color: #4f46e5;">🌓 Split View</button>
-          <button type="button" onclick="setModalTmplViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-editor" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #475569;">📝 Editor Only</button>
-          <button type="button" onclick="setModalTmplViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-preview" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #475569;">👁️ Preview Only</button>
+        <div class="mail-studio-toolbar-cluster">
+          <button type="button" onclick="setModalTmplViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-tmpl-modal-split" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">🌓 Split View</button>
+          <button type="button" onclick="setModalTmplViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-editor" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">📝 Editor Only</button>
+          <button type="button" onclick="setModalTmplViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-preview" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">👁️ Preview Only</button>
         </div>
-        <button type="button" onclick="closeTemplateEditorModal()" class="admin-modal-close" style="color: #64748b; font-size: 1.2rem;" title="Close Modal">✕</button>
+        <button type="button" onclick="closeTemplateEditorModal()" class="admin-modal-close" title="Close Modal">✕</button>
       </div>
     </div>
 
-    <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="templateBuilderForm" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding: 1rem; background: #f8fafc;">
+    <form action="<?= url('/admin/mail/template/save') ?>" method="POST" id="templateBuilderForm" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding: 1rem;">
       <input type="hidden" name="id" id="tmpl_id_input" value="">
 
       <!-- Top Metadata Strip -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem; background: #ffffff; padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-        <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Key (Unique Identifier) <span style="color:#ef4444;">*</span></label>
-          <input type="text" name="template_key" id="tmpl_key_input" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace; background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
-        </div>
-        <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Display Name <span style="color:#ef4444;">*</span></label>
-          <input type="text" name="name" id="tmpl_name_input" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
-        </div>
-        <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Default Subject Line <span style="color:#ef4444;">*</span></label>
-          <input type="text" name="subject" id="tmpl_subject_input" oninput="updateTmplModalPreview()" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
-        </div>
-        <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Assigned Outbound Sender Account</label>
-          <select name="assigned_credential_id" id="tmpl_cred_id_input" class="admin-modal-select" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
-            <option value="">-- Default Outbound System Provider --</option>
-            <?php foreach ($mailCredentials as $mc): ?>
-              <option value="<?= $mc['id'] ?>"><?= htmlspecialchars($mc['name']) ?> (<?= htmlspecialchars(strtoupper($mc['provider'])) ?>) <?= $mc['is_default'] ? '★ [DEFAULT]' : '' ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-        <div style="grid-column: span 2;">
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Description / Notes</label>
-          <input type="text" name="description" id="tmpl_desc_input" placeholder="e.g. Broadcast update for new frontier models..." class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
+      <div class="mail-studio-card" style="margin-bottom: 0.85rem; padding: 0.85rem 1rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem;">
+          <div>
+            <label class="admin-modal-label">Template Key (Unique Identifier) <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="template_key" id="tmpl_key_input" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: var(--admin-font-mono);" required>
+          </div>
+          <div>
+            <label class="admin-modal-label">Template Display Name <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="name" id="tmpl_name_input" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" required>
+          </div>
+          <div>
+            <label class="admin-modal-label">Default Subject Line <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="subject" id="tmpl_subject_input" oninput="updateTmplModalPreview()" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" required>
+          </div>
+          <div>
+            <label class="admin-modal-label">Assigned Outbound Sender Account</label>
+            <select name="assigned_credential_id" id="tmpl_cred_id_input" class="admin-modal-select">
+              <option value="">-- Default Outbound System Provider --</option>
+              <?php foreach ($mailCredentials as $mc): ?>
+                <option value="<?= $mc['id'] ?>"><?= htmlspecialchars($mc['name']) ?> (<?= htmlspecialchars(strtoupper($mc['provider'])) ?>) <?= $mc['is_default'] ? '★ [DEFAULT]' : '' ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label class="admin-modal-label">Template Description / Notes</label>
+            <input type="text" name="description" id="tmpl_desc_input" placeholder="e.g. Broadcast update for new frontier models..." class="admin-modal-input">
+          </div>
         </div>
       </div>
 
@@ -1369,23 +1371,23 @@
         <div id="tmpl-modal-col-editor" style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 0.25rem;">
           
           <!-- Collapsible 10 Categories Dynamic Variables Matrix -->
-          <details open style="margin-bottom: 0.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.65rem 0.85rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-            <summary style="cursor: pointer; font-size: 0.82rem; font-weight: 800; color: #4f46e5; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          <details open class="mail-studio-palette-accordion">
+            <summary class="mail-studio-palette-summary">
               <span style="display: flex; align-items: center; gap: 0.4rem;">
-                <i data-lucide="variable" style="width: 15px; height: 15px; color: #4f46e5;"></i>
+                <i data-lucide="variable" style="width: 15px; height: 15px; color: var(--admin-primary);"></i>
                 Dynamic Variables Palette (10 Categories &bull; 60+ Tokens)
               </span>
-              <span style="font-size: 0.72rem; color: #6366f1; font-weight: 600;">Click token to insert into caret ▾</span>
+              <span style="font-size: 0.72rem; font-weight: 600;">Click token to insert into caret ▾</span>
             </summary>
-            <div style="margin-top: 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; max-height: 200px; overflow-y: auto; border-top: 1px solid #f1f5f9; padding-top: 0.6rem;">
+            <div style="margin-top: 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; max-height: 200px; overflow-y: auto; border-top: 1px solid var(--admin-border-subtle); padding-top: 0.6rem;">
               <?php foreach ($availableVariables as $cat => $vars): ?>
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.45rem;">
-                  <div style="font-size: 0.68rem; font-weight: 800; color: #4338ca; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></div>
+                <div class="mail-studio-palette-cat">
+                  <div class="mail-studio-cat-title"><?= htmlspecialchars($cat) ?></div>
                   <div style="display: flex; flex-direction: column; gap: 0.2rem;">
                     <?php foreach ($vars as $tag => $desc): ?>
-                      <button type="button" onclick="insertTmplTag('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: #ffffff; border: 1px solid #e2e8f0; padding: 0.2rem 0.4rem; border-radius: 4px; color: #334155; font-size: 0.68rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.borderColor='#818cf8'; this.style.background='#eef2ff';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#ffffff';" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
-                        <code style="color: #4f46e5; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
-                        <span style="color: #64748b; font-size: 0.62rem; margin-left: 0.3rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
+                      <button type="button" onclick="insertTmplTag('<?= $tag ?>')" class="mail-studio-token-btn" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
+                        <code class="mail-studio-token-code"><?= htmlspecialchars($tag) ?></code>
+                        <span style="font-size: 0.62rem; opacity: 0.8; margin-left: 0.3rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
                       </button>
                     <?php endforeach; ?>
                   </div>
@@ -1395,43 +1397,43 @@
           </details>
 
           <!-- Modern Block Component Library (14 Responsive Email Blocks) -->
-          <div style="margin-bottom: 0.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem 0.85rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+          <div class="mail-studio-blocks-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.5rem;">
-              <div style="font-size: 0.8rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
-                <i data-lucide="blocks" style="width: 15px; height: 15px; color: #4f46e5;"></i> 
+              <div style="font-size: 0.8rem; font-weight: 800; color: var(--admin-text-primary); display: flex; align-items: center; gap: 0.35rem;">
+                <i data-lucide="blocks" style="width: 15px; height: 15px; color: var(--admin-primary);"></i> 
                 <span>1-Click Universal Responsive Email Blocks</span>
               </div>
-              <span style="font-size: 0.68rem; color: #10b981; font-weight: 700;">⚡ 14 Ready-to-use Email Blocks</span>
+              <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; font-weight: 700;">⚡ 14 Blocks</span>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 0.3rem;">
-              <button type="button" onclick="insertBlockComponent('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #eef2ff;" title="Hero Header with Badge">✨ Hero Header</button>
-              <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;" title="Primary Action CTA Button">🔘 Primary CTA</button>
-              <button type="button" onclick="insertBlockComponent('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Disbursal / Financial CTA">💰 Disbursal CTA</button>
-              <button type="button" onclick="insertBlockComponent('cta_secondary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Outline Action Button">🔗 Outline Button</button>
-              <button type="button" onclick="insertBlockComponent('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;" title="Technical Info Callout">ℹ️ Info Callout</button>
-              <button type="button" onclick="insertBlockComponent('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;" title="Verified Success Box">✅ Success Box</button>
-              <button type="button" onclick="insertBlockComponent('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #d97706; border-color: #fde68a; background: #fffbeb;" title="Action Required Warning Box">⚠️ Warning Box</button>
-              <button type="button" onclick="insertBlockComponent('callout_critical')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #dc2626; border-color: #fecaca; background: #fef2f2;" title="Critical Security Alert Box">🚨 Critical Alert</button>
-              <button type="button" onclick="insertBlockComponent('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Key-Value Data Grid">📊 Data Grid</button>
-              <button type="button" onclick="insertBlockComponent('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;" title="OTP Verification Badge">🔑 OTP Badge</button>
-              <button type="button" onclick="insertBlockComponent('two_col_card')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #4f46e5; border-color: #c7d2fe; background: #ffffff;" title="2-Column Metric Cards">⚖️ 2-Col Cards</button>
-              <button type="button" onclick="insertBlockComponent('quote')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Community Discussion Quote">💬 Quote</button>
-              <button type="button" onclick="insertBlockComponent('checklist')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Styled Checklist">📋 Checklist</button>
-              <button type="button" onclick="insertBlockComponent('divider')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #64748b; border-color: #e2e8f0; background: #f8fafc;" title="Section Divider Line">➖ Divider</button>
+              <button type="button" onclick="insertBlockComponent('hero')" class="mail-studio-block-btn" title="Hero Header with Badge">✨ Hero Header</button>
+              <button type="button" onclick="insertBlockComponent('cta_primary')" class="mail-studio-block-btn" title="Primary Action CTA Button">🔘 Primary CTA</button>
+              <button type="button" onclick="insertBlockComponent('cta_green')" class="mail-studio-block-btn" title="Disbursal / Financial CTA">💰 Disbursal CTA</button>
+              <button type="button" onclick="insertBlockComponent('cta_secondary')" class="mail-studio-block-btn" title="Outline Action Button">🔗 Outline Button</button>
+              <button type="button" onclick="insertBlockComponent('callout_info')" class="mail-studio-block-btn" title="Technical Info Callout">ℹ️ Info Callout</button>
+              <button type="button" onclick="insertBlockComponent('callout_success')" class="mail-studio-block-btn" title="Verified Success Box">✅ Success Box</button>
+              <button type="button" onclick="insertBlockComponent('callout_warning')" class="mail-studio-block-btn" title="Action Required Warning Box">⚠️ Warning Box</button>
+              <button type="button" onclick="insertBlockComponent('callout_critical')" class="mail-studio-block-btn" title="Critical Security Alert Box">🚨 Critical Alert</button>
+              <button type="button" onclick="insertBlockComponent('datagrid')" class="mail-studio-block-btn" title="Key-Value Data Grid">📊 Data Grid</button>
+              <button type="button" onclick="insertBlockComponent('otp_box')" class="mail-studio-block-btn" title="OTP Verification Badge">🔑 OTP Badge</button>
+              <button type="button" onclick="insertBlockComponent('two_col_card')" class="mail-studio-block-btn" title="2-Column Metric Cards">⚖️ 2-Col Cards</button>
+              <button type="button" onclick="insertBlockComponent('quote')" class="mail-studio-block-btn" title="Community Discussion Quote">💬 Quote</button>
+              <button type="button" onclick="insertBlockComponent('checklist')" class="mail-studio-block-btn" title="Styled Checklist">📋 Checklist</button>
+              <button type="button" onclick="insertBlockComponent('divider')" class="mail-studio-block-btn" title="Section Divider Line">➖ Divider</button>
             </div>
           </div>
 
           <!-- Visual Editor Mode Switcher & Rich Formatting Toolbar -->
-          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px 10px 0 0; padding: 0.65rem 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0;">
+          <div class="mail-studio-editor-box" style="border-radius: 10px 10px 0 0; padding: 0.65rem 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
               <div style="display: flex; gap: 0.25rem;">
-                <button type="button" onclick="switchTmplEditMode('wysiwyg')" id="btn-tmpl-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: #4f46e5; border-color: #4f46e5;">🎨 Visual WYSIWYG Editor</button>
-                <button type="button" onclick="switchTmplEditMode('html')" id="btn-tmpl-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; color: #475569;">💻 Raw HTML Code</button>
+                <button type="button" onclick="switchTmplEditMode('wysiwyg')" id="btn-tmpl-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.25rem 0.6rem;">🎨 Visual WYSIWYG Editor</button>
+                <button type="button" onclick="switchTmplEditMode('html')" id="btn-tmpl-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.25rem 0.6rem;">💻 Raw HTML Code</button>
               </div>
               
               <div style="display: flex; gap: 0.35rem; align-items: center;">
                 <!-- Dynamic Variable Selector Dropdown -->
-                <select onchange="if(this.value){ insertTmplTag(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.22rem 0.5rem; font-size: 0.72rem; color: #4f46e5; width: auto; max-width: 220px; font-weight: 700; border-color: #cbd5e1; background: #f8fafc;">
+                <select onchange="if(this.value){ insertTmplTag(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.22rem 0.5rem; font-size: 0.72rem; width: auto; max-width: 220px; font-weight: 700;">
                   <option value="">⚡ Quick Token Insert... ▾</option>
                   <?php foreach ($availableVariables as $vCat => $vList): ?>
                     <optgroup label="<?= htmlspecialchars($vCat) ?>">
@@ -1441,20 +1443,20 @@
                     </optgroup>
                   <?php endforeach; ?>
                 </select>
-                <button type="button" onclick="loadTmplStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff; font-weight: 700;" title="Load Clean White Responsive Email Starter Boilerplate">
+                <button type="button" onclick="loadTmplStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; font-weight: 700;" title="Load Clean White Responsive Email Starter Boilerplate">
                   ⚡ Light Boilerplate
                 </button>
               </div>
             </div>
 
             <!-- WYSIWYG Formatting Buttons Bar -->
-            <div id="tmpl_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #f8fafc; padding: 0.4rem; border-radius: 6px; border: 1px solid #e2e8f0;">
-              <button type="button" onclick="execTmplWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800; color: #0f172a; background: #fff;" title="Bold"><b>B</b></button>
-              <button type="button" onclick="execTmplWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic; color: #0f172a; background: #fff;" title="Italic"><i>I</i></button>
-              <button type="button" onclick="execTmplWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline; color: #0f172a; background: #fff;" title="Underline"><u>U</u></button>
-              <button type="button" onclick="execTmplWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through; color: #0f172a; background: #fff;" title="Strikethrough"><s>S</s></button>
-              <span style="color: #cbd5e1;">|</span>
-              <select onchange="execTmplWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #ffffff; border-color: #cbd5e1; color: #0f172a;">
+            <div id="tmpl_wysiwyg_toolbar" class="mail-studio-wysiwyg-bar">
+              <button type="button" onclick="execTmplWysiwyg('bold')" class="mail-studio-action-btn" title="Bold"><b>B</b></button>
+              <button type="button" onclick="execTmplWysiwyg('italic')" class="mail-studio-action-btn" style="font-style: italic;" title="Italic"><i>I</i></button>
+              <button type="button" onclick="execTmplWysiwyg('underline')" class="mail-studio-action-btn" style="text-decoration: underline;" title="Underline"><u>U</u></button>
+              <button type="button" onclick="execTmplWysiwyg('strikeThrough')" class="mail-studio-action-btn" style="text-decoration: line-through;" title="Strikethrough"><s>S</s></button>
+              <span style="opacity: 0.3;">|</span>
+              <select onchange="execTmplWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto;">
                 <option value="">Header ▾</option>
                 <option value="H1">H1 Main Heading</option>
                 <option value="H2">H2 Sub Heading</option>
@@ -1462,56 +1464,56 @@
                 <option value="P">Paragraph</option>
                 <option value="BLOCKQUOTE">Blockquote</option>
               </select>
-              <span style="color: #cbd5e1;">|</span>
-              <button type="button" onclick="execTmplWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Left">⬅️</button>
-              <button type="button" onclick="execTmplWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Center">↔️</button>
-              <button type="button" onclick="execTmplWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Right">➡️</button>
-              <span style="color: #cbd5e1;">|</span>
-              <button type="button" onclick="execTmplWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Bullet List">• List</button>
-              <button type="button" onclick="execTmplWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Numbered List">1. List</button>
-              <span style="color: #cbd5e1;">|</span>
-              <button type="button" onclick="promptTmplLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #0284c7; background: #fff;" title="Insert Link">🔗 Link</button>
-              <button type="button" onclick="insertBlockComponent('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #4f46e5; background: #fff;" title="Insert Primary CTA Button">🔘 Button</button>
-              <button type="button" onclick="execTmplWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444; background: #fff;" title="Clear Formatting">🧹 Clear</button>
+              <span style="opacity: 0.3;">|</span>
+              <button type="button" onclick="execTmplWysiwyg('justifyLeft')" class="mail-studio-action-btn" title="Align Left">⬅️</button>
+              <button type="button" onclick="execTmplWysiwyg('justifyCenter')" class="mail-studio-action-btn" title="Align Center">↔️</button>
+              <button type="button" onclick="execTmplWysiwyg('justifyRight')" class="mail-studio-action-btn" title="Align Right">➡️</button>
+              <span style="opacity: 0.3;">|</span>
+              <button type="button" onclick="execTmplWysiwyg('insertUnorderedList')" class="mail-studio-action-btn" title="Bullet List">• List</button>
+              <button type="button" onclick="execTmplWysiwyg('insertOrderedList')" class="mail-studio-action-btn" title="Numbered List">1. List</button>
+              <span style="opacity: 0.3;">|</span>
+              <button type="button" onclick="promptTmplLink()" class="mail-studio-action-btn" title="Insert Link">🔗 Link</button>
+              <button type="button" onclick="insertBlockComponent('cta_primary')" class="mail-studio-action-btn" title="Insert Primary CTA Button">🔘 Button</button>
+              <button type="button" onclick="execTmplWysiwyg('removeFormat')" class="mail-studio-action-btn" style="color: #ef4444;" title="Clear Formatting">🧹 Clear</button>
             </div>
           </div>
 
-          <!-- Visual WYSIWYG Editable Canvas -->
-          <div id="tmpl_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-top: none; border-radius: 0 0 10px 10px; padding: 1.25rem; min-height: 280px; max-height: 480px; overflow-y: auto; flex: 1; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
-            <div id="tmpl_wysiwyg_editor" contenteditable="true" oninput="syncWysiwygToCode()" style="outline: none; min-height: 260px; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.65; color: #0f172a;"></div>
+          <!-- Visual WYSIWYG Editable Canvas (Viewport + White Document Sheet) -->
+          <div id="tmpl_wysiwyg_container" class="mail-studio-viewport" style="border-top: none; border-radius: 0 0 10px 10px; flex: 1; min-height: 280px; max-height: 480px;">
+            <div id="tmpl_wysiwyg_editor" contenteditable="true" oninput="syncWysiwygToCode()" class="mail-email-document-sheet" style="min-height: 260px;"></div>
           </div>
 
           <!-- HTML Code Editor Textarea (Hidden when in WYSIWYG mode) -->
-          <textarea name="html_content" id="tmpl_html_input" oninput="syncCodeToWysiwyg()" rows="14" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" class="admin-modal-textarea" style="display: none; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 0.85rem; flex: 1; min-height: 280px; resize: vertical; border-radius: 0 0 10px 10px; border-top: none; background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required></textarea>
+          <textarea name="html_content" id="tmpl_html_input" oninput="syncCodeToWysiwyg()" rows="14" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" class="mail-studio-code-editor" style="border-radius: 0 0 10px 10px; border-top: none; min-height: 280px;" required></textarea>
         </div>
 
         <!-- RIGHT COLUMN: REAL-TIME RENDERED LIVE HTML PREVIEW IFRAME -->
         <div id="tmpl-modal-col-preview" style="display: flex; flex-direction: column;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-            <label class="admin-modal-label" style="margin: 0; color: #4f46e5; display: flex; align-items: center; gap: 0.35rem; font-weight: 700;">
+            <label class="admin-modal-label" style="margin: 0; color: var(--admin-primary); display: flex; align-items: center; gap: 0.35rem; font-weight: 700;">
               <i data-lucide="eye" style="width: 15px; height: 15px;"></i> Live Delivery Simulation Sandbox (Light Mode)
             </label>
-            <span style="font-size: 0.7rem; color: #64748b;">Simulated Recipient: Alex Rivera</span>
+            <span style="font-size: 0.7rem; color: var(--admin-text-tertiary);">Simulated Recipient: Alex Rivera</span>
           </div>
 
-          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; flex: 1; min-height: 420px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+          <div class="mail-studio-preview-card" style="flex: 1; min-height: 420px; height: auto;">
             <!-- Simulated Email Header -->
-            <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 0.85rem; font-size: 0.78rem;">
-              <div style="color: #0f172a; font-weight: 700;" id="tmplModalSimSubject">Subject: TechScout Intelligence Update</div>
-              <div style="color: #64748b; font-size: 0.68rem; margin-top: 0.15rem;">
-                From: <strong style="color: #334155;">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
+            <div class="mail-studio-preview-header">
+              <div class="mail-studio-preview-subject" id="tmplModalSimSubject">Subject: TechScout Intelligence Update</div>
+              <div class="mail-studio-preview-meta">
+                From: <strong style="color: var(--admin-text-primary);">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
               </div>
             </div>
 
-            <!-- Frame Canvas (Pure Light Mode Grid Envelope) -->
+            <!-- Frame Canvas (Pure Light Mode White Envelope) -->
             <iframe id="tmplModalLivePreviewFrame" style="width: 100%; height: 100%; border: none; background: #ffffff; flex: 1;"></iframe>
           </div>
         </div>
       </div>
 
-      <div class="admin-modal-footer" style="padding: 0.85rem 1rem 0 1rem; margin-top: 0.75rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 0.5rem; background: #ffffff; border-radius: 0 0 12px 12px;">
-        <button type="button" onclick="closeTemplateEditorModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #64748b; border-color: #cbd5e1;">Cancel</button>
-        <button type="submit" id="tmplSubmitBtn" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 800; padding: 0.65rem 1.85rem; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+      <div class="admin-modal-footer" style="padding: 0.85rem 1rem 0 1rem; margin-top: 0.75rem; border-top: 1px solid var(--admin-border-subtle); display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button type="button" onclick="closeTemplateEditorModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+        <button type="submit" id="tmplSubmitBtn" class="ts-btn ts-btn-primary" style="font-weight: 800; padding: 0.65rem 1.85rem;">
           <i data-lucide="save"></i> Save HTML Template 💾
         </button>
       </div>
@@ -3235,15 +3237,15 @@ function switchTmplEditMode(mode) {
     if (wysiwygCont) wysiwygCont.style.display = 'block';
     if (wysiwygTool) wysiwygTool.style.display = 'flex';
     if (htmlInput) htmlInput.style.display = 'none';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#4f46e5'; btnWysiwyg.style.borderColor='#4f46e5'; btnWysiwyg.style.color='#ffffff'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; btnHtml.style.color='#475569'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.removeAttribute('style'); btnWysiwyg.style.fontSize = '0.72rem'; btnWysiwyg.style.padding = '0.25rem 0.6rem'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.removeAttribute('style'); btnHtml.style.fontSize = '0.72rem'; btnHtml.style.padding = '0.25rem 0.6rem'; }
   } else {
     syncWysiwygToCode();
     if (wysiwygCont) wysiwygCont.style.display = 'none';
     if (wysiwygTool) wysiwygTool.style.display = 'none';
     if (htmlInput) htmlInput.style.display = 'block';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; btnWysiwyg.style.color='#475569'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#4f46e5'; btnHtml.style.borderColor='#4f46e5'; btnHtml.style.color='#ffffff'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.removeAttribute('style'); btnWysiwyg.style.fontSize = '0.72rem'; btnWysiwyg.style.padding = '0.25rem 0.6rem'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.removeAttribute('style'); btnHtml.style.fontSize = '0.72rem'; btnHtml.style.padding = '0.25rem 0.6rem'; }
   }
 }
 

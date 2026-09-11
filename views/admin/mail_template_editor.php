@@ -83,32 +83,32 @@ $allVariableCategories = [
 <!-- Embedded Notification Toast Container -->
 <div id="saToastBox" style="position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;"></div>
 
-<div class="admin-content-inner" style="max-width: 1600px; margin: 0 auto; padding-bottom: 3rem;">
+<div class="admin-content-inner mail-studio-shell">
   <!-- Page Header Strip -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 1rem;">
+  <div class="mail-studio-header-strip">
     <div>
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-        <a href="<?= url('/admin/mail?tab=templates') ?>" style="color: #6366f1; text-decoration: none; font-size: 0.82rem; font-weight: 700;">
+        <a href="<?= url('/admin/mail?tab=templates') ?>" class="mail-studio-back-link">
           &larr; Back to Mail &amp; Template Studio
         </a>
-        <span style="color: #94a3b8;">&bull;</span>
-        <span class="ts-badge ts-badge-purple" style="font-size: 0.68rem; font-weight: 800; background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe;">FULL-SCREEN TEMPLATE STUDIO</span>
+        <span style="opacity: 0.5;">&bull;</span>
+        <span class="ts-badge ts-badge-purple">FULL-SCREEN TEMPLATE STUDIO</span>
       </div>
-      <h1 style="font-size: 1.65rem; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+      <h1 class="mail-studio-page-title">
         <?= $template ? '✏️ Edit Template: ' . htmlspecialchars($template['name'] ?? '') : '➕ Create Custom HTML Email Template' ?>
       </h1>
-      <p style="color: #64748b; font-size: 0.85rem; margin: 0.2rem 0 0 0;">
+      <p class="mail-studio-page-subtitle">
         Responsive email studio with 1-click blocks, dynamic token insertion, and real-time live light delivery preview.
       </p>
     </div>
 
     <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
-      <div style="display: flex; gap: 0.25rem; background: #f1f5f9; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0;">
-        <button type="button" onclick="setStandaloneViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-sa-split" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; background: #4f46e5; border-color: #4f46e5;">🌓 Split View</button>
-        <button type="button" onclick="setStandaloneViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-editor" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; color: #475569;">📝 Editor Only</button>
-        <button type="button" onclick="setStandaloneViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-preview" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; color: #475569;">👁️ Preview Only</button>
+      <div class="mail-studio-toolbar-cluster">
+        <button type="button" onclick="setStandaloneViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-sa-split">🌓 Split View</button>
+        <button type="button" onclick="setStandaloneViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-editor">📝 Editor Only</button>
+        <button type="button" onclick="setStandaloneViewMode('preview')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-sa-preview">👁️ Preview Only</button>
       </div>
-      <button type="submit" form="mailTemplateEditorForm" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.65rem 1.75rem; border: none; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+      <button type="submit" form="mailTemplateEditorForm" class="ts-btn ts-btn-primary" style="font-weight: 800; padding: 0.65rem 1.75rem;">
         <i data-lucide="save"></i> Save Template 💾
       </button>
     </div>
@@ -118,25 +118,25 @@ $allVariableCategories = [
     <input type="hidden" name="id" value="<?= htmlspecialchars($template['id'] ?? '') ?>">
 
     <!-- Top Metadata Configuration Card -->
-    <div style="padding: 1.5rem; margin-bottom: 1.25rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-      <h3 style="font-size: 1rem; color: #0f172a; margin: 0 0 1rem 0; font-weight: 800; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+    <div class="mail-studio-card">
+      <h3 class="mail-studio-section-title">
         <span>⚙️</span> Template Configuration &amp; Credential Binding
       </h3>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
         <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Unique Key <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="template_key" value="<?= htmlspecialchars($template['template_key'] ?? '') ?>" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: monospace; background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
+          <label class="admin-modal-label">Template Unique Key <span style="color: #ef4444;">*</span></label>
+          <input type="text" name="template_key" value="<?= htmlspecialchars($template['template_key'] ?? '') ?>" placeholder="e.g. weekly_ai_roundup" class="admin-modal-input" style="font-family: var(--admin-font-mono);" required>
         </div>
 
         <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Display Name <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="name" value="<?= htmlspecialchars($template['name'] ?? '') ?>" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
+          <label class="admin-modal-label">Display Name <span style="color: #ef4444;">*</span></label>
+          <input type="text" name="name" value="<?= htmlspecialchars($template['name'] ?? '') ?>" placeholder="e.g. ⚡ Weekly AI Digest" class="admin-modal-input" required>
         </div>
 
         <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Assigned Outbound Sender Account</label>
-          <select name="assigned_credential_id" class="admin-modal-select" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
+          <label class="admin-modal-label">Assigned Outbound Sender Account</label>
+          <select name="assigned_credential_id" class="admin-modal-select">
             <option value="">-- Platform Default Outbound Provider --</option>
             <?php foreach ($mailCredentials as $mc): ?>
               <option value="<?= $mc['id'] ?>" <?= (!empty($template['assigned_credential_id']) && (int)$template['assigned_credential_id'] === (int)$mc['id']) ? 'selected' : '' ?>>
@@ -149,13 +149,13 @@ $allVariableCategories = [
 
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
         <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Default Email Subject Line <span style="color: #ef4444;">*</span></label>
-          <input type="text" name="subject" id="sa_subject_input" oninput="updateStandaloneLivePreview()" value="<?= htmlspecialchars($template['subject'] ?? '') ?>" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;" required>
+          <label class="admin-modal-label">Default Email Subject Line <span style="color: #ef4444;">*</span></label>
+          <input type="text" name="subject" id="sa_subject_input" oninput="updateStandaloneLivePreview()" value="<?= htmlspecialchars($template['subject'] ?? '') ?>" placeholder="e.g. TechScout Intelligence Update: {{headline}}" class="admin-modal-input" required>
         </div>
 
         <div>
-          <label class="admin-modal-label" style="color: #334155; font-weight: 700;">Template Notes / Description</label>
-          <input type="text" name="description" value="<?= htmlspecialchars($template['description'] ?? '') ?>" placeholder="e.g. Dispatched when new models drop..." class="admin-modal-input" style="background: #f8fafc; border-color: #cbd5e1; color: #0f172a;">
+          <label class="admin-modal-label">Template Notes / Description</label>
+          <input type="text" name="description" value="<?= htmlspecialchars($template['description'] ?? '') ?>" placeholder="e.g. Dispatched when new models drop..." class="admin-modal-input">
         </div>
       </div>
     </div>
@@ -167,24 +167,24 @@ $allVariableCategories = [
       <div id="sa-col-editor">
         
         <!-- 10 Categories Dynamic Tag Palette Accordion -->
-        <details open style="margin-bottom: 0.85rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
-          <summary style="cursor: pointer; font-size: 0.82rem; font-weight: 800; color: #4f46e5; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+        <details open class="mail-studio-palette-accordion">
+          <summary class="mail-studio-palette-summary">
             <span style="display: flex; align-items: center; gap: 0.45rem;">
-              <i data-lucide="variable" style="width: 15px; height: 15px; color: #4f46e5;"></i>
+              <i data-lucide="variable" style="width: 15px; height: 15px;"></i>
               Dynamic Variables Palette (10 Categories &bull; 60+ Tokens)
             </span>
-            <span style="font-size: 0.72rem; color: #6366f1; font-weight: 600;">Click token to insert into caret ▾</span>
+            <span style="font-size: 0.72rem; font-weight: 600;">Click token to insert into caret ▾</span>
           </summary>
 
-          <div style="margin-top: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; border-top: 1px solid #f1f5f9; padding-top: 0.75rem; max-height: 230px; overflow-y: auto;">
+          <div style="margin-top: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; border-top: 1px solid var(--admin-border-subtle); padding-top: 0.75rem; max-height: 230px; overflow-y: auto;">
             <?php foreach ($allVariableCategories as $cat => $vars): ?>
-              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem;">
-                <div style="font-size: 0.68rem; font-weight: 800; color: #4338ca; text-transform: uppercase; margin-bottom: 0.35rem; letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></div>
+              <div class="mail-studio-palette-cat">
+                <div class="mail-studio-cat-title"><?= htmlspecialchars($cat) ?></div>
                 <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                   <?php foreach ($vars as $tag => $desc): ?>
-                    <button type="button" onclick="insertVariable('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: #ffffff; border: 1px solid #e2e8f0; padding: 0.25rem 0.45rem; border-radius: 5px; color: #334155; font-size: 0.7rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.borderColor='#818cf8'; this.style.background='#eef2ff';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#ffffff';" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
-                      <code style="color: #4f46e5; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
-                      <span style="color: #64748b; font-size: 0.62rem; margin-left: 0.35rem; max-width: 125px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
+                    <button type="button" onclick="insertVariable('<?= $tag ?>')" class="mail-studio-token-btn" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
+                      <code class="mail-studio-token-code"><?= htmlspecialchars($tag) ?></code>
+                      <span style="font-size: 0.62rem; opacity: 0.8; margin-left: 0.35rem; max-width: 125px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($desc) ?></span>
                     </button>
                   <?php endforeach; ?>
                 </div>
@@ -194,43 +194,43 @@ $allVariableCategories = [
         </details>
 
         <!-- Modern Block Component Library (14 Responsive Email Blocks) -->
-        <div style="margin-bottom: 0.85rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+        <div class="mail-studio-blocks-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.55rem; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="font-size: 0.82rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.4rem;">
-              <i data-lucide="blocks" style="width: 16px; height: 16px; color: #4f46e5;"></i> 
+            <div style="font-size: 0.82rem; font-weight: 800; color: var(--admin-text-primary); display: flex; align-items: center; gap: 0.4rem;">
+              <i data-lucide="blocks" style="width: 16px; height: 16px; color: var(--admin-primary);"></i> 
               <span>1-Click Universal Responsive Email Blocks</span>
             </div>
-            <span style="font-size: 0.7rem; color: #10b981; font-weight: 700;">⚡ 14 Ready-to-use Email Blocks</span>
+            <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; font-weight: 700;">⚡ 14 Blocks</span>
           </div>
           
           <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
-            <button type="button" onclick="insertBlock('hero')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #eef2ff;" title="Insert Responsive Hero Header Banner">✨ Hero Header</button>
-            <button type="button" onclick="insertBlock('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4338ca; border-color: #c7d2fe; background: #eef2ff;" title="Insert Primary Deep Indigo Action CTA">🔘 Primary CTA</button>
-            <button type="button" onclick="insertBlock('cta_green')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Insert Emerald Disbursal / Financial CTA">💰 Disbursal CTA</button>
-            <button type="button" onclick="insertBlock('cta_secondary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Insert Light Outline Action Button">🔗 Outline Button</button>
-            <button type="button" onclick="insertBlock('callout_info')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;" title="Insert Sky Blue Technical Info Box">ℹ️ Info Callout</button>
-            <button type="button" onclick="insertBlock('callout_success')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #059669; border-color: #a7f3d0; background: #ecfdf5;" title="Insert Mint Verified Success Box">✅ Success Box</button>
-            <button type="button" onclick="insertBlock('callout_warning')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #d97706; border-color: #fde68a; background: #fffbeb;" title="Insert Warm Attention Warning Box">⚠️ Warning Box</button>
-            <button type="button" onclick="insertBlock('callout_critical')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #dc2626; border-color: #fecaca; background: #fef2f2;" title="Insert Urgent Security Alert Box">🚨 Critical Alert</button>
-            <button type="button" onclick="insertBlock('datagrid')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Insert 2-Column Responsive Data Grid">📊 Data Grid</button>
-            <button type="button" onclick="insertBlock('otp_box')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #f8fafc;" title="Insert Large Monospace OTP Verification Badge">🔑 OTP PIN Badge</button>
-            <button type="button" onclick="insertBlock('two_col_card')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #4f46e5; border-color: #c7d2fe; background: #ffffff;" title="Insert 2-Column Stat Cards">⚖️ 2-Col Cards</button>
-            <button type="button" onclick="insertBlock('quote')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #334155; border-color: #cbd5e1; background: #f8fafc;" title="Insert Formatted Community Quote">💬 Quote</button>
-            <button type="button" onclick="insertBlock('checklist')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #047857; border-color: #a7f3d0; background: #ecfdf5;" title="Insert Styled Checklist">📋 Checklist</button>
-            <button type="button" onclick="insertBlock('divider')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.28rem 0.55rem; font-size: 0.72rem; color: #64748b; border-color: #e2e8f0; background: #f8fafc;" title="Insert Elegant Section Divider">➖ Divider</button>
+            <button type="button" onclick="insertBlock('hero')" class="mail-studio-block-btn" title="Insert Responsive Hero Header Banner">✨ Hero Header</button>
+            <button type="button" onclick="insertBlock('cta_primary')" class="mail-studio-block-btn" title="Insert Primary Deep Indigo Action CTA">🔘 Primary CTA</button>
+            <button type="button" onclick="insertBlock('cta_green')" class="mail-studio-block-btn" title="Insert Emerald Disbursal / Financial CTA">💰 Disbursal CTA</button>
+            <button type="button" onclick="insertBlock('cta_secondary')" class="mail-studio-block-btn" title="Insert Light Outline Action Button">🔗 Outline Button</button>
+            <button type="button" onclick="insertBlock('callout_info')" class="mail-studio-block-btn" title="Insert Sky Blue Technical Info Box">ℹ️ Info Callout</button>
+            <button type="button" onclick="insertBlock('callout_success')" class="mail-studio-block-btn" title="Insert Mint Verified Success Box">✅ Success Box</button>
+            <button type="button" onclick="insertBlock('callout_warning')" class="mail-studio-block-btn" title="Insert Warm Attention Warning Box">⚠️ Warning Box</button>
+            <button type="button" onclick="insertBlock('callout_critical')" class="mail-studio-block-btn" title="Insert Urgent Security Alert Box">🚨 Critical Alert</button>
+            <button type="button" onclick="insertBlock('datagrid')" class="mail-studio-block-btn" title="Insert 2-Column Responsive Data Grid">📊 Data Grid</button>
+            <button type="button" onclick="insertBlock('otp_box')" class="mail-studio-block-btn" title="Insert Large Monospace OTP Verification Badge">🔑 OTP PIN Badge</button>
+            <button type="button" onclick="insertBlock('two_col_card')" class="mail-studio-block-btn" title="Insert 2-Column Stat Cards">⚖️ 2-Col Cards</button>
+            <button type="button" onclick="insertBlock('quote')" class="mail-studio-block-btn" title="Insert Formatted Community Quote">💬 Quote</button>
+            <button type="button" onclick="insertBlock('checklist')" class="mail-studio-block-btn" title="Insert Styled Checklist">📋 Checklist</button>
+            <button type="button" onclick="insertBlock('divider')" class="mail-studio-block-btn" title="Insert Elegant Section Divider">➖ Divider</button>
           </div>
         </div>
 
         <!-- HTML Code & Visual WYSIWYG Editor Workspace -->
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div class="mail-studio-editor-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
             <div style="display: flex; gap: 0.35rem; align-items: center;">
-              <button type="button" onclick="switchSaEditMode('wysiwyg')" id="btn-sa-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.75rem; background: #4f46e5; border-color: #4f46e5;">🎨 Visual WYSIWYG Editor</button>
-              <button type="button" onclick="switchSaEditMode('html')" id="btn-sa-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.75rem; color: #475569;">💻 Raw HTML Code</button>
+              <button type="button" onclick="switchSaEditMode('wysiwyg')" id="btn-sa-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.75rem;">🎨 Visual WYSIWYG Editor</button>
+              <button type="button" onclick="switchSaEditMode('html')" id="btn-sa-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.75rem;">💻 Raw HTML Code</button>
             </div>
 
             <div style="display: flex; gap: 0.4rem; align-items: center;">
-              <select onchange="if(this.value){ insertVariable(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; color: #4f46e5; width: auto; max-width: 220px; font-weight: 700; background: #f8fafc; border-color: #cbd5e1;">
+              <select onchange="if(this.value){ insertVariable(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; width: auto; max-width: 220px; font-weight: 700;">
                 <option value="">⚡ Quick Token Insert... ▾</option>
                 <?php foreach ($allVariableCategories as $vCat => $vList): ?>
                   <optgroup label="<?= htmlspecialchars($vCat) ?>">
@@ -240,20 +240,20 @@ $allVariableCategories = [
                   </optgroup>
                 <?php endforeach; ?>
               </select>
-              <button type="button" onclick="loadStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #0284c7; border-color: #bae6fd; background: #f0f9ff; font-weight: 700;" title="Load Clean White Responsive Email Starter Boilerplate">
+              <button type="button" onclick="loadStarterBoilerplate()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; font-weight: 700;" title="Load Clean White Responsive Email Starter Boilerplate">
                 ⚡ Light Boilerplate
               </button>
             </div>
           </div>
 
           <!-- WYSIWYG Formatting Buttons Toolbar -->
-          <div id="sa_wysiwyg_toolbar" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; background: #f8fafc; padding: 0.45rem; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 0.65rem;">
-            <button type="button" onclick="execSaWysiwyg('bold')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 800; color: #0f172a; background: #fff;" title="Bold"><b>B</b></button>
-            <button type="button" onclick="execSaWysiwyg('italic')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; font-style: italic; color: #0f172a; background: #fff;" title="Italic"><i>I</i></button>
-            <button type="button" onclick="execSaWysiwyg('underline')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: underline; color: #0f172a; background: #fff;" title="Underline"><u>U</u></button>
-            <button type="button" onclick="execSaWysiwyg('strikeThrough')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; text-decoration: line-through; color: #0f172a; background: #fff;" title="Strikethrough"><s>S</s></button>
-            <span style="color: #cbd5e1;">|</span>
-            <select onchange="execSaWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto; background: #ffffff; border-color: #cbd5e1; color: #0f172a;">
+          <div id="sa_wysiwyg_toolbar" class="mail-studio-wysiwyg-bar">
+            <button type="button" onclick="execSaWysiwyg('bold')" class="mail-studio-action-btn" title="Bold"><b>B</b></button>
+            <button type="button" onclick="execSaWysiwyg('italic')" class="mail-studio-action-btn" style="font-style: italic;" title="Italic"><i>I</i></button>
+            <button type="button" onclick="execSaWysiwyg('underline')" class="mail-studio-action-btn" style="text-decoration: underline;" title="Underline"><u>U</u></button>
+            <button type="button" onclick="execSaWysiwyg('strikeThrough')" class="mail-studio-action-btn" style="text-decoration: line-through;" title="Strikethrough"><s>S</s></button>
+            <span style="opacity: 0.3;">|</span>
+            <select onchange="execSaWysiwyg('formatBlock', this.value); this.value='';" class="admin-modal-select" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; width: auto;">
               <option value="">Header ▾</option>
               <option value="H1">H1 Main Heading</option>
               <option value="H2">H2 Sub Heading</option>
@@ -261,71 +261,71 @@ $allVariableCategories = [
               <option value="P">Paragraph</option>
               <option value="BLOCKQUOTE">Blockquote</option>
             </select>
-            <span style="color: #cbd5e1;">|</span>
-            <button type="button" onclick="execSaWysiwyg('justifyLeft')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Left">⬅️</button>
-            <button type="button" onclick="execSaWysiwyg('justifyCenter')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Center">↔️</button>
-            <button type="button" onclick="execSaWysiwyg('justifyRight')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Align Right">➡️</button>
-            <span style="color: #cbd5e1;">|</span>
-            <button type="button" onclick="execSaWysiwyg('insertUnorderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Bullet List">• List</button>
-            <button type="button" onclick="execSaWysiwyg('insertOrderedList')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; background: #fff;" title="Numbered List">1. List</button>
-            <span style="color: #cbd5e1;">|</span>
-            <button type="button" onclick="promptSaLink()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #0284c7; background: #fff;" title="Insert Link">🔗 Link</button>
-            <button type="button" onclick="insertBlock('cta_primary')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.72rem; color: #4f46e5; background: #fff;" title="Insert Action CTA Button">🔘 Button</button>
-            <button type="button" onclick="execSaWysiwyg('removeFormat')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.35rem; font-size: 0.72rem; color: #ef4444; background: #fff;" title="Clear Formatting">🧹 Clear</button>
+            <span style="opacity: 0.3;">|</span>
+            <button type="button" onclick="execSaWysiwyg('justifyLeft')" class="mail-studio-action-btn" title="Align Left">⬅️</button>
+            <button type="button" onclick="execSaWysiwyg('justifyCenter')" class="mail-studio-action-btn" title="Align Center">↔️</button>
+            <button type="button" onclick="execSaWysiwyg('justifyRight')" class="mail-studio-action-btn" title="Align Right">➡️</button>
+            <span style="opacity: 0.3;">|</span>
+            <button type="button" onclick="execSaWysiwyg('insertUnorderedList')" class="mail-studio-action-btn" title="Bullet List">• List</button>
+            <button type="button" onclick="execSaWysiwyg('insertOrderedList')" class="mail-studio-action-btn" title="Numbered List">1. List</button>
+            <span style="opacity: 0.3;">|</span>
+            <button type="button" onclick="promptSaLink()" class="mail-studio-action-btn" title="Insert Link">🔗 Link</button>
+            <button type="button" onclick="insertBlock('cta_primary')" class="mail-studio-action-btn" title="Insert Action CTA Button">🔘 Button</button>
+            <button type="button" onclick="execSaWysiwyg('removeFormat')" class="mail-studio-action-btn" style="color: #ef4444;" title="Clear Formatting">🧹 Clear</button>
           </div>
 
-          <!-- Visual WYSIWYG Editable Canvas -->
-          <div id="sa_wysiwyg_container" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.25rem; min-height: 440px; max-height: 520px; overflow-y: auto; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
-            <div id="sa_wysiwyg_editor" contenteditable="true" oninput="syncSaWysiwygToCode()" style="outline: none; min-height: 420px; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.65; color: #0f172a;">
+          <!-- Visual WYSIWYG Editable Canvas (Viewport + White Document Sheet) -->
+          <div id="sa_wysiwyg_container" class="mail-studio-viewport">
+            <div id="sa_wysiwyg_editor" contenteditable="true" oninput="syncSaWysiwygToCode()" class="mail-email-document-sheet">
               <?= $template ? ($template['html_content'] ?? ($template['html_body'] ?? '')) : '' ?>
             </div>
           </div>
 
           <!-- Raw HTML Code Editor (Hidden when in WYSIWYG mode) -->
-          <textarea name="html_content" id="templateHtmlBody" oninput="syncSaCodeToWysiwyg()" rows="22" class="admin-modal-input" style="display: none; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre; background: #f8fafc; border-color: #cbd5e1; color: #0f172a; height: 480px; resize: vertical;" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" required><?= htmlspecialchars($template['html_content'] ?? ($template['html_body'] ?? '')) ?></textarea>
+          <textarea name="html_content" id="templateHtmlBody" oninput="syncSaCodeToWysiwyg()" rows="22" class="mail-studio-code-editor" placeholder="<h2 style='color:#0f172a;'>Hello {{name}}!</h2><p>{{message}}</p>" required><?= htmlspecialchars($template['html_content'] ?? ($template['html_body'] ?? '')) ?></textarea>
         </div>
       </div>
 
       <!-- RIGHT COLUMN: REAL-TIME LIVE EMAIL PREVIEW IFRAME -->
       <div id="sa-col-preview">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-          <label class="admin-modal-label" style="margin: 0; color: #4f46e5; display: flex; align-items: center; gap: 0.35rem; font-weight: 700;">
+          <label class="admin-modal-label" style="margin: 0; color: var(--admin-primary); display: flex; align-items: center; gap: 0.35rem; font-weight: 700;">
             <i data-lucide="eye" style="width: 15px; height: 15px;"></i> Live Delivery Simulation Canvas (Light Mode)
           </label>
-          <span style="font-size: 0.72rem; color: #64748b;">Simulated Recipient: Alex Rivera</span>
+          <span style="font-size: 0.72rem; color: var(--admin-text-tertiary);">Simulated Recipient: Alex Rivera</span>
         </div>
 
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; height: 680px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        <div class="mail-studio-preview-card">
           <!-- Simulated Email Client Header -->
-          <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.65rem 0.95rem; font-size: 0.78rem;">
-            <div style="color: #0f172a; font-weight: 700;" id="saSimSubject">Subject: TechScout Intelligence Update</div>
-            <div style="color: #64748b; font-size: 0.7rem; margin-top: 0.15rem;">
-              From: <strong style="color: #334155;">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
+          <div class="mail-studio-preview-header">
+            <div class="mail-studio-preview-subject" id="saSimSubject">Subject: TechScout Intelligence Update</div>
+            <div class="mail-studio-preview-meta">
+              From: <strong style="color: var(--admin-text-primary);">TechScout Intelligence</strong> &lt;notifications@techscout.online&gt; &bull; To: alex@example.com
             </div>
           </div>
 
-          <!-- Rendered Iframe (Pure Light Mode Canvas with Grid Lines) -->
+          <!-- Rendered Iframe (Pure Light Mode Canvas with White Envelope) -->
           <iframe id="standaloneLivePreviewFrame" style="width: 100%; height: 100%; border: none; background: #ffffff; flex: 1;"></iframe>
         </div>
       </div>
     </div>
 
     <!-- Bottom Action Bar -->
-    <div style="padding: 1.25rem 1.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+    <div class="mail-studio-bottom-bar">
       <div>
-        <div style="font-weight: 800; color: #0f172a; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <div style="font-weight: 800; color: var(--admin-text-primary); font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
           <i data-lucide="check-circle" style="color: #10b981;"></i> Ready to deploy HTML email template?
         </div>
-        <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">
+        <div style="font-size: 0.8rem; color: var(--admin-text-secondary); margin-top: 0.2rem;">
           Template updates take effect instantly across platform automated triggers and broadcast composers.
         </div>
       </div>
 
       <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <a href="<?= url('/admin/mail?tab=templates') ?>" class="ts-btn ts-btn-outline" style="color: #64748b; border-color: #cbd5e1;">
+        <a href="<?= url('/admin/mail?tab=templates') ?>" class="ts-btn ts-btn-outline">
           Cancel &amp; Return
         </a>
-        <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800; padding: 0.75rem 2.25rem; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(16,185,129,0.3); border: none;">
+        <button type="submit" class="ts-btn ts-btn-primary" style="font-weight: 800; padding: 0.75rem 2.25rem; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem;">
           <i data-lucide="save"></i> Save Template 💾
         </button>
       </div>
@@ -636,15 +636,15 @@ function switchSaEditMode(mode) {
     if (wysiwygCont) wysiwygCont.style.display = 'block';
     if (wysiwygTool) wysiwygTool.style.display = 'flex';
     if (htmlInput) htmlInput.style.display = 'none';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.style.background='#4f46e5'; btnWysiwyg.style.borderColor='#4f46e5'; btnWysiwyg.style.color='#ffffff'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.style.background='transparent'; btnHtml.style.color='#475569'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnWysiwyg.removeAttribute('style'); btnWysiwyg.style.fontSize = '0.75rem'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnHtml.removeAttribute('style'); btnHtml.style.fontSize = '0.75rem'; }
   } else {
     syncSaWysiwygToCode();
     if (wysiwygCont) wysiwygCont.style.display = 'none';
     if (wysiwygTool) wysiwygTool.style.display = 'none';
     if (htmlInput) htmlInput.style.display = 'block';
-    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.style.background='transparent'; btnWysiwyg.style.color='#475569'; }
-    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.style.background='#4f46e5'; btnHtml.style.borderColor='#4f46e5'; btnHtml.style.color='#ffffff'; }
+    if (btnWysiwyg) { btnWysiwyg.className = 'ts-btn ts-btn-sm ts-btn-outline'; btnWysiwyg.removeAttribute('style'); btnWysiwyg.style.fontSize = '0.75rem'; }
+    if (btnHtml) { btnHtml.className = 'ts-btn ts-btn-sm ts-btn-primary'; btnHtml.removeAttribute('style'); btnHtml.style.fontSize = '0.75rem'; }
   }
 }
 

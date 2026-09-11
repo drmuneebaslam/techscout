@@ -105,6 +105,18 @@ This document serves as the permanent registry of architectural and implementati
   - Maintain clean light-theme visual consistency across all studio modals, toolbars, and preview canvases without dark/white theme conflicts.
   - Always verify template view files to ensure no duplicated template markup or ID collisions exist.
 
+### 🔴 MISTAKE-10: Forcing Light Mode on Web UI Components & Inlining Tag Styles Instead of Dual-Theme CSS
+* **Root Cause:** 
+  - Confusing "light/white email boilerplate" with the web application's user interface. The dispatched email HTML and the inner preview canvas (`#wysiwyg_canvas` / `#preview_pane`) must be clean white, but the web page, studio toolbars, sidebar panels, modals, and container chrome must honor the platform's active dark or light theme.
+  - Applying hardcoded inline `style="background: #fff; color: #000;"` directly onto individual HTML tags prevents the platform's theme classes (`data-theme="light"` / dark mode defaults) from functioning, breaking dark mode entirely.
+* **Consequences:**
+  - In dark mode, admin pages or modals appear with glaring, mismatched white boxes and broken visual hierarchy.
+  - Maintainability is compromised because styles are scattered across individual tag attributes instead of centralized CSS rules.
+* **Mandatory Rule:**
+  - All web application components, modals, panels, toolbars, and inputs must use CSS classes and CSS variables (in `assets/css/admin.css` or scoped stylesheet blocks) that define explicit rules for both default dark mode and `[data-theme="light"]`.
+  - Never hardcode inline `style="..."` colors on UI tags.
+  - ONLY the email canvas preview card (representing the email viewport) and the actual dispatched email HTML are styled with a clean white email body.
+
 ---
 
 ## 2. Response Audit Protocol
@@ -118,5 +130,7 @@ At the conclusion of any code generation, the agent must cross-check every modif
 7. [ ] **Idempotent Reaction Toggling**: Do user reaction/helpful counters maintain state via user/IP tracking with toggle (add/undo) functionality?
 8. [ ] **Branded Dynamic Error Pages**: Are error pages written as dynamic PHP scripts incorporating official header/footer layouts?
 9. [ ] **Dual-Mode Editor Insertion & Cohesive Theme**: Do editor tag/block insertion tools support both WYSIWYG caret and raw HTML textarea modes with light theme consistency?
+10. [ ] **Dual-Theme (Dark/Light) UI Preservation & No Hardcoded Inline Tag Styles**: Are web components styled via CSS with both dark and light modes supported, reserving white backgrounds strictly for the email preview canvas and email body?
+
 
 
