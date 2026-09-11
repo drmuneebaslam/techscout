@@ -6703,27 +6703,18 @@ class AdminController {
             Database::execute("UPDATE contents SET view_count = view_count + ? WHERE id = ?", [$amount, $contentId]);
             Database::execute("UPDATE authors SET total_views = total_views + ? WHERE id = (SELECT author_id FROM contents WHERE id = ?)", [$amount, $contentId]);
 
-            // Distributed synthetic IP views for hourly/daily chart telemetry (without user_id)
-            Database::executeSilent("CREATE TABLE IF NOT EXISTS post_views (
-              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-              content_id BIGINT UNSIGNED NOT NULL,
-              user_id BIGINT UNSIGNED NULL,
-              ip_address VARCHAR(45) NULL,
-              user_agent VARCHAR(255) NULL,
-              referrer VARCHAR(255) NULL,
-              created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              INDEX idx_pv_content (content_id),
-              INDEX idx_pv_created (created_at),
-              INDEX idx_pv_user (user_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-
-            for ($i = 0; $i < min(10, $amount); $i++) {
-                $daysAgo = rand(0, 6);
-                $randIp = rand(10, 240) . '.' . rand(1, 250) . '.' . rand(1, 250) . '.' . rand(1, 250);
-                Database::executeSilent("
-                    INSERT INTO post_views (content_id, ip_address, created_at)
-                    VALUES (?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
-                ", [$contentId, $randIp, $daysAgo]);
+            // Distributed synthetic IP views for hourly/daily chart telemetry (safe telemetry recording)
+            try {
+                for ($i = 0; $i < min(10, $amount); $i++) {
+                    $daysAgo = rand(0, 6);
+                    $randIp = rand(10, 240) . '.' . rand(1, 250) . '.' . rand(1, 250) . '.' . rand(1, 250);
+                    Database::executeSilent("
+                        INSERT INTO post_views (content_id, ip_address, created_at)
+                        VALUES (?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
+                    ", [$contentId, $randIp, $daysAgo]);
+                }
+            } catch (\Throwable $telemetryEx) {
+                // Auxiliary telemetry must never interrupt view counter update
             }
 
             Session::flash('success', "⚡ Successfully boosted view counter by +" . number_format($amount) . " reads! (Display counter updated without adding fake member accounts)");

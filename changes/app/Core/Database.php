@@ -524,45 +524,49 @@ class Database {
                   INDEX `idx_ml_token` (`tracking_token`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
             } else {
-                $mailCols = array_column($pdo->query("SHOW COLUMNS FROM `mail_logs`")->fetchAll(PDO::FETCH_ASSOC), 'Field');
-                if (!in_array('body_html', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `body_html` LONGTEXT NULL AFTER `template_key`");
-                }
-                if (!in_array('attachments_json', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `attachments_json` JSON NULL AFTER `body_html`");
-                }
-                if (!in_array('from_email', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `from_email` VARCHAR(191) NULL AFTER `to_name`");
-                }
-                if (!in_array('from_name', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `from_name` VARCHAR(150) NULL AFTER `from_email`");
-                }
-                if (!in_array('credential_name', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `credential_name` VARCHAR(150) NULL AFTER `driver`");
-                }
-                if (!in_array('tracking_token', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `tracking_token` VARCHAR(64) NULL AFTER `credential_name`, ADD INDEX `idx_ml_token` (`tracking_token`)");
-                }
-                if (!in_array('open_count', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `open_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `tracking_token`");
-                }
-                if (!in_array('opened_at', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `opened_at` DATETIME NULL AFTER `open_count`");
-                }
-                if (!in_array('click_count', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `click_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `opened_at`");
-                }
-                if (!in_array('clicked_at', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `clicked_at` DATETIME NULL AFTER `click_count`");
-                }
-                if (!in_array('last_clicked_url', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `last_clicked_url` TEXT NULL AFTER `clicked_at`");
-                }
-                if (!in_array('user_ip', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_ip` VARCHAR(45) NULL AFTER `last_clicked_url`");
-                }
-                if (!in_array('user_agent', $mailCols)) {
-                    $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_agent` TEXT NULL AFTER `user_ip`");
+                try {
+                    $mailCols = array_column($pdo->query("SHOW COLUMNS FROM `mail_logs`")->fetchAll(PDO::FETCH_ASSOC), 'Field');
+                    if (!in_array('body_html', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `body_html` LONGTEXT NULL AFTER `template_key`");
+                    }
+                    if (!in_array('attachments_json', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `attachments_json` LONGTEXT NULL AFTER `body_html`");
+                    }
+                    if (!in_array('from_email', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `from_email` VARCHAR(191) NULL AFTER `to_name`");
+                    }
+                    if (!in_array('from_name', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `from_name` VARCHAR(150) NULL AFTER `from_email`");
+                    }
+                    if (!in_array('credential_name', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `credential_name` VARCHAR(150) NULL AFTER `driver`");
+                    }
+                    if (!in_array('tracking_token', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `tracking_token` VARCHAR(64) NULL AFTER `credential_name`");
+                    }
+                    if (!in_array('open_count', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `open_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `tracking_token`");
+                    }
+                    if (!in_array('opened_at', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `opened_at` DATETIME NULL AFTER `open_count`");
+                    }
+                    if (!in_array('click_count', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `click_count` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `opened_at`");
+                    }
+                    if (!in_array('clicked_at', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `clicked_at` DATETIME NULL AFTER `click_count`");
+                    }
+                    if (!in_array('last_clicked_url', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `last_clicked_url` TEXT NULL AFTER `clicked_at`");
+                    }
+                    if (!in_array('user_ip', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_ip` VARCHAR(45) NULL AFTER `last_clicked_url`");
+                    }
+                    if (!in_array('user_agent', $mailCols)) {
+                        $pdo->exec("ALTER TABLE `mail_logs` ADD COLUMN `user_agent` TEXT NULL AFTER `user_ip`");
+                    }
+                } catch (\Throwable $mlEx) {
+                    error_log("mail_logs incremental check skipped: " . $mlEx->getMessage());
                 }
             }
 
@@ -1571,14 +1575,8 @@ class Database {
             $stmt = $conn->prepare($sql);
             return $stmt->execute($params);
         } catch (Throwable $e) {
-            $msg = $e->getMessage();
-            // Suppress benign duplicate column/index errors during auto-migrations
-            if (str_contains($msg, '1060') || str_contains($msg, '42S21') || str_contains($msg, '1061') || str_contains($msg, 'Duplicate column')) {
-                return false;
-            }
-            if (class_exists('\\App\\Core\\ErrorLogger')) {
-                \App\Core\ErrorLogger::log('DATABASE_SILENT_ERROR', $msg . ($sql ? " | SQL: " . substr($sql, 0, 200) : ""));
-            }
+            // Truly silent execution: log to standard PHP server log only, never pollute system_error_logs database table
+            error_log("Database::executeSilent suppressed: " . $e->getMessage());
             return false;
         }
     }

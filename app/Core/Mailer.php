@@ -1323,7 +1323,20 @@ class Mailer {
 
         // Record in mail_logs table with full body_html, tracking_token & attachments_json (fail-safe)
         try {
-            $attachmentsJson = json_encode(!empty($attachments) ? $attachments : []);
+            $attachmentsJson = '[]';
+            if (!empty($attachments) && is_array($attachments)) {
+                // Ensure all strings are UTF-8 valid before JSON serialization
+                $cleanAttachments = $attachments;
+                array_walk_recursive($cleanAttachments, function(&$val) {
+                    if (is_string($val)) {
+                        $val = mb_convert_encoding($val, 'UTF-8', 'UTF-8');
+                    }
+                });
+                $encoded = json_encode($cleanAttachments, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if ($encoded !== false && $encoded !== '') {
+                    $attachmentsJson = $encoded;
+                }
+            }
             $credName = !empty($credProfile['name']) ? $credProfile['name'] : strtoupper($driver);
 
             // 1. Try modern schema with tracking_token, from_email, from_name, credential_name

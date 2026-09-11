@@ -863,17 +863,29 @@ CREATE TABLE `mail_logs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `to_email` varchar(191) NOT NULL,
   `to_name` varchar(150) DEFAULT NULL,
+  `from_email` varchar(191) DEFAULT NULL,
+  `from_name` varchar(150) DEFAULT NULL,
   `subject` varchar(255) NOT NULL,
   `template_key` varchar(80) DEFAULT NULL,
   `body_html` longtext DEFAULT NULL,
-  `attachments_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`attachments_json`)),
+  `attachments_json` longtext DEFAULT NULL,
   `driver` varchar(30) NOT NULL DEFAULT 'log',
+  `credential_name` varchar(150) DEFAULT NULL,
+  `tracking_token` varchar(64) DEFAULT NULL,
+  `open_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `opened_at` datetime DEFAULT NULL,
+  `click_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `clicked_at` datetime DEFAULT NULL,
+  `last_clicked_url` text DEFAULT NULL,
+  `user_ip` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
   `status` enum('sent','failed','queued') NOT NULL DEFAULT 'sent',
   `error_message` text DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_ml_email` (`to_email`),
-  KEY `idx_ml_status` (`status`)
+  KEY `idx_ml_status` (`status`),
+  KEY `idx_ml_token` (`tracking_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `post_views`;
