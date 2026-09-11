@@ -214,6 +214,34 @@ class Mailer {
                 'description' => 'Flash alert sent for emergency security vulnerabilities or major frontier AI releases.',
                 'vars' => ['name', 'headline', 'message', 'action_url'],
                 'is_custom' => false
+            ],
+            'payout_method_linked' => [
+                'name' => '💳 Creator Payout Method Linked & Verified',
+                'subject' => 'Payment Method Linked to Your Creator Account 💳',
+                'description' => 'Sent to creators when a new payout method (Bank, PayPal, SEPA, USDC) is added.',
+                'vars' => ['name', 'method_type', 'account_identifier', 'created_at', 'action_url'],
+                'is_custom' => false
+            ],
+            'payout_method_removed' => [
+                'name' => '🗑️ Creator Payout Method Removed',
+                'subject' => 'Security Notice: Payout Method Removed from Account',
+                'description' => 'Sent to creators when a payment destination is removed.',
+                'vars' => ['name', 'method_type', 'action_url'],
+                'is_custom' => false
+            ],
+            'author_profile_updated' => [
+                'name' => '👤 Creator Profile & Brand Identity Updated',
+                'subject' => 'Creator Guild: Your Author Profile Was Updated',
+                'description' => 'Sent when an author updates their bio, social handles, or specialties.',
+                'vars' => ['name', 'headline', 'action_url'],
+                'is_custom' => false
+            ],
+            'campaign_submission_received' => [
+                'name' => '🚀 Hackathon / Campaign Submission Received',
+                'subject' => 'Project Submitted: We received your entry for {{campaign_title}}!',
+                'description' => 'Sent to participants upon submitting a project to an active AI campaign or sprint.',
+                'vars' => ['name', 'campaign_title', 'project_title', 'action_url'],
+                'is_custom' => false
             ]
         ];
 
@@ -858,6 +886,45 @@ class Mailer {
                 </div>
                 <div style='text-align:center;margin:28px 0;'>
                   <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>Read Full Analysis on TechScout &rarr;</a>
+                </div>",
+
+            'payout_method_linked' => "
+                <h2 style='color:#059669;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Payment Method Linked &amp; Verified 💳</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>A new payout destination has been successfully connected to your TechScout Creator Account:</p>
+                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;'>
+                  <div style='display:grid;gap:8px;font-size:14px;color:#334155;'>
+                    <div><strong style='color:#64748b;'>Method Type:</strong> <span style='font-weight:700;color:#0f172a;'>{{method_type}}</span></div>
+                    <div><strong style='color:#64748b;'>Account / Identifier:</strong> <code style='color:#4f46e5;background:#eef2ff;padding:2px 6px;border-radius:4px;'>{{account_identifier}}</code></div>
+                    <div><strong style='color:#64748b;'>Verified On:</strong> {{created_at}}</div>
+                  </div>
+                </div>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#059669,#10b981);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(5,150,105,0.25);'>Manage Payout Methods &rarr;</a>
+                </div>",
+
+            'payout_method_removed' => "
+                <h2 style='color:#dc2626;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Security Alert: Payout Method Removed 🗑️</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Your payout method (<strong>{{method_type}}</strong>) has been removed from your Creator Account. If you did not perform this removal, please secure your account immediately.</p>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:#dc2626;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(220,38,38,0.25);'>Review Creator Settings &rarr;</a>
+                </div>",
+
+            'author_profile_updated' => "
+                <h2 style='color:#4f46e5;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Creator Profile &amp; Bio Updated 👤</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Your public creator profile on TechScout has been updated with headline: <em>&ldquo;{{headline}}&rdquo;</em>.</p>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(79,70,229,0.25);'>View Your Public Profile &rarr;</a>
+                </div>",
+
+            'campaign_submission_received' => "
+                <h2 style='color:#d97706;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Hackathon Project Submitted! 🚀</h2>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>Hello <strong>{{name}}</strong>,</p>
+                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>We have received your project submission <strong>&ldquo;{{project_title}}&rdquo;</strong> for the <strong>{{campaign_title}}</strong> challenge!</p>
+                <div style='text-align:center;margin:28px 0;'>
+                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#d97706,#ea580c);color:#ffffff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;box-shadow:0 4px 12px rgba(217,119,6,0.25);'>View Submission in Campaign &rarr;</a>
                 </div>",
 
             default => "

@@ -544,6 +544,16 @@ class AuthorStudioController {
         // Sync with user record
         Database::execute("UPDATE users SET display_name = ?, headline = ?, avatar_url = COALESCE(NULLIF(?, ''), avatar_url) WHERE id = ?", [$displayName, $headline, $avatarUrl, $user['id']]);
 
+        // Dispatch author_profile_updated event automation
+        try {
+            \App\Core\EventTriggerEngine::fire('author_profile_updated', [
+                'email' => $user['email'],
+                'name' => $displayName ?: $user['username'],
+                'headline' => $headline ?: 'Verified Contributor',
+                'action_url' => url('/author/' . ($author['slug'] ?? $user['username']))
+            ]);
+        } catch (\Throwable $e) {}
+
         Session::flash('success', 'Creator public profile & developer channels saved successfully! 🌟');
         Response::redirect('/author/dashboard');
     }
@@ -772,6 +782,20 @@ class AuthorStudioController {
         ]);
 
         FinancialLedger::savePayoutMethod($authorId, $saveData);
+
+        // Dispatch payout_method_linked event automation
+        try {
+            $identifier = $email ?: ($accNum ? (substr($accNum, 0, 4) . '••••' . substr($accNum, -4)) : ($wallet ? (substr($wallet, 0, 6) . '...' . substr($wallet, -4)) : $holder));
+            \App\Core\EventTriggerEngine::fire('payout_method_linked', [
+                'email' => $user['email'],
+                'name' => $user['display_name'] ?? $user['username'],
+                'method_type' => strtoupper(str_replace('_', ' ', $methodType)),
+                'account_identifier' => $identifier ?: 'Verified Account',
+                'created_at' => date('F j, Y, g:i a'),
+                'action_url' => url('/author/dashboard')
+            ]);
+        } catch (\Throwable $e) {}
+
         Session::flash('success', 'Payout method linked and verified successfully! 💳');
         Response::redirect('/author/dashboard');
     }
@@ -782,6 +806,17 @@ class AuthorStudioController {
         $methodId = (int)($params['id'] ?? 0);
 
         FinancialLedger::deletePayoutMethod($authorId, $methodId);
+
+        // Dispatch payout_method_removed event automation
+        try {
+            \App\Core\EventTriggerEngine::fire('payout_method_removed', [
+                'email' => $user['email'],
+                'name' => $user['display_name'] ?? $user['username'],
+                'method_type' => 'Configured Payout Method',
+                'action_url' => url('/author/dashboard')
+            ]);
+        } catch (\Throwable $e) {}
+
         Session::flash('success', 'Payout method removed.');
         Response::redirect('/author/dashboard');
     }

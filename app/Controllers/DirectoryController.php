@@ -436,6 +436,18 @@ class DirectoryController {
                 $campaignId, $userId, $projectTitle, $summary, $detailedDesc, $techStack,
                 $githubUrl, $demoUrl, $videoUrl, $linkedArticleId, $refCode
             ]);
+
+            // Dispatch campaign_submission_received email automation
+            try {
+                \App\Core\EventTriggerEngine::fire('campaign_submission_received', [
+                    'email' => $user['email'],
+                    'name' => $user['display_name'] ?? $user['username'],
+                    'campaign_title' => $campaign['title'] ?? 'AI Challenge Campaign',
+                    'project_title' => $projectTitle,
+                    'action_url' => url('/campaigns/' . $slug . '?tab=submission')
+                ]);
+            } catch (\Throwable $e) {}
+
             \App\Core\Session::flash('success', "Congratulations! Your project has been officially submitted to the challenge! 🏆 Use your personal referral link to share and track votes.");
         }
 

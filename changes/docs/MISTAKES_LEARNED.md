@@ -80,6 +80,15 @@ This document serves as the permanent registry of architectural and implementati
   - All reaction and helpful interactions must maintain a relational record (e.g., `comment_reactions` with `comment_id`, `user_id`, and `ip_address`).
   - The API endpoint must act as an idempotent toggle: if a record exists for the user/IP, remove it and decrement the counter (`GREATEST(0, count - 1)`); if not, insert it and increment the counter.
 
+### 🔴 MISTAKE-08: Hardcoded Static Error Pages Omitting Core Branding & Dynamic PHP
+* **Root Cause:** Creating standalone `.html` files for error pages without bootstrapping the application or including `views/layouts/header.php` and `footer.php`.
+* **Consequences:**
+  - Users visiting error pages (403, 404, 405, 429, 500) saw disconnected, isolated screens lacking platform navigation, active session context, search, and corporate branding.
+  - Adding Apache `ErrorDocument` directives into `.htaccess` conflicts with hosting control panels (e.g. InfinityFree / cPanel) where custom error pages are configured directly.
+* **Mandatory Rule:**
+  - Custom error pages must be executable PHP files that load application bootstrap and embed the official `header.php` and `footer.php` templates.
+  - Do not force Apache `ErrorDocument` directives inside `.htaccess` when the hosting environment requires manual control panel mapping.
+
 ---
 
 ## 2. Response Audit Protocol
@@ -91,4 +100,5 @@ At the conclusion of any code generation, the agent must cross-check every modif
 5. [ ] **Non-Destructive Upgrade SQL Provided**: Has an upgrade SQL script been provided for any database schema changes that preserves all existing data?
 6. [ ] **Syntax-Verified Scripts**: Are all JavaScript view scripts and inline blocks verified with a JS parser to prevent `SyntaxError` and `ReferenceError`?
 7. [ ] **Idempotent Reaction Toggling**: Do user reaction/helpful counters maintain state via user/IP tracking with toggle (add/undo) functionality?
+8. [ ] **Branded Dynamic Error Pages**: Are error pages written as dynamic PHP scripts incorporating official header/footer layouts?
 

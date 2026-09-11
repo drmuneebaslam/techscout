@@ -98,6 +98,30 @@ class EventTriggerEngine {
                 'description' => 'Fired when support staff replies to a helpdesk ticket.',
                 'default_template' => 'ticket_reply',
                 'single_delivery' => false
+            ],
+            'payout_method_linked' => [
+                'name' => 'Creator Payout Method Linked',
+                'description' => 'Fired when a creator links a new payout destination (Bank, PayPal, etc.).',
+                'default_template' => 'payout_method_linked',
+                'single_delivery' => false
+            ],
+            'payout_method_removed' => [
+                'name' => 'Creator Payout Method Removed',
+                'description' => 'Fired when a creator removes an existing payment method.',
+                'default_template' => 'payout_method_removed',
+                'single_delivery' => false
+            ],
+            'author_profile_updated' => [
+                'name' => 'Creator Guild Profile Updated',
+                'description' => 'Fired when an author updates their public portfolio or specialties.',
+                'default_template' => 'author_profile_updated',
+                'single_delivery' => false
+            ],
+            'campaign_submission_received' => [
+                'name' => 'Hackathon Campaign Submission Received',
+                'description' => 'Fired when a project entry is submitted to an AI challenge.',
+                'default_template' => 'campaign_submission_received',
+                'single_delivery' => false
             ]
         ];
     }

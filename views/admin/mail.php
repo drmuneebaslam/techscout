@@ -1549,66 +1549,193 @@
 <!-- ========================================================================= -->
 <!-- MODAL: CREATE CUSTOM AUTOMATION TRIGGER -->
 <!-- ========================================================================= -->
+<!-- MODAL: CREATE CUSTOM AUTOMATION TRIGGER -->
+<!-- ========================================================================= -->
 <div id="createCustomTriggerModal" class="admin-modal-overlay" style="display: none;">
-  <div class="admin-modal-box modal-cyan" style="max-width: 580px; width: 95%;">
-    <div class="admin-modal-header">
-      <h3 class="admin-modal-title" style="color: #38bdf8;">➕ Create Custom Trigger &amp; URL Automation</h3>
+  <div class="admin-modal-box modal-cyan" style="max-width: 760px; width: 95%;">
+    <div class="admin-modal-header" style="border-bottom: 1px solid rgba(56,189,248,0.2); padding-bottom: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span style="font-size: 1.4rem;">⚡</span>
+        <div>
+          <h3 class="admin-modal-title" style="color: #38bdf8; font-size: 1.25rem;">Automation Trigger Studio</h3>
+          <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: #94a3b8;">
+            Configure real-time event automations and URL pattern triggers without writing any PHP code.
+          </p>
+        </div>
+      </div>
       <button type="button" onclick="closeCreateCustomTriggerModal()" class="admin-modal-close">✕</button>
     </div>
-    <form id="createCustomTriggerForm" onsubmit="submitCreateCustomTrigger(event)">
-      <div style="margin-bottom: 1rem;">
-        <label class="admin-modal-label">Trigger Name <span style="color:#ef4444;">*</span></label>
-        <input type="text" id="ct_name" placeholder="e.g. Payout Disbursement URL Trigger" class="admin-modal-input" required>
-      </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-        <div>
-          <label class="admin-modal-label">Trigger Type</label>
-          <select id="ct_type" class="admin-modal-select" onchange="toggleCustomTriggerTypeNotice(this.value)">
-            <option value="url_pattern">🌐 Specific URL Path Pattern</option>
-            <option value="event">⚡ Custom Event Key</option>
+    <!-- Modal Internal Navigation Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 0.75rem;">
+      <button type="button" id="cmodal-tab-btn-config" onclick="switchCustomTriggerModalTab('config')" class="ts-btn ts-btn-sm ts-btn-primary" style="font-weight: 700;">
+        ⚙️ Trigger Configuration
+      </button>
+      <button type="button" id="cmodal-tab-btn-tutorial" onclick="switchCustomTriggerModalTab('tutorial')" class="ts-btn ts-btn-sm ts-btn-outline" style="color: #38bdf8; border-color: rgba(56,189,248,0.4); font-weight: 700;">
+        📚 Tutorial &amp; Live Samples
+      </button>
+    </div>
+
+    <!-- TAB 1: TRIGGER CONFIGURATION -->
+    <div id="cmodal-tab-config" style="padding-top: 1.25rem;">
+      <form id="createCustomTriggerForm" onsubmit="submitCreateCustomTrigger(event)">
+        <div style="margin-bottom: 1rem;">
+          <label class="admin-modal-label">Trigger Name <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="ct_name" placeholder="e.g. Instant Payout Disbursement Notification" class="admin-modal-input" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label class="admin-modal-label">Trigger Engine Type</label>
+            <select id="ct_type" class="admin-modal-select" onchange="toggleCustomTriggerTypeNotice(this.value)">
+              <option value="url_pattern">🌐 Specific URL Path Pattern (No Code)</option>
+              <option value="event">⚡ Custom System Event Key</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-modal-label">Pattern or Event Key <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="ct_key_or_pattern" placeholder="e.g. /admin/revenue/process-payout" class="admin-modal-input" style="font-family: monospace;" required>
+          </div>
+        </div>
+
+        <div id="ct_type_notice" style="font-size: 0.78rem; color: #38bdf8; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 1.15rem; line-height: 1.5;">
+          Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>process-payout</code>) and automatically dispatches the assigned HTML template with session user context!
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="admin-modal-label">Assigned Target HTML Email Template <span style="color:#ef4444;">*</span></label>
+          <select id="ct_template_key" class="admin-modal-select" required>
+            <?php foreach ($templateLibrary as $tKey => $tVal): ?>
+              <option value="<?= htmlspecialchars($tKey) ?>">
+                <?= htmlspecialchars($tVal['name']) ?> (<?= htmlspecialchars($tKey) ?>)
+              </option>
+            <?php endforeach; ?>
           </select>
         </div>
-        <div>
-          <label class="admin-modal-label">Pattern or Event Key <span style="color:#ef4444;">*</span></label>
-          <input type="text" id="ct_key_or_pattern" placeholder="e.g. /admin/revenue/process-payout" class="admin-modal-input" style="font-family: monospace;" required>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="admin-modal-label">Subject Line Override (Optional)</label>
+          <input type="text" id="ct_subject_override" placeholder="Leave blank to use the template default subject" class="admin-modal-input">
+        </div>
+
+        <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
+          <label style="display: flex; align-items: center; gap: 0.65rem; color: #cbd5e1; font-size: 0.84rem; cursor: pointer; user-select: none;">
+            <input type="checkbox" id="ct_single_delivery" value="1" style="width: 17px; height: 17px; accent-color: #38bdf8;">
+            <span><strong>🔒 Enforce Single Delivery Only</strong> &mdash; Automatically protects against duplicate emails sent to the same recipient for this trigger.</span>
+          </label>
+        </div>
+
+        <div class="admin-modal-footer" style="padding-top: 0.75rem; border-top: 1px solid rgba(148,163,184,0.15);">
+          <button type="button" onclick="closeCreateCustomTriggerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+          <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-weight: 700; padding: 0.5rem 1.25rem;">
+            Save Automation Trigger 🚀
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- TAB 2: TUTORIAL & LIVE SAMPLES -->
+    <div id="cmodal-tab-tutorial" style="display: none; padding-top: 1.25rem; max-height: 65vh; overflow-y: auto;">
+      <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+        <h4 style="color: #38bdf8; font-size: 0.95rem; margin: 0 0 0.35rem 0; display: flex; align-items: center; gap: 0.4rem;">
+          <span>💡</span> What is a Trigger in TechScout?
+        </h4>
+        <p style="color: #cbd5e1; font-size: 0.82rem; line-height: 1.6; margin: 0;">
+          Triggers allow you to connect any platform action directly to an email template without touching PHP code. When a user hits a specific URL pattern or triggers an event, TechScout automatically prepares the template, fills in user variables, and delivers it through your assigned SMTP or Python API credentials.
+        </p>
+      </div>
+
+      <!-- Quick Preset Samples -->
+      <h5 style="color: #f8fafc; font-size: 0.88rem; margin: 0 0 0.75rem 0; text-transform: uppercase; letter-spacing: 0.05em;">
+        ⚡ Ready-to-Use Trigger Samples (Click to Pre-Fill)
+      </h5>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <!-- Sample 1 -->
+        <div style="background: #05070b; border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="color: #34d399; font-size: 0.85rem;">💳 Payment Method Linked</strong>
+              <span class="ts-badge ts-badge-cyan" style="font-size: 0.62rem;">EVENT KEY</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0 0 0.65rem 0;">
+              Fires when an author connects a Bank, PayPal, SEPA, or USDC crypto wallet.
+            </p>
+          </div>
+          <button type="button" onclick="prefillTriggerSample('payout_method_linked', 'Payment Method Linked Confirmation', 'event', 'payout_method_linked', 'Payment Method Linked to Your Account 💳', true)" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #34d399; font-size: 0.72rem; border-color: rgba(16,185,129,0.4);">
+            Use This Sample &rarr;
+          </button>
+        </div>
+
+        <!-- Sample 2 -->
+        <div style="background: #05070b; border: 1px solid rgba(56,189,248,0.3); border-radius: 8px; padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="color: #38bdf8; font-size: 0.85rem;">🌐 Payout Processed URL</strong>
+              <span class="ts-badge ts-badge-green" style="font-size: 0.62rem;">URL PATTERN</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0 0 0.65rem 0;">
+              Listens for admin payout approvals on <code>/admin/revenue/process-payout</code>.
+            </p>
+          </div>
+          <button type="button" onclick="prefillTriggerSample('/admin/revenue/process-payout', 'Disbursement URL Trigger', 'url_pattern', 'payout_approved', 'Your Payout Has Been Processed & Disbursed! 🎉', false)" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; font-size: 0.72rem; border-color: rgba(56,189,248,0.4);">
+            Use This Sample &rarr;
+          </button>
+        </div>
+
+        <!-- Sample 3 -->
+        <div style="background: #05070b; border: 1px solid rgba(168,85,247,0.3); border-radius: 8px; padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="color: #c084fc; font-size: 0.85rem;">🏆 Hackathon Submission</strong>
+              <span class="ts-badge ts-badge-cyan" style="font-size: 0.62rem;">EVENT KEY</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0 0 0.65rem 0;">
+              Sends receipt confirmation when a creator submits a project to a live sprint.
+            </p>
+          </div>
+          <button type="button" onclick="prefillTriggerSample('campaign_submission_received', 'Campaign Submission Receipt', 'event', 'campaign_submission_received', 'Project Submitted: We received your challenge entry!', false)" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #c084fc; font-size: 0.72rem; border-color: rgba(168,85,247,0.4);">
+            Use This Sample &rarr;
+          </button>
+        </div>
+
+        <!-- Sample 4 -->
+        <div style="background: #05070b; border: 1px solid rgba(244,63,94,0.3); border-radius: 8px; padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="color: #fb7185; font-size: 0.85rem;">👤 Creator Profile Updated</strong>
+              <span class="ts-badge ts-badge-cyan" style="font-size: 0.62rem;">EVENT KEY</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin: 0 0 0.65rem 0;">
+              Sends confirmation whenever an author modifies their bio or social links.
+            </p>
+          </div>
+          <button type="button" onclick="prefillTriggerSample('author_profile_updated', 'Author Profile Sync Notice', 'event', 'author_profile_updated', 'Creator Guild: Your Author Profile Was Updated', false)" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #fb7185; font-size: 0.72rem; border-color: rgba(244,63,94,0.4);">
+            Use This Sample &rarr;
+          </button>
         </div>
       </div>
 
-      <div id="ct_type_notice" style="font-size: 0.76rem; color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 1rem;">
-        Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>process-payout</code>) and automatically dispatches assigned HTML template!
+      <!-- Step-by-Step Tutorial Card -->
+      <div style="background: #05070b; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 1.25rem;">
+        <h4 style="color: #f8fafc; font-size: 0.95rem; margin: 0 0 0.75rem 0;">
+          📖 Step-by-Step Setup Guide
+        </h4>
+        <ol style="margin: 0; padding-left: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.75;">
+          <li><strong>Step 1: Choose Trigger Type</strong> &mdash; Select <em>URL Path Pattern</em> if you want emails sent when any user or admin visits a URL. Select <em>Event Key</em> to hook into core application lifecycle events.</li>
+          <li><strong>Step 2: Enter Pattern or Key</strong> &mdash; Specify the URL fragment (e.g. <code>/contact</code>, <code>/author/save</code>) or the event key name.</li>
+          <li><strong>Step 3: Select Template</strong> &mdash; Choose which pre-designed HTML template should be rendered and dispatched.</li>
+          <li><strong>Step 4: Configure Subject &amp; Deduplication</strong> &mdash; Optionally override the email subject line and enable single delivery if users should only ever receive this once.</li>
+          <li><strong>Step 5: Click Save</strong> &mdash; The engine activates immediately. You can test fire it using the <strong>Test ⚡</strong> button in the table.</li>
+        </ol>
       </div>
 
-      <div style="margin-bottom: 1rem;">
-        <label class="admin-modal-label">Assigned Target HTML Email Template <span style="color:#ef4444;">*</span></label>
-        <select id="ct_template_key" class="admin-modal-select" required>
-          <?php foreach ($templateLibrary as $tKey => $tVal): ?>
-            <option value="<?= htmlspecialchars($tKey) ?>">
-              <?= htmlspecialchars($tVal['name']) ?> (<?= htmlspecialchars($tKey) ?>)
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-
-      <div style="margin-bottom: 1rem;">
-        <label class="admin-modal-label">Subject Line Override (Optional)</label>
-        <input type="text" id="ct_subject_override" placeholder="Leave blank to use template default subject" class="admin-modal-input">
-      </div>
-
-      <div style="margin-bottom: 1.25rem;">
-        <label style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.84rem; cursor: pointer;">
-          <input type="checkbox" id="ct_single_delivery" value="1" style="width: 16px; height: 16px; accent-color: #38bdf8;">
-          <span>🔒 Enforce Single Delivery Only (prevent duplicate delivery to same email)</span>
-        </label>
-      </div>
-
-      <div class="admin-modal-footer">
-        <button type="button" onclick="closeCreateCustomTriggerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
-        <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #38bdf8; color: #000; font-weight: 700;">
-          Save Custom Trigger 🚀
+      <div style="text-align: right; margin-top: 1.25rem;">
+        <button type="button" onclick="switchCustomTriggerModalTab('config')" class="ts-btn ts-btn-primary ts-btn-sm" style="font-weight: 700;">
+          &larr; Return to Configuration Form
         </button>
       </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -2822,6 +2949,62 @@ function openCreateCustomTriggerModal() {
 function closeCreateCustomTriggerModal() {
   const modal = document.getElementById('createCustomTriggerModal');
   if (modal) modal.style.display = 'none';
+}
+
+function switchCustomTriggerModalTab(tab) {
+  const configTab = document.getElementById('cmodal-tab-config');
+  const tutorialTab = document.getElementById('cmodal-tab-tutorial');
+  const btnConfig = document.getElementById('cmodal-tab-btn-config');
+  const btnTutorial = document.getElementById('cmodal-tab-btn-tutorial');
+
+  if (tab === 'tutorial') {
+    if (configTab) configTab.style.display = 'none';
+    if (tutorialTab) tutorialTab.style.display = 'block';
+    if (btnConfig) {
+      btnConfig.className = 'ts-btn ts-btn-sm ts-btn-outline';
+      btnConfig.style.color = '#94a3b8';
+      btnConfig.style.borderColor = 'rgba(148,163,184,0.3)';
+    }
+    if (btnTutorial) {
+      btnTutorial.className = 'ts-btn ts-btn-sm ts-btn-primary';
+      btnTutorial.style.color = '#fff';
+      btnTutorial.style.background = 'linear-gradient(135deg, #0284c7, #38bdf8)';
+    }
+  } else {
+    if (configTab) configTab.style.display = 'block';
+    if (tutorialTab) tutorialTab.style.display = 'none';
+    if (btnConfig) {
+      btnConfig.className = 'ts-btn ts-btn-sm ts-btn-primary';
+      btnConfig.style.color = '#fff';
+      btnConfig.style.background = '';
+    }
+    if (btnTutorial) {
+      btnTutorial.className = 'ts-btn ts-btn-sm ts-btn-outline';
+      btnTutorial.style.color = '#38bdf8';
+      btnTutorial.style.borderColor = 'rgba(56,189,248,0.4)';
+    }
+  }
+}
+
+function prefillTriggerSample(patternOrKey, name, type, templateKey, subject, singleDelivery) {
+  const nameInput = document.getElementById('ct_name');
+  const typeSelect = document.getElementById('ct_type');
+  const keyInput = document.getElementById('ct_key_or_pattern');
+  const tmplSelect = document.getElementById('ct_template_key');
+  const subjInput = document.getElementById('ct_subject_override');
+  const singleCheckbox = document.getElementById('ct_single_delivery');
+
+  if (nameInput) nameInput.value = name;
+  if (typeSelect) {
+    typeSelect.value = type;
+    toggleCustomTriggerTypeNotice(type);
+  }
+  if (keyInput) keyInput.value = patternOrKey;
+  if (tmplSelect) tmplSelect.value = templateKey;
+  if (subjInput) subjInput.value = subject || '';
+  if (singleCheckbox) singleCheckbox.checked = !!singleDelivery;
+
+  switchCustomTriggerModalTab('config');
 }
 
 function toggleCustomTriggerTypeNotice(type) {
