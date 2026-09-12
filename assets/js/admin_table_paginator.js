@@ -29,23 +29,37 @@
     let allRows = Array.from(tbody.querySelectorAll('tr')).filter(tr => !tr.classList.contains('no-paginate') && !tr.classList.contains('paginator-empty-row'));
 
     // If table explicitly says data-no-paginate="true", skip
-    if (table.getAttribute('data-no-paginate') === 'true') {
+    if (table.getAttribute('data-no-paginate') === 'true' || table.classList.contains('no-paginate')) {
+      const existingPager = document.getElementById(table.id + '_paginator');
+      if (existingPager) existingPager.remove();
       return null;
     }
     if (allRows.length === 0) {
+      const existingPager = document.getElementById(table.id + '_paginator');
+      if (existingPager) existingPager.remove();
       return null;
     }
 
-    // Create pagination container wrapper if not exists
-    let pagerWrap = document.getElementById(table.id + '_paginator');
+    // Clean up any duplicate paginator elements in the DOM for this table
+    const existingPagers = document.querySelectorAll('#' + table.id + '_paginator');
+    let pagerWrap = existingPagers[0] || null;
+    if (existingPagers.length > 1) {
+      for (let i = 1; i < existingPagers.length; i++) existingPagers[i].remove();
+    }
+
     if (!pagerWrap) {
       pagerWrap = document.createElement('div');
       pagerWrap.id = table.id + '_paginator';
       pagerWrap.className = 'admin-pagination-container';
-      pagerWrap.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 1rem 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; gap: 1rem; border-top: 1px solid rgba(148,163,184,0.12); font-size: 0.85rem;';
+      pagerWrap.style.display = 'none'; // Initially hidden until render confirms multiple pages or active search
       
-      const parentWrap = table.closest('.admin-table-wrap') || table.parentElement;
-      parentWrap.parentNode.insertBefore(pagerWrap, parentWrap.nextSibling);
+      // Insert immediately after table within its own direct parent (never outside parent wrapper)
+      table.insertAdjacentElement('afterend', pagerWrap);
+    } else {
+      // Ensure pagerWrap is right after table in DOM
+      if (table.nextElementSibling !== pagerWrap) {
+        table.insertAdjacentElement('afterend', pagerWrap);
+      }
     }
 
     let filteredRows = [...allRows];
@@ -95,16 +109,24 @@
         emptyRow.style.display = 'none';
       }
 
+      // If total entries fit on a single page and no filter query is active, suppress paginator UI completely
+      const activeQuery = ((searchInput ? searchInput.value : '') || (pagerWrap.querySelector('.paginator-inline-search')?.value || '')).trim();
+      if (allRows.length <= pageSize && !activeQuery) {
+        pagerWrap.style.display = 'none';
+        return;
+      }
+      pagerWrap.style.display = 'flex';
+
       // Render pagination controls
       const showingText = total > 0 
-        ? `Showing <strong style="color: #f8fafc;">${startIndex + 1}</strong> to <strong style="color: #f8fafc;">${endIndex}</strong> of <strong style="color: #38bdf8;">${total}</strong> entries`
+        ? `Showing <strong>${startIndex + 1}</strong> to <strong>${endIndex}</strong> of <strong style="color: var(--admin-primary);">${total}</strong> entries`
         : `No entries to show`;
 
       // Page size selector
       const sizeSelectorHtml = `
-        <div style="display: flex; align-items: center; gap: 0.4rem; color: #94a3b8; font-size: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;">
           <span>Rows:</span>
-          <select class="paginator-size-select" style="background: #05070b; border: 1px solid rgba(148,163,184,0.25); color: #f8fafc; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; outline: none;">
+          <select class="paginator-size-select" style="padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; outline: none;">
             <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
             <option value="15" ${pageSize === 15 ? 'selected' : ''}>15</option>
             <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
@@ -117,9 +139,10 @@
       // Inline search if no external search input
       let inlineSearchHtml = '';
       if (!searchInputId && !options.noInlineSearch) {
+        const currentQueryVal = pagerWrap.querySelector('.paginator-inline-search')?.value || '';
         inlineSearchHtml = `
           <div style="display: flex; align-items: center; gap: 0.35rem;">
-            <input type="text" class="paginator-inline-search" placeholder="🔍 Quick filter table..." style="background: #05070b; border: 1px solid rgba(148,163,184,0.25); color: #f8fafc; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; width: 140px; outline: none;">
+            <input type="text" class="paginator-inline-search" value="${currentQueryVal ? currentQueryVal.replace(/"/g, '&quot;') : ''}" placeholder="🔍 Quick filter table..." style="padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.8rem; width: 140px; outline: none;">
           </div>
         `;
       }
@@ -141,20 +164,20 @@
 
       if (startPill > 1) {
         btnsHtml += `<button type="button" class="ts-btn ts-btn-outline ts-btn-sm paginator-page-btn" data-page="1" style="padding: 0.25rem 0.55rem; font-size: 0.8rem;">1</button>`;
-        if (startPill > 2) btnsHtml += `<span style="color: #64748b; padding: 0 0.25rem;">...</span>`;
+        if (startPill > 2) btnsHtml += `<span style="opacity: 0.5; padding: 0 0.25rem;">...</span>`;
       }
 
       for (let p = startPill; p <= endPill; p++) {
         const isActive = p === currentPage;
         btnsHtml += `
-          <button type="button" class="ts-btn ${isActive ? 'ts-btn-primary' : 'ts-btn-outline'} ts-btn-sm paginator-page-btn" data-page="${p}" style="padding: 0.25rem 0.6rem; font-size: 0.8rem; font-weight: ${isActive ? '700' : '500'}; ${isActive ? 'background: linear-gradient(135deg, #6366f1, #38bdf8); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.5);' : ''}">
+          <button type="button" class="ts-btn ${isActive ? 'ts-btn-primary' : 'ts-btn-outline'} ts-btn-sm paginator-page-btn" data-page="${p}" style="padding: 0.25rem 0.6rem; font-size: 0.8rem; font-weight: ${isActive ? '700' : '500'};">
             ${p}
           </button>
         `;
       }
 
       if (endPill < totalPages) {
-        if (endPill < totalPages - 1) btnsHtml += `<span style="color: #64748b; padding: 0 0.25rem;">...</span>`;
+        if (endPill < totalPages - 1) btnsHtml += `<span style="opacity: 0.5; padding: 0 0.25rem;">...</span>`;
         btnsHtml += `<button type="button" class="ts-btn ts-btn-outline ts-btn-sm paginator-page-btn" data-page="${totalPages}" style="padding: 0.25rem 0.55rem; font-size: 0.8rem;">${totalPages}</button>`;
       }
 
@@ -165,7 +188,7 @@
       `;
 
       pagerWrap.innerHTML = `
-        <div style="color: #94a3b8; font-size: 0.84rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div style="font-size: 0.84rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
           <div>${showingText}</div>
           ${sizeSelectorHtml}
           ${inlineSearchHtml}
@@ -174,6 +197,7 @@
           ${btnsHtml}
         </div>
       `;
+
 
       // Attach event listeners
       pagerWrap.querySelector('.paginator-prev')?.addEventListener('click', () => {
@@ -260,6 +284,8 @@
       window.paginateAdminTable(t, { pageSize: size, searchInputId: searchId });
     });
   }
+
+  window.refreshAdminTablePaginators = initAllAdminTables;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAllAdminTables);

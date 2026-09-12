@@ -13,16 +13,25 @@
     </div>
 
     <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-      <!-- Timeframe Selector -->
-      <div style="display: flex; background: #04070e; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.2rem;">
-        <a href="?tab=<?= urlencode($activeTab) ?>&range=7d" class="ts-btn ts-btn-sm <?= $range === '7d' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.65rem; font-size: 0.75rem;">7 Days</a>
-        <a href="?tab=<?= urlencode($activeTab) ?>&range=30d" class="ts-btn ts-btn-sm <?= $range === '30d' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.65rem; font-size: 0.75rem;">30 Days</a>
-        <a href="?tab=<?= urlencode($activeTab) ?>&range=90d" class="ts-btn ts-btn-sm <?= $range === '90d' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.65rem; font-size: 0.75rem;">90 Days</a>
-        <a href="?tab=<?= urlencode($activeTab) ?>&range=all" class="ts-btn ts-btn-sm <?= $range === 'all' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.65rem; font-size: 0.75rem;">All Time</a>
+      <!-- Timeframe Selector with Real-time 30m / 1h / 24h / 7d / 30d / 90d / all -->
+      <div style="display: flex; background: var(--admin-bg-surface); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.2rem; flex-wrap: wrap; gap: 2px;">
+        <a href="?tab=<?= urlencode($activeTab) ?>&range=30m" class="ts-btn ts-btn-sm <?= $range === '30m' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.6rem; font-size: 0.75rem;">30 Min</a>
+        <a href="?tab=<?= urlencode($activeTab) ?>&range=1h" class="ts-btn ts-btn-sm <?= $range === '1h' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.6rem; font-size: 0.75rem;">1 Hour</a>
+        <a href="?tab=<?= urlencode($activeTab) ?>&range=24h" class="ts-btn ts-btn-sm <?= $range === '24h' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.6rem; font-size: 0.75rem;">24 Hours</a>
+        <a href="?tab=<?= urlencode($activeTab) ?>&range=7d" class="ts-btn ts-btn-sm <?= $range === '7d' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.6rem; font-size: 0.75rem;">7 Days</a>
+        <a href="?tab=<?= urlencode($activeTab) ?>&range=30d" class="ts-btn ts-btn-sm <?= $range === '30d' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.6rem; font-size: 0.75rem;">30 Days</a>
+        <a href="?tab=<?= urlencode($activeTab) ?>&range=90d" class="ts-btn ts-btn-sm <?= $range === '90d' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.6rem; font-size: 0.75rem;">90 Days</a>
+        <a href="?tab=<?= urlencode($activeTab) ?>&range=all" class="ts-btn ts-btn-sm <?= $range === 'all' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border: none; padding: 0.25rem 0.6rem; font-size: 0.75rem;">All Time</a>
       </div>
 
-      <a href="<?= url('/admin/analytics/export') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.3);">
-        <i data-lucide="download"></i> Export Telemetry CSV
+      <!-- Real-Time Auto Refresh HUD Toggle -->
+      <button type="button" id="btnLiveTelemetryToggle" onclick="toggleLiveTelemetry()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.35); font-size: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span id="liveTelemetryDot" style="width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 8px #38bdf8; display: inline-block;"></span>
+        <span id="liveTelemetryStatusText">Live Telemetry: Auto (15s)</span>
+      </button>
+
+      <a href="<?= url('/admin/analytics/export') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.3); font-size: 0.75rem;">
+        <i data-lucide="download"></i> Export CSV
       </a>
     </div>
   </div>
@@ -31,7 +40,7 @@
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
     <div class="admin-table-wrap" style="padding: 1.25rem;">
       <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Total Pageviews</div>
-      <div style="font-size: 1.85rem; font-weight: 800; color: #38bdf8; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
+      <div id="hud_total_pageviews" style="font-size: 1.85rem; font-weight: 800; color: #38bdf8; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
         <?= number_format($traffic['pageviews']) ?>
       </div>
       <div style="font-size: 0.75rem; color: #10b981; margin-top: 0.2rem;">↑ +14.8% vs last month</div>
@@ -39,7 +48,7 @@
 
     <div class="admin-table-wrap" style="padding: 1.25rem;">
       <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Unique Visitors (Est)</div>
-      <div style="font-size: 1.85rem; font-weight: 800; color: #a855f7; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
+      <div id="hud_unique_visitors" style="font-size: 1.85rem; font-weight: 800; color: #a855f7; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
         <?= number_format($traffic['uniques']) ?>
       </div>
       <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Unique browser fingerprints</div>
@@ -47,7 +56,7 @@
 
     <div class="admin-table-wrap" style="padding: 1.25rem;">
       <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Registered Users</div>
-      <div style="font-size: 1.85rem; font-weight: 800; color: #10b981; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
+      <div id="hud_registered_users" style="font-size: 1.85rem; font-weight: 800; color: #10b981; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
         <?= number_format($users['total']) ?>
       </div>
       <div style="font-size: 0.75rem; color: #10b981; margin-top: 0.2rem;">+<?= $users['today'] ?> joined today</div>
@@ -55,7 +64,7 @@
 
     <div class="admin-table-wrap" style="padding: 1.25rem;">
       <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Verified Authors</div>
-      <div style="font-size: 1.85rem; font-weight: 800; color: #ec4899; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
+      <div id="hud_verified_authors" style="font-size: 1.85rem; font-weight: 800; color: #ec4899; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
         <?= number_format($authors['total']) ?>
       </div>
       <div style="font-size: 0.75rem; color: #f472b6; margin-top: 0.2rem;"><?= $authors['acceptance_rate'] ?>% acceptance rate</div>
@@ -66,7 +75,7 @@
         <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; display: inline-block;"></span>
         Active Now
       </div>
-      <div style="font-size: 1.85rem; font-weight: 800; color: #f8fafc; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
+      <div id="hud_realtime_active" style="font-size: 1.85rem; font-weight: 800; color: #f8fafc; margin-top: 0.25rem; font-family: 'Outfit', sans-serif;">
         <?= $traffic['realtime_active'] ?>
       </div>
       <div style="font-size: 0.75rem; color: #38bdf8; margin-top: 0.2rem;">Real-time concurrent sessions</div>
@@ -187,33 +196,69 @@
   <!-- 2. USERS & MEMBERS MODULE -->
   <!-- ========================================================================= -->
   <div class="analytics-pane" id="apane_users" style="<?= $activeTab === 'users' ? 'display:block;' : 'display:none;' ?>">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
       <div class="admin-table-wrap" style="padding: 1.75rem;">
-        <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0;">👥 User Roles Distribution</h3>
-        <table class="admin-table">
-          <thead><tr><th>Role Name</th><th>Account Count</th><th>Share</th></tr></thead>
+        <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="users" style="color: #38bdf8;"></i> 👥 User Roles Distribution &amp; RBAC Roster
+        </h3>
+        <table class="admin-table" id="userRolesTable" data-no-paginate="true">
+          <thead>
+            <tr>
+              <th>Role Designation</th>
+              <th style="text-align: right;">Account Count</th>
+              <th style="text-align: right;">Share</th>
+            </tr>
+          </thead>
           <tbody>
-            <?php foreach ($users['roles'] as $r): ?>
+            <?php if (!empty($users['roles'])): ?>
+              <?php foreach ($users['roles'] as $r): ?>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span class="ts-badge <?= htmlspecialchars($r['badge'] ?? 'ts-badge-indigo') ?>" style="font-weight: 700; font-size: 0.8rem; padding: 3px 9px; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <span><?= htmlspecialchars($r['icon'] ?? '👤') ?></span>
+                        <span><?= htmlspecialchars($r['display_name'] ?? 'Member') ?></span>
+                      </span>
+                      <?php if (!empty($r['role']) && $r['role'] !== ($r['display_name'] ?? '')): ?>
+                        <span style="font-size: 0.72rem; color: #64748b; font-family: var(--admin-font-mono);">
+                          (<?= htmlspecialchars($r['role']) ?>)
+                        </span>
+                      <?php endif; ?>
+                    </div>
+                  </td>
+                  <td style="font-family: var(--admin-font-mono); font-weight: 700; color: #f8fafc; text-align: right;"><?= number_format($r['count']) ?></td>
+                  <td style="color: #94a3b8; font-size: 0.85rem; font-family: var(--admin-font-mono); text-align: right;"><?= $users['total'] > 0 ? round(($r['count'] / $users['total']) * 100, 1) : 0 ?>%</td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
               <tr>
-                <td><span class="ts-badge ts-badge-indigo"><?= strtoupper(htmlspecialchars($r['role'])) ?></span></td>
-                <td style="font-family: var(--admin-font-mono); font-weight: 700; color: #f8fafc;"><?= number_format($r['count']) ?></td>
-                <td style="color: #64748b; font-size: 0.85rem;"><?= $users['total'] > 0 ? round(($r['count'] / $users['total']) * 100, 1) : 0 ?>%</td>
+                <td colspan="3" style="text-align: center; color: #64748b; padding: 2rem;">No user accounts recorded.</td>
               </tr>
-            <?php endforeach; ?>
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
 
       <div class="admin-table-wrap" style="padding: 1.75rem;">
-        <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0;">📈 Registration Growth</h3>
+        <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="trending-up" style="color: #10b981;"></i> 📈 Real-Time Registration Growth
+        </h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div style="background: rgba(15,23,42,0.8); padding: 1.25rem; border-radius: 8px;">
-            <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Past 7 Days</div>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; margin-top: 0.25rem;">+<?= number_format($users['seven_days']) ?></div>
+          <div style="background: rgba(15,23,42,0.8); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--admin-border-subtle);">
+            <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Past 30 Mins</div>
+            <div id="hud_users_30m" style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; margin-top: 0.25rem;">+<?= number_format($users['thirty_min'] ?? 0) ?></div>
           </div>
-          <div style="background: rgba(15,23,42,0.8); padding: 1.25rem; border-radius: 8px;">
+          <div style="background: rgba(15,23,42,0.8); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--admin-border-subtle);">
+            <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Past 24 Hours</div>
+            <div id="hud_users_24h" style="font-size: 1.6rem; font-weight: 800; color: #a855f7; margin-top: 0.25rem;">+<?= number_format($users['twenty_four_hours'] ?? 0) ?></div>
+          </div>
+          <div style="background: rgba(15,23,42,0.8); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--admin-border-subtle);">
+            <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Past 7 Days</div>
+            <div id="hud_users_7d" style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; margin-top: 0.25rem;">+<?= number_format($users['seven_days']) ?></div>
+          </div>
+          <div style="background: rgba(15,23,42,0.8); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--admin-border-subtle);">
             <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Past 30 Days</div>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #10b981; margin-top: 0.25rem;">+<?= number_format($users['thirty_days']) ?></div>
+            <div id="hud_users_30d" style="font-size: 1.6rem; font-weight: 800; color: #10b981; margin-top: 0.25rem;">+<?= number_format($users['thirty_days']) ?></div>
           </div>
         </div>
       </div>
@@ -247,7 +292,7 @@
   <div class="analytics-pane" id="apane_authors" style="<?= $activeTab === 'authors' ? 'display:block;' : 'display:none;' ?>">
     <div class="admin-table-wrap" style="padding: 1.75rem;">
       <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0;">🏆 Top Performing Authors (Ranked by Readership)</h3>
-      <table class="admin-table">
+      <table class="admin-table" id="topAuthorsRankTable">
         <thead>
           <tr>
             <th>Author</th>
@@ -281,7 +326,7 @@
   <div class="analytics-pane" id="apane_content" style="<?= $activeTab === 'content' ? 'display:block;' : 'display:none;' ?>">
     <div class="admin-table-wrap" style="padding: 1.75rem;">
       <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0;">📚 Content Production &amp; Status Matrix</h3>
-      <table class="admin-table">
+      <table class="admin-table" id="contentProductionMatrixTable" data-no-paginate="true">
         <thead>
           <tr>
             <th>Content Entity</th>
@@ -312,7 +357,7 @@
   <div class="analytics-pane" id="apane_views" style="<?= $activeTab === 'views' ? 'display:block;' : 'display:none;' ?>">
     <div class="admin-table-wrap" style="padding: 1.75rem;">
       <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0;">🔥 Top 10 Most Viral Articles &amp; Technical Guides</h3>
-      <table class="admin-table">
+      <table class="admin-table" id="topArticlesViralTable">
         <thead>
           <tr>
             <th>Title / Publication</th>
@@ -522,6 +567,10 @@
 </div>
 
 <script>
+var currentAnalyticsRange = '<?= htmlspecialchars($range) ?>';
+var liveTelemetryInterval = 15; // 15s, 30s, or 0 (paused)
+var liveTelemetryTimer = null;
+
 function switchAnalyticsTab(tabKey) {
   // Update button active states
   document.querySelectorAll('[id^="atab_"]').forEach(btn => {
@@ -536,7 +585,7 @@ function switchAnalyticsTab(tabKey) {
 
   // Show pane
   document.querySelectorAll('.analytics-pane').forEach(p => p.style.display = 'none');
-  const targetPane = document.getElementById('apane_' + tabKey) || document.getElementById('apane_tools');
+  const targetPane = document.getElementById('apane_' + tabKey) || document.getElementById('apane_traffic');
   if (targetPane) targetPane.style.display = 'block';
 
   // Update URL state
@@ -545,6 +594,110 @@ function switchAnalyticsTab(tabKey) {
   window.history.replaceState({}, '', url);
 
   if (window.lucide) lucide.createIcons();
+  if (window.refreshAdminTablePaginators) window.refreshAdminTablePaginators();
+}
+
+function toggleLiveTelemetry() {
+  const dot = document.getElementById('liveTelemetryDot');
+  const text = document.getElementById('liveTelemetryStatusText');
+  const btn = document.getElementById('btnLiveTelemetryToggle');
+
+  if (liveTelemetryInterval === 15) {
+    liveTelemetryInterval = 30;
+    if (text) text.innerText = 'Live Telemetry: Auto (30s)';
+    if (dot) {
+      dot.style.background = '#10b981';
+      dot.style.boxShadow = '0 0 8px #10b981';
+    }
+  } else if (liveTelemetryInterval === 30) {
+    liveTelemetryInterval = 0; // Paused
+    if (text) text.innerText = 'Live Telemetry: Paused ⏸️';
+    if (dot) {
+      dot.style.background = '#64748b';
+      dot.style.boxShadow = 'none';
+    }
+    if (liveTelemetryTimer) {
+      clearInterval(liveTelemetryTimer);
+      liveTelemetryTimer = null;
+    }
+    return;
+  } else {
+    liveTelemetryInterval = 15;
+    if (text) text.innerText = 'Live Telemetry: Auto (15s)';
+    if (dot) {
+      dot.style.background = '#38bdf8';
+      dot.style.boxShadow = '0 0 8px #38bdf8';
+    }
+  }
+
+  restartLiveTelemetryTimer();
+  fetchRealtimeTelemetry();
+}
+
+function restartLiveTelemetryTimer() {
+  if (liveTelemetryTimer) clearInterval(liveTelemetryTimer);
+  if (liveTelemetryInterval > 0) {
+    liveTelemetryTimer = setInterval(fetchRealtimeTelemetry, liveTelemetryInterval * 1000);
+  }
+}
+
+function flashCardUpdate(el, val) {
+  if (!el || el.innerText.trim() === val) return;
+  el.innerText = val;
+  el.style.transition = 'color 0.3s ease, transform 0.3s ease';
+  el.style.transform = 'scale(1.05)';
+  setTimeout(() => {
+    el.style.transform = 'scale(1)';
+  }, 300);
+}
+
+function fetchRealtimeTelemetry() {
+  const url = '<?= url('/admin/analytics/realtime') ?>?range=' + encodeURIComponent(currentAnalyticsRange);
+  fetch(url, {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (!res.success || !res.traffic) return;
+
+    // Update Quick Stats cards
+    const pvEl = document.getElementById('hud_total_pageviews');
+    const uqEl = document.getElementById('hud_unique_visitors');
+    const usEl = document.getElementById('hud_registered_users');
+    const auEl = document.getElementById('hud_verified_authors');
+    const acEl = document.getElementById('hud_realtime_active');
+
+    if (pvEl) flashCardUpdate(pvEl, res.traffic.pageviews_formatted);
+    if (uqEl) flashCardUpdate(uqEl, res.traffic.uniques_formatted);
+    if (usEl) flashCardUpdate(usEl, res.users.total_formatted);
+    if (auEl) flashCardUpdate(auEl, res.authors.total_formatted);
+    if (acEl) flashCardUpdate(acEl, String(res.traffic.realtime_active));
+
+    // Update Registration Growth numbers
+    const u30m = document.getElementById('hud_users_30m');
+    const u24h = document.getElementById('hud_users_24h');
+    const u7d  = document.getElementById('hud_users_7d');
+    const u30d = document.getElementById('hud_users_30d');
+
+    if (u30m && res.users.thirty_min !== undefined) u30m.innerText = '+' + res.users.thirty_min;
+    if (u24h && res.users.twenty_four_hours !== undefined) u24h.innerText = '+' + res.users.twenty_four_hours;
+    if (u7d  && res.users.seven_days !== undefined) u7d.innerText = '+' + res.users.seven_days;
+    if (u30d && res.users.thirty_days !== undefined) u30d.innerText = '+' + res.users.thirty_days;
+
+    // Update status text with sync timestamp
+    const text = document.getElementById('liveTelemetryStatusText');
+    if (text && liveTelemetryInterval > 0) {
+      text.innerText = `Live: Auto (${liveTelemetryInterval}s) • ${res.timestamp}`;
+    }
+  })
+  .catch(() => {});
+}
+
+// Initialize live telemetry timer on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', restartLiveTelemetryTimer);
+} else {
+  restartLiveTelemetryTimer();
 }
 </script>
 

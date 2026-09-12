@@ -484,6 +484,7 @@ $router->post('/admin/system-logs/clear', [AdminController::class, 'clearSystemL
 $router->get('/admin/settings', [AdminController::class, 'settings'], ['admin']);
 $router->post('/admin/settings/save', [AdminController::class, 'saveUnifiedSettings'], ['admin']);
 $router->get('/admin/analytics', [AdminController::class, 'analytics'], ['admin']);
+$router->get('/admin/analytics/realtime', [AdminController::class, 'realtimeTelemetryJson'], ['admin']);
 $router->get('/admin/analytics/content/{id}', [AdminController::class, 'contentAnalytics'], ['admin']);
 $router->get('/admin/analytics/export', [AdminController::class, 'exportAnalyticsCsv'], ['admin']);
 

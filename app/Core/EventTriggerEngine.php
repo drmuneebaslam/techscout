@@ -11,9 +11,9 @@ namespace App\Core;
 class EventTriggerEngine {
 
     /**
-     * List of all supported system event triggers and their default template keys.
+     * List of all core system event triggers and their default template keys.
      */
-    public static function getSupportedEvents(): array {
+    public static function getBuiltInEvents(): array {
         return [
             'user_registered' => [
                 'name' => 'User Account Registration',
@@ -217,6 +217,32 @@ class EventTriggerEngine {
     }
 
     /**
+     * List of all supported system event triggers, merging core platform events
+     * with admin-created dynamic custom event keys from site_settings.
+     */
+    public static function getSupportedEvents(): array {
+        $events = self::getBuiltInEvents();
+        try {
+            $customTriggers = self::getCustomTriggers();
+            foreach ($customTriggers as $ct) {
+                if (isset($ct['is_active']) && !$ct['is_active']) continue;
+                $key = trim((string)($ct['key_or_pattern'] ?? ''));
+                if ($key && ($ct['type'] ?? 'event') === 'event') {
+                    $events[$key] = [
+                        'name' => trim((string)($ct['name'] ?? ucwords(str_replace('_', ' ', $key)))),
+                        'description' => !empty($ct['description']) ? trim($ct['description']) : 'Dynamic event automation trigger configured visually via Admin Studio.',
+                        'default_template' => trim((string)($ct['template_key'] ?? 'community_broadcast')),
+                        'single_delivery' => !empty($ct['single_delivery']),
+                        'is_custom' => true,
+                        'subject_override' => trim((string)($ct['subject_override'] ?? ''))
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {}
+        return $events;
+    }
+
+    /**
      * Get all admin-configured custom triggers (Event Key & URL Pattern triggers).
      */
     public static function getCustomTriggers(): array {
@@ -277,6 +303,18 @@ class EventTriggerEngine {
             [$jsonStr, $jsonStr]
         );
 
+        // Auto-synchronize event_mail_map for seamless event routing without manual mapping
+        if ($newTrigger['type'] === 'event' && !empty($newTrigger['template_key']) && !empty($newTrigger['key_or_pattern'])) {
+            try {
+                $mapKey = 'event_mail_map_' . $newTrigger['key_or_pattern'];
+                Database::execute(
+                    "INSERT INTO site_settings (key_name, key_value, updated_at) VALUES (?, ?, NOW()) 
+                     ON DUPLICATE KEY UPDATE key_value = ?, updated_at = NOW()",
+                    [$mapKey, $newTrigger['template_key'], $newTrigger['template_key']]
+                );
+            } catch (\Throwable $e) {}
+        }
+
         return ['success' => true, 'trigger' => $newTrigger];
     }
 
@@ -285,6 +323,14 @@ class EventTriggerEngine {
      */
     public static function deleteCustomTrigger(string $id): bool {
         $triggers = self::getCustomTriggers();
+        $targetTrigger = null;
+        foreach ($triggers as $t) {
+            if (($t['id'] ?? '') === $id) {
+                $targetTrigger = $t;
+                break;
+            }
+        }
+
         $filtered = array_filter($triggers, fn($t) => ($t['id'] ?? '') !== $id);
         $jsonStr = json_encode(array_values($filtered), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         Database::execute(
@@ -292,6 +338,13 @@ class EventTriggerEngine {
              ON DUPLICATE KEY UPDATE key_value = ?, updated_at = NOW()",
             [$jsonStr, $jsonStr]
         );
+
+        if ($targetTrigger && ($targetTrigger['type'] ?? '') === 'event' && !empty($targetTrigger['key_or_pattern'])) {
+            try {
+                Database::execute("DELETE FROM site_settings WHERE key_name = ?", ['event_mail_map_' . $targetTrigger['key_or_pattern']]);
+            } catch (\Throwable $e) {}
+        }
+
         return true;
     }
 
@@ -346,9 +399,6 @@ class EventTriggerEngine {
      * Admins can reassign event mappings via site_settings or custom event mapping.
      */
     public static function getMappedTemplate(string $eventKey): string {
-        $events = self::getSupportedEvents();
-        $defaultTmpl = $events[$eventKey]['default_template'] ?? 'community_broadcast';
-
         try {
             $settingKey = 'event_mail_map_' . $eventKey;
             $customMapped = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = ?", [$settingKey]);
@@ -357,7 +407,18 @@ class EventTriggerEngine {
             }
         } catch (\Throwable $e) {}
 
-        return $defaultTmpl;
+        // Check custom triggers configured in site_settings
+        try {
+            $customTriggers = self::getCustomTriggers();
+            foreach ($customTriggers as $ct) {
+                if (($ct['key_or_pattern'] ?? '') === $eventKey && !empty($ct['template_key'])) {
+                    return trim($ct['template_key']);
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        $events = self::getSupportedEvents();
+        return $events[$eventKey]['default_template'] ?? 'community_broadcast';
     }
 
     /**
@@ -398,6 +459,10 @@ class EventTriggerEngine {
         $templateKey = self::getMappedTemplate($eventKey);
         $singleDelivery = $eventInfo['single_delivery'] ?? false;
         $entityId = $payload['payout_id'] ?? ($payload['article_id'] ?? ($payload['ticket_id'] ?? null));
+
+        if (empty($payload['subject_override']) && !empty($eventInfo['subject_override'])) {
+            $payload['subject_override'] = $eventInfo['subject_override'];
+        }
 
         // Duplicate Delivery Protection Check
         if (!$forceAllowDuplicate && $singleDelivery) {

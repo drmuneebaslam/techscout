@@ -618,7 +618,7 @@
         </div>
       </div>
 
-      <table class="admin-table">
+      <table class="admin-table" id="mailCredentialsTable">
         <thead>
           <tr>
             <th>Profile Name &amp; Provider</th>
@@ -1120,7 +1120,7 @@
       </div>
 
       <!-- Table Matrix of Event Triggers -->
-      <table class="admin-table">
+      <table class="admin-table" id="systemEventTriggersTable">
         <thead>
           <tr>
             <th>System Event &amp; Trigger Key</th>
@@ -1201,7 +1201,7 @@
           </button>
         </div>
 
-        <table class="admin-table">
+        <table class="admin-table" id="customUrlTriggersTable">
           <thead>
             <tr>
               <th>Trigger Name &amp; Type</th>
@@ -1242,8 +1242,9 @@
                   </td>
                   <td style="text-align: center;">
                     <div style="display: flex; gap: 0.35rem; justify-content: center;">
-                      <button type="button" onclick="openTestEventTriggerModal('<?= htmlspecialchars(addslashes($ct['key_or_pattern'])) ?>', '<?= htmlspecialchars(addslashes($ct['name'])) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #38bdf8;">Test ⚡</button>
-                      <button type="button" onclick="deleteCustomTrigger('<?= htmlspecialchars($ct['id']) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">Delete 🗑️</button>
+                      <button type="button" onclick="openTestEventTriggerModal('<?= htmlspecialchars(addslashes($ct['key_or_pattern'])) ?>', '<?= htmlspecialchars(addslashes($ct['name'])) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #38bdf8;" title="Test Fire Trigger">Test ⚡</button>
+                      <button type="button" onclick='openEditCustomTriggerModal(<?= json_encode($ct, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #c084fc; border-color: rgba(168,85,247,0.35);" title="Edit Custom Trigger">Edit ✏️</button>
+                      <button type="button" onclick="deleteCustomTrigger('<?= htmlspecialchars($ct['id']) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Delete Trigger">Delete 🗑️</button>
                     </div>
                   </td>
                 </tr>
@@ -1260,42 +1261,40 @@
       </div>
     </div>
 
-    <!-- Developer & Admin Architecture Guide Box -->
+    <!-- Visual Automation Trigger Studio Guide (Zero PHP Code Required) -->
     <div style="background: rgba(15,23,42,0.9); border: 1px solid rgba(56,189,248,0.35); border-radius: 12px; padding: 1.75rem;">
-      <h4 style="font-size: 1.1rem; color: #38bdf8; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-        <i data-lucide="book-open"></i> Developer Guide: How &amp; Where to Create Custom Triggers &amp; Assign Templates
-      </h4>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <h4 style="font-size: 1.1rem; color: #38bdf8; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="sparkles"></i> Visual Automation Trigger Studio Guide &bull; 100% Zero PHP Coding Required
+        </h4>
+        <button type="button" onclick="openCreateCustomTriggerModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-weight: 700; font-size: 0.78rem;">
+          ➕ Launch Trigger Studio Modal
+        </button>
+      </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
         <!-- Step 1 -->
-        <div style="background: #05070b; border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 1.1rem;">
-          <strong style="color: #38bdf8; display: block; margin-bottom: 0.4rem; font-size: 0.92rem;">
-            1. Assigning Templates to Triggers in UI
+        <div style="background: #05070b; border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 1.1rem;">
+          <strong style="color: #38bdf8; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; font-size: 0.92rem;">
+            <span>1️⃣</span> Assign Any Template Visually
           </strong>
-          Select any system event in the table above and choose your desired HTML email template from the dropdown menu. Click <strong>Save 💾</strong>. The mapping is saved dynamically in the <code>site_settings</code> table under <code>event_mail_map_{event_key}</code>.
+          Pick any system event or custom URL in the tables above. Choose your responsive HTML email template from the dropdown and click <strong>Save 💾</strong>. The routing policy updates instantaneously without server restarts or code edits.
         </div>
 
         <!-- Step 2 -->
-        <div style="background: #05070b; border: 1px solid rgba(168,85,247,0.2); border-radius: 8px; padding: 1.1rem;">
-          <strong style="color: #c084fc; display: block; margin-bottom: 0.4rem; font-size: 0.92rem;">
-            2. Triggering Events in PHP Code
+        <div style="background: #05070b; border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 1.1rem;">
+          <strong style="color: #c084fc; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; font-size: 0.92rem;">
+            <span>2️⃣</span> Create Custom Triggers from Modal
           </strong>
-          Call <code>\App\Core\EventTriggerEngine::fire($eventKey, $payload)</code> from any controller, model, or service in the backend:
-          <pre style="background: #030712; border: 1px solid rgba(148,163,184,0.15); padding: 0.6rem; border-radius: 6px; font-family: monospace; font-size: 0.72rem; color: #38bdf8; margin-top: 0.4rem; overflow-x: auto;"><code>\App\Core\EventTriggerEngine::fire('payout_approved', [
-  'email' => $author['email'],
-  'name' => $author['name'],
-  'amount' => '$150.00',
-  'payout_id' => '1042',
-  'transaction_ref' => 'tx_987654321'
-]);</code></pre>
+          Click <strong>➕ Add Custom Trigger</strong> to open the Visual Studio. Enter a friendly name, select <em>URL Path Pattern</em> (e.g. <code>/admin/revenue/process-payout</code>, <code>/author/apply</code>) or <em>Custom Event Key</em>, assign a template, and toggle Single Delivery protection with 1 click.
         </div>
 
         <!-- Step 3 -->
-        <div style="background: #05070b; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; padding: 1.1rem;">
-          <strong style="color: #34d399; display: block; margin-bottom: 0.4rem; font-size: 0.92rem;">
-            3. Registering New Custom Event Keys
+        <div style="background: #05070b; border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 1.1rem;">
+          <strong style="color: #34d399; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; font-size: 0.92rem;">
+            <span>3️⃣</span> 1-Click Live Test Simulation
           </strong>
-          To add a new custom trigger key to the platform, simply add its entry to <code>getSupportedEvents()</code> in <code>app/Core/EventTriggerEngine.php</code> or fire custom keys directly. The engine automatically checks single-delivery protection!
+          Click <strong>Test ⚡</strong> on any trigger row to launch the simulation modal. Fire live test payloads with sample variables to verify email delivery directly in your inbox without modifying any PHP files or database schemas.
         </div>
       </div>
     </div>
@@ -1589,6 +1588,7 @@
     <!-- TAB 1: TRIGGER CONFIGURATION -->
     <div id="cmodal-tab-config" style="padding-top: 1.25rem;">
       <form id="createCustomTriggerForm" onsubmit="submitCreateCustomTrigger(event)">
+        <input type="hidden" id="ct_id" value="">
         <div style="margin-bottom: 1rem;">
           <label class="admin-modal-label">Trigger Name <span style="color:#ef4444;">*</span></label>
           <input type="text" id="ct_name" placeholder="e.g. Instant Payout Disbursement Notification" class="admin-modal-input" required>
@@ -1599,7 +1599,7 @@
             <label class="admin-modal-label">Trigger Engine Type</label>
             <select id="ct_type" class="admin-modal-select" onchange="toggleCustomTriggerTypeNotice(this.value)">
               <option value="url_pattern">🌐 Specific URL Path Pattern (No Code)</option>
-              <option value="event">⚡ Custom System Event Key</option>
+              <option value="event">⚡ Custom System Event Key (Zero Code)</option>
             </select>
           </div>
           <div>
@@ -1628,16 +1628,30 @@
           <input type="text" id="ct_subject_override" placeholder="Leave blank to use the template default subject" class="admin-modal-input">
         </div>
 
-        <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
+        <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.85rem; margin-bottom: 1.15rem;">
           <label style="display: flex; align-items: center; gap: 0.65rem; color: #cbd5e1; font-size: 0.84rem; cursor: pointer; user-select: none;">
             <input type="checkbox" id="ct_single_delivery" value="1" style="width: 17px; height: 17px; accent-color: #38bdf8;">
             <span><strong>🔒 Enforce Single Delivery Only</strong> &mdash; Automatically protects against duplicate emails sent to the same recipient for this trigger.</span>
           </label>
         </div>
 
+        <!-- In-Modal Quick Test Simulator -->
+        <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.78rem; font-weight: 700; color: #c084fc; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>⚡ In-Modal Quick Test Fire Simulator</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <input type="email" id="ct_modal_test_email" placeholder="tester@example.com" class="admin-modal-input" style="flex: 1; min-width: 180px; padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+            <button type="button" onclick="quickTestTriggerFromModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #c084fc; border-color: rgba(168,85,247,0.4); font-size: 0.78rem; font-weight: 700; white-space: nowrap;">
+              Test Fire Now ⚡
+            </button>
+          </div>
+          <div id="ct_modal_test_result" style="display: none; margin-top: 0.5rem; font-size: 0.75rem; padding: 0.4rem 0.65rem; border-radius: 6px;"></div>
+        </div>
+
         <div class="admin-modal-footer" style="padding-top: 0.75rem; border-top: 1px solid rgba(148,163,184,0.15);">
           <button type="button" onclick="closeCreateCustomTriggerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
-          <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-weight: 700; padding: 0.5rem 1.25rem;">
+          <button type="submit" id="ct_submit_btn" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-weight: 700; padding: 0.5rem 1.25rem;">
             Save Automation Trigger 🚀
           </button>
         </div>
@@ -1923,6 +1937,10 @@ var switchMailTab = window.switchMailTab = function switchMailTab(tab) {
 
   if (window.lucide) {
     try { lucide.createIcons(); } catch (e) {}
+  }
+
+  if (window.refreshAdminTablePaginators) {
+    try { window.refreshAdminTablePaginators(); } catch (e) {}
   }
 }
 
@@ -3081,9 +3099,54 @@ function submitTestEventTrigger(e) {
 function openCreateCustomTriggerModal() {
   const modal = document.getElementById('createCustomTriggerModal');
   if (modal) {
-    document.getElementById('createCustomTriggerForm').reset();
+    const form = document.getElementById('createCustomTriggerForm');
+    if (form) form.reset();
+    const idField = document.getElementById('ct_id');
+    if (idField) idField.value = '';
+    const submitBtn = document.getElementById('ct_submit_btn');
+    if (submitBtn) submitBtn.innerText = 'Save Automation Trigger 🚀';
+    const testResult = document.getElementById('ct_modal_test_result');
+    if (testResult) testResult.style.display = 'none';
+    const title = document.querySelector('#createCustomTriggerModal .admin-modal-title');
+    if (title) title.innerText = '⚡ Visual Automation Trigger Studio';
+    toggleCustomTriggerTypeNotice(document.getElementById('ct_type')?.value || 'url_pattern');
+    switchCustomTriggerModalTab('config');
     modal.style.display = 'flex';
   }
+}
+
+function openEditCustomTriggerModal(ct) {
+  if (!ct) return;
+  const modal = document.getElementById('createCustomTriggerModal');
+  if (!modal) return;
+
+  const idField = document.getElementById('ct_id');
+  const nameInput = document.getElementById('ct_name');
+  const typeSelect = document.getElementById('ct_type');
+  const keyInput = document.getElementById('ct_key_or_pattern');
+  const tmplSelect = document.getElementById('ct_template_key');
+  const subjInput = document.getElementById('ct_subject_override');
+  const singleCheckbox = document.getElementById('ct_single_delivery');
+  const submitBtn = document.getElementById('ct_submit_btn');
+  const title = document.querySelector('#createCustomTriggerModal .admin-modal-title');
+  const testResult = document.getElementById('ct_modal_test_result');
+
+  if (idField) idField.value = ct.id || '';
+  if (nameInput) nameInput.value = ct.name || '';
+  if (typeSelect) {
+    typeSelect.value = ct.type || 'url_pattern';
+    toggleCustomTriggerTypeNotice(typeSelect.value);
+  }
+  if (keyInput) keyInput.value = ct.key_or_pattern || '';
+  if (tmplSelect) tmplSelect.value = ct.template_key || '';
+  if (subjInput) subjInput.value = ct.subject_override || '';
+  if (singleCheckbox) singleCheckbox.checked = !!parseInt(ct.single_delivery || '0');
+  if (submitBtn) submitBtn.innerText = 'Update Automation Trigger 💾';
+  if (title) title.innerText = '✏️ Edit Automation Trigger';
+  if (testResult) testResult.style.display = 'none';
+
+  switchCustomTriggerModalTab('config');
+  modal.style.display = 'flex';
 }
 
 function closeCreateCustomTriggerModal() {
@@ -3152,17 +3215,84 @@ function toggleCustomTriggerTypeNotice(type) {
   const input = document.getElementById('ct_key_or_pattern');
   if (notice && input) {
     if (type === 'url_pattern') {
-      notice.innerHTML = 'Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>process-payout</code>) and automatically dispatches assigned HTML template!';
+      notice.innerHTML = 'Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>/author/apply</code>) and automatically dispatches assigned HTML template on request!';
       input.placeholder = 'e.g. /admin/revenue/process-payout';
     } else {
-      notice.innerHTML = 'Fires when <code>\\App\\Core\\EventTriggerEngine::fire("key", $payload)</code> is called in PHP code!';
-      input.placeholder = 'e.g. custom_user_signup';
+      notice.innerHTML = 'Custom automation event key (e.g. <code>payout_approved</code>, <code>vip_upgrade</code>). Can be fired via 1-click test simulation or automated triggers without touching PHP code!';
+      input.placeholder = 'e.g. payout_approved';
     }
   }
 }
 
+function quickTestTriggerFromModal() {
+  const emailInput = document.getElementById('ct_modal_test_email');
+  const keyInput = document.getElementById('ct_key_or_pattern');
+  const resultBox = document.getElementById('ct_modal_test_result');
+  const tmplSelect = document.getElementById('ct_template_key');
+
+  const email = emailInput ? emailInput.value.trim() : '';
+  const key = keyInput ? keyInput.value.trim() : '';
+  const tmpl = tmplSelect ? tmplSelect.value.trim() : '';
+
+  if (!email) {
+    alert('Please enter a recipient test email address.');
+    if (emailInput) emailInput.focus();
+    return;
+  }
+  if (!key) {
+    alert('Please specify a Trigger Key or Pattern to test.');
+    if (keyInput) keyInput.focus();
+    return;
+  }
+
+  if (resultBox) {
+    resultBox.style.display = 'block';
+    resultBox.style.background = 'rgba(56,189,248,0.1)';
+    resultBox.style.color = '#38bdf8';
+    resultBox.innerText = '⏳ Dispatching test payload...';
+  }
+
+  const formData = new FormData();
+  formData.append('event_key', key);
+  formData.append('test_name', 'Alex Rivera');
+  formData.append('test_email', email);
+  formData.append('template_key', tmpl);
+  formData.append('amount', '$150.00');
+  formData.append('payout_id', '1042');
+  formData.append('transaction_ref', 'tx_987654321');
+
+  fetch('<?= url('/admin/mail/event-triggers/test') ?>', {
+    method: 'POST',
+    body: formData
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (resultBox) {
+      resultBox.style.display = 'block';
+      if (data.success) {
+        resultBox.style.background = 'rgba(16,185,129,0.15)';
+        resultBox.style.color = '#34d399';
+        resultBox.innerText = '✅ ' + (data.message || 'Trigger fired and email dispatched successfully!');
+      } else {
+        resultBox.style.background = 'rgba(239,68,68,0.15)';
+        resultBox.style.color = '#f87171';
+        resultBox.innerText = '❌ ' + (data.message || 'Simulation failed.');
+      }
+    }
+  })
+  .catch(err => {
+    if (resultBox) {
+      resultBox.style.display = 'block';
+      resultBox.style.background = 'rgba(239,68,68,0.15)';
+      resultBox.style.color = '#f87171';
+      resultBox.innerText = '❌ Network error during trigger test fire.';
+    }
+  });
+}
+
 function submitCreateCustomTrigger(e) {
   e.preventDefault();
+  const id = document.getElementById('ct_id') ? document.getElementById('ct_id').value : '';
   const name = document.getElementById('ct_name').value.trim();
   const type = document.getElementById('ct_type').value;
   const keyOrPattern = document.getElementById('ct_key_or_pattern').value.trim();
@@ -3176,6 +3306,7 @@ function submitCreateCustomTrigger(e) {
   }
 
   const formData = new FormData();
+  if (id) formData.append('id', id);
   formData.append('name', name);
   formData.append('type', type);
   formData.append('key_or_pattern', keyOrPattern);

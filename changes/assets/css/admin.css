@@ -1662,5 +1662,49 @@ body.admin-body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
+/* ==========================================================================
+   Admin Universal Table Paginator Controls (Dual-Theme Preserved)
+   ========================================================================== */
+.admin-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-top: 1px solid var(--admin-border-subtle);
+  background: var(--admin-bg-surface);
+  font-size: 0.85rem;
+  color: var(--admin-text-secondary);
+}
 
+[data-theme="light"] .admin-pagination-container {
+  border-top-color: #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+}
 
+.admin-pagination-container .paginator-size-select,
+.admin-pagination-container .paginator-inline-search {
+  background: var(--admin-bg-base);
+  border: 1px solid var(--admin-border-main);
+  color: var(--admin-text-primary);
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+[data-theme="light"] .admin-pagination-container .paginator-size-select,
+[data-theme="light"] .admin-pagination-container .paginator-inline-search {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.admin-pagination-container .paginator-size-select:focus,
+.admin-pagination-container .paginator-inline-search:focus {
+  border-color: var(--admin-primary);
+}
