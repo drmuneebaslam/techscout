@@ -140,6 +140,35 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-13: Asymmetric Theme Class Toggling & Un-Scoped Global CSS Variable Leakage
+* **Root Cause:** 
+  - `window.toggleTheme()` in `assets/js/main.js` toggled `theme-light` on `document.body` but failed to remove it from `document.documentElement`, leaving `html.theme-light` persistently active.
+  - In `assets/css/style.css`, CSS variables were bound to `html.theme-light` and un-scoped `[data-theme="light"]`, causing the entire page's custom properties (`--ts-bg-main: #f8fafc`, `--ts-bg-surface: #ffffff`) to be stuck in light mode even when `data-theme="dark"` was set.
+  - In `views/layouts/header.php`, the `<head>` script initialized before `<body>` existed, allowing `<body>` to retain server-rendered `data-theme="light"` and `class="theme-light"` indefinitely.
+  - Invasive attribute selectors (`[data-theme="light"] [style*="background: #020408"]`) matched all dark inline containers when `theme-light` leaked, turning public page cards, tabs, and feeds white in dark mode.
+* **Consequences:**
+  - Dark mode rendered as a broken, hybrid state ("much weird and just like light in all public pages") with white cards and washed-out surfaces.
+* **Mandatory Rule:**
+  - All theme toggling routines (`main.js`, `header.php`, `admin_footer.php`) must symmetrically update both `data-theme` attribute and `theme-light` class on BOTH `document.documentElement` and `document.body`.
+  - Include an immediate post-body micro-script in layouts to synchronize `document.body` before first paint.
+  - Scope all light mode CSS variables strictly to root (`html[data-theme="light"], html.theme-light, body[data-theme="light"], body.theme-light`).
+  - Keep default Obsidian dark mode (`#07090e`) and light mode (`#f8fafc`) 100% decoupled and isolated.
+
+---
+
+### 🔴 MISTAKE-14: Environment Disconnect Between Local Development and Cloud Hosting Database Credentials
+* **Root Cause:** 
+  - Placing static cloud database credentials (`sql306.infinityfree.com`) directly into the local development config causes local execution (XAMPP Apache, CLI tests) to hang or exhaust memory because cloud hosting providers (like InfinityFree) block remote external database access.
+  - Conversely, pushing local credentials (`127.0.0.1`, `root`, blank password) to production breaks the live hosted platform.
+* **Consequences:**
+  - Local diagnostic and automated tests fail or crash PHP with memory exhaustion.
+  - Deploying mismatched configs causes 500 errors in production.
+* **Mandatory Rule:**
+  - Local repository configuration (`app/Core/Config.php` in main workspace) must use local development credentials (`127.0.0.1`, `techscout_db`, `root`, ``, or auto-environment detection) for fast and reliable local execution.
+  - The `changes/` staging folder (`changes/app/Core/Config.php`) must strictly preserve the production hosted InfinityFree credentials (`sql306.infinityfree.com`, `if0_40102772_techscoutmainafterallchanges`, `if0_40102772`, `Fp9QFWfj5fm`, `https://funwithcoding.free.nf`) so deployments remain fully functional without manual intervention.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -154,6 +183,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 10. [ ] **Dual-Theme (Dark/Light) UI Preservation & No Hardcoded Inline Tag Styles**: Are web components styled via CSS with both dark and light modes supported, reserving white backgrounds strictly for the email preview canvas and email body?
 11. [ ] **Accurate Table Aliases in Dynamic SQL**: Are WHERE filter clauses strictly verified against the FROM clause of each query to ensure alias consistency and prevent 1054 Unknown Column errors?
 12. [ ] **Extension Table Parent Column Awareness**: Do queries on child/extension tables (e.g. `prompts`, `articles`) join their parent `contents` table when filtering by timestamps or common metadata?
+13. [ ] **Symmetric Theme Toggling & Clean Dual-Mode Isolation**: Are `data-theme` and `theme-light` updated symmetrically on both `document.documentElement` and `document.body`, with light theme tokens strictly scoped to root selectors to prevent dark mode leakage?
+14. [ ] **Segregated Local vs. Hosted Environment Credentials**: Are local configurations configured for localhost execution while `changes/app/Core/Config.php` preserves hosted production credentials?
 
 
 

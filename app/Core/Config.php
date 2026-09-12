@@ -5,14 +5,14 @@ class Config {
     public static array $settings = [
         'app_name' => 'TechScout',
         'app_tagline' => 'The Frontier of Tech, Scouted for Builders.',
-        'app_url' => 'https://funwithcoding.free.nf',
-        'db_host' => 'sql306.infinityfree.com',
+        'app_url' => 'http://localhost/techscout.n',
+        'db_host' => '127.0.0.1',
         'db_port' => '3306',
-        'db_name' => 'if0_40102772_techscoutmainafterallchanges',
-        'db_user' => 'if0_40102772',
-        'db_pass' => 'Fp9QFWfj5fm',
+        'db_name' => 'techscout_db',
+        'db_user' => 'root',
+        'db_pass' => '',
         'session_lifetime' => 86400 * 7,
-        'environment' => 'production' // 'development' or 'production'
+        'environment' => 'development' // 'development' or 'production'
     ];
 
     public static function get(string $key, $default = null) {

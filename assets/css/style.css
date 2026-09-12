@@ -67,7 +67,7 @@
 /* ==========================================================================
    LIGHT THEME DESIGN SYSTEM TOKENS & SURFACES
    ========================================================================== */
-[data-theme="light"], html.theme-light, body.theme-light {
+html[data-theme="light"], html.theme-light, body[data-theme="light"], body.theme-light {
   --ts-bg-main: #f8fafc;
   --ts-bg-surface: #ffffff;
   --ts-bg-surface-elevated: #f1f5f9;
@@ -77,59 +77,15 @@
   --ts-scrollbar-thumb: #cbd5e1;
   --ts-scrollbar-track: #f1f5f9;
   --ts-bg-glass: rgba(255, 255, 255, 0.92);
-  --ts-bg-glass-card: rgba(255, 255, 255, 0.88);
-
-  --ts-text-primary: #0f172a;
-  --ts-text-secondary: #475569;
-  --ts-text-tertiary: #64748b;
-  --ts-text-accent: #0284c7;
-  --ts-border-main: rgba(15, 23, 42, 0.12);
-  --ts-border-focus: rgba(99, 102, 241, 0.8);
-
-  --ts-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --ts-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-  --ts-shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.12);
-  --ts-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
-  --ts-shadow-cyan: 0 0 20px rgba(6, 182, 212, 0.15);
-}
-
-[data-theme="light"] body,
-body[data-theme="light"] {
-  background-color: var(--ts-bg-main);
-  color: var(--ts-text-primary);
-}
-
-[data-theme="light"] .ts-card,
-[data-theme="light"] .ts-box,
-[data-theme="light"] .ts-dropdown-menu,
-[data-theme="light"] .ts-modal-box,
-[data-theme="light"] .ts-nav-header,
-[data-theme="light"] .ts-header {
-  background: var(--ts-bg-surface);
-  border-color: var(--ts-border-main);
-}
-
-[data-theme="light"] .ts-input,
-[data-theme="light"] .ts-textarea,
-[data-theme="light"] .ts-select {
-  background: #ffffff;
-  color: #0f172a;
-  border-color: rgba(15, 23, 42, 0.2);
-}
-
-[data-theme="light"] {
-  --ts-bg-main: #f8fafc;
-  --ts-bg-surface: #ffffff;
-  --ts-bg-surface-elevated: #f1f5f9;
-  --ts-bg-surface-hover: #e2e8f0;
-  --ts-bg-glass: rgba(255, 255, 255, 0.92);
   --ts-bg-glass-card: rgba(255, 255, 255, 0.96);
 
   --ts-text-primary: #0f172a;
   --ts-text-secondary: #334155;
   --ts-text-tertiary: #64748b;
+  --ts-text-accent: #0284c7;
   --ts-border-main: rgba(15, 23, 42, 0.12);
   --ts-border-subtle: rgba(15, 23, 42, 0.06);
+  --ts-border-focus: rgba(99, 102, 241, 0.8);
 
   --ts-primary: #4f46e5;
   --ts-primary-hover: #4338ca;
@@ -149,6 +105,60 @@ body[data-theme="light"] {
   --ts-shadow-md: 0 4px 14px -1px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
   --ts-shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06);
   --ts-shadow-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+  --ts-shadow-cyan: 0 0 20px rgba(2, 132, 199, 0.15);
+}
+
+html[data-theme="light"] body,
+html.theme-light body,
+body[data-theme="light"],
+body.theme-light {
+  background-color: var(--ts-bg-main);
+  color: var(--ts-text-secondary);
+}
+
+html[data-theme="light"] .ts-card,
+html.theme-light .ts-card,
+body[data-theme="light"] .ts-card,
+body.theme-light .ts-card,
+html[data-theme="light"] .ts-box,
+html.theme-light .ts-box,
+body[data-theme="light"] .ts-box,
+body.theme-light .ts-box,
+html[data-theme="light"] .ts-dropdown-menu,
+html.theme-light .ts-dropdown-menu,
+body[data-theme="light"] .ts-dropdown-menu,
+body.theme-light .ts-dropdown-menu,
+html[data-theme="light"] .ts-modal-box,
+html.theme-light .ts-modal-box,
+body[data-theme="light"] .ts-modal-box,
+body.theme-light .ts-modal-box,
+html[data-theme="light"] .ts-nav-header,
+html.theme-light .ts-nav-header,
+body[data-theme="light"] .ts-nav-header,
+body.theme-light .ts-nav-header,
+html[data-theme="light"] .ts-header,
+html.theme-light .ts-header,
+body[data-theme="light"] .ts-header,
+body.theme-light .ts-header {
+  background: var(--ts-bg-surface);
+  border-color: var(--ts-border-main);
+}
+
+html[data-theme="light"] .ts-input,
+html.theme-light .ts-input,
+body[data-theme="light"] .ts-input,
+body.theme-light .ts-input,
+html[data-theme="light"] .ts-textarea,
+html.theme-light .ts-textarea,
+body[data-theme="light"] .ts-textarea,
+body.theme-light .ts-textarea,
+html[data-theme="light"] .ts-select,
+html.theme-light .ts-select,
+body[data-theme="light"] .ts-select,
+body.theme-light .ts-select {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: rgba(15, 23, 42, 0.2);
 }
 
 /* Light Mode Global Element Overrides */

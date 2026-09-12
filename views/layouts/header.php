@@ -50,8 +50,12 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
         }
       } catch (e) {}
       var urlParams = new URLSearchParams(window.location.search);
-      var cookieTheme = (document.cookie.match(/ts_theme=([^;]+)/) || [])[1];
-      var t = urlParams.get('theme') || cookieTheme || localStorage.getItem('ts_theme') || '<?= $activeTheme ?>';
+      var cookieMatch = document.cookie.match(/(^|;)\s*ts_theme=([^;]+)/);
+      var cookieTheme = cookieMatch ? cookieMatch[2].trim() : null;
+      var storedTheme = null;
+      try { storedTheme = localStorage.getItem('ts_theme'); } catch(e) {}
+      var t = urlParams.get('theme') || storedTheme || cookieTheme || '<?= $activeTheme ?>';
+      if (t !== 'light' && t !== 'dark') t = 'dark';
       document.documentElement.setAttribute('data-theme', t);
       if (t === 'light') {
         document.documentElement.classList.add('theme-light');
@@ -92,6 +96,17 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <!-- Dynamic Base Url for JS -->
   <script>window.TS_BASE_URL = "<?= $appUrl ?>";</script>
 </head><body data-theme="<?= $activeTheme ?>" class="<?= $activeTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($siteSettings['enable_bg_grid_lines']) && $siteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
+<script>
+  (function() {
+    var t = document.documentElement.getAttribute('data-theme') || 'dark';
+    document.body.setAttribute('data-theme', t);
+    if (t === 'light') {
+      document.body.classList.add('theme-light');
+    } else {
+      document.body.classList.remove('theme-light');
+    }
+  })();
+</script>
 
   <?php if (\App\Core\Auth::isImpersonating()): ?>
     <?php 
