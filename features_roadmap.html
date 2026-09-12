@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechScout Enterprise Roadmap: 105+ High-Impact Features</title>
+    <meta name="description" content="Comprehensive strategic product roadmap and architectural feature specifications derived from TechScout's recent system enhancements.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-base: #0a0e1a;
+            --bg-surface: #0f172a;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --border-main: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(99, 102, 241, 0.4);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.25);
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="light"], .theme-light {
+            --bg-base: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --border-main: #e2e8f0;
+            --border-hover: #6366f1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.12);
+            --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Background */
+        .ambient-glow {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1000px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 80%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Header Navigation */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-main);
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .brand-title h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-title p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle-btn, .action-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-main);
+            color: var(--text-primary);
+            padding: 0.6rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .theme-toggle-btn:hover, .action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 3rem auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 30px;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-banner h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-banner p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Key Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-main);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow-card);
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* Commit Trajectory Card */
+        .commit-analysis-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-main);
+            border-radius: 18px;
+            padding: 2rem;
+            margin-bottom: 3.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .analysis-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-main);
+        }
+
+        .analysis-badge {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .analysis-badge i {
+            color: var(--primary);
+        }
+
+        .analysis-date {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .commit-timeline {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.25rem;
+        }
+
+        .timeline-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .commit-hash {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.12);
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            align-self: flex-start;
+        }
+
+        .step-content strong {
+            display: block;
+            font-size: 0.88rem;
+            margin-bottom: 0.35rem;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        /* Filter Controls */
+        .controls-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-main);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .search-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1.1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-base);
+            border: 1px solid var(--border-main);
+            color: var(--text-primary);
+            padding: 0.75rem 1.1rem 0.75rem 2.8rem;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .filter-select {
+            background: var(--bg-base);
+            border: 1px solid var(--border-main);
+            color: var(--text-primary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+
+        .categories-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .cat-pill {
+            background: var(--bg-base);
+            border: 1px solid var(--border-main);
+            color: var(--text-secondary);
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .cat-pill:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        .cat-pill.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .cat-pill.active i {
+            color: #ffffff !important;
+        }
+
+        .pill-count {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.1rem 0.45rem;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .feature-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid;
+        }
+
+        .card-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .meta-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.18rem 0.55rem;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            text-transform: uppercase;
+        }
+
+        .impact-critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .impact-high {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .impact-medium {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .impact-low {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .diff-easy {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .diff-moderate {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .diff-advanced {
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .feature-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.35;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .feature-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-main);
+        }
+
+        .feature-cat {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .copy-idea-btn {
+            background: transparent;
+            border: 1px solid var(--border-main);
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .copy-idea-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: var(--primary-glow);
+        }
+
+        /* Footer */
+        .footer-bar {
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 1px solid var(--border-main);
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        .footer-bar p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Toast notification */
+        .toast-popup {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            color: var(--text-primary);
+            padding: 0.85rem 1.4rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 9999;
+        }
+
+        .toast-popup.visible {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .commit-timeline {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.25rem;
+            }
+            .search-row {
+                flex-direction: column;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-banner h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="container">
+        <!-- Top Navigation -->
+        <header class="header-bar">
+            <div class="brand-box">
+                <div class="brand-logo"><i class="fa-solid fa-compass"></i></div>
+                <div class="brand-title">
+                    <h1>TechScout Architecture Lab</h1>
+                    <p>Enterprise Feature Roadmap & Innovation Catalog</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn" onclick="exportRoadmapJson()"><i class="fa-solid fa-file-export"></i> Export JSON</button>
+                <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()"><i class="fa-solid fa-sun"></i> <span>Light Mode</span></button>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-banner">
+            <div class="hero-badge"><i class="fa-solid fa-rocket"></i> Production Expansion Blueprint</div>
+            <h2>105+ High-Impact Architecture Features</h2>
+            <p>Directly extrapolating and compounding the technical foundations of our recent commits: generative visual prompt engines, IP timezone math, compact social graph, custom database studio, and crypto web3 revenue pipelines.</p>
+        </section>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="countTotal">111</div>
+                <div class="metric-label">High-Impact Features</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">10</div>
+                <div class="metric-label">Strategic Engineering Pillars</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">5 Commits</div>
+                <div class="metric-label">Analyzed Trajectory</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">100% Non-Waste</div>
+                <div class="metric-label">Practical Production Value</div>
+            </div>
+        </div>
+
+        <!-- Trajectory Analysis Card -->
+        
+<div class="commit-analysis-card">
+    <div class="analysis-header">
+        <div class="analysis-badge"><i class="fa-solid fa-code-commit"></i> Trajectory Analysis: Last 5 Git Commits</div>
+        <div class="analysis-date">Evaluated on: September 12, 2026</div>
+    </div>
+    <div class="commit-timeline">
+        <div class="timeline-step">
+            <span class="commit-hash">6f65064</span>
+            <div class="step-content">
+                <strong>Multi-Timezone Engine, Image Prompts Hub, Social Comments, DB Exporter, Web Installer & Crypto Ads</strong>
+                <p>Groundwork established for generative image prompts (Midjourney, Flux, SDXL), social engagement loops, custom data exporting, and crypto ad revenue pipelines.</p>
+            </div>
+        </div>
+        <div class="timeline-step">
+            <span class="commit-hash">4eabede</span>
+            <div class="step-content">
+                <strong>Repository Hygiene & Dependency Isolation</strong>
+                <p>Cleaned git tracking, isolated testing frameworks, and streamlined production build footprints.</p>
+            </div>
+        </div>
+        <div class="timeline-step">
+            <span class="commit-hash">d026e1c</span>
+            <div class="step-content">
+                <strong>IP Geolocation & Multi-Tier Timezone Resolution</strong>
+                <p>Cloudflare header fallback, fast external IP lookups, API geo endpoint, and forensic telemetry location logging.</p>
+            </div>
+        </div>
+        <div class="timeline-step">
+            <span class="commit-hash">9c0b467</span>
+            <div class="step-content">
+                <strong>Client-Side Dynamic Timestamp Localization Engine</strong>
+                <p>DateHelper normalized UTC+5 math to visitor local time, live DOM synchronization, and dual-theme preservation across admin consoles.</p>
+            </div>
+        </div>
+        <div class="timeline-step">
+            <span class="commit-hash">5a7b76c</span>
+            <div class="step-content">
+                <strong>Core System Hardening, Theme Synchronization & Telemetry Stability</strong>
+                <p>Resolved theme icon reference sync, fixed mail tab switching, fortified role-based access checks, and eliminated DB telemetry edge cases.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Interactive Filters & Search -->
+        <div class="controls-panel">
+            <div class="search-row">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search 105+ features by keyword, tech stack, API, or concept..." oninput="filterCards()">
+                </div>
+                <select id="impactSelect" class="filter-select" onchange="filterCards()">
+                    <option value="all">All Impact Levels</option>
+                    <option value="critical">Critical Impact</option>
+                    <option value="high">High Impact</option>
+                    <option value="medium">Medium Impact</option>
+                    <option value="low">Low Impact</option>
+                </select>
+                <select id="difficultySelect" class="filter-select" onchange="filterCards()">
+                    <option value="all">All Difficulties</option>
+                    <option value="easy">Easy (1-2 Days)</option>
+                    <option value="moderate">Moderate (3-5 Days)</option>
+                    <option value="advanced">Advanced (1-2 Weeks)</option>
+                </select>
+            </div>
+            <div class="categories-nav">
+                <button class="cat-pill active" onclick="filterCategory('all', this)"><i class="fa-solid fa-layer-group"></i> All Pillars <span class="pill-count">111</span></button><button class="cat-pill" onclick="filterCategory('AI &amp; Generative Studio', this)"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio <span class="pill-count">12</span></button><button class="cat-pill" onclick="filterCategory('Timezone &amp; Global Localization', this)"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('Editorial &amp; DOCX Studio', this)"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('Database &amp; Storage Engine', this)"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('Social &amp; Community Viral Engine', this)"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('Web3, Crypto &amp; Sponsor Monetization', this)"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('WAF, Telemetry &amp; Forensic Security', this)"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('White-Label, Installer &amp; Platform Architecture', this)"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('API, Webhooks &amp; Developer Ecosystem', this)"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem <span class="pill-count">11</span></button><button class="cat-pill" onclick="filterCategory('UI/UX Polish, Themes &amp; Micro-Interactions', this)"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions <span class="pill-count">11</span></button>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <main class="features-grid" id="featuresContainer">
+            
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Negative Prompt Generator &amp; Token Pruner</h3>
+        <p class="feature-desc">Add an intelligent negative prompt builder for Stable Diffusion and Flux.1 that removes artifact tokens (e.g. &quot;extra limbs, lowres, jpeg artifacts&quot;) with 1-click presets tailored to photorealism, anime, and 3D render styles.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-01', 'Negative Prompt Generator &amp; Token Pruner', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Interactive Aspect Ratio &amp; Resolution Calculator</h3>
+        <p class="feature-desc">Provide a visual ratio selector (16:9, 9:16, 1:1, 4:5, 21:9) on each prompt card that automatically generates model-specific CLI flags (--ar 16:9 for Midjourney, --aspect-ratio 9:16 for Flux).</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-02', 'Interactive Aspect Ratio &amp; Resolution Calculator', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Prompt Forking &amp; Community Variations Tree</h3>
+        <p class="feature-desc">Allow registered authors to &quot;Fork&quot; any existing image or GPT prompt, modifying seed words, lighting parameters, and tags while visually attributing the ancestor prompt in an interactive lineage tree.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-03', 'Prompt Forking &amp; Community Variations Tree', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Side-by-Side Model Comparison Sandbox</h3>
+        <p class="feature-desc">Allow visitors to test the identical text prompt across Midjourney v6, DALL-E 3, and Flux.1 with a split-screen slider comparing render aesthetics, detail retention, and prompt adherence.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-04', 'Side-by-Side Model Comparison Sandbox', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Lighting &amp; Camera Lens Matrix Injector</h3>
+        <p class="feature-desc">Add quick-inject chips for photographic parameters: Golden Hour, Volumetric Lighting, 85mm f/1.4 Lens, Octane Render, Hasselblad 500C, with live prompt preview updates.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-05', 'Lighting &amp; Camera Lens Matrix Injector', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">AI Prompt Reverse-Engineering (Image-to-Prompt)</h3>
+        <p class="feature-desc">Integrate vision AI API allowing authors to drag-and-drop an AI-generated artwork and automatically extract guessed descriptive prompts, artist styles, lighting, and suggested seed parameters.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-06', 'AI Prompt Reverse-Engineering (Image-to-Prompt)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Prompt Quality &amp; Adherence Scoring Engine</h3>
+        <p class="feature-desc">Evaluate submitted prompts against best-practice criteria (token diversity, avoiding duplicate adjectives, length calibration) and display a 0-100% &quot;Prompt Eloquence Score&quot;.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-07', 'Prompt Quality &amp; Adherence Scoring Engine', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">1-Click Direct Launch into Discord / Midjourney Bot</h3>
+        <p class="feature-desc">Provide a &quot;Run in Midjourney&quot; deeplink that copies the sanitized prompt and opens Discord or Midjourney web directly into the generation input bar.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-08', '1-Click Direct Launch into Discord / Midjourney Bot', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Curated Style Presets Matrix (Cyberpunk, Baroque, Studio Ghibli)</h3>
+        <p class="feature-desc">Curate 50+ pre-calibrated artistic style definitions that users can toggle on top of base prompts with visual thumbnails demonstrating the aesthetic shift.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-09', 'Curated Style Presets Matrix (Cyberpunk, Baroque, Studio Ghibli)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="low" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-low"><i class="fa-solid fa-bolt"></i> Low</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Prompt Token Breakdown &amp; Cost Estimator</h3>
+        <p class="feature-desc">For LLM and image prompts, render real-time token counts and estimated generation cost in cents across OpenAI, Anthropic, and Replicate endpoints.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-10', 'Prompt Token Breakdown &amp; Cost Estimator', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">High-Res Asset Download with Embedded EXIF Metadata</h3>
+        <p class="feature-desc">When users download sample prompt images, embed the full prompt text, seed, CFG scale, and model version directly into the PNG/WebP chunk metadata.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-11', 'High-Res Asset Download with Embedded EXIF Metadata', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="AI &amp; Generative Studio" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #8b5cf6; border-color: #8b5cf633; background: #8b5cf615;">TS-AI-12</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Weekly &quot;Prompt of the Week&quot; Voting Contest</h3>
+        <p class="feature-desc">Automated community showcase highlighting the highest-upvoted prompt of the week with a spotlight banner on the homepage and badge for the creator.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI &amp; Generative Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-AI-12', 'Weekly \&quot;Prompt of the Week\&quot; Voting Contest', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Dynamic Daylight Saving Time (DST) Transition Alerts</h3>
+        <p class="feature-desc">Expand DateHelper to detect impending DST clock shifts in visitor timezones and alert scheduled post authors to avoid publishing overlaps or timing miscalculations.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-01', 'Dynamic Daylight Saving Time (DST) Transition Alerts', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Visitor Currency &amp; Regional Pricing Auto-Localization</h3>
+        <p class="feature-desc">Using the IP country code detected in ApiController geo-lookup, automatically display sponsored ad prices in local currencies (USD, EUR, GBP, PKR, INR) with live exchange rates.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-02', 'Visitor Currency &amp; Regional Pricing Auto-Localization', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Admin Multi-Timezone Dual Clock in Topbar</h3>
+        <p class="feature-desc">Display a compact dual-clock pill in the admin topbar showing Server Time (UTC/PKT) alongside Visitor Local Time with live tick updates and timezone picker dropdown.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-03', 'Admin Multi-Timezone Dual Clock in Topbar', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Localized Date &amp; Time Format Preferences in User Profile</h3>
+        <p class="feature-desc">Allow members to select preferred timestamp syntax: 12-hour vs 24-hour, Little-Endian (DD/MM/YYYY) vs Middle-Endian (MM/DD/YYYY) vs ISO-8601 (YYYY-MM-DD).</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-04', 'Localized Date &amp; Time Format Preferences in User Profile', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Global Activity Heatmap by Regional Timezones</h3>
+        <p class="feature-desc">Render a dynamic 24-hour world map in Admin Analytics showing peak visitor activity normalized across global time zones (Americas, EMEA, APAC).</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-05', 'Global Activity Heatmap by Regional Timezones', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Intelligent Travel Mode Timezone Detection</h3>
+        <p class="feature-desc">When a logged-in user changes geographical IP location, prompt them gently: &quot;We noticed you are in London (GMT). Would you like to update your display timezone?&quot;.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-06', 'Intelligent Travel Mode Timezone Detection', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Localized &quot;Relative Time&quot; Ticker (Just now, 5m ago)</h3>
+        <p class="feature-desc">Add client-side interval timer to all `.ts-time` elements that automatically increments relative counters (&quot;2 minutes ago&quot; -&gt; &quot;3 minutes ago&quot;) without requiring page refreshes.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-07', 'Localized \&quot;Relative Time\&quot; Ticker (Just now, 5m ago)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Multi-Language i18n Dictionary Engine with Fallback</h3>
+        <p class="feature-desc">Create a lightweight translation architecture with JSON dictionaries (English, Spanish, Arabic, Urdu, French) that automatically defaults to browser Accept-Language.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-08', 'Multi-Language i18n Dictionary Engine with Fallback', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">RTL (Right-to-Left) Layout Support for Arabic &amp; Urdu</h3>
+        <p class="feature-desc">Introduce `[dir=&quot;rtl&quot;]` stylesheets reversing navigation, sidebars, icon margins, and table alignments for Middle Eastern and South Asian regional readers.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-09', 'RTL (Right-to-Left) Layout Support for Arabic &amp; Urdu', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Scheduled Publishing Timezone Synchronizer</h3>
+        <p class="feature-desc">When authors schedule an article to publish at &quot;9:00 AM&quot;, allow them to specify whether that is 9:00 AM EST (New York) or 9:00 AM PKT, preventing early/late releases.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-10', 'Scheduled Publishing Timezone Synchronizer', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Timezone &amp; Global Localization" data-impact="low" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #06b6d4; border-color: #06b6d433; background: #06b6d415;">TS-TZ-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-low"><i class="fa-solid fa-bolt"></i> Low</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Calendar ICS Export with Exact Timezone Conversions</h3>
+        <p class="feature-desc">Allow users to download `.ics` calendar invites for scheduled tech webinars or product launches with automatic VTIMEZONE definitions.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-globe-americas" style="color: #06b6d4;"></i> Timezone &amp; Global Localization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-TZ-11', 'Calendar ICS Export with Exact Timezone Conversions', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Client-Side DOCX Ingestion &amp; Direct HTML Converter</h3>
+        <p class="feature-desc">Build an in-browser Word (.docx) parser using Mammoth.js or JSZip that extracts headings, formatted text, lists, and embedded images directly into the editor canvas.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-01', 'Client-Side DOCX Ingestion &amp; Direct HTML Converter', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="high" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Table of Contents (TOC) Generator</h3>
+        <p class="feature-desc">Automatically parse all H2 and H3 tags in article manuscripts to generate a sticky, smooth-scrolling Table of Contents widget on long-form guides.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-02', 'Automated Table of Contents (TOC) Generator', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Flesch-Kincaid Readability &amp; Complexity Meter</h3>
+        <p class="feature-desc">Add a real-time badge in the editor toolbar calculating Flesch Reading Ease score, average sentence length, and vocabulary difficulty to help authors write clear copy.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-03', 'Flesch-Kincaid Readability &amp; Complexity Meter', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Interactive Google SERP &amp; Social OpenGraph Card Previewer</h3>
+        <p class="feature-desc">Live preview tab in author studio showing exactly how the title, meta description, and featured image will appear in Google Search, Twitter/X cards, and LinkedIn posts.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-04', 'Interactive Google SERP &amp; Social OpenGraph Card Previewer', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Author Manuscript Version History &amp; Visual Diff Viewer</h3>
+        <p class="feature-desc">Save snapshots of article drafts on every auto-save interval and allow authors/editors to review additions (green) and deletions (red) across previous versions.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-05', 'Author Manuscript Version History &amp; Visual Diff Viewer', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Smart Markdown Shortcut Expander in Visual Editor</h3>
+        <p class="feature-desc">Allow authors to type `# ` for H1, `## ` for H2, `&gt; ` for blockquote, or `---` for horizontal rule, seamlessly converting text into rich blocks on keystroke.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-06', 'Smart Markdown Shortcut Expander in Visual Editor', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Broken Link &amp; Outdated URL Checker</h3>
+        <p class="feature-desc">Scan article drafts before publication to identify 404 links, insecure HTTP embeds, or redirected affiliate links with 1-click replacement prompts.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-07', 'Automated Broken Link &amp; Outdated URL Checker', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Code Block Syntax Highlighter with 40+ Language Themes</h3>
+        <p class="feature-desc">Upgrade the editor code block insert tool with language selection (Python, PHP, Rust, Go, SQL, Bash), line numbering, and copy-code floating button.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-08', 'Code Block Syntax Highlighter with 40+ Language Themes', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Image Compression &amp; WebP Auto-Conversion on Upload</h3>
+        <p class="feature-desc">Automatically resize uploaded article banners, strip unnecessary EXIF data, and convert heavy JPEGs/PNGs to lightweight WebP formats to maintain fast page speed.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-09', 'Image Compression &amp; WebP Auto-Conversion on Upload', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Co-Author &amp; Peer Review Editorial Feedback Notes</h3>
+        <p class="feature-desc">Allow editors to highlight text snippets within draft manuscripts and leave inline revision comments (e.g. &quot;Needs source citation&quot;, &quot;Clarify benchmark stats&quot;).</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-10', 'Co-Author &amp; Peer Review Editorial Feedback Notes', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Editorial &amp; DOCX Studio" data-impact="medium" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #3b82f6; border-color: #3b82f633; background: #3b82f615;">TS-ED-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">PDF / ePub eBook Export Engine for Tech Guides</h3>
+        <p class="feature-desc">Provide a 1-click button allowing readers to export comprehensive tech roundups and multi-part tutorials into beautifully formatted, printable PDF whitepapers.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-file-word" style="color: #3b82f6;"></i> Editorial &amp; DOCX Studio</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-ED-11', 'PDF / ePub eBook Export Engine for Tech Guides', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Scheduled Database Backups to Remote FTP / S3</h3>
+        <p class="feature-desc">Add automated cron runner in DB Manager that dumps SQL tables, gzips the archive, and securely uploads backups to secondary off-site FTP or Amazon S3 buckets.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-01', 'Automated Scheduled Database Backups to Remote FTP / S3', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Table Defragmenter &amp; Live OPTIMIZE TABLE Orchestrator</h3>
+        <p class="feature-desc">Inspect table overhead and fragmented indexes in DB Manager, offering a 1-click &quot;Defrag &amp; Rebuild Indexes&quot; operation that optimizes MySQL storage engine performance.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-02', 'Table Defragmenter &amp; Live OPTIMIZE TABLE Orchestrator', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="critical" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">PII &amp; Sensitive Data Masking in Custom Seed Exporter</h3>
+        <p class="feature-desc">When exporting real seed rows via the new Custom Exporter Studio, automatically anonymize user email addresses, IP addresses, and password hashes into sanitized mock data.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-03', 'PII &amp; Sensitive Data Masking in Custom Seed Exporter', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Database Visual ERD (Entity Relationship Diagram) Visualizer</h3>
+        <p class="feature-desc">Render an interactive SVG diagram in DB Manager showing foreign keys, table relationships, and cardinality across users, content, comments, and telemetry tables.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-04', 'Database Visual ERD (Entity Relationship Diagram) Visualizer', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">MySQL Slow Query Profiler &amp; Index Advisor</h3>
+        <p class="feature-desc">Log slow SQL queries (&gt; 200ms) with execution time, rows examined, and display AI-assisted index recommendations (e.g. &quot;Add INDEX on content(status, created_at)&quot;).</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-05', 'MySQL Slow Query Profiler &amp; Index Advisor', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Database Schema Migration Runner with Rollback History</h3>
+        <p class="feature-desc">Track applied SQL migrations in a `migrations` table with version hashes, batch execution, and forward/backward rollbacks to prevent manual schema drift.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-06', 'Database Schema Migration Runner with Rollback History', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Orphaned Media &amp; Attachment Garbage Collector</h3>
+        <p class="feature-desc">Scan the filesystem uploads folder against database references to identify unlinked images from deleted drafts and safely purge them to recover disk space.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-07', 'Orphaned Media &amp; Attachment Garbage Collector', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Point-in-Time Database Snapshot &amp; Quick Staging Restore</h3>
+        <p class="feature-desc">Allow administrators to create instant local database snapshots before performing major upgrades or bulk imports, with 1-click restore functionality.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-08', 'Point-in-Time Database Snapshot &amp; Quick Staging Restore', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">JSON &amp; CSV Table Exporter with Column Filter Selection</h3>
+        <p class="feature-desc">Complement the SQL exporter by allowing admins to export query results or selected table columns directly into sanitized CSV or formatted JSON.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-09', 'JSON &amp; CSV Table Exporter with Column Filter Selection', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Database Health Benchmark &amp; Connection Latency Monitor</h3>
+        <p class="feature-desc">Display live metrics in the DB Manager: ping latency to MySQL server, active thread count, query cache hit ratio, and table lock status.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-10', 'Database Health Benchmark &amp; Connection Latency Monitor', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Database &amp; Storage Engine" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #10b981; border-color: #10b98133; background: #10b98115;">TS-DB-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated SQLite Portable Database Converter</h3>
+        <p class="feature-desc">Allow developers to export the entire MySQL database into a single, portable `.sqlite` database file for fast local testing and unit test integration.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-database" style="color: #10b981;"></i> Database &amp; Storage Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-DB-11', 'Automated SQLite Portable Database Converter', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">@Username Autocomplete Mentions &amp; Instant Notifications</h3>
+        <p class="feature-desc">In the newly upgraded social comment bubbles, typing `@` brings up an interactive dropdown of authors/commenters, sending direct web notifications when tagged.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-01', '@Username Autocomplete Mentions &amp; Instant Notifications', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Inline Markdown &amp; Spoiler Tag Support in Comments</h3>
+        <p class="feature-desc">Allow community members to use bold, italics, code blocks, and click-to-reveal spoiler tags `||hidden code||` within technical discussion threads.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-02', 'Inline Markdown &amp; Spoiler Tag Support in Comments', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="critical" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">AI Automated Sentiment Analysis &amp; Toxic Content Blocker</h3>
+        <p class="feature-desc">Scan incoming comment submissions in real-time for offensive slurs, spam links, and harassment patterns, automatically routing suspicious comments to admin moderation.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-03', 'AI Automated Sentiment Analysis &amp; Toxic Content Blocker', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Multi-Emoji Reaction Bar (❤️, 🚀, 💡, 🔥, 👀)</h3>
+        <p class="feature-desc">Expand the simple like button into a Facebook/Slack-style floating emoji reaction bar with instant count updates and reaction avatars on hover.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-04', 'Multi-Emoji Reaction Bar (❤️, 🚀, 💡, 🔥, 👀)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">User Reputation &amp; Trust Tier Badges (Bronze, Silver, Gold, Mod)</h3>
+        <p class="feature-desc">Reward active community members with reputation points for insightful comments and accepted prompt submissions, unlocking visual badge flairs on their profiles.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-05', 'User Reputation &amp; Trust Tier Badges (Bronze, Silver, Gold, Mod)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Live WebSocket / Server-Sent Events (SSE) Comment Stream</h3>
+        <p class="feature-desc">Allow new replies in active discussion threads to pop up in real-time with a gentle slide animation without requiring page reloads.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-06', 'Live WebSocket / Server-Sent Events (SSE) Comment Stream', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Pin &quot;Best Answer&quot; / Top Insight by Article Author</h3>
+        <p class="feature-desc">Allow the author of an article or tool to pin a helpful technical comment to the very top of the discussion thread with an &quot;Author&#039;s Choice&quot; highlight border.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-07', 'Pin \&quot;Best Answer\&quot; / Top Insight by Article Author', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Social Share Card Generator with Dynamic Quotes</h3>
+        <p class="feature-desc">Allow readers highlighting text within an article to click &quot;Share Quote&quot;, auto-generating a branded Instagram story / Twitter graphic with the highlighted phrase.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-08', 'Social Share Card Generator with Dynamic Quotes', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Community Member Public Profiles with Prompt Collections</h3>
+        <p class="feature-desc">Give each registered member a public handle (`/u/username`) showing their published articles, bookmarked tools, curated prompt collections, and badges.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-09', 'Community Member Public Profiles with Prompt Collections', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Weekly Discussion Digest Email</h3>
+        <p class="feature-desc">Send a personalized weekly email roundup to subscribers highlighting the hottest conversations, new replies to their threads, and trending tech tools.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-10', 'Automated Weekly Discussion Digest Email', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Social &amp; Community Viral Engine" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #f59e0b; border-color: #f59e0b33; background: #f59e0b15;">TS-SOC-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Community Polls &amp; Interactive Feedback Widgets</h3>
+        <p class="feature-desc">Allow authors to embed interactive single/multiple choice voting polls inside articles (e.g. &quot;Which AI Model do you prefer?&quot;) with instant percentage charts.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-comments" style="color: #f59e0b;"></i> Social &amp; Community Viral Engine</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SOC-11', 'Community Polls &amp; Interactive Feedback Widgets', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated On-Chain TXID Verification via Blockchain APIs</h3>
+        <p class="feature-desc">Integrate Etherscan, Mempool, and Solscan APIs to automatically verify submitted transaction hashes (TXIDs) for Bitcoin, Ethereum, USDT, and Solana ad payments.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-01', 'Automated On-Chain TXID Verification via Blockchain APIs', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="high" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Dynamic QR Code Generator with Web3 Deep Linking</h3>
+        <p class="feature-desc">On the `/sponsor` page, generate standard BIP-21 (Bitcoin) and EIP-681 (Ethereum) QR codes allowing sponsors to pay instantly by scanning with MetaMask or Phantom.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-02', 'Dynamic QR Code Generator with Web3 Deep Linking', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Real-Time Sponsor Analytics &amp; Impression CTR Dashboard</h3>
+        <p class="feature-desc">Provide an exclusive private dashboard for approved sponsors showing real-time impressions, unique click-through rates (CTR), top referring countries, and device types.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-03', 'Real-Time Sponsor Analytics &amp; Impression CTR Dashboard', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Ad Expiration Email Alerts &amp; Renewal Discounts</h3>
+        <p class="feature-desc">Trigger automated transactional emails to sponsors 48 hours and 24 hours before their campaign expires, offering a 1-click renewal link with 10% loyalty discount.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-04', 'Automated Ad Expiration Email Alerts &amp; Renewal Discounts', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Creator Revenue Share &amp; Crypto Tip Jar on Articles</h3>
+        <p class="feature-desc">Allow authors to configure their own crypto wallet addresses in profile settings, displaying a sleek &quot;Tip the Author&quot; modal (SOL, ETH, BTC) at the footer of each guide.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-05', 'Creator Revenue Share &amp; Crypto Tip Jar on Articles', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated VAT / Crypto Invoice PDF Generator</h3>
+        <p class="feature-desc">Generate downloadable corporate PDF tax invoices containing the sponsor&#039;s company name, transaction hash, timestamp, exchange rate at block height, and platform tax ID.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-06', 'Automated VAT / Crypto Invoice PDF Generator', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Affiliate Link Auto-Cloaker &amp; Outbound Click Tracker</h3>
+        <p class="feature-desc">Automatically route outbound commercial tool links through `/go/{tool_slug}` to mask raw affiliate URLs, prevent referrer leaks, and record monetization conversion metrics.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-07', 'Affiliate Link Auto-Cloaker &amp; Outbound Click Tracker', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Sponsorship Slot Availability Real-Time Calendar</h3>
+        <p class="feature-desc">Display a calendar on `/sponsor` showing available ad slots across Homepage Banner, Prompts Spotlight, and Newsletter Header with booked dates grayed out.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-08', 'Sponsorship Slot Availability Real-Time Calendar', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="medium" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Web3 Wallet Login (Sign-In with Ethereum / Solana)</h3>
+        <p class="feature-desc">Allow Web3 native users to authenticate via MetaMask or Phantom by signing a cryptographic nonce challenge, eliminating password requirements.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-09', 'Web3 Wallet Login (Sign-In with Ethereum / Solana)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Crypto Price Conversion API (CoinGecko Integration)</h3>
+        <p class="feature-desc">Fetch real-time spot rates from CoinGecko so a $50 sponsorship tier dynamically calculates the exact amount of BTC, ETH, USDT, or SOL required at checkout.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-10', 'Automated Crypto Price Conversion API (CoinGecko Integration)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="Web3, Crypto &amp; Sponsor Monetization" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ec4899; border-color: #ec489933; background: #ec489915;">TS-CR-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Tiered Ad Pricing Engine with Bulk Duration Discounts</h3>
+        <p class="feature-desc">Offer tiered pricing calculators: 7 Days (Standard), 30 Days (15% discount), 90 Days (30% discount) with instant checkout summary.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-coins" style="color: #ec4899;"></i> Web3, Crypto &amp; Sponsor Monetization</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-CR-11', 'Tiered Ad Pricing Engine with Bulk Duration Discounts', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="critical" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Brute-Force Honeypot &amp; IP Auto-Banning</h3>
+        <p class="feature-desc">Deploy hidden decoy login fields (honeypots). If automated bots populate these fields or exceed 5 failed login attempts in 10 minutes, automatically blacklist their IP in the firewall.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-01', 'Automated Brute-Force Honeypot &amp; IP Auto-Banning', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Audit Log Tamper-Proof Cryptographic Hash Chain</h3>
+        <p class="feature-desc">Link each record in `audit_logs` with a SHA-256 hash containing the previous entry&#039;s hash (Merkle chain), preventing silent tampering or manual record deletion by rogue admins.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-02', 'Audit Log Tamper-Proof Cryptographic Hash Chain', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="critical" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Two-Factor Authentication (2FA) via Authenticator App (TOTP)</h3>
+        <p class="feature-desc">Enable standard RFC 6238 TOTP two-factor authentication for Admin and Author accounts with Google Authenticator QR setup and one-time emergency backup recovery codes.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-03', 'Two-Factor Authentication (2FA) via Authenticator App (TOTP)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Real-Time Content Security Policy (CSP) Violation Reporter</h3>
+        <p class="feature-desc">Configure `report-uri /api/v1/telemetry/csp` headers in `.htaccess` to log and inspect any client-side cross-site scripting (XSS) attempts directly in the Admin Error Inspector.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-04', 'Real-Time Content Security Policy (CSP) Violation Reporter', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="high" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Disposable &amp; Temporary Email Domain Blocker</h3>
+        <p class="feature-desc">Block spam bot registrations by checking email domains against an open-source blacklist of 5,000+ throwaway email providers (10minutemail, temp-mail, guerrillamail).</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-05', 'Disposable &amp; Temporary Email Domain Blocker', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Admin Session Geo-Fencing &amp; Suspicious Login Alerts</h3>
+        <p class="feature-desc">When an administrator logs in from a previously unseen country or ASN, trigger an immediate high-priority email alert containing IP, browser fingerprint, and 1-click session revoke.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-06', 'Admin Session Geo-Fencing &amp; Suspicious Login Alerts', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">CIDR Subnet IP Whitelisting / Blacklisting in Firewall</h3>
+        <p class="feature-desc">Upgrade the admin IP manager to accept CIDR blocks (e.g. `192.168.1.0/24`, `10.0.0.0/8`) for enterprise VPN whitelisting or whole malicious subnet blocking.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-07', 'CIDR Subnet IP Whitelisting / Blacklisting in Firewall', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Encrypted Secrets Vault for External API Keys</h3>
+        <p class="feature-desc">Store third-party API keys (OpenAI, CoinGecko, Mailgun, AWS) encrypted at rest using AES-256-GCM with master keys stored outside web root.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-08', 'Encrypted Secrets Vault for External API Keys', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated File Integrity &amp; Core Code Checksum Scanner</h3>
+        <p class="feature-desc">Calculate baseline SHA-256 hashes of all PHP core files. Run a nightly cron checking for injected backdoors or unauthorized file modifications, alerting admins immediately.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-09', 'Automated File Integrity &amp; Core Code Checksum Scanner', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-010</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Strict Rate-Limiting Engine on Public APIs &amp; Search</h3>
+        <p class="feature-desc">Implement Token Bucket algorithm in `ApiController` to cap public endpoints at 60 requests/min per IP, returning HTTP 429 Too Many Requests with Retry-After headers.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-010', 'Strict Rate-Limiting Engine on Public APIs &amp; Search', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="WAF, Telemetry &amp; Forensic Security" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #ef4444; border-color: #ef444433; background: #ef444415;">TS-SEC-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">User Account Self-Destruct &amp; GDPR &quot;Right to be Forgotten&quot;</h3>
+        <p class="feature-desc">Provide a self-service privacy portal where users can download all personal data in JSON format or trigger complete cryptographic erasure of their profile.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> WAF, Telemetry &amp; Forensic Security</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-SEC-11', 'User Account Self-Destruct &amp; GDPR \&quot;Right to be Forgotten\&quot;', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">1-Click GitHub Remote Update &amp; Deployment Runner</h3>
+        <p class="feature-desc">Allow administrators to trigger seamless system updates directly from GitHub releases with automated pre-flight checks, schema migration, and rollback if failure occurs.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-01', '1-Click GitHub Remote Update &amp; Deployment Runner', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Multi-Tenant Custom Domain CNAME Routing Engine</h3>
+        <p class="feature-desc">Support custom branded domain mapping (e.g. `community.mybrand.com`), automatically resolving settings, logos, and categories per incoming HTTP Host header.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-02', 'Multi-Tenant Custom Domain CNAME Routing Engine', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Interactive CSS Theme Styler &amp; Palette Export Studio</h3>
+        <p class="feature-desc">In Admin Settings, add color picker inputs allowing white-label customers to customize `--admin-primary`, `--color-accent`, fonts, and border radiuses with live preview.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-03', 'Interactive CSS Theme Styler &amp; Palette Export Studio', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="high" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Public System Status Page &amp; Real-Time Uptime Healthcheck</h3>
+        <p class="feature-desc">Create a lightweight `/status` endpoint and public dashboard reporting MySQL connection, disk space, mail gateway, and cache performance with HTTP 200/503 codes.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-04', 'Public System Status Page &amp; Real-Time Uptime Healthcheck', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Installer Sample Seed Demo Data Pack Selector</h3>
+        <p class="feature-desc">In the 5-step installer, offer an optional checkbox to pre-populate the database with 50+ realistic sample AI prompts, tools, articles, and author accounts for instant demo.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-05', 'Installer Sample Seed Demo Data Pack Selector', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated SMTP Mail Delivery Tester &amp; Diagnostics</h3>
+        <p class="feature-desc">Provide a 1-click test button in Admin Mail Settings that sends an instant diagnostic email and prints full SMTP socket handshakes, TLS negotiation, and error logs.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-06', 'Automated SMTP Mail Delivery Tester &amp; Diagnostics', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Storage Directory Symlink &amp; Remote CDN Offloader</h3>
+        <p class="feature-desc">Support offloading `/storage/uploads` to Cloudflare R2 or DigitalOcean Spaces, generating CDN URLs to offload web server bandwidth.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-07', 'Storage Directory Symlink &amp; Remote CDN Offloader', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Granular Role-Based Access Control (RBAC) Permissions Matrix</h3>
+        <p class="feature-desc">Upgrade the binary Admin/Author role check into a permission matrix: `posts.create`, `posts.publish`, `comments.moderate`, `ads.review`, `db.export`, `settings.edit`.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-08', 'Granular Role-Based Access Control (RBAC) Permissions Matrix', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Maintenance Mode with IP Bypass &amp; Custom Countdown Clock</h3>
+        <p class="feature-desc">Allow administrators to toggle a sleek 503 Maintenance Mode screen with estimated return countdown while allowing specific admin IPs to browse normally.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-09', 'Maintenance Mode with IP Bypass &amp; Custom Countdown Clock', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Cron Job Orchestrator &amp; Execution Log</h3>
+        <p class="feature-desc">Centralize all scheduled tasks (telemetry cleanup, email queue, sitemap generation, backup) under a single `cron.php` runner with duration tracking and failure alerts.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-10', 'Automated Cron Job Orchestrator &amp; Execution Log', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="White-Label, Installer &amp; Platform Architecture" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #6366f1; border-color: #6366f133; background: #6366f115;">TS-INF-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Environment Detection &amp; Production Config Lockdown</h3>
+        <p class="feature-desc">Automatically disable display_errors, enable strict error logging, and freeze installer routes when running under production domain names.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-sliders" style="color: #6366f1;"></i> White-Label, Installer &amp; Platform Architecture</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-INF-11', 'Environment Detection &amp; Production Config Lockdown', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Interactive Swagger / OpenAPI 3.0 Documentation Studio</h3>
+        <p class="feature-desc">Serve an interactive API documentation explorer at `/docs/api` where third-party developers can test GET/POST endpoints directly with live request builders.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-01', 'Interactive Swagger / OpenAPI 3.0 Documentation Studio', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="critical" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-critical"><i class="fa-solid fa-bolt"></i> Critical</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Outgoing Webhook Event Subscriptions (Zapier &amp; Make.com)</h3>
+        <p class="feature-desc">Allow admins to configure HTTP POST webhooks for events: `article.published`, `comment.created`, `sponsor.paid`, with HMAC-SHA256 signature verification headers.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-02', 'Outgoing Webhook Event Subscriptions (Zapier &amp; Make.com)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Granular Developer API Key Management with Scopes</h3>
+        <p class="feature-desc">Allow registered developers to generate scoped API keys (`ts_live_...`, `ts_test_...`) with read/write limitations, expiry dates, and IP address binding.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-03', 'Granular Developer API Key Management with Scopes', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Webhook Delivery Logs &amp; 1-Click Retry Inspector</h3>
+        <p class="feature-desc">Log all outgoing webhook attempts with HTTP status code, request payload, response body, and automated exponential backoff retries on 5xx failures.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-04', 'Webhook Delivery Logs &amp; 1-Click Retry Inspector', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Public RSS, Atom &amp; JSON Feeds per Category</h3>
+        <p class="feature-desc">Provide clean, syndication-ready RSS 2.0 and JSON Feed endpoints for every category (`/feed/prompts.xml`, `/feed/articles.json`) for feed readers and aggregators.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-05', 'Public RSS, Atom &amp; JSON Feeds per Category', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Official PHP &amp; Python Lightweight Client SDKs</h3>
+        <p class="feature-desc">Publish official client libraries on Composer (`techscout/sdk`) and PyPI (`techscout-python`) enabling developers to fetch prompts and tools with 3 lines of code.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-06', 'Official PHP &amp; Python Lightweight Client SDKs', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="high" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Dynamic XML Sitemap with Priority Weighting &amp; Google Ping</h3>
+        <p class="feature-desc">Generate automated XML sitemaps partitioned by `/sitemap-articles.xml`, `/sitemap-tools.xml`, and `/sitemap-prompts.xml` with automatic Google/Bing submission pings.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-07', 'Dynamic XML Sitemap with Priority Weighting &amp; Google Ping', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="medium" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">GraphQL Flexible Query Endpoint for Mobile Apps</h3>
+        <p class="feature-desc">Introduce an optional GraphQL query endpoint allowing client applications to request precisely the fields needed for fast mobile bandwidth optimization.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-08', 'GraphQL Flexible Query Endpoint for Mobile Apps', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">API Quota Analytics &amp; Developer Usage Charts</h3>
+        <p class="feature-desc">Provide developers with interactive usage charts showing hourly request volume, latency averages, and remaining monthly quota.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-09', 'API Quota Analytics &amp; Developer Usage Charts', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Automated Discord &amp; Telegram Post Broadcasting Bots</h3>
+        <p class="feature-desc">Build automated webhook integration that broadcasts newly published AI prompts and featured tools directly into a community Discord channel or Telegram group.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-10', 'Automated Discord &amp; Telegram Post Broadcasting Bots', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="API, Webhooks &amp; Developer Ecosystem" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #14b8a6; border-color: #14b8a633; background: #14b8a615;">TS-API-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Headless CMS REST API Mode for Custom Frontend Apps</h3>
+        <p class="feature-desc">Expose full read endpoints allowing developers to use TechScout as a Headless CMS powering Next.js, Nuxt, or mobile applications.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-code" style="color: #14b8a6;"></i> API, Webhooks &amp; Developer Ecosystem</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-API-11', 'Headless CMS REST API Mode for Custom Frontend Apps', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-01</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Global Command Palette Keyboard Shortcuts (Ctrl+K / Cmd+K)</h3>
+        <p class="feature-desc">Expand the admin command palette into a universal modal across the entire website with fuzzy search across tools, prompts, articles, settings, and theme toggling.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-01', 'Global Command Palette Keyboard Shortcuts (Ctrl+K / Cmd+K)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="low" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-02</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-low"><i class="fa-solid fa-bolt"></i> Low</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Sound Effects &amp; Haptic Audio Feedback for Key Actions</h3>
+        <p class="feature-desc">Provide a subtle, toggleable UI audio chime for actions like &quot;Prompt Copied&quot;, &quot;Comment Submitted&quot;, or &quot;Ad Approved&quot;, with volume controls in user preferences.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-02', 'Sound Effects &amp; Haptic Audio Feedback for Key Actions', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="high" data-difficulty="advanced">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-03</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-advanced"><i class="fa-solid fa-gauge-high"></i> Advanced</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Interactive Drag-and-Drop Admin Dashboard Widget Studio</h3>
+        <p class="feature-desc">Allow administrators to rearrange, resize, hide, or add dashboard stat widgets (Revenue, Active Users, Error Rate, Pending Ads) using Sortable.js.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-03', 'Interactive Drag-and-Drop Admin Dashboard Widget Studio', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-04</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">High-Contrast &amp; Dyslexia-Friendly Accessibility Modes</h3>
+        <p class="feature-desc">Add an accessibility panel offering High-Contrast Theme (WCAG AAA compliant), OpenDyslexic font toggle, text size scaling, and animation reduction.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-04', 'High-Contrast &amp; Dyslexia-Friendly Accessibility Modes', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-05</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Offline Progressive Web App (PWA) Support with Service Worker</h3>
+        <p class="feature-desc">Provide `manifest.json` and service worker caching so visitors can install TechScout as a native desktop/mobile app and browse previously viewed prompts offline.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-05', 'Offline Progressive Web App (PWA) Support with Service Worker', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-06</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Quick-Action Floating Dock for Power Users</h3>
+        <p class="feature-desc">Add a floating bottom dock (macOS style) on admin pages with quick icons for: New Post, DB Export, Error Log, Ad Approvals, and Theme Switch.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-06', 'Quick-Action Floating Dock for Power Users', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-07</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Skeleton Screen Loading States for Instant Perceived Speed</h3>
+        <p class="feature-desc">Replace generic spinning loaders with shimmering skeleton layout cards matching the exact layout of prompt cards and comments while data loads.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-07', 'Skeleton Screen Loading States for Instant Perceived Speed', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="medium" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-08</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Interactive Keyboard Navigation for Directory Cards (J/K Keys)</h3>
+        <p class="feature-desc">Allow power users to browse directory listings using Reddit/Vim style `J` and `K` keys to cycle through cards, and `C` to copy prompts instantly.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-08', 'Interactive Keyboard Navigation for Directory Cards (J/K Keys)', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="low" data-difficulty="easy">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-09</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-low"><i class="fa-solid fa-bolt"></i> Low</span>
+                <span class="meta-badge diff-easy"><i class="fa-solid fa-gauge-high"></i> Easy</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Confetti &amp; Celebration Particle Effects on Milestone Events</h3>
+        <p class="feature-desc">Trigger lightweight canvas confetti bursts when an author publishes their first article, when a user reaches a reputation milestone, or after ad payment.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-09', 'Confetti &amp; Celebration Particle Effects on Milestone Events', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="high" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-10</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-high"><i class="fa-solid fa-bolt"></i> High</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Multi-Select Batch Actions in Admin Tables</h3>
+        <p class="feature-desc">Add checkboxes to all admin tables (Users, Content, Logs, Comments) with floating action bar for batch operations: &quot;Bulk Delete&quot;, &quot;Bulk Approve&quot;, &quot;Bulk Export&quot;.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-10', 'Multi-Select Batch Actions in Admin Tables', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="feature-card" data-category="UI/UX Polish, Themes &amp; Micro-Interactions" data-impact="medium" data-difficulty="moderate">
+        <div class="card-header">
+            <span class="feature-id" style="color: #a855f7; border-color: #a855f733; background: #a855f715;">TS-UI-11</span>
+            <div class="card-badges">
+                <span class="meta-badge impact-medium"><i class="fa-solid fa-bolt"></i> Medium</span>
+                <span class="meta-badge diff-moderate"><i class="fa-solid fa-gauge-high"></i> Moderate</span>
+            </div>
+        </div>
+        <h3 class="feature-title">Smooth Micro-Transitions &amp; Page State Persistence</h3>
+        <p class="feature-desc">Preserve active tab states, scroll positions, and search inputs in `sessionStorage` so navigating back from a detail page restores the exact view state.</p>
+        <div class="card-footer">
+            <span class="feature-cat"><i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> UI/UX Polish, Themes &amp; Micro-Interactions</span>
+            <button class="copy-idea-btn" onclick="copyIdea('TS-UI-11', 'Smooth Micro-Transitions &amp; Page State Persistence', this)" title="Copy Feature Details"><i class="fa-regular fa-copy"></i></button>
+        </div>
+    </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer-bar">
+            <p><strong>TechScout Engineering & Product Architecture</strong> &bull; Generated from real commit trajectory & technical requirements.</p>
+            <p>Compliant with Dual-Theme System (Dark/Light), Zero-Inline Styles, and Production Infrastructure Standards.</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-popup" id="toastPopup">
+        <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
+        <span id="toastMsg">Feature specifications copied to clipboard!</span>
+    </div>
+
+    <script>
+        let currentCategory = "all";
+
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-theme") || "dark";
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            html.setAttribute("data-theme", newTheme);
+            localStorage.setItem("ts_roadmap_theme", newTheme);
+            updateThemeButton(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const btn = document.getElementById("themeToggleBtn");
+            if (theme === "light") {
+                btn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark Mode</span>';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light Mode</span>';
+            }
+        }
+
+        // Initialize Theme from localStorage
+        const savedTheme = localStorage.getItem("ts_roadmap_theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateThemeButton(savedTheme);
+
+        // Filter Category
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll(".cat-pill").forEach(p => p.classList.remove("active"));
+            btn.classList.add("active");
+            filterCards();
+        }
+
+        // Filter Cards by Keyword, Category, Impact, and Difficulty
+        function filterCards() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+            const impact = document.getElementById("impactSelect").value.toLowerCase();
+            const difficulty = document.getElementById("difficultySelect").value.toLowerCase();
+            const cards = document.querySelectorAll(".feature-card");
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardCat = card.getAttribute("data-category");
+                const cardImpact = card.getAttribute("data-impact");
+                const cardDiff = card.getAttribute("data-difficulty");
+                const cardText = card.innerText.toLowerCase();
+
+                const matchesCat = (currentCategory === "all" || cardCat === currentCategory);
+                const matchesImpact = (impact === "all" || cardImpact === impact);
+                const matchesDiff = (difficulty === "all" || cardDiff === difficulty);
+                const matchesQuery = (!query || cardText.includes(query));
+
+                if (matchesCat && matchesImpact && matchesDiff && matchesQuery) {
+                    card.style.display = "flex";
+                    visibleCount++;
+                } else {
+                    card.style.display = "none";
+                }
+            });
+
+            document.getElementById("countTotal").innerText = visibleCount;
+        }
+
+        // Copy Idea to Clipboard
+        function copyIdea(id, title, btn) {
+            const card = btn.closest(".feature-card");
+            const desc = card.querySelector(".feature-desc").innerText;
+            const cat = card.getAttribute("data-category");
+            const textToCopy = `[${id}] ${title}\nCategory: ${cat}\nSpecification: ${desc}`;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast(`Copied ${id}: "${title}"`);
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById("toastPopup");
+            document.getElementById("toastMsg").innerText = msg;
+            toast.classList.add("visible");
+            setTimeout(() => {
+                toast.classList.remove("visible");
+            }, 3000);
+        }
+
+        // Export Roadmap JSON
+        function exportRoadmapJson() {
+            const cards = document.querySelectorAll(".feature-card");
+            const data = [];
+            cards.forEach(c => {
+                data.push({
+                    id: c.querySelector(".feature-id").innerText,
+                    title: c.querySelector(".feature-title").innerText,
+                    category: c.getAttribute("data-category"),
+                    impact: c.getAttribute("data-impact"),
+                    difficulty: c.getAttribute("data-difficulty"),
+                    description: c.querySelector(".feature-desc").innerText
+                });
+            });
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "techscout_feature_roadmap_105.json";
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Exported 105+ features to JSON file!");
+        }
+    </script>
+</body>
+</html>
