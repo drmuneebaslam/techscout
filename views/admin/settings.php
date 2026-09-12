@@ -75,6 +75,37 @@
     }
   </style>
 
+  <script>
+  function switchSettingsTab(tabKey) {
+    document.querySelectorAll('#settingsTabNav button').forEach(b => {
+      b.classList.remove('active');
+    });
+    const activeBtn = document.getElementById('tabbtn_' + tabKey);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+    }
+
+    document.querySelectorAll('.settings-pane').forEach(pane => {
+      pane.style.display = 'none';
+    });
+    const activePane = document.getElementById('pane_' + tabKey);
+    if (activePane) {
+      activePane.style.display = 'block';
+    }
+
+    const field = document.getElementById('active_tab_field');
+    if (field) field.value = tabKey;
+
+    try {
+      const url = new URL(window.location);
+      url.searchParams.set('tab', tabKey);
+      window.history.replaceState({}, '', url);
+    } catch (e) {}
+
+    if (window.lucide) lucide.createIcons();
+  }
+  </script>
+
   <!-- Master Settings Shell (Sidebar Tabs + Content Workspace) -->
   <div class="admin-settings-layout">
     
@@ -1031,36 +1062,6 @@
 </div>
 
 <script>
-function switchSettingsTab(tabKey) {
-  // Update left tab buttons
-  document.querySelectorAll('#settingsTabNav button').forEach(b => {
-    b.classList.remove('active');
-  });
-  const activeBtn = document.getElementById('tabbtn_' + tabKey);
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-  }
-
-  // Show selected pane, hide all other panes
-  document.querySelectorAll('.settings-pane').forEach(pane => {
-    pane.style.display = 'none';
-  });
-  const activePane = document.getElementById('pane_' + tabKey);
-  if (activePane) {
-    activePane.style.display = 'block';
-  }
-
-  // Update hidden field for POST persistence
-  document.getElementById('active_tab_field').value = tabKey;
-
-  // Update URL query string without reloading
-  const url = new URL(window.location);
-  url.searchParams.set('tab', tabKey);
-  window.history.replaceState({}, '', url);
-
-  if (window.lucide) lucide.createIcons();
-}
-
 function launchWebInstaller() {
   if (!confirm('Authorize and launch the 5-step Web Setup Wizard to reconfigure platform branding and database parameters?')) {
     return;

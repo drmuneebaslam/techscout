@@ -145,6 +145,24 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   
   <!-- Dynamic Base Url for JS -->
   <script>window.TS_BASE_URL = "<?= $appUrl ?>";</script>
+
+  <style>
+    .maint-admin-indicator-banner {
+      background: #7f1d1d;
+      color: #fee2e2;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.4);
+    }
+    [data-theme="light"] .maint-admin-indicator-banner,
+    .theme-light .maint-admin-indicator-banner {
+      background: #fee2e2;
+      color: #991b1b;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+    }
+  </style>
 </head><body data-theme="<?= $activeTheme ?>" class="<?= $activeTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($siteSettings['enable_bg_grid_lines']) && $siteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
 <script>
   (function() {
@@ -176,6 +194,21 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
       <a href="<?= url('/auth/impersonate/exit') ?>" style="background: #ffffff; color: #c2410c; padding: 0.4rem 1.1rem; border-radius: 6px; text-decoration: none; font-weight: 800; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.2s ease;">
         <span>Exit Impersonation Mode &rarr;</span>
       </a>
+    </div>
+  <?php endif; ?>
+
+  <?php if (!empty($siteSettings['site_maintenance_mode']) && $siteSettings['site_maintenance_mode'] === '1' && (Auth::isAdmin() || !empty($_SESSION['maintenance_bypass']))): ?>
+    <div class="maint-admin-indicator-banner">
+      <div class="container" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+        <span style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700;">
+          <i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: #f59e0b;"></i>
+          <span><strong>MAINTENANCE MODE ACTIVE:</strong> Public visitors receive HTTP 503. You are bypassing this as Administrator.</span>
+        </span>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <a href="<?= url('/admin/settings?tab=general') ?>" class="ts-btn ts-btn-xs ts-btn-outline" style="border-color: currentColor;">⚙️ Settings</a>
+          <a href="<?= url('/?preview_503=1') ?>" target="_blank" class="ts-btn ts-btn-xs ts-btn-primary">Preview 503 Page ↗</a>
+        </div>
+      </div>
     </div>
   <?php endif; ?>
 

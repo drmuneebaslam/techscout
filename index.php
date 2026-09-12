@@ -1,15 +1,36 @@
 <?php
 declare(strict_types=1);
 
-// Direct High-Performance Favicon Serving (Guarantees 200 OK without 404)
-if (isset($_SERVER['REQUEST_URI']) && (str_ends_with($_SERVER['REQUEST_URI'], 'favicon.ico') || $_SERVER['REQUEST_URI'] === '/favicon.ico')) {
-    $icoPath = __DIR__ . '/favicon.ico';
-    if (file_exists($icoPath)) {
-        header('Content-Type: image/x-icon');
-        header('Content-Length: ' . filesize($icoPath));
-        header('Cache-Control: public, max-age=604800');
-        readfile($icoPath);
-        exit;
+// Direct High-Performance Favicon, Manifest & Service Worker Serving
+if (isset($_SERVER['REQUEST_URI'])) {
+    $cleanUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '';
+    if (str_ends_with($cleanUri, 'favicon.ico')) {
+        $icoPath = __DIR__ . '/favicon.ico';
+        if (file_exists($icoPath)) {
+            header('Content-Type: image/x-icon');
+            header('Content-Length: ' . filesize($icoPath));
+            header('Cache-Control: public, max-age=604800');
+            readfile($icoPath);
+            exit;
+        }
+    } elseif (str_ends_with($cleanUri, 'manifest.json')) {
+        $manifestPath = __DIR__ . '/manifest.json';
+        if (file_exists($manifestPath)) {
+            header('Content-Type: application/manifest+json; charset=utf-8');
+            header('Access-Control-Allow-Origin: *');
+            header('Cache-Control: public, max-age=86400');
+            readfile($manifestPath);
+            exit;
+        }
+    } elseif (str_ends_with($cleanUri, 'sw.js')) {
+        $swPath = __DIR__ . '/sw.js';
+        if (file_exists($swPath)) {
+            header('Content-Type: application/javascript; charset=utf-8');
+            header('Service-Worker-Allowed: /');
+            header('Cache-Control: no-cache, no-store, must-revalidate');
+            readfile($swPath);
+            exit;
+        }
     }
 }
 
@@ -593,7 +614,8 @@ $router->get('/help/{slug}', [PageController::class, 'help']);
 $router->get('/write/guidelines', [PageController::class, 'authorGuidelines']);
 $router->get('/editorial', [PageController::class, 'editorial']);
 $router->get('/about', [PageController::class, 'about']);
-$router->get('/status', [PageController::class, 'systemStatus']);
+$router->get('/status', [PageController::class, 'systemStatus'], ['admin']);
+$router->get('/api/v1/diagnostic-ping', [PageController::class, 'diagnosticPing'], ['admin']);
 
 // Feeds & Dynamic Partitioned Sitemaps [TS-API-05, TS-API-07]
 $router->get('/feed/prompts.xml', [\App\Controllers\FeedController::class, 'promptsXml']);
@@ -732,10 +754,10 @@ try {
     $isFullMaint = in_array($val, ['1', 'true', 'on', 'yes', 'full', 'lockout'], true);
     $isReadOnly = in_array($val, ['read_only', 'readonly'], true);
 
-    $uri = $request->getUri();
+    $path = $request->getPath();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $isAdmin = \App\Core\Auth::isAdmin();
-    $isAdminPath = str_starts_with($uri, '/admin') || str_starts_with($uri, '/login') || str_starts_with($uri, '/logout') || str_starts_with($uri, '/assets') || str_starts_with($uri, '/auth') || str_starts_with($uri, '/api/v1/diagnostic-ping') || str_starts_with($uri, '/status');
+    $isAdminPath = str_starts_with($path, '/admin') || str_starts_with($path, '/login') || str_starts_with($path, '/logout') || str_starts_with($path, '/assets') || str_starts_with($path, '/auth');
     $hasBypass = \App\Core\Session::get('maintenance_bypass') || $request->query('bypass') === 'techscout_ops';
     
     // Check Client IP against Maintenance Allowed IPs whitelist [TS-INF-09]
@@ -754,8 +776,11 @@ try {
         $hasBypass = true;
     }
 
-    if ($isFullMaint && !$isAdmin && !$isAdminPath && !$hasBypass) {
+    $isPreview503 = ($request->query('preview_503') === '1');
+
+    if (($isFullMaint && !$isAdmin && !$isAdminPath && !$hasBypass) || $isPreview503) {
         http_response_code(503);
+        header('Retry-After: 300');
         $msgRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_message'");
         $customMessage = $msgRow['key_value'] ?? 'TechScout core engineering systems are currently executing scheduled platform upgrades.';
         $countdownRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_countdown_minutes'");

@@ -114,12 +114,17 @@ if (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E')
         </p>
 
         <div style="display: grid; gap: 1rem;">
-          <?php foreach ($variables as $v): ?>
+          <?php foreach ($variables as $v): 
+            $varName = is_array($v) ? ($v['name'] ?? '') : (string)$v;
+            $varLabel = is_array($v) ? ($v['label'] ?? $varName) : (string)$v;
+            $varDefault = is_array($v) ? ($v['default'] ?? '') : '';
+            if ($varName === '') continue;
+          ?>
             <div>
               <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--ts-text-primary); margin-bottom: 0.35rem;">
-                <?= htmlspecialchars($v['label'] ?? $v['name']) ?>
+                <?= htmlspecialchars($varLabel) ?>
               </label>
-              <input type="text" class="prompt-var-input" data-var-name="<?= htmlspecialchars($v['name']) ?>" value="<?= htmlspecialchars($v['default'] ?? '') ?>" style="width: 100%; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); padding: 0.65rem 1rem; border-radius: var(--ts-radius-md); color: var(--ts-text-primary); font-size: 0.9rem; outline: none;">
+              <input type="text" class="prompt-var-input" data-var-name="<?= htmlspecialchars($varName) ?>" value="<?= htmlspecialchars($varDefault) ?>" style="width: 100%; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); padding: 0.65rem 1rem; border-radius: var(--ts-radius-md); color: var(--ts-text-primary); font-size: 0.9rem; outline: none;">
             </div>
           <?php endforeach; ?>
         </div>

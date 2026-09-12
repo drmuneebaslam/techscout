@@ -144,7 +144,8 @@ class DirectoryController {
             'type' => 'prompt',
             'search' => $search,
             'category' => $category,
-            'model' => $model
+            'model' => $model,
+            'prompt_kind' => 'image'
         ];
 
         $prompts = Content::getFeed('prompt', $category, $sort, 50, 0, $filters);

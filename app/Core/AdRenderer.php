@@ -41,6 +41,7 @@ class AdRenderer {
             $clickUrl = Config::url('/ad/click/' . $id);
             $imageUrl = !empty($ad['image_url']) ? image_url($ad['image_url']) : '';
             $targetDisplay = htmlspecialchars(parse_url($ad['target_url'] ?? '', PHP_URL_HOST) ?: 'partner.com');
+            $badgeHtml = self::renderBadge($imageUrl, $title);
 
             // Header Banner layout
             if ($slot === 'header_banner') {
@@ -48,7 +49,7 @@ class AdRenderer {
 <div class="ts-ad-slot-header" style="max-width: 1320px; margin: 0.75rem auto 1.25rem; padding: 0 1rem;">
   <div style="background: var(--ts-bg-surface-elevated, #0d1527); border: 1px solid var(--ts-border-main, rgba(148,163,184,0.15)); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.25rem; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
     <div style="display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 260px;">
-      {$thisImageBadge($imageUrl, $title)}
+      {$badgeHtml}
       <div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
           <span style="font-size: 0.65rem; font-weight: 800; background: rgba(245,158,11,0.15); color: #f59e0b; padding: 0.15rem 0.45rem; border-radius: 4px; letter-spacing: 0.05em; text-transform: uppercase;">Sponsored</span>
@@ -106,12 +107,11 @@ HTML;
             return '';
         }
     }
-}
 
-// Helper to render image or icon badge
-function thisImageBadge(string $url, string $alt): string {
-    if (!empty($url) && $url !== 'https://funwithcoding.free.nf/') {
-        return '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($alt) . '" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(148,163,184,0.2); flex-shrink: 0;">';
+    private static function renderBadge(string $url, string $alt): string {
+        if (!empty($url) && $url !== 'https://funwithcoding.free.nf/') {
+            return '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($alt) . '" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(148,163,184,0.2); flex-shrink: 0;">';
+        }
+        return '<div style="width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #0284c7, #6366f1); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">⚡</div>';
     }
-    return '<div style="width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #0284c7, #6366f1); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">⚡</div>';
 }

@@ -50,6 +50,14 @@ class Request {
         return $this->path;
     }
 
+    public function getUri(): string {
+        return $this->uri;
+    }
+
+    public function uri(): string {
+        return $this->path;
+    }
+
     public function query(string $key, $default = null) {
         return $this->queryParams[$key] ?? $default;
     }
@@ -83,8 +91,15 @@ class Request {
         return array_merge($this->queryParams, $this->bodyParams, $this->jsonBody ?? []);
     }
 
-    public function ip(): string {
-        return $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    public static function ip(): string {
+        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            return trim($_SERVER['HTTP_CF_CONNECTING_IP']);
+        }
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $parts = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return trim($parts[0]);
+        }
+        return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
     }
 
     public function header(string $key, $default = null): ?string {

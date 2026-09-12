@@ -38,9 +38,18 @@ class Content {
         // Prompt Kind Filter (Text vs Image)
         if (!empty($filters['prompt_kind']) && $filters['prompt_kind'] !== 'all') {
             if ($filters['prompt_kind'] === 'image') {
-                $sql .= " AND (cat.slug IN ('ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion') OR p.target_models LIKE '%Midjourney%' OR p.target_models LIKE '%DALL-E%' OR p.target_models LIKE '%Flux%' OR p.target_models LIKE '%Stable Diffusion%')";
+                $sql .= " AND (cat.slug IN ('ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion', 'photorealism', '3d-renders', 'cyberpunk', 'anime', 'architecture', 'landscapes', 'fantasy') 
+                              OR cat.parent_id IN (SELECT subc.id FROM categories subc WHERE subc.slug = 'ai-image-prompts')
+                              OR p.target_models LIKE '%Midjourney%' 
+                              OR p.target_models LIKE '%DALL-E%' 
+                              OR p.target_models LIKE '%Flux%' 
+                              OR p.target_models LIKE '%Stable Diffusion%'
+                              OR p.target_models LIKE '%Leonardo%'
+                              OR p.target_models LIKE '%Ideogram%'
+                              OR (c.featured_image_url IS NOT NULL AND c.featured_image_url != '' AND c.featured_image_url != 'https://funwithcoding.free.nf/'))";
             } elseif ($filters['prompt_kind'] === 'text') {
-                $sql .= " AND (cat.slug NOT IN ('ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion') AND (p.target_models IS NULL OR (p.target_models NOT LIKE '%Midjourney%' AND p.target_models NOT LIKE '%Flux%' AND p.target_models NOT LIKE '%Stable Diffusion%')))";
+                $sql .= " AND (cat.slug NOT IN ('ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion', 'photorealism', '3d-renders', 'cyberpunk', 'anime', 'architecture', 'landscapes', 'fantasy') 
+                              AND (p.target_models IS NULL OR (p.target_models NOT LIKE '%Midjourney%' AND p.target_models NOT LIKE '%Flux%' AND p.target_models NOT LIKE '%Stable Diffusion%')))";
             }
         }
 

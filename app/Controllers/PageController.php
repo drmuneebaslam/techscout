@@ -137,6 +137,8 @@ class PageController {
     // 6. PUBLIC SYSTEM STATUS & REAL-TIME UPTIME [TS-INF-04]
     // ========================================================================
     public function systemStatus(Request $request): void {
+        \App\Core\Auth::requireRole(['admin', 'super_admin']);
+
         $startTime = microtime(true);
         $dbConnected = false;
         $dbLatency = 0.0;
@@ -174,6 +176,26 @@ class PageController {
         Response::view('pages/status', [
             'title' => 'System Status & Real-Time Uptime Monitor | TechScout',
             'status' => $statusPayload
+        ]);
+    }
+
+    public function diagnosticPing(Request $request): void {
+        \App\Core\Auth::requireRole(['admin', 'super_admin']);
+
+        $start = microtime(true);
+        $dbOk = false;
+        try {
+            Database::getConnection()->query("SELECT 1");
+            $dbOk = true;
+        } catch (\Throwable $e) {}
+
+        Response::json([
+            'status' => $dbOk ? 'healthy' : 'degraded',
+            'timestamp' => date('c'),
+            'database' => $dbOk ? 'connected' : 'error',
+            'latency_ms' => round((microtime(true) - $start) * 1000, 2),
+            'php_version' => PHP_VERSION,
+            'memory_usage_mb' => round(memory_get_usage(true) / (1024 * 1024), 2)
         ]);
     }
 }

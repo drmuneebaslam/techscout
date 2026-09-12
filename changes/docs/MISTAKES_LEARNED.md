@@ -300,6 +300,49 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-25: Static Invocation on Non-Static Instance Methods in PHP 8+
+* **Root Cause**: In `Request.php`, `ip()` was declared as an instance method `public function ip(): string`. In various controllers and views (e.g. `settings.php:204`), it was invoked statically as `Request::ip()`.
+* **Consequences**:
+  - In PHP 8.0+, calling non-static methods statically throws a fatal `Error: Non-static method App\Core\Request::ip() cannot be called statically`.
+  - The request crashes completely with a 500 fatal error.
+* **Mandatory Rule**:
+  - Utility and context-interrogation methods on `Request` (such as `Request::ip()`, `Request::userAgent()`) that can logically be consumed statically must be declared with `public static function`.
+  - Always verify static vs instance method declarations in core framework classes.
+
+---
+
+### 🔴 MISTAKE-26: Swallowed Exceptions Bypassing Critical Middleware (Maintenance Mode)
+* **Root Cause**: Maintenance mode middleware wrapped in `try { ... } catch (\Throwable $e) {}` invoked non-existent methods or encountered fatal errors (e.g. `Request::getUri()` returning full URI or throwing undefined method), silently aborting maintenance mode checks and proceeding directly to normal routing.
+* **Consequences**:
+  - Maintenance mode appeared completely broken and failed to render the 503 template.
+  - Admins had no feedback why the site was online or offline.
+* **Mandatory Rule**:
+  - Always log caught exceptions in core bootstrap middleware to error telemetry instead of silent empty catch blocks.
+  - Normalize request paths using `$request->getPath()` rather than raw URI query strings.
+  - Support instant previewing with query parameters (`?preview_503=1`) and render a persistent, dual-theme administrative indicator banner on all pages when maintenance mode is active.
+
+---
+
+### 🔴 MISTAKE-27: Service Worker RespondWith Promise Null/Undefined Value Conversion
+* **Root Cause**: In `sw.js`, `event.respondWith()` was passed a fetch promise chained with `.catch(() => caches.match(event.request))`. When offline or on network failure, if the cache did not contain the requested resource, `caches.match()` resolved to `undefined`.
+* **Consequences**:
+  - Threw uncaught browser exception: `sw.js:1 Uncaught (in promise) TypeError: Failed to convert value to 'Response'`.
+  - The browser treated the request as a failed fetch event and broke navigation.
+* **Mandatory Rule**:
+  - In service workers, always ensure `.catch()` handlers resolve to a valid `Response` object (e.g. a fallback cached offline page `Response` or an informative SVG/JSON fallback) rather than resolving to `undefined`.
+  - Exclude admin paths (`/admin`), authentication (`/auth`, `/login`), telemetry, and hosting cookies (`?i=1`) from service worker interception.
+
+---
+
+### 🔴 MISTAKE-28: Apache 404 Rewrite Fallback Intercepting Manifest and Service Worker
+* **Root Cause**: Single-page framework `.htaccess` rules routed non-file requests to `index.php`. When browsers requested `/manifest.json` or `/sw.js` without physical file existence or explicit exemptions, the router returned an HTML 404 page with `<!DOCTYPE html>`.
+* **Consequences**:
+  - Browser JSON parser threw: `manifest.json:1 Manifest: Line: 1, column: 1, Syntax error`.
+* **Mandatory Rule**:
+  - In `index.php`, intercept root PWA assets (`manifest.json`, `sw.js`) at the very top of execution before routing, serving physical files directly with strict MIME headers (`application/manifest+json`, `application/javascript`) and exiting immediately.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -326,6 +369,11 @@ At the conclusion of any code generation, the agent must cross-check every modif
 22. [ ] **Universal Timezone Auto-Detection & Dual-Layer Localization**: Are all timestamps rendered with `DateHelper::render()` or `DateHelper::renderTwoLines()` using ISO-8601 `<time class="ts-time">` markup, backed by `Intl.DateTimeFormat` client synchronization and cookie persistence without hardcoded inline styles?
 23. [ ] **Explicit Image Upload Buttons & Multi-Image Gallery Support**: Are image inputs equipped with direct file upload buttons with multi-file capabilities where appropriate, with non-image items rendered gracefully without broken image frames?
 24. [ ] **No `type="url"` on Relative Media Storage Inputs (MISTAKE-24)**: Are all media path inputs set to `type="text"` to prevent native browser form submission rejections on valid relative storage paths?
+25. [ ] **Static Call on Instance Method Prevention (MISTAKE-25)**: Are all methods called statically declared as `public static function`?
+26. [ ] **Non-Swallowed Middleware Exceptions & Normalized Paths (MISTAKE-26)**: Are middleware paths parsed with `$request->getPath()` with instant preview support?
+27. [ ] **Service Worker Guaranteed Response Conversion (MISTAKE-27)**: Do all `.catch()` service worker branches return valid `Response` instances?
+28. [ ] **Direct PWA Asset Interception (MISTAKE-28)**: Are `manifest.json` and `sw.js` served directly with proper MIME types before framework routing?
+
 
 
 
