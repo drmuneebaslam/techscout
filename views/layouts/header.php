@@ -138,6 +138,11 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
   
+  <!-- Progressive Web App Manifest & Meta [TS-UI-05] -->
+  <link rel="manifest" href="<?= url('/manifest.json') ?>">
+  <meta name="theme-color" content="#0284c7">
+  <link rel="apple-touch-icon" href="<?= url('/favicon.ico') ?>">
+  
   <!-- Dynamic Base Url for JS -->
   <script>window.TS_BASE_URL = "<?= $appUrl ?>";</script>
 </head><body data-theme="<?= $activeTheme ?>" class="<?= $activeTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($siteSettings['enable_bg_grid_lines']) && $siteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
@@ -893,3 +898,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
     }
   });
   </script>
+
+  <!-- Display Banner Advertisement: Header Slot -->
+  <?= \App\Core\AdRenderer::renderSlot('header_banner') ?>
+

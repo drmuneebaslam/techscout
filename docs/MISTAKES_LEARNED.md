@@ -285,6 +285,19 @@ This document serves as the permanent registry of architectural and implementati
   - **Multi-Image Support:** Wherever multiple images make sense (e.g., prompt output variations, tool screenshots, article gallery), support `multiple` file uploads, storing image arrays or related child records (`prompt_images`, `content_media`), instead of restricting to 1 image.
   - **Graceful Non-Image Handling:** In directory listings, never render broken image frames or generic placeholders for prompts/tools that do not have images. Differentiate visual cards from text/code prompt cards.
 
+### MISTAKE-24: HTML5 `type="url"` Rejection on Relative Uploaded Storage Paths
+* **Issue**:
+  - In form inputs meant for image URLs or creative paths (e.g., ad manager, sponsor campaign, author avatar, tool logo), the field was defined as `<input type="url">`.
+  - When the user uploaded an image via the file upload button, the AJAX handler saved the file and returned a local relative path (e.g., `/storage/uploads/ads/ad_123.png`).
+  - Upon clicking "Save" or "Submit", the browser blocked form submission with a native tooltip error: *"Please enter a URL"*, because browser validation for `type="url"` strictly requires an absolute protocol scheme (`http://` or `https://`).
+* **Consequences**:
+  - Users were blocked from submitting ads, tools, and content after successfully uploading images.
+  - Frustration as the path was visibly filled in the input box, yet rejected by browser constraint validation.
+* **Mandatory Rule**:
+  - **Never use `type="url"` for media/image inputs** where uploaded relative asset paths (e.g. `/storage/uploads/...`, `/assets/...`, `uploads/...`) can be populated.
+  - Always use `<input type="text">` with a descriptive placeholder: `e.g. https://... or /storage/uploads/...`.
+  - On both frontend validation and backend controllers, permit both valid absolute URLs (`http://`, `https://`) and valid relative site storage paths starting with `/` or containing supported image extensions (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.svg`).
+
 ---
 
 ## 2. Response Audit Protocol
@@ -312,6 +325,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 21. [ ] **Early Script Declarations & Robust Global Helpers**: Are interactive UI handlers declared early before markup, dynamic JSON safely defaulted, and theme sync helpers universally available?
 22. [ ] **Universal Timezone Auto-Detection & Dual-Layer Localization**: Are all timestamps rendered with `DateHelper::render()` or `DateHelper::renderTwoLines()` using ISO-8601 `<time class="ts-time">` markup, backed by `Intl.DateTimeFormat` client synchronization and cookie persistence without hardcoded inline styles?
 23. [ ] **Explicit Image Upload Buttons & Multi-Image Gallery Support**: Are image inputs equipped with direct file upload buttons with multi-file capabilities where appropriate, with non-image items rendered gracefully without broken image frames?
+24. [ ] **No `type="url"` on Relative Media Storage Inputs (MISTAKE-24)**: Are all media path inputs set to `type="text"` to prevent native browser form submission rejections on valid relative storage paths?
+
 
 
 

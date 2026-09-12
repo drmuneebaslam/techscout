@@ -329,54 +329,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderedPromptEl = document.getElementById('rendered-prompt-output');
 
     if (copyBtn && renderedPromptEl) {
-        copyBtn.addEventListener('click', async () => {
-            const textToCopy = renderedPromptEl.textContent || document.getElementById('raw-prompt-template').value;
+        copyBtn.addEventListener('click', function() {
+            const rawTemplateEl = document.getElementById('raw-prompt-template');
+            const textToCopy = renderedPromptEl.innerText || (rawTemplateEl ? rawTemplateEl.value : '');
             const promptId = copyBtn.getAttribute('data-prompt-id');
             const adUrl = copyBtn.getAttribute('data-ad-url') || 'https://omg10.com/4/11737440';
 
-            // 1. Reveal full prompt visually
-            if (previewContainer) {
-                previewContainer.style.maxHeight = '1400px';
-                if (fadeOverlay) fadeOverlay.style.display = 'none';
-            }
-            document.getElementById('copy-btn-icon').setAttribute('data-lucide', 'check');
-            document.getElementById('copy-btn-label').innerText = 'Copied to Clipboard! 🎉';
-            if (window.lucide) lucide.createIcons();
-
-            // 2. Copy text to clipboard
-            try {
-                await navigator.clipboard.writeText(textToCopy);
-                if (typeof showToast === 'function') {
-                    showToast('Prompt unlocked and copied to clipboard! 🚀', 'success');
-                }
-            } catch (err) {
-                // Fallback for older browsers
-                const tempTextArea = document.createElement('textarea');
-                tempTextArea.value = textToCopy;
-                document.body.appendChild(tempTextArea);
-                tempTextArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempTextArea);
-            }
-
-            // 3. Trigger Popunder / Direct Link Ad in a separate background tab
+            // 1. Trigger Popunder / Direct Link Ad SYNCHRONOUSLY (Guarantees bypass of popup blocker)
             if (adUrl) {
                 try {
-                    const adWindow = window.open(adUrl, '_blank');
-                    if (adWindow) {
-                        adWindow.blur();
-                        window.focus();
+                    const adWin = window.open(adUrl, '_blank');
+                    if (adWin) {
+                        try {
+                            adWin.blur();
+                            window.focus();
+                        } catch(e) {}
                     }
-                } catch (e) {
+                } catch(e) {
                     window.open(adUrl, '_blank');
                 }
             }
 
+            // 2. Reveal full prompt visually & clear blur overlay
+            if (previewContainer) {
+                previewContainer.style.maxHeight = 'none';
+                if (fadeOverlay) fadeOverlay.style.display = 'none';
+            }
+            const iconEl = document.getElementById('copy-btn-icon');
+            const labelEl = document.getElementById('copy-btn-label');
+            if (iconEl) iconEl.setAttribute('data-lucide', 'check');
+            if (labelEl) labelEl.innerText = 'Copied to Clipboard! 🎉';
+            if (window.lucide) lucide.createIcons();
+
+            // 3. Copy text to clipboard
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    if (typeof showToast === 'function') {
+                        showToast('Prompt blueprint unlocked & copied! 🚀 Ready to paste into your AI model.', 'success');
+                    }
+                }).catch(() => {
+                    copyFallback(textToCopy);
+                });
+            } else {
+                copyFallback(textToCopy);
+            }
+
             // 4. Send background telemetry
             if (promptId) {
-                fetch('<?= url('/api/v1/prompts/') ?>' + promptId + '/copy', { method: 'POST' });
+                fetch('<?= url('/api/v1/prompts/') ?>' + promptId + '/copy', { method: 'POST' }).catch(() => {});
             }
         });
+    }
+
+    function copyFallback(text) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        temp.style.position = 'fixed';
+        temp.style.left = '-9999px';
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+            document.execCommand('copy');
+            if (typeof showToast === 'function') {
+                showToast('Prompt blueprint unlocked and copied! 🚀', 'success');
+            }
+        } catch(e) {}
+        document.body.removeChild(temp);
     }
 });
 </script>

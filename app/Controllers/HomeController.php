@@ -271,6 +271,27 @@ class HomeController {
         $imageUrl = trim((string)$request->post('image_url', ''));
         $cryptoCurrency = (string)$request->post('crypto_currency', 'USDT');
         $cryptoTxid = trim((string)$request->post('crypto_txid', ''));
+        $durationTier = (int)$request->post('duration_tier', 30);
+        $priceUsd = (float)$request->post('pricing_amount_usd', 0);
+
+        if ($priceUsd <= 0) {
+            $tierKey = 'ad_tier_' . $durationTier . '_price';
+            $settingRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = ?", [$tierKey]);
+            $priceUsd = $settingRow ? (float)$settingRow['key_value'] : ($durationTier === 7 ? 49.00 : ($durationTier === 90 ? 299.00 : 149.00));
+        }
+
+        // Handle uploaded logo file if provided
+        if (!empty($_FILES['logo_file']['tmp_name']) && is_uploaded_file($_FILES['logo_file']['tmp_name'])) {
+            $uploadDir = dirname(__DIR__, 2) . '/storage/uploads/tools';
+            if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+            $ext = strtolower(pathinfo($_FILES['logo_file']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'svg'])) {
+                $filename = 'tool_logo_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                if (move_uploaded_file($_FILES['logo_file']['tmp_name'], $uploadDir . '/' . $filename)) {
+                    $imageUrl = '/storage/uploads/tools/' . $filename;
+                }
+            }
+        }
 
         if (empty($title) || empty($targetUrl) || empty($authorEmail) || empty($cryptoTxid)) {
             \App\Core\Session::flash('error', 'Please complete all required fields including the transaction hash (TXID).');
@@ -282,11 +303,11 @@ class HomeController {
             Database::execute(
                 "INSERT INTO sponsored_submissions 
                 (type, title, target_url, category_id, author_name, author_email, summary, body_content, image_url, pricing_amount_usd, crypto_currency, crypto_txid, status, created_at)
-                VALUES ('tool', ?, ?, ?, ?, ?, ?, ?, ?, 149.00, ?, ?, 'pending_review', NOW())",
-                [$title, $targetUrl, $categoryId, $authorName, $authorEmail, $summary, $bodyContent, $imageUrl, $cryptoCurrency, $cryptoTxid]
+                VALUES ('tool', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_review', NOW())",
+                [$title, $targetUrl, $categoryId, $authorName, $authorEmail, $summary, $bodyContent, $imageUrl, $priceUsd, $cryptoCurrency, $cryptoTxid]
             );
 
-            \App\Core\Session::flash('success', 'Your sponsored AI tool submission and payment proof have been received! Our team will verify the TXID on-chain and publish within 24 hours.');
+            \App\Core\Session::flash('success', "Your sponsored AI tool submission ({$durationTier}-day tier, \${$priceUsd}) and payment proof have been received! Our team will verify the TXID on-chain and publish within 24 hours.");
         } catch (\Throwable $e) {
             \App\Core\Session::flash('error', 'Submission error: ' . $e->getMessage());
         }
@@ -305,6 +326,27 @@ class HomeController {
         $imageUrl = trim((string)$request->post('image_url', ''));
         $cryptoCurrency = (string)$request->post('crypto_currency', 'USDT');
         $cryptoTxid = trim((string)$request->post('crypto_txid', ''));
+        $durationTier = (int)$request->post('duration_tier', 30);
+        $priceUsd = (float)$request->post('pricing_amount_usd', 0);
+
+        if ($priceUsd <= 0) {
+            $tierKey = 'ad_tier_' . $durationTier . '_price';
+            $settingRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = ?", [$tierKey]);
+            $priceUsd = $settingRow ? (float)$settingRow['key_value'] : ($durationTier === 7 ? 49.00 : ($durationTier === 90 ? 299.00 : 149.00));
+        }
+
+        // Handle uploaded hero image file if provided
+        if (!empty($_FILES['hero_file']['tmp_name']) && is_uploaded_file($_FILES['hero_file']['tmp_name'])) {
+            $uploadDir = dirname(__DIR__, 2) . '/storage/uploads/articles';
+            if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+            $ext = strtolower(pathinfo($_FILES['hero_file']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'svg'])) {
+                $filename = 'article_hero_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                if (move_uploaded_file($_FILES['hero_file']['tmp_name'], $uploadDir . '/' . $filename)) {
+                    $imageUrl = '/storage/uploads/articles/' . $filename;
+                }
+            }
+        }
 
         if (empty($title) || empty($authorEmail) || empty($cryptoTxid)) {
             \App\Core\Session::flash('error', 'Please provide article headline, email, and crypto transaction hash.');
@@ -327,15 +369,33 @@ class HomeController {
             Database::execute(
                 "INSERT INTO sponsored_submissions 
                 (type, title, target_url, category_id, author_name, author_email, summary, body_content, image_url, pricing_amount_usd, crypto_currency, crypto_txid, status, created_at)
-                VALUES ('article', ?, ?, ?, ?, ?, ?, ?, ?, 299.00, ?, ?, 'pending_review', NOW())",
-                [$title, $targetUrl, $categoryId, $authorName, $authorEmail, $summary, $bodyContent, $imageUrl, $cryptoCurrency, $cryptoTxid]
+                VALUES ('article', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_review', NOW())",
+                [$title, $targetUrl, $categoryId, $authorName, $authorEmail, $summary, $bodyContent, $imageUrl, $priceUsd, $cryptoCurrency, $cryptoTxid]
             );
 
-            \App\Core\Session::flash('success', 'Your sponsored article manuscript and payment proof have been received! Our editorial team is reviewing your piece and will notify you at ' . htmlspecialchars($authorEmail) . '.');
+            \App\Core\Session::flash('success', "Your sponsored article manuscript ({$durationTier}-day tier, \${$priceUsd}) and payment proof have been received! Our editorial team is reviewing your piece and will notify you at " . htmlspecialchars($authorEmail) . '.');
         } catch (\Throwable $e) {
             \App\Core\Session::flash('error', 'Submission error: ' . $e->getMessage());
         }
 
         Response::redirect('/sponsor?tab=article');
     }
+
+    public function trackAdClick(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        $ad = Database::fetch("SELECT * FROM advertisements WHERE id = ?", [$id]);
+
+        if ($ad) {
+            try {
+                Database::execute("UPDATE advertisements SET click_count = click_count + 1 WHERE id = ?", [$id]);
+            } catch (\Throwable $e) {}
+
+            $targetUrl = !empty($ad['target_url']) ? $ad['target_url'] : Config::url('/');
+            header("Location: {$targetUrl}", true, 302);
+            exit;
+        }
+
+        Response::redirect('/');
+    }
 }
+

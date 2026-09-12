@@ -52,7 +52,7 @@
             <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'gpt_featured_image_url', 'gpts')" style="display: none;">
           </label>
         </div>
-        <input type="url" name="featured_image_url" id="gpt_featured_image_url" placeholder="https://.../gpt-icon.png" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.75rem 1rem; border-radius: 6px; color: #f8fafc;">
+        <input type="text" name="featured_image_url" id="gpt_featured_image_url" placeholder="https://.../gpt-icon.png or /storage/uploads/..." style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.75rem 1rem; border-radius: 6px; color: #f8fafc;">
       </div>
 
       <div style="margin-bottom: 1.5rem;">

@@ -1586,7 +1586,7 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
               </button>
               <span id="cover_filename_display" style="font-size: 0.75rem; color: #38bdf8;"></span>
             </div>
-            <input type="url" name="cover_image_url" id="profile_cover_url" value="<?= htmlspecialchars(image_url($author['cover_image_url'] ?? '')) ?>" placeholder="Or optional image URL fallback (https://images.unsplash.com/...)" class="admin-modal-input" style="font-size: 0.82rem;">
+            <input type="text" name="cover_image_url" id="profile_cover_url" value="<?= htmlspecialchars(image_url($author['cover_image_url'] ?? '')) ?>" placeholder="Or optional image URL/path fallback (https://... or /storage/...)" class="admin-modal-input" style="font-size: 0.82rem;">
           </div>
         </div>
 

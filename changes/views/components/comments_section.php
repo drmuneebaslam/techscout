@@ -9,6 +9,7 @@
 $contentItem = $article ?? $tool ?? $gpt ?? $prompt ?? $campaign ?? [];
 $contentId = (int)($contentItem['id'] ?? 0);
 $contentAuthorId = (int)($contentItem['author_id'] ?? 0);
+$comments = (isset($comments) && is_array($comments)) ? $comments : [];
 $totalComments = count($comments);
 $currentUser = \App\Core\Auth::user();
 

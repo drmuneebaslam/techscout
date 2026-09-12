@@ -145,7 +145,7 @@
           <input type="file" name="logo_file" accept="image/*" class="ts-form-input" style="padding: 0.4rem; font-size: 0.82rem; flex: 1;">
           <span style="font-size: 0.75rem; color: var(--ts-text-muted);">or paste URL below</span>
         </div>
-        <input type="url" name="image_url" class="ts-form-input" placeholder="https://codeforge.ai/logo.png">
+        <input type="text" name="image_url" class="ts-form-input" placeholder="https://codeforge.ai/logo.png or /storage/uploads/...">
 
         <div style="margin-top: 1rem; border-top: 1px dashed var(--ts-border-subtle); padding-top: 0.85rem;">
           <label class="ts-form-label" style="font-weight: 700; margin-bottom: 0.25rem;">
@@ -229,7 +229,7 @@
         <div>
           <label class="ts-form-label">Featured Hero Image (URL or Direct Upload)</label>
           <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
-            <input type="url" name="image_url" id="article_hero_url" class="ts-form-input" placeholder="https://images.unsplash.com/..." style="flex: 1;">
+            <input type="text" name="image_url" id="article_hero_url" class="ts-form-input" placeholder="https://images.unsplash.com/... or /storage/uploads/..." style="flex: 1;">
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <label class="ts-btn ts-btn-outline" style="cursor: pointer; font-size: 0.75rem; padding: 0.35rem 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem;">

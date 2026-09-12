@@ -119,6 +119,13 @@ class AuthController {
             return;
         }
 
+        // Check for disposable/burner email addresses [TS-SEC-05]
+        if (\App\Core\Firewall::isDisposableEmail($email)) {
+            Session::flash('error', 'Disposable and temporary burner email addresses are not permitted. Please register with a verified email provider.');
+            Response::redirect('/auth/register');
+            return;
+        }
+
         if (empty($displayName)) {
             $displayName = $username;
         }
@@ -422,16 +429,24 @@ class AuthController {
     }
 
     // =========================================================================
-    // TWO-FACTOR AUTHENTICATION (2FA)
+    // TWO-FACTOR AUTHENTICATION (2FA) [TS-SEC-03]
     // =========================================================================
     public function showTwoFactor(Request $request): void {
         $user = Auth::user();
-        $totpSecret = 'TS' . strtoupper(bin2hex(random_bytes(7)));
+        if (!$user) {
+            Response::redirect('/auth/login');
+            return;
+        }
+
+        $isEnrolled = !empty($user['totp_enabled']) || !empty($user['two_factor_enabled']);
+        $totpSecret = $isEnrolled 
+            ? ($user['totp_secret'] ?? $user['two_factor_secret'] ?? '') 
+            : \App\Core\Totp::generateSecret(16);
 
         Response::view('auth/two_factor', [
             'title' => 'Two-Factor Authentication | TechScout',
             'user' => $user,
-            'isEnrolling' => true,
+            'isEnrolling' => !$isEnrolled,
             'totpSecret' => $totpSecret
         ]);
     }
@@ -441,18 +456,39 @@ class AuthController {
         $secret = trim((string)$request->post('secret', ''));
         $user = Auth::user();
 
-        if (strlen($code) < 6) {
+        if (!$user) {
+            Response::redirect('/auth/login');
+            return;
+        }
+
+        if (strlen($code) !== 6 || !ctype_digit($code)) {
             Session::flash('error', 'Please enter a valid 6-digit authentication token.');
             Response::redirect('/two-factor-authentication');
             return;
         }
 
-        if ($user) {
-            Database::execute("UPDATE users SET two_factor_enabled = 1, two_factor_secret = ? WHERE id = ?", [$secret, $user['id']]);
-            Session::flash('success', '✓ Two-Factor Authentication successfully activated for your account.');
+        $activeSecret = !empty($secret) ? $secret : ($user['totp_secret'] ?? $user['two_factor_secret'] ?? '');
+        if (empty($activeSecret)) {
+            Session::flash('error', 'Authentication secret missing. Please configure 2FA again.');
+            Response::redirect('/two-factor-authentication');
+            return;
         }
 
-        Response::redirect('/profile');
+        if (!\App\Core\Totp::verify($activeSecret, $code)) {
+            Session::flash('error', 'Invalid or expired 2FA code. Please ensure your device clock is accurate and try again.');
+            Response::redirect('/two-factor-authentication');
+            return;
+        }
+
+        // Successfully verified
+        $recoveryCodes = json_encode(\App\Core\Totp::generateRecoveryCodes(8));
+        Database::execute(
+            "UPDATE users SET totp_enabled = 1, two_factor_enabled = 1, totp_secret = ?, two_factor_secret = ?, totp_recovery_codes = ? WHERE id = ?",
+            [$activeSecret, $activeSecret, $recoveryCodes, $user['id']]
+        );
+
+        Session::flash('success', '✓ Two-Factor Authentication verified and active on your account.');
+        Response::redirect($user['role'] === 'author' ? '/author/dashboard' : ($user['role'] === 'admin' || $user['role'] === 'super_admin' ? '/admin/dashboard' : '/account/settings'));
     }
 
     // =========================================================================

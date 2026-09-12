@@ -166,7 +166,7 @@
             </div>
             <div>
               <span style="font-size: 0.75rem; color: var(--ts-text-secondary); display: block; margin-bottom: 0.25rem;">Or Paste Cloud Attachment URL:</span>
-              <input type="url" name="attachment_url" placeholder="https://..." style="width: 100%; background: var(--ts-bg); border: 1px solid var(--ts-border-main); padding: 0.55rem 0.85rem; border-radius: 6px; color: var(--ts-text-primary); font-size: 0.85rem;">
+              <input type="text" name="attachment_url" placeholder="https://... or /storage/uploads/..." style="width: 100%; background: var(--ts-bg); border: 1px solid var(--ts-border-main); padding: 0.55rem 0.85rem; border-radius: 6px; color: var(--ts-text-primary); font-size: 0.85rem;">
             </div>
           </div>
         </div>

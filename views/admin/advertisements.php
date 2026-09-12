@@ -82,7 +82,7 @@
           <span id="ad_upload_status" style="font-size: 0.78rem; color: var(--admin-text-secondary);">PNG, JPG, WebP supported</span>
         </div>
 
-        <input type="url" name="image_url" id="ad_image_url" placeholder="Or enter direct image URL (https://...)" class="admin-input" oninput="previewAdImage(this.value)">
+        <input type="text" name="image_url" id="ad_image_url" placeholder="Or enter direct image URL (https://... or /storage/uploads/...)" class="admin-input" oninput="previewAdImage(this.value)">
 
         <div id="ad_preview_wrap" style="display: none; margin-top: 1rem; text-align: center;">
           <img id="ad_preview_img" src="" alt="Ad Creative Preview" style="max-height: 140px; max-width: 100%; border-radius: 8px; border: 1px solid var(--admin-border-main); object-fit: contain;">

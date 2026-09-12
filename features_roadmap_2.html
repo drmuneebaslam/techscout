@@ -370,7 +370,54 @@
             font-size: 0.85rem;
             background: var(--bg-surface);
         }
-    </style>
+    
+        .status-badge {
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .status-completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .status-partial {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .status-planned {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .copy-idea-btn {
+            background: var(--bg-surface-2, rgba(255,255,255,0.06));
+            border: 1px solid var(--border-main, rgba(148,163,184,0.15));
+            color: var(--text-secondary, #94a3b8);
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+        .copy-idea-btn:hover {
+            background: var(--primary, #0284c7);
+            color: #ffffff;
+            border-color: var(--primary, #0284c7);
+        }
+    
+</style>
 </head>
 <body>
 
@@ -462,12 +509,18 @@
 
         <!-- Features Grid -->
         <div class="features-grid" id="featuresGrid">
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-01" data-impact="High">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-01" data-impact="High" data-status="completed">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-01</span>
+                            <span class="status-badge status-completed"><i class="fa-solid fa-circle-check"></i> Completely Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-01', 'Automated Dual-Agent Peer Review &amp;amp; Fact-Checker', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Dual-Agent Peer Review &amp; Fact-Checker</h3>
                     <div class="feature-cat">
@@ -480,12 +533,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-02" data-impact="High">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-02" data-impact="High" data-status="partial">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-02</span>
+                            <span class="status-badge status-partial"><i class="fa-solid fa-bolt"></i> Partially Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-02', 'In-Browser WebAssembly Code Execution Sandbox', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">In-Browser WebAssembly Code Execution Sandbox</h3>
                     <div class="feature-cat">
@@ -498,12 +557,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-03" data-impact="High">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-03" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-03</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-03', 'Semantic Vector Search &amp;amp; Hybrid RAG Assistant', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Semantic Vector Search &amp; Hybrid RAG Assistant</h3>
                     <div class="feature-cat">
@@ -516,12 +581,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-04" data-impact="Medium">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-04" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-04</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-04', 'Automated TTS Podcast &amp;amp; Audio Article Generator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated TTS Podcast &amp; Audio Article Generator</h3>
                     <div class="feature-cat">
@@ -534,12 +605,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-05" data-impact="Medium">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-05" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-05</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-05', 'AI Prompt Auto-Completion in Author Studio', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">AI Prompt Auto-Completion in Author Studio</h3>
                     <div class="feature-cat">
@@ -552,12 +629,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-06" data-impact="Medium">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-06" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-06</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-06', 'Automated Hero Banner &amp;amp; OG Image Synthesizer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Hero Banner &amp; OG Image Synthesizer</h3>
                     <div class="feature-cat">
@@ -570,12 +653,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-07" data-impact="Medium">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-07" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-07</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-07', 'Smart Duplicate Content &amp;amp; Near-Duplicate Detector', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Smart Duplicate Content &amp; Near-Duplicate Detector</h3>
                     <div class="feature-cat">
@@ -588,12 +677,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-08" data-impact="Medium">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-08" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-08</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-08', 'AI Prompt Negative Matrix &amp;amp; Aesthetic Tuning Slider', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">AI Prompt Negative Matrix &amp; Aesthetic Tuning Slider</h3>
                     <div class="feature-cat">
@@ -606,12 +701,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-09" data-impact="Low">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-09" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-09</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-09', 'Autonomous Technical Jargon Explainer Bubbles', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Autonomous Technical Jargon Explainer Bubbles</h3>
                     <div class="feature-cat">
@@ -624,12 +725,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-10" data-impact="High">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-10" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-10</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-10', 'AI-Driven Automated Translation into 12 Languages', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">AI-Driven Automated Translation into 12 Languages</h3>
                     <div class="feature-cat">
@@ -642,12 +749,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-11" data-impact="Medium">
+                            <div class="feature-card" data-category="Autonomous AI Agents &amp; Orchestration" data-id="TS2-AI-11" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-AI-11</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-AI-11</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-AI-11', 'Automatic Code Refactoring &amp;amp; Security Linter', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automatic Code Refactoring &amp; Security Linter</h3>
                     <div class="feature-cat">
@@ -660,12 +773,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-01" data-impact="High">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-01" data-impact="High" data-status="completed">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-01</span>
+                            <span class="status-badge status-completed"><i class="fa-solid fa-circle-check"></i> Completely Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-01', 'FIDO2 / WebAuthn Hardware Key &amp;amp; Passkey Authentication', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">FIDO2 / WebAuthn Hardware Key &amp; Passkey Authentication</h3>
                     <div class="feature-cat">
@@ -678,12 +797,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-02" data-impact="High">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-02" data-impact="High" data-status="partial">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-02</span>
+                            <span class="status-badge status-partial"><i class="fa-solid fa-bolt"></i> Partially Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-02', 'Tamper-Proof Merkle Tree Cryptographic Audit Ledger', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Tamper-Proof Merkle Tree Cryptographic Audit Ledger</h3>
                     <div class="feature-cat">
@@ -696,12 +821,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-03" data-impact="Medium">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-03" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-03</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-03', 'Automated SOC2 / ISO 27001 Compliance Report Exporter', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated SOC2 / ISO 27001 Compliance Report Exporter</h3>
                     <div class="feature-cat">
@@ -714,12 +845,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-04" data-impact="High">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-04" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-04</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-04', 'Dynamic Honeypot Bot Trap &amp;amp; Fingerprint Blocking', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Dynamic Honeypot Bot Trap &amp; Fingerprint Blocking</h3>
                     <div class="feature-cat">
@@ -732,12 +869,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-05" data-impact="Medium">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-05" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-05</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-05', 'Strict Subresource Integrity (SRI) Hash Verifier', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Strict Subresource Integrity (SRI) Hash Verifier</h3>
                     <div class="feature-cat">
@@ -750,12 +893,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-06" data-impact="Medium">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-06" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-06</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-06', 'Granular Time-Based OTP (TOTP) Emergency Recovery Codes', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Granular Time-Based OTP (TOTP) Emergency Recovery Codes</h3>
                     <div class="feature-cat">
@@ -768,12 +917,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-07" data-impact="High">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-07" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-07</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-07', 'Automated PII Masking in Crash Forensics &amp;amp; Error Logs', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated PII Masking in Crash Forensics &amp; Error Logs</h3>
                     <div class="feature-cat">
@@ -786,12 +941,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-08" data-impact="High">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-08" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-08</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-08', 'Client-Side End-to-End Encrypted Creator DMs', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Client-Side End-to-End Encrypted Creator DMs</h3>
                     <div class="feature-cat">
@@ -804,12 +965,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-09" data-impact="Medium">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-09" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-09</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-09', 'Dynamic IP CIDR Geofencing &amp;amp; Country-Level Access Rules', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Dynamic IP CIDR Geofencing &amp; Country-Level Access Rules</h3>
                     <div class="feature-cat">
@@ -822,12 +989,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-10" data-impact="High">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-10" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-10</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-10', 'Content Security Policy (CSP) Level 3 Nonce Generator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Content Security Policy (CSP) Level 3 Nonce Generator</h3>
                     <div class="feature-cat">
@@ -840,12 +1013,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-11" data-impact="Medium">
+                            <div class="feature-card" data-category="Enterprise Security, Zero-Trust &amp; Compliance" data-id="TS2-SEC-11" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SEC-11</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SEC-11</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SEC-11', 'Brute-Force Attack Velocity Throttler with Adaptive Delay', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Brute-Force Attack Velocity Throttler with Adaptive Delay</h3>
                     <div class="feature-cat">
@@ -858,12 +1037,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-01" data-impact="High">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-01" data-impact="High" data-status="completed">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-01</span>
+                            <span class="status-badge status-completed"><i class="fa-solid fa-circle-check"></i> Completely Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-01', 'Stale-While-Revalidate Edge Cache Header Engine', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Stale-While-Revalidate Edge Cache Header Engine</h3>
                     <div class="feature-cat">
@@ -876,12 +1061,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-02" data-impact="High">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-02" data-impact="High" data-status="partial">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-02</span>
+                            <span class="status-badge status-partial"><i class="fa-solid fa-bolt"></i> Partially Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-02', 'Distributed Redis &amp;amp; Valkey Session &amp;amp; Query Cache Layer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Distributed Redis &amp; Valkey Session &amp; Query Cache Layer</h3>
                     <div class="feature-cat">
@@ -894,12 +1085,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-03" data-impact="High">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-03" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-03</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-03', 'Responsive AVIF &amp;amp; WebP `picture` Tag Synthesizer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Responsive AVIF &amp; WebP `picture` Tag Synthesizer</h3>
                     <div class="feature-cat">
@@ -912,12 +1109,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-04" data-impact="Medium">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-04" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-04</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-04', 'Server-Sent Events (SSE) Live Notification Stream', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Server-Sent Events (SSE) Live Notification Stream</h3>
                     <div class="feature-cat">
@@ -930,12 +1133,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-05" data-impact="High">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-05" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-05</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-05', 'Database Read-Replica Load Balancer &amp;amp; Connection Router', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Database Read-Replica Load Balancer &amp; Connection Router</h3>
                     <div class="feature-cat">
@@ -948,12 +1157,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-06" data-impact="Medium">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-06" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-06</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-06', 'Dynamic Asset Minification &amp;amp; Inlining for Critical CSS', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Dynamic Asset Minification &amp; Inlining for Critical CSS</h3>
                     <div class="feature-cat">
@@ -966,12 +1181,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-07" data-impact="Medium">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-07" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-07</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-07', 'Brotli Dynamic HTTP Compression Engine', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Brotli Dynamic HTTP Compression Engine</h3>
                     <div class="feature-cat">
@@ -984,12 +1205,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-08" data-impact="Medium">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-08" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-08</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-08', 'Instant Page Prefetching on Hover (Speculation Rules)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Instant Page Prefetching on Hover (Speculation Rules)</h3>
                     <div class="feature-cat">
@@ -1002,12 +1229,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-09" data-impact="High">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-09" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-09</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-09', 'Automated CDN Purge Webhooks on Content Update', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated CDN Purge Webhooks on Content Update</h3>
                     <div class="feature-cat">
@@ -1020,12 +1253,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-10" data-impact="Medium">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-10" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-10</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-10', 'Dynamic Database Connection Pooling &amp;amp; Reconnect Handler', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Dynamic Database Connection Pooling &amp; Reconnect Handler</h3>
                     <div class="feature-cat">
@@ -1038,12 +1277,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-11" data-impact="Low">
+                            <div class="feature-card" data-category="High-Performance Edge Architecture &amp; Caching" data-id="TS2-PERF-11" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-PERF-11</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-PERF-11</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-PERF-11', 'Lazy-Loaded Offscreen Iframes &amp;amp; Video Player Placeholders', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Lazy-Loaded Offscreen Iframes &amp; Video Player Placeholders</h3>
                     <div class="feature-cat">
@@ -1056,12 +1301,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-01" data-impact="High">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-01" data-impact="High" data-status="completed">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-01</span>
+                            <span class="status-badge status-completed"><i class="fa-solid fa-circle-check"></i> Completely Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-01', 'Permanent Archival to IPFS &amp;amp; Arweave Permaweb', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Permanent Archival to IPFS &amp; Arweave Permaweb</h3>
                     <div class="feature-cat">
@@ -1074,12 +1325,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-02" data-impact="High">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-02" data-impact="High" data-status="partial">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-02</span>
+                            <span class="status-badge status-partial"><i class="fa-solid fa-bolt"></i> Partially Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-02', 'Bitcoin Lightning Network Instant Satoshi Tipping', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Bitcoin Lightning Network Instant Satoshi Tipping</h3>
                     <div class="feature-cat">
@@ -1092,12 +1349,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-03" data-impact="Medium">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-03" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-03</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-03', 'ENS (.eth) &amp;amp; Solana (.sol) Decentralized Profile Resolution', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">ENS (.eth) &amp; Solana (.sol) Decentralized Profile Resolution</h3>
                     <div class="feature-cat">
@@ -1110,12 +1373,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-04" data-impact="High">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-04" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-04</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-04', 'Token-Gated Exclusive Content &amp;amp; Premium Blueprint Pass', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Token-Gated Exclusive Content &amp; Premium Blueprint Pass</h3>
                     <div class="feature-cat">
@@ -1128,12 +1397,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-05" data-impact="High">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-05" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-05</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-05', 'Automated Smart Contract Escrow for Sponsored Placements', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Smart Contract Escrow for Sponsored Placements</h3>
                     <div class="feature-cat">
@@ -1146,12 +1421,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-06" data-impact="Medium">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-06" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-06</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-06', 'Coinbase Commerce &amp;amp; Multi-Chain Deposit Webhook Suite', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Coinbase Commerce &amp; Multi-Chain Deposit Webhook Suite</h3>
                     <div class="feature-cat">
@@ -1164,12 +1445,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-07" data-impact="Medium">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-07" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-07</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-07', 'Creator On-Chain Reputation &amp;amp; Non-Transferable Badges', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Creator On-Chain Reputation &amp; Non-Transferable Badges</h3>
                     <div class="feature-cat">
@@ -1182,12 +1469,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-08" data-impact="Low">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-08" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-08</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-08', 'Real-Time Crypto Fee Gas Station &amp;amp; Fee Optimizer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Real-Time Crypto Fee Gas Station &amp; Fee Optimizer</h3>
                     <div class="feature-cat">
@@ -1200,12 +1493,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-09" data-impact="High">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-09" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-09</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-09', 'Creator Referral Revenue Smart Splitter', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Creator Referral Revenue Smart Splitter</h3>
                     <div class="feature-cat">
@@ -1218,12 +1517,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-10" data-impact="Medium">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-10" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-10</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-10', 'Decentralized Identity (DID) &amp;amp; Sign-In with Ethereum (SIWE)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Decentralized Identity (DID) &amp; Sign-In with Ethereum (SIWE)</h3>
                     <div class="feature-cat">
@@ -1236,12 +1541,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-11" data-impact="Medium">
+                            <div class="feature-card" data-category="Web3, Decentralized Storage &amp; Micropayments" data-id="TS2-WEB3-11" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-WEB3-11</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-WEB3-11</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-WEB3-11', 'Crypto Tax &amp;amp; Annual Payout Statement Generator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Crypto Tax &amp; Annual Payout Statement Generator</h3>
                     <div class="feature-cat">
@@ -1254,12 +1565,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-01" data-impact="High">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-01" data-impact="High" data-status="completed">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-01</span>
+                            <span class="status-badge status-completed"><i class="fa-solid fa-circle-check"></i> Completely Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-01', 'High-Performance GraphQL API with Introspection Playground', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">High-Performance GraphQL API with Introspection Playground</h3>
                     <div class="feature-cat">
@@ -1272,12 +1589,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-02" data-impact="High">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-02" data-impact="High" data-status="partial">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-02</span>
+                            <span class="status-badge status-partial"><i class="fa-solid fa-bolt"></i> Partially Built</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-02', 'Automated TypeScript &amp;amp; Node.js SDK Code Generator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated TypeScript &amp; Node.js SDK Code Generator</h3>
                     <div class="feature-cat">
@@ -1290,12 +1613,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-03" data-impact="Medium">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-03" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-03</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-03', 'OpenAPI 3.1 &amp;amp; Interactive Swagger Documentation Hub', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">OpenAPI 3.1 &amp; Interactive Swagger Documentation Hub</h3>
                     <div class="feature-cat">
@@ -1308,12 +1637,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-04" data-impact="High">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-04" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-04</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-04', 'Webhook Signature Replay Attack Defense &amp;amp; Exponential Retry', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Webhook Signature Replay Attack Defense &amp; Exponential Retry</h3>
                     <div class="feature-cat">
@@ -1326,12 +1661,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-05" data-impact="Medium">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-05" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-05</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-05', 'Interactive Developer CLI Tool (`techscout-cli`)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Interactive Developer CLI Tool (`techscout-cli`)</h3>
                     <div class="feature-cat">
@@ -1344,12 +1685,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-06" data-impact="High">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-06" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-06</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-06', 'Granular Scoped API Keys (Read, Write, Admin, Webhook)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Granular Scoped API Keys (Read, Write, Admin, Webhook)</h3>
                     <div class="feature-cat">
@@ -1362,12 +1709,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-07" data-impact="Low">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-07" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-07</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-07', 'Automated Postman Collection &amp;amp; Insomnia Workspace Exporter', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Postman Collection &amp; Insomnia Workspace Exporter</h3>
                     <div class="feature-cat">
@@ -1380,12 +1733,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-08" data-impact="Medium">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-08" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-08</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-08', 'Real-Time API Sandbox Mock Server', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Real-Time API Sandbox Mock Server</h3>
                     <div class="feature-cat">
@@ -1398,12 +1757,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-09" data-impact="Low">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-09" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-09</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-09', 'Developer Rate Limit HUD &amp;amp; Quota Overage Alerts', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Developer Rate Limit HUD &amp; Quota Overage Alerts</h3>
                     <div class="feature-cat">
@@ -1416,12 +1781,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-10" data-impact="High">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-10" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-10</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-10', 'Automated GitHub Actions CI/CD Deployment Integration', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated GitHub Actions CI/CD Deployment Integration</h3>
                     <div class="feature-cat">
@@ -1434,12 +1805,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-11" data-impact="Medium">
+                            <div class="feature-card" data-category="Developer Platform, GraphQL &amp; Modern SDKs" data-id="TS2-DEV-11" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-DEV-11</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-DEV-11</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-DEV-11', 'Webhooks Event Replay Terminal &amp;amp; Payload Inspector', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Webhooks Event Replay Terminal &amp; Payload Inspector</h3>
                     <div class="feature-cat">
@@ -1452,12 +1829,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-01" data-impact="High">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-01" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-01</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-01', 'Real-Time Collaborative Multi-Cursor Editing (CRDT / Yjs)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Real-Time Collaborative Multi-Cursor Editing (CRDT / Yjs)</h3>
                     <div class="feature-cat">
@@ -1470,12 +1853,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-02" data-impact="High">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-02" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-02</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-02', 'Git-Style Article Version Branching &amp;amp; Pull Requests', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Git-Style Article Version Branching &amp; Pull Requests</h3>
                     <div class="feature-cat">
@@ -1488,12 +1877,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-03" data-impact="Medium">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-03" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-03</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-03', 'LaTeX &amp;amp; MathJax Complex Equation Typesetting Engine', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">LaTeX &amp; MathJax Complex Equation Typesetting Engine</h3>
                     <div class="feature-cat">
@@ -1506,12 +1901,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-04" data-impact="Medium">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-04" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-04</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-04', 'Interactive Mermaid.js Diagram &amp;amp; Flowchart Builder', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Interactive Mermaid.js Diagram &amp; Flowchart Builder</h3>
                     <div class="feature-cat">
@@ -1524,12 +1925,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-05" data-impact="High">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-05" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-05</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-05', 'Automated SEO Article JSON-LD Schema Generator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated SEO Article JSON-LD Schema Generator</h3>
                     <div class="feature-cat">
@@ -1542,12 +1949,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-06" data-impact="Medium">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-06" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-06</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-06', 'Interactive Before/After Image Comparison Slider', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Interactive Before/After Image Comparison Slider</h3>
                     <div class="feature-cat">
@@ -1560,12 +1973,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-07" data-impact="Low">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-07" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-07</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-07', 'Automated Flesch-Kincaid Readability &amp;amp; Cadence Analyzer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Flesch-Kincaid Readability &amp; Cadence Analyzer</h3>
                     <div class="feature-cat">
@@ -1578,12 +1997,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-08" data-impact="Medium">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-08" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-08</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-08', 'Dynamic Table of Contents with Scroll-Spy Progress Indicator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Dynamic Table of Contents with Scroll-Spy Progress Indicator</h3>
                     <div class="feature-cat">
@@ -1596,12 +2021,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-09" data-impact="High">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-09" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-09</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-09', 'Editorial Content Scheduling with Multi-Timezone Calendar', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Editorial Content Scheduling with Multi-Timezone Calendar</h3>
                     <div class="feature-cat">
@@ -1614,12 +2045,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-10" data-impact="Medium">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-10" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-10</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-10', 'Article Audio Transcription &amp;amp; Auto-Subtitle Generator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Article Audio Transcription &amp; Auto-Subtitle Generator</h3>
                     <div class="feature-cat">
@@ -1632,12 +2069,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-11" data-impact="Medium">
+                            <div class="feature-card" data-category="Next-Gen Editorial &amp; Collaborative Studio" data-id="TS2-ED-11" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-ED-11</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-ED-11</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-ED-11', '1-Click Markdown, Notion, and Medium Cross-Importer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">1-Click Markdown, Notion, and Medium Cross-Importer</h3>
                     <div class="feature-cat">
@@ -1650,12 +2093,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-01" data-impact="High">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-01" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-01</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-01', 'Live Interactive Creator AMA (Ask Me Anything) Stages', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Live Interactive Creator AMA (Ask Me Anything) Stages</h3>
                     <div class="feature-cat">
@@ -1668,12 +2117,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-02" data-impact="High">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-02" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-02</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-02', 'Federated ActivityPub Protocol (Mastodon &amp;amp; Threads Sync)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Federated ActivityPub Protocol (Mastodon &amp; Threads Sync)</h3>
                     <div class="feature-cat">
@@ -1686,12 +2141,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-03" data-impact="High">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-03" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-03</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-03', 'Gamified Creator Quest &amp;amp; Milestone Bounty System', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Gamified Creator Quest &amp; Milestone Bounty System</h3>
                     <div class="feature-cat">
@@ -1704,12 +2165,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-04" data-impact="High">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-04" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-04</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-04', 'Dynamic Creator Tier Subscriptions &amp;amp; Patron Passes', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Dynamic Creator Tier Subscriptions &amp; Patron Passes</h3>
                     <div class="feature-cat">
@@ -1722,12 +2189,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-05" data-impact="Medium">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-05" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-05</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-05', 'Custom Creator Profile Page Studio with Custom CSS', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Custom Creator Profile Page Studio with Custom CSS</h3>
                     <div class="feature-cat">
@@ -1740,12 +2213,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-06" data-impact="Medium">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-06" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-06</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-06', 'Reader Reading Streaks &amp;amp; Weekly Learning Habit Tracker', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Reader Reading Streaks &amp; Weekly Learning Habit Tracker</h3>
                     <div class="feature-cat">
@@ -1758,12 +2237,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-07" data-impact="Medium">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-07" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-07</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-07', 'Community Prompt Battle Arena with Live Voting', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Community Prompt Battle Arena with Live Voting</h3>
                     <div class="feature-cat">
@@ -1776,12 +2261,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-08" data-impact="Medium">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-08" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-08</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-08', 'Verified Creator Blue Checkmark &amp;amp; Authenticity Verification', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Verified Creator Blue Checkmark &amp; Authenticity Verification</h3>
                     <div class="feature-cat">
@@ -1794,12 +2285,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-09" data-impact="Medium">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-09" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-09</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-09', 'Real-Time Mentions &amp;amp; Quote Notifications Drawer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Real-Time Mentions &amp; Quote Notifications Drawer</h3>
                     <div class="feature-cat">
@@ -1812,12 +2309,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-10" data-impact="High">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-10" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-10</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-10', 'Automated Weekly Discussion Roundup &amp;amp; Digest Newsletter', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Weekly Discussion Roundup &amp; Digest Newsletter</h3>
                     <div class="feature-cat">
@@ -1830,12 +2333,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-11" data-impact="Medium">
+                            <div class="feature-card" data-category="Social Graph, Gamification &amp; Creator Economy" data-id="TS2-SOC-11" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-SOC-11</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-SOC-11</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-SOC-11', 'Curated Community Reading Collections &amp;amp; Playlists', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Curated Community Reading Collections &amp; Playlists</h3>
                     <div class="feature-cat">
@@ -1848,12 +2357,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-01" data-impact="High">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-01" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-01</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-01', 'Native RTL (Right-to-Left) Arabic, Urdu &amp;amp; Hebrew UI Engine', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Native RTL (Right-to-Left) Arabic, Urdu &amp; Hebrew UI Engine</h3>
                     <div class="feature-cat">
@@ -1866,12 +2381,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-02" data-impact="High">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-02" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-02</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-02', 'Multi-Tenant Agency Subdomain &amp;amp; Whitelabel Routing', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Multi-Tenant Agency Subdomain &amp; Whitelabel Routing</h3>
                     <div class="feature-cat">
@@ -1884,12 +2405,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-03" data-impact="Medium">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-03" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-03</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-03', 'Dynamic Crowdin &amp;amp; Phrase Translation String Sync', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Dynamic Crowdin &amp; Phrase Translation String Sync</h3>
                     <div class="feature-cat">
@@ -1902,12 +2429,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-04" data-impact="Medium">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-04" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-04</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-04', 'Multi-Currency Real-Time Forex Engine with 40+ Fiat Currencies', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Multi-Currency Real-Time Forex Engine with 40+ Fiat Currencies</h3>
                     <div class="feature-cat">
@@ -1920,12 +2453,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-05" data-impact="High">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-05" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-05</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-05', 'GDPR, CCPA &amp;amp; Global Cookie Consent Management Suite', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">GDPR, CCPA &amp; Global Cookie Consent Management Suite</h3>
                     <div class="feature-cat">
@@ -1938,12 +2477,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-06" data-impact="High">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-06" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-06</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-06', 'Regional CDN Edge Origin Routing', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Regional CDN Edge Origin Routing</h3>
                     <div class="feature-cat">
@@ -1956,12 +2501,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-07" data-impact="Medium">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-07" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-07</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-07', 'White-Label Dynamic Email Template Theme Synchronizer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">White-Label Dynamic Email Template Theme Synchronizer</h3>
                     <div class="feature-cat">
@@ -1974,12 +2525,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-08" data-impact="Low">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-08" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-08</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-08', 'Regional Number &amp;amp; Currency Formatting Locale Standardizer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Regional Number &amp; Currency Formatting Locale Standardizer</h3>
                     <div class="feature-cat">
@@ -1992,12 +2549,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-09" data-impact="Medium">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-09" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-09</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-09', 'Multi-Brand Typography &amp;amp; Google Fonts Live Selector', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Multi-Brand Typography &amp; Google Fonts Live Selector</h3>
                     <div class="feature-cat">
@@ -2010,12 +2573,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-10" data-impact="Medium">
+                            <div class="feature-card" data-category="Internationalization, Multi-Tenant &amp; White-Label" data-id="TS2-I18N-10" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-I18N-10</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-I18N-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-I18N-10', 'Automated Legal Terms &amp;amp; Privacy Policy Regional Customizer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Legal Terms &amp; Privacy Policy Regional Customizer</h3>
                     <div class="feature-cat">
@@ -2028,12 +2597,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-01" data-impact="High">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-01" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-01</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-01', 'Visual Heatmap &amp;amp; Click Tracking Canvas', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Visual Heatmap &amp; Click Tracking Canvas</h3>
                     <div class="feature-cat">
@@ -2046,12 +2621,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-02" data-impact="High">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-02" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-02</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-02', 'Scroll Depth Engagement Funnel &amp;amp; Drop-Off Analyzer', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Scroll Depth Engagement Funnel &amp; Drop-Off Analyzer</h3>
                     <div class="feature-cat">
@@ -2064,12 +2645,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-03" data-impact="High">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-03" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-03</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-03', 'Multivariate A/B Testing Suite for Headlines &amp;amp; Hero Images', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Multivariate A/B Testing Suite for Headlines &amp; Hero Images</h3>
                     <div class="feature-cat">
@@ -2082,12 +2669,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-04" data-impact="Medium">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-04" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-04</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-04', 'Predictive Subscriber Churn &amp;amp; Engagement Risk Models', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Predictive Subscriber Churn &amp; Engagement Risk Models</h3>
                     <div class="feature-cat">
@@ -2100,12 +2693,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-05" data-impact="Low">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-05" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-05</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-05', 'Carbon Footprint &amp;amp; Green Web Performance Estimator', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Carbon Footprint &amp; Green Web Performance Estimator</h3>
                     <div class="feature-cat">
@@ -2118,12 +2717,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-06" data-impact="Medium">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-06" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-06</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-06', 'Ad Block Detection &amp;amp; Gentle Whitelist Recovery Modal', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Ad Block Detection &amp; Gentle Whitelist Recovery Modal</h3>
                     <div class="feature-cat">
@@ -2136,12 +2741,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-07" data-impact="Medium">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-07" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-07</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-07', 'Real-Time Top 10 Trending Articles Live Ticker', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Real-Time Top 10 Trending Articles Live Ticker</h3>
                     <div class="feature-cat">
@@ -2154,12 +2765,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-08" data-impact="High">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-08" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-08</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-08', 'Automated Executive Weekly Business Intelligence PDF', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Automated Executive Weekly Business Intelligence PDF</h3>
                     <div class="feature-cat">
@@ -2172,12 +2789,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-09" data-impact="Medium">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-09" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-09</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-09', 'Referral Source Attribution &amp;amp; Campaign UTM Tracker', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Referral Source Attribution &amp; Campaign UTM Tracker</h3>
                     <div class="feature-cat">
@@ -2190,12 +2813,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-10" data-impact="Medium">
+                            <div class="feature-card" data-category="Analytics, Business Intelligence &amp; Telemetry" data-id="TS2-BI-10" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-BI-10</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-BI-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-BI-10', 'Anonymized Privacy-First Telemetry (Cookieless Analytics)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Anonymized Privacy-First Telemetry (Cookieless Analytics)</h3>
                     <div class="feature-cat">
@@ -2208,12 +2837,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-01" data-impact="High">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-01" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-01</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-01</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-01', 'Progressive Web App (PWA) Offline Reading &amp;amp; Background Sync', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Progressive Web App (PWA) Offline Reading &amp; Background Sync</h3>
                     <div class="feature-cat">
@@ -2226,12 +2861,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-02" data-impact="High">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-02" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-02</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-02</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-02', 'WCAG 2.1 AAA High-Contrast &amp;amp; Focus Ring Mode', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">WCAG 2.1 AAA High-Contrast &amp; Focus Ring Mode</h3>
                     <div class="feature-cat">
@@ -2244,12 +2885,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-03" data-impact="Medium">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-03" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-03</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-03</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-03', 'OpenDyslexic Font Engine &amp;amp; Reading Ruler Guide', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">OpenDyslexic Font Engine &amp; Reading Ruler Guide</h3>
                     <div class="feature-cat">
@@ -2262,12 +2909,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-04" data-impact="Medium">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-04" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-04</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-04</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-04', 'Fluid Spring Physics &amp;amp; Micro-Interaction Animations', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Fluid Spring Physics &amp; Micro-Interaction Animations</h3>
                     <div class="feature-cat">
@@ -2280,12 +2933,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-05" data-impact="High">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-05" data-impact="High" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-05</span>
-                        <span class="impact-badge impact-High">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-05</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-High">
                             High Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-05', 'Global Command Palette Keyboard Shortcuts (`Ctrl+K` / `Cmd+K`)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Global Command Palette Keyboard Shortcuts (`Ctrl+K` / `Cmd+K`)</h3>
                     <div class="feature-cat">
@@ -2298,12 +2957,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-06" data-impact="Low">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-06" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-06</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-06</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-06', 'Interactive Keyboard Navigation (`J`/`K` Feed Browsing)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Interactive Keyboard Navigation (`J`/`K` Feed Browsing)</h3>
                     <div class="feature-cat">
@@ -2316,12 +2981,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-07" data-impact="Medium">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-07" data-impact="Medium" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-07</span>
-                        <span class="impact-badge impact-Medium">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-07</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Medium">
                             Medium Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-07', 'Reader Preferences Drawer (Font Size, Line Height, Width)', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Reader Preferences Drawer (Font Size, Line Height, Width)</h3>
                     <div class="feature-cat">
@@ -2334,12 +3005,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-08" data-impact="Low">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-08" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-08</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-08</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-08', 'Auto-Detect OS Theme &amp;amp; Ambient Light Mode Adaptor', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Auto-Detect OS Theme &amp; Ambient Light Mode Adaptor</h3>
                     <div class="feature-cat">
@@ -2352,12 +3029,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-09" data-impact="Low">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-09" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-09</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-09</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-09', 'Haptic Feedback Support on Mobile Interactions', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Haptic Feedback Support on Mobile Interactions</h3>
                     <div class="feature-cat">
@@ -2370,12 +3053,18 @@
                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">STATUS: PLANNED</span>
                     </div>
                 </div>
-                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-10" data-impact="Low">
+                            <div class="feature-card" data-category="Accessibility, Micro-Interactions &amp; PWA Studio" data-id="TS2-UI-10" data-impact="Low" data-status="planned">
                     <div class="card-header">
-                        <span class="feature-id">TS2-UI-10</span>
-                        <span class="impact-badge impact-Low">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="feature-id">TS2-UI-10</span>
+                            <span class="status-badge status-planned"><i class="fa-regular fa-clock"></i> Planned</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="impact-badge impact-Low">
                             Low Impact
                         </span>
+                            <button class="copy-idea-btn" onclick="copyIdea('TS2-UI-10', 'Print-Optimized Clean PDF &amp;amp; Paper Stylesheet', this)" title="Copy Feature Specification"><i class="fa-regular fa-copy"></i></button>
+                        </div>
                     </div>
                     <h3 class="feature-title">Print-Optimized Clean PDF &amp; Paper Stylesheet</h3>
                     <div class="feature-cat">
@@ -2462,6 +3151,29 @@
             downloadAnchor.click();
             downloadAnchor.remove();
         }
-    </script>
+    
+    function copyIdea(id, title, btn) {
+        const card = btn.closest('.feature-card');
+        const desc = card.querySelector('.feature-desc')?.innerText || '';
+        const cat = card.querySelector('.feature-cat span')?.innerText || '';
+        const text = `[${id}] ${title}\nCategory: ${cat}\nSpecification: ${desc}`;
+        
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981;"></i>';
+            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981;"></i>';
+            setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy"></i>'; }, 2000);
+        });
+    }
+    
+</script>
 </body>
 </html>

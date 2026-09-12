@@ -5004,25 +5004,29 @@ class AdminController {
         // Strip internal routing fields
         unset($allPosts['_active_tab'], $allPosts['csrf_token']);
 
-        // Checkbox field keys that should be treated as 0 if unchecked
-        $checkboxKeys = [
-            'site_maintenance_mode', 'enable_user_registration', 'require_email_verification',
-            'force_staff_2fa', 'social_login_google', 'social_login_github',
-            'enable_stripe_payments', 'enable_crypto_payments', 'auto_compress_images',
-            'cdn_enabled', 'cdn_minify_assets', 'search_highlight_matches',
-            'seo_auto_generate_sitemap', 'analytics_track_internal_telemetry', 'analytics_anonymize_ips',
-            'notifications_inapp_enabled', 'notifications_sound_enabled', 'moderation_auto_engine_enabled',
-            'security_csrf_strict', 'security_csp_strict', 'security_honeypot_enabled',
-            'api_public_enabled', 'api_require_auth_public', 'api_expose_swagger',
-            'integration_discord_enabled', 'integration_telegram_enabled', 'integration_slack_enabled',
-            'flag_jobs_board', 'flag_community_comments', 'flag_emoji_reactions',
-            'flag_rewards_shop', 'flag_custom_gpts', 'flag_prompt_blueprints',
-            'flag_author_studio', 'flag_markdown_exporter', 'loc_multilang_enabled'
+        // Scope checkbox defaulting strictly to the active tab being saved
+        $tabCheckboxes = [
+            'general' => ['site_maintenance_mode', 'enable_user_registration', 'require_email_verification'],
+            'security' => ['force_staff_2fa', 'security_csrf_strict', 'security_csp_strict', 'security_honeypot_enabled'],
+            'social' => ['social_login_google', 'social_login_github'],
+            'payments' => ['enable_stripe_payments', 'enable_crypto_payments'],
+            'media' => ['auto_compress_images', 'cdn_enabled', 'cdn_minify_assets'],
+            'seo' => ['search_highlight_matches', 'seo_auto_generate_sitemap'],
+            'analytics' => ['analytics_track_internal_telemetry', 'analytics_anonymize_ips'],
+            'notifications' => ['notifications_inapp_enabled', 'notifications_sound_enabled'],
+            'moderation' => ['moderation_auto_engine_enabled'],
+            'api' => ['api_public_enabled', 'api_require_auth_public', 'api_expose_swagger'],
+            'integrations' => ['integration_discord_enabled', 'integration_telegram_enabled', 'integration_slack_enabled'],
+            'features' => [
+                'flag_jobs_board', 'flag_community_comments', 'flag_emoji_reactions',
+                'flag_rewards_shop', 'flag_custom_gpts', 'flag_prompt_blueprints',
+                'flag_author_studio', 'flag_markdown_exporter', 'loc_multilang_enabled'
+            ]
         ];
 
-        foreach ($checkboxKeys as $cbKey) {
+        $relevantCheckboxes = $tabCheckboxes[$activeTab] ?? [];
+        foreach ($relevantCheckboxes as $cbKey) {
             if (!isset($allPosts[$cbKey])) {
-                // If on the relevant tab and the checkbox was not in POST, mark 0
                 $allPosts[$cbKey] = '0';
             }
         }

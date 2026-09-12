@@ -353,7 +353,7 @@
             <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'camp_featured_image_url', 'general')" style="display: none;">
           </label>
         </div>
-        <input type="url" name="featured_image_url" id="camp_featured_image_url" placeholder="https://images.unsplash.com/..." class="admin-modal-input">
+        <input type="text" name="featured_image_url" id="camp_featured_image_url" placeholder="https://images.unsplash.com/... or /storage/uploads/..." class="admin-modal-input">
       </div>
 
       <div style="margin-bottom: 1.25rem;">

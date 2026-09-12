@@ -146,6 +146,8 @@ $router->get('/advertise', [HomeController::class, 'sponsor']);
 $router->post('/sponsor/submit-tool', [HomeController::class, 'submitSponsoredTool']);
 $router->post('/sponsor/submit-post', [HomeController::class, 'submitSponsoredPost']);
 
+$router->get('/ad/click/{id}', [HomeController::class, 'trackAdClick']);
+
 // ----------------------------------------------------------------------------
 // 2. BLOG & EDITORIAL ROUTES
 // ----------------------------------------------------------------------------
@@ -170,6 +172,9 @@ $router->get('/tools/category/{slug}', [DirectoryController::class, 'tools']);
 $router->get('/tools/{slug}', [DirectoryController::class, 'toolSingle']);
 
 $router->get('/prompts', [DirectoryController::class, 'prompts']);
+$router->get('/prompts/images', [DirectoryController::class, 'imagePrompts']);
+$router->get('/prompts/images/{category}', [DirectoryController::class, 'imagePrompts']);
+$router->get('/prompts/image-prompts', [DirectoryController::class, 'imagePrompts']);
 $router->get('/prompts/category/{slug}', [DirectoryController::class, 'prompts']);
 $router->get('/prompts/{slug}', [DirectoryController::class, 'promptSingle']);
 
@@ -588,6 +593,17 @@ $router->get('/help/{slug}', [PageController::class, 'help']);
 $router->get('/write/guidelines', [PageController::class, 'authorGuidelines']);
 $router->get('/editorial', [PageController::class, 'editorial']);
 $router->get('/about', [PageController::class, 'about']);
+$router->get('/status', [PageController::class, 'systemStatus']);
+
+// Feeds & Dynamic Partitioned Sitemaps [TS-API-05, TS-API-07]
+$router->get('/feed/prompts.xml', [\App\Controllers\FeedController::class, 'promptsXml']);
+$router->get('/feed/articles.xml', [\App\Controllers\FeedController::class, 'articlesXml']);
+$router->get('/feed/articles.json', [\App\Controllers\FeedController::class, 'articlesJson']);
+$router->get('/feed.xml', [\App\Controllers\FeedController::class, 'articlesXml']);
+$router->get('/sitemap.xml', [\App\Controllers\FeedController::class, 'sitemapIndex']);
+$router->get('/sitemap-articles.xml', [\App\Controllers\FeedController::class, 'sitemapArticles']);
+$router->get('/sitemap-tools.xml', [\App\Controllers\FeedController::class, 'sitemapTools']);
+$router->get('/sitemap-prompts.xml', [\App\Controllers\FeedController::class, 'sitemapPrompts']);
 
 // System, Audit Logs & Backup Exporter
 $router->get('/admin/audit-logs', [AdminController::class, 'auditLogs'], ['admin']);
@@ -603,12 +619,9 @@ $router->get('/api/v1/auth/check-availability', [ApiController::class, 'checkAut
 $router->get('/api/v1/geo/timezone', [ApiController::class, 'getIpTimezone']);
 
 
-// Public Dynamic SEO Feeds
-$router->get('/sitemap.xml', function() {
-    header('Content-Type: application/xml; charset=utf-8');
-    echo \App\Core\SeoEngine::generateSitemapXml();
-    exit;
-});
+$router->post('/api/v1/telemetry/csp', [ApiController::class, 'cspTelemetry']);
+
+// Dynamic Robots.txt
 $router->get('/robots.txt', function() {
     header('Content-Type: text/plain; charset=utf-8');
     echo \App\Core\SeoEngine::getRobotsTxt();
@@ -722,9 +735,20 @@ try {
     $uri = $request->getUri();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $isAdmin = \App\Core\Auth::isAdmin();
-    $isAdminPath = str_starts_with($uri, '/admin') || str_starts_with($uri, '/login') || str_starts_with($uri, '/logout') || str_starts_with($uri, '/assets') || str_starts_with($uri, '/auth') || str_starts_with($uri, '/api/v1/diagnostic-ping');
+    $isAdminPath = str_starts_with($uri, '/admin') || str_starts_with($uri, '/login') || str_starts_with($uri, '/logout') || str_starts_with($uri, '/assets') || str_starts_with($uri, '/auth') || str_starts_with($uri, '/api/v1/diagnostic-ping') || str_starts_with($uri, '/status');
     $hasBypass = \App\Core\Session::get('maintenance_bypass') || $request->query('bypass') === 'techscout_ops';
     
+    // Check Client IP against Maintenance Allowed IPs whitelist [TS-INF-09]
+    $clientIp = Request::ip();
+    $ipRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_allowed_ips'");
+    $allowedIps = array_filter(array_map('trim', explode(',', (string)($ipRow['key_value'] ?? ''))));
+    foreach ($allowedIps as $ip) {
+        if ($ip === $clientIp || $ip === '*' || (str_contains($ip, '/') && \App\Core\Firewall::ipInRange($clientIp, $ip))) {
+            $hasBypass = true;
+            break;
+        }
+    }
+
     if ($request->query('bypass') === 'techscout_ops') {
         \App\Core\Session::set('maintenance_bypass', true);
         $hasBypass = true;
@@ -734,9 +758,13 @@ try {
         http_response_code(503);
         $msgRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_message'");
         $customMessage = $msgRow['key_value'] ?? 'TechScout core engineering systems are currently executing scheduled platform upgrades.';
+        $countdownRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_countdown_minutes'");
+        $countdownMinutes = (int)($countdownRow['key_value'] ?? 45);
+
         \App\Core\Response::view('errors/503', [
             'title' => 'Platform Upgrades Underway (HTTP 503) | TechScout',
-            'customMessage' => $customMessage
+            'customMessage' => $customMessage,
+            'countdownMinutes' => $countdownMinutes
         ]);
         exit;
     } elseif ($isReadOnly && $method === 'POST' && !$isAdmin && !$isAdminPath && !$hasBypass) {
@@ -750,6 +778,16 @@ try {
         }
     }
 } catch (\Throwable $e) {}
+
+// Strict Rate-Limiting Engine on Public APIs and Search [TS-SEC-010]
+try {
+    $uriPath = $request->getUri();
+    if (str_starts_with($uriPath, '/api/') && !str_starts_with($uriPath, '/api/v1/diagnostic-ping')) {
+        \App\Core\RateLimiter::guard('api', 120, 60);
+    } elseif (str_starts_with($uriPath, '/search')) {
+        \App\Core\RateLimiter::guard('search', 40, 60);
+    }
+} catch (\Throwable $rlEx) {}
 
 // Dispatch the current request
 $router->dispatch($request);

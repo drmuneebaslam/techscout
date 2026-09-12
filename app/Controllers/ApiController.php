@@ -1518,6 +1518,26 @@ class ApiController {
             'formatted_time' => $now->format('Y-m-d H:i:s T')
         ]);
     }
+
+    /**
+     * Content Security Policy (CSP) Violation Telemetry Collector [TS-SEC-04]
+     */
+    public function cspTelemetry(Request $request): void {
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? [];
+        $report = $data['csp-report'] ?? $data;
+
+        $ip = Request::ip();
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $blockedUri = $report['blocked-uri'] ?? $report['blockedURI'] ?? 'unknown';
+        $violatedDirective = $report['violated-directive'] ?? $report['effective-directive'] ?? 'policy';
+        $docUri = $report['document-uri'] ?? $report['documentURI'] ?? $_SERVER['HTTP_REFERER'] ?? '/';
+
+        $threatType = "CSP Violation: {$violatedDirective} blocked '{$blockedUri}'";
+        \App\Core\Firewall::logThreat($ip, $ua, $docUri, $threatType, 'logged');
+
+        Response::json(['status' => 'acknowledged', 'logged' => true]);
+    }
 }
 
 

@@ -51,6 +51,9 @@
   }
 ?>
 
+  <!-- Display Banner Advertisement: Footer Slot -->
+  <?= \App\Core\AdRenderer::renderSlot('footer_banner') ?>
+
   <!-- Optional Footer Banner Ad Slot -->
   <?php if (!empty($siteSettings['ad_slot_footer'])): ?>
     <div class="container" style="margin-top: 2rem; margin-bottom: 2rem; text-align: center; overflow: hidden;">
@@ -150,5 +153,45 @@
   <!-- Scripts -->
   <script src="<?= url('/assets/js/main.js') ?>"></script>
   <script src="<?= url('/assets/js/content-engine.js') ?>"></script>
+
+  <!-- PWA Offline Service Worker Registration [TS-UI-05] -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('<?= url('/sw.js') ?>').catch(() => {});
+    });
+  }
+  </script>
+
+  <!-- Dynamic Direct / Popunder Ad Trigger -->
+  <?php 
+    $popunderUrl = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_popunder_url'")['key_value'] ?? 'https://omg10.com/4/11737440';
+  ?>
+  <?php if (!empty($popunderUrl)): ?>
+  <script>
+  (function() {
+    const popunderUrl = <?= json_encode($popunderUrl) ?>;
+    let popunderFired = false;
+    if (!sessionStorage.getItem('ts_popunder_fired') && popunderUrl) {
+      function triggerSitePopunder(e) {
+        if (popunderFired) return;
+        const target = e.target.closest('a, button, input, select, textarea');
+        if (target && target.tagName === 'A' && (target.getAttribute('href')?.startsWith('#') || target.getAttribute('href')?.startsWith('javascript:'))) return;
+        popunderFired = true;
+        sessionStorage.setItem('ts_popunder_fired', '1');
+        try {
+          const win = window.open(popunderUrl, '_blank');
+          if (win) {
+            win.blur();
+            window.focus();
+          }
+        } catch(err) {}
+        document.removeEventListener('click', triggerSitePopunder, true);
+      }
+      document.addEventListener('click', triggerSitePopunder, true);
+    }
+  })();
+  </script>
+  <?php endif; ?>
 </body>
 </html>

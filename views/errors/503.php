@@ -85,7 +85,7 @@
 
 <script>
 // Animated countdown timer
-let secondsLeft = 880;
+let secondsLeft = <?= (isset($countdownMinutes) && (int)$countdownMinutes > 0) ? ((int)$countdownMinutes * 60) : (45 * 60) ?>;
 function updateMaintTimer() {
   const mins = Math.floor(secondsLeft / 60);
   const secs = secondsLeft % 60;

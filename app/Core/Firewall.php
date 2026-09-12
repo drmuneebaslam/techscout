@@ -61,4 +61,40 @@ class Firewall {
             );
         } catch (Throwable $e) {}
     }
+
+    /**
+     * Check if an IP matches a CIDR range or single IP [TS-INF-09]
+     */
+    public static function ipInRange(string $ip, string $range): bool {
+        if (!str_contains($range, '/')) {
+            return $ip === $range;
+        }
+        [$subnet, $bits] = explode('/', $range, 2);
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ipLong = ip2long($ip);
+            $subnetLong = ip2long($subnet);
+            $mask = -1 << (32 - (int)$bits);
+            $subnetLong &= $mask;
+            return ($ipLong & $mask) == $subnetLong;
+        }
+        return false;
+    }
+
+    /**
+     * Validate against disposable/temporary burner email providers [TS-SEC-05]
+     */
+    public static function isDisposableEmail(string $email): bool {
+        $parts = explode('@', strtolower(trim($email)));
+        if (count($parts) !== 2) return true;
+        $domain = $parts[1];
+
+        $disposableDomains = [
+            'mailinator.com', '10minutemail.com', 'tempmail.com', 'guerrillamail.com',
+            'sharklasers.com', 'yopmail.com', 'throwawaymail.com', 'dispostable.com',
+            'getairmail.com', 'fakemailgenerator.com', 'temp-mail.org', 'generator.email',
+            'trashmail.com', 'maildrop.cc', 'getnada.com', 'inboxkitten.com', 'burnermail.io'
+        ];
+
+        return in_array($domain, $disposableDomains, true);
+    }
 }

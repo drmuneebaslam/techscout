@@ -144,7 +144,7 @@ $userBadgeLabel = ($user['custom_badge_label'] ?? '') ?: ($user['verification_ba
 
           <div class="ts-form-row">
             <label class="ts-input-label">Remote Avatar URL <span class="ts-label-sub">(Optional CDN Link)</span></label>
-            <input type="url" name="avatar_url" id="avatar_url_field" value="<?= htmlspecialchars($currentAvatar) ?>" placeholder="https://example.com/avatar.jpg" class="ts-form-input" oninput="previewAvatarUrl(this.value)">
+            <input type="text" name="avatar_url" id="avatar_url_field" value="<?= htmlspecialchars($currentAvatar) ?>" placeholder="https://example.com/avatar.jpg or /storage/uploads/..." class="ts-form-input" oninput="previewAvatarUrl(this.value)">
           </div>
 
           <div class="ts-form-row" style="margin-bottom: 1.15rem;">

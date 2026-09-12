@@ -186,7 +186,7 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
             </label>
           </div>
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <input type="url" name="featured_image_url" id="doc_cover" value="<?= htmlspecialchars(image_url($content['featured_image_url'] ?? '')) ?>" placeholder="https://images.unsplash.com/... or uploaded image URL" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc;">
+            <input type="text" name="featured_image_url" id="doc_cover" value="<?= htmlspecialchars(image_url($content['featured_image_url'] ?? '')) ?>" placeholder="https://images.unsplash.com/... or uploaded image path" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc;">
           </div>
         </div>
       </div>

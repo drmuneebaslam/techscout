@@ -195,7 +195,7 @@
         </div>
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #f8fafc; margin-bottom: 0.35rem;">Or Diagnostic URL (Optional)</label>
-          <input type="url" name="attachment_url" placeholder="https://gist.github.com/... or screenshot URL" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.55rem 0.85rem; border-radius: 6px; color: #f8fafc; font-size: 0.85rem;">
+          <input type="text" name="attachment_url" placeholder="https://... or /storage/uploads/... or screenshot URL" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.55rem 0.85rem; border-radius: 6px; color: #f8fafc; font-size: 0.85rem;">
         </div>
       </div>
 

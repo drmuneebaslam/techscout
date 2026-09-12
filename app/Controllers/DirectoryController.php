@@ -134,6 +134,41 @@ class DirectoryController {
         ]);
     }
 
+    public function imagePrompts(Request $request, array $params = []): void {
+        $category = $params['category'] ?? $request->query('category');
+        $sort = $request->query('sort', 'popular');
+        $search = trim((string)$request->query('search', ''));
+        $model = $request->query('model');
+
+        $filters = [
+            'type' => 'prompt',
+            'search' => $search,
+            'category' => $category,
+            'model' => $model
+        ];
+
+        $allPrompts = Content::getFilteredPrompts($filters, $sort);
+        $prompts = array_values(array_filter($allPrompts, function($p) {
+            $modelsStr = is_string($p['target_models'] ?? '') ? $p['target_models'] : json_encode($p['target_models'] ?? []);
+            $hasImageModel = (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || stripos($modelsStr, 'Leonardo') !== false);
+            $hasImageCat = in_array($p['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion', 'photorealism', '3d-renders', 'cyberpunk', 'anime', 'architecture', 'fantasy']);
+            $hasImage = !empty($p['featured_image_url']) && $p['featured_image_url'] !== 'https://funwithcoding.free.nf/';
+            return $hasImageModel || $hasImageCat || $hasImage;
+        }));
+
+        $categories = Category::getByType('prompt');
+
+        Response::view('directory/prompts_images', [
+            'title' => 'AI Image Prompts Sub-Directory & Visual Blueprints | TechScout',
+            'prompts' => $prompts,
+            'categories' => $categories,
+            'currentCategory' => $category,
+            'currentSort' => $sort,
+            'currentSearch' => $search,
+            'currentModel' => $model
+        ]);
+    }
+
     public function promptSingle(Request $request, array $params): void {
         $slug = $params['slug'] ?? '';
         $prompt = Content::findBySlug($slug);
@@ -185,6 +220,11 @@ class DirectoryController {
             }
         } catch (\Throwable $e) {}
 
+        $comments = [];
+        try {
+            $comments = \App\Models\Comment::getTreeForContent((int)$prompt['id']);
+        } catch (\Throwable $e) {}
+
         Response::view('directory/prompt_single', [
             'title' => $prompt['title'] . ' — Prompt Blueprint | TechScout',
             'prompt' => $prompt,
@@ -192,7 +232,8 @@ class DirectoryController {
             'models' => $models,
             'isBookmarked' => $isBookmarked,
             'galleryImages' => $galleryImages,
-            'adDirectUrl' => $adDirectUrl
+            'adDirectUrl' => $adDirectUrl,
+            'comments' => $comments
         ]);
     }
 
