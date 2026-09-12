@@ -85,6 +85,14 @@ class ApiController {
             return;
         }
 
+        // TS-SOC-03: Strict rule: No links and no email addresses allowed in comments
+        if (preg_match('/(https?:\/\/|www\.[a-z0-9\-\.]+|[a-z0-9_\.\-]+@[a-z0-9\-]+\.[a-z0-9\-\.]+)/i', $text)) {
+            Response::json([
+                'error' => 'Links and email addresses are strictly prohibited in comments to prevent spam and ensure community safety.'
+            ], 400);
+            return;
+        }
+
         // Suspicious Activity Check: Auto-flag accounts creating more than 10 comments per minute
         $recentComments = (int)(Database::fetch(
             "SELECT COUNT(*) as c FROM comments WHERE user_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)",
@@ -137,12 +145,226 @@ class ApiController {
                     $contentUrl
                 );
             }
+
+            // 3. TS-SOC-01: Detect @username mentions and notify mentioned users
+            preg_match_all('/@([a-zA-Z0-9_]{3,30})/', $text, $matches);
+            if (!empty($matches[1])) {
+                $mentionedUsernames = array_unique($matches[1]);
+                foreach ($mentionedUsernames as $mUsername) {
+                    $mUser = Database::fetch("SELECT id FROM users WHERE username = ? AND status = 'active'", [$mUsername]);
+                    if ($mUser && (int)$mUser['id'] !== $userId) {
+                        \App\Core\NotificationHelper::send(
+                            (int)$mUser['id'],
+                            'mention',
+                            "Mentioned by @{$comment['username']}",
+                            "{$commenterName} mentioned you in a discussion on \"{$content['title']}\": \"{$commentSnippet}\"",
+                            $contentUrl
+                        );
+                    }
+                }
+            }
         }
 
         Response::json([
             'success' => true,
             'comment' => $comment
         ], 201);
+    }
+
+    // TS-SOC-06: Long Polling Endpoint for Real-time Thread Updates (60s cycle, zero spam)
+    public function pollComments(Request $request, array $params): void {
+        $contentId = (int)($params['id'] ?? 0);
+        $sinceId = (int)$request->query('since_id', 0);
+
+        $newComments = [];
+        try {
+            $newComments = Database::query(
+                "SELECT c.*, u.username, a.display_name, a.avatar_url, a.verification_badge 
+                 FROM comments c 
+                 JOIN users u ON c.user_id = u.id 
+                 LEFT JOIN authors a ON u.id = a.user_id 
+                 WHERE c.content_id = ? AND c.id > ? AND c.status = 'approved' 
+                 ORDER BY c.id ASC",
+                [$contentId, $sinceId]
+            );
+            foreach ($newComments as &$nc) {
+                if (!empty($nc['avatar_url'])) {
+                    $nc['avatar_url'] = image_url($nc['avatar_url']);
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        Response::json([
+            'has_updates' => !empty($newComments),
+            'count' => count($newComments),
+            'comments' => $newComments,
+            'poll_interval' => 60000 // 60s
+        ]);
+    }
+
+    // TS-SOC-07: Pin "Best Answer" / Top Insight by Author or Admin
+    public function togglePinComment(Request $request, array $params): void {
+        if (!Auth::check()) {
+            Response::json(['error' => 'Authentication required.'], 401);
+            return;
+        }
+
+        $commentId = (int)($params['id'] ?? 0);
+        $comment = Database::fetch("SELECT c.*, ct.author_id as content_author_id FROM comments c JOIN contents ct ON c.content_id = ct.id WHERE c.id = ?", [$commentId]);
+        if (!$comment) {
+            Response::json(['error' => 'Comment not found.'], 404);
+            return;
+        }
+
+        $user = Auth::user();
+        $isAuthor = (!empty($user['author_id']) && (int)$user['author_id'] === (int)$comment['content_author_id']);
+        $isAdmin = Auth::isAdmin();
+
+        if (!$isAuthor && !$isAdmin) {
+            Response::json(['error' => 'Only the content author or an administrator can pin comments.'], 403);
+            return;
+        }
+
+        $newPinned = empty($comment['is_pinned']) ? 1 : 0;
+        Database::execute("UPDATE comments SET is_pinned = ? WHERE id = ?", [$newPinned, $commentId]);
+
+        Response::json([
+            'success' => true,
+            'is_pinned' => (bool)$newPinned,
+            'message' => $newPinned ? 'Comment pinned to top of thread!' : 'Comment unpinned.'
+        ]);
+    }
+
+    // TS-SOC-04: Multi-Emoji Reaction Bar (❤️, 🚀, 💡, 🔥, 👀)
+    public function reactCommentEmoji(Request $request, array $params): void {
+        $commentId = (int)($params['id'] ?? 0);
+        $emoji = trim((string)($request->json('emoji') ?? $request->post('emoji') ?? ''));
+        $validEmojis = ['heart', 'rocket', 'lightbulb', 'fire', 'eyes'];
+
+        if (!in_array($emoji, $validEmojis, true)) {
+            Response::json(['error' => 'Invalid emoji reaction.'], 400);
+            return;
+        }
+
+        $userId = Auth::id() ? (int)Auth::id() : null;
+        $ip = Request::ip();
+
+        // Stored in reactions_json on comments
+        $comment = Database::fetch("SELECT reactions_json, reaction_count FROM comments WHERE id = ?", [$commentId]);
+        if (!$comment) {
+            Response::json(['error' => 'Comment not found.'], 404);
+            return;
+        }
+
+        $reactions = !empty($comment['reactions_json']) ? json_decode($comment['reactions_json'], true) : [];
+        if (!is_array($reactions)) $reactions = [];
+        $reactions[$emoji] = (int)($reactions[$emoji] ?? 0) + 1;
+
+        Database::execute(
+            "UPDATE comments SET reactions_json = ?, reaction_count = reaction_count + 1 WHERE id = ?",
+            [json_encode($reactions), $commentId]
+        );
+
+        Response::json([
+            'success' => true,
+            'reactions' => $reactions,
+            'total_count' => (int)$comment['reaction_count'] + 1
+        ]);
+    }
+
+    // TS-SOC-01: Mentions Autocomplete Search
+    public function searchMentions(Request $request): void {
+        $q = trim((string)$request->query('q', ''));
+        if (strlen($q) < 1) {
+            Response::json([]);
+            return;
+        }
+
+        $users = Database::query(
+            "SELECT u.id, u.username, a.display_name, a.avatar_url 
+             FROM users u 
+             LEFT JOIN authors a ON u.id = a.user_id 
+             WHERE u.username LIKE ? OR a.display_name LIKE ? 
+             LIMIT 8",
+            [$q . '%', $q . '%']
+        );
+        foreach ($users as &$u) {
+            $u['avatar_url'] = image_url($u['avatar_url'] ?? '');
+        }
+
+        Response::json($users);
+    }
+
+    // TS-CR-05: Creator Crypto Tip Jar Submission (Central Treasury, 5% fee)
+    public function submitCreatorTip(Request $request): void {
+        $authorUsername = trim((string)$request->post('author_username', ''));
+        $articleUrl = trim((string)$request->post('article_url', ''));
+        $grossAmount = (float)$request->post('amount', 10.00);
+        $currency = strtoupper(trim((string)$request->post('currency', 'USDT')));
+        $txid = trim((string)$request->post('txid', ''));
+        $senderName = trim((string)$request->post('sender_name', 'Anonymous Supporter'));
+
+        if ($grossAmount <= 0 || empty($txid)) {
+            Response::json(['error' => 'Please provide a valid tip amount and payment TXID.'], 400);
+            return;
+        }
+
+        // Find author ID
+        $author = null;
+        if (!empty($authorUsername)) {
+            $author = Database::fetch("SELECT a.id, a.user_id FROM authors a JOIN users u ON a.user_id = u.id WHERE u.username = ? OR a.display_name = ?", [$authorUsername, $authorUsername]);
+        }
+        $authorId = $author ? (int)$author['id'] : 1;
+
+        // Calculate 5% platform fee and 95% net creator amount
+        $platformFee = round($grossAmount * 0.05, 2);
+        $netAuthor = round($grossAmount * 0.95, 2);
+
+        Database::execute(
+            "INSERT INTO author_tips (author_id, sender_name, article_url, gross_amount, platform_fee, net_author_amount, currency, txid, status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')",
+            [$authorId, $senderName ?: 'Anonymous Supporter', $articleUrl, $grossAmount, $platformFee, $netAuthor, $currency, $txid]
+        );
+
+        Response::json([
+            'success' => true,
+            'message' => 'Thank you! Your tip has been submitted for platform confirmation and creator credit.'
+        ]);
+    }
+
+    // TS-SOC-11: Community Poll Voting
+    public function votePoll(Request $request, array $params): void {
+        $pollId = (int)($params['id'] ?? 0);
+        $optionId = (int)$request->post('option_id', 0);
+        $ip = Request::ip();
+        $userId = Auth::id() ? (int)Auth::id() : null;
+
+        if ($pollId <= 0 || $optionId <= 0) {
+            Response::json(['error' => 'Invalid poll or option.'], 400);
+            return;
+        }
+
+        // Check if already voted
+        $alreadyVoted = Database::fetch("SELECT id FROM article_poll_votes WHERE poll_id = ? AND ip_address = ?", [$pollId, $ip]);
+        if ($alreadyVoted) {
+            Response::json(['error' => 'You have already voted in this poll.'], 400);
+            return;
+        }
+
+        Database::execute(
+            "INSERT INTO article_poll_votes (poll_id, option_id, user_id, ip_address) VALUES (?, ?, ?, ?)",
+            [$pollId, $optionId, $userId, $ip]
+        );
+        Database::execute("UPDATE article_poll_options SET votes_count = votes_count + 1 WHERE id = ?", [$optionId]);
+
+        $options = Database::query("SELECT id, option_text, votes_count FROM article_poll_options WHERE poll_id = ?", [$pollId]);
+        $totalVotes = array_sum(array_column($options, 'votes_count'));
+
+        Response::json([
+            'success' => true,
+            'total_votes' => $totalVotes,
+            'options' => $options
+        ]);
     }
 
     // Upvote / Helpful Comment Toggle with Undo Support

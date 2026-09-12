@@ -42,14 +42,48 @@ if (!function_exists('renderRedditCommentNode')) {
         $replyCount = $hasReplies ? count($c['replies']) : 0;
         $maxDepthIndent = min($depth * 1.5, 4.5);
         $isUpvoted = in_array($commentId, $userUpvotedCommentIds, true);
-        $avatarSize = $depth === 0 ? 34 : 26;
+        $avatarSize = $depth === 0 ? 36 : 28;
+        $isPinned = !empty($c['is_pinned']);
+        $canPin = $currentUser && ((int)$currentUser['id'] === $contentAuthorId || \App\Core\Auth::isAdmin());
+
+        // Parse reactions
+        $reactions = [];
+        if (!empty($c['reactions_json'])) {
+            $reactions = is_string($c['reactions_json']) ? json_decode($c['reactions_json'], true) : $c['reactions_json'];
+        }
+        if (!is_array($reactions)) $reactions = [];
+        $emojiMap = ['heart' => '❤️', 'rocket' => '🚀', 'idea' => '💡', 'fire' => '🔥', 'eyes' => '👀'];
+
+        // Reputation / Trust Tier Badges [TS-SOC-05]
+        $reputation = (int)($c['reputation_points'] ?? 0);
+        $trustBadge = '';
+        $trustColor = 'var(--ts-text-muted)';
+        if (($c['role'] ?? '') === 'super_admin' || ($c['role'] ?? '') === 'admin') {
+            $trustBadge = '🛡️ Mod';
+            $trustColor = '#38bdf8';
+        } elseif ($reputation >= 500) {
+            $trustBadge = '🏆 Gold';
+            $trustColor = '#f59e0b';
+        } elseif ($reputation >= 150) {
+            $trustBadge = '🥈 Silver';
+            $trustColor = '#94a3b8';
+        } elseif ($reputation >= 30) {
+            $trustBadge = '🥉 Bronze';
+            $trustColor = '#d97706';
+        }
         ?>
-        <div class="comment-node-wrapper <?= $depth === 0 ? 'comment-item' : 'comment-reply-node' ?>" 
+        <div class="comment-node-wrapper <?= $depth === 0 ? 'comment-item' : 'comment-reply-node' ?> <?= $isPinned ? 'comment-pinned-highlight' : '' ?>" 
              id="comment-node-<?= $commentId ?>" 
              data-upvotes="<?= $upvotes ?>" 
              data-timestamp="<?= strtotime($c['created_at']) ?>"
-             style="<?= $depth > 0 ? "margin-left: {$maxDepthIndent}rem; border-left: 2px solid var(--ts-border-subtle); padding-left: 0.85rem; margin-top: 0.5rem;" : "margin-bottom: 0.85rem;" ?>">
+             style="<?= $depth > 0 ? "margin-left: {$maxDepthIndent}rem; border-left: 2px solid var(--ts-border-subtle); padding-left: 0.85rem; margin-top: 0.5rem;" : "margin-bottom: 0.95rem;" ?><?= $isPinned ? ' border: 2px solid #eab308; background: rgba(234, 179, 8, 0.04); border-radius: 14px; padding: 0.75rem;' : '' ?>">
           
+          <?php if ($isPinned): ?>
+            <div style="display: flex; align-items: center; gap: 0.35rem; color: #eab308; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.4rem; padding-left: 0.2rem;">
+              <i data-lucide="pin" style="width: 14px; height: 14px;"></i> Author's Choice — Top Insight
+            </div>
+          <?php endif; ?>
+
           <div style="display: flex; gap: 0.65rem; align-items: flex-start;">
             <!-- Social Avatar -->
             <img src="<?= htmlspecialchars(image_url($c['avatar_url'] ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80')) ?>" 
@@ -57,30 +91,61 @@ if (!function_exists('renderRedditCommentNode')) {
                  style="width: <?= $avatarSize ?>px; height: <?= $avatarSize ?>px; border-radius: 50%; object-fit: cover; border: 1px solid var(--ts-border-main); flex-shrink: 0; margin-top: 2px;">
 
             <div style="flex: 1; max-width: calc(100% - <?= $avatarSize + 12 ?>px);">
-              <!-- Compact Social Speech Bubble (Instagram / FB Style) -->
-              <div class="ts-comment-bubble" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 16px; padding: 0.55rem 0.95rem; display: inline-block; max-width: 100%;">
-                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem; flex-wrap: wrap;">
+              <!-- Compact Social Speech Bubble -->
+              <div class="ts-comment-bubble" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 16px; padding: 0.6rem 1rem; display: inline-block; max-width: 100%; position: relative;">
+                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem; flex-wrap: wrap;">
                   <span style="font-weight: 700; font-size: 0.85rem; color: var(--ts-text-primary);">
                     <?= htmlspecialchars($c['display_name'] ?? $c['username']) ?>
                   </span>
 
-                  <?php if ($isAuthorComment): ?>
-                    <span class="ts-badge ts-badge-pink" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Author ✍️</span>
-                  <?php elseif (($c['role'] ?? '') === 'super_admin' || ($c['role'] ?? '') === 'admin'): ?>
-                    <span class="ts-badge ts-badge-cyan" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Staff 🛡️</span>
+                  <?php if ($trustBadge): ?>
+                    <span class="ts-badge" style="font-size: 0.6rem; padding: 0.05rem 0.35rem; border: 1px solid <?= $trustColor ?>; color: <?= $trustColor ?>; background: transparent;">
+                      <?= $trustBadge ?>
+                    </span>
                   <?php endif; ?>
 
-                  <?php if (!empty($c['is_pinned'])): ?>
-                    <span class="ts-badge ts-badge-green" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Pinned ⭐</span>
+                  <?php if ($isAuthorComment): ?>
+                    <span class="ts-badge ts-badge-pink" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Author ✍️</span>
+                  <?php endif; ?>
+
+                  <?php if ($isPinned): ?>
+                    <span class="ts-badge ts-badge-amber" style="font-size: 0.6rem; padding: 0.05rem 0.35rem; background: rgba(234,179,8,0.15); color: #eab308;">Pinned ⭐</span>
                   <?php endif; ?>
                 </div>
 
                 <div class="comment-body-text" style="font-size: 0.88rem; line-height: 1.5; color: var(--ts-text-primary); word-break: break-word; white-space: pre-wrap;"><?= htmlspecialchars($c['comment_text']) ?></div>
+
+                <!-- Live Multi-Emoji Reactions Pill Row [TS-SOC-04] -->
+                <div id="reactions-display-<?= $commentId ?>" style="display: flex; gap: 0.3rem; margin-top: 0.4rem; flex-wrap: wrap;">
+                  <?php foreach ($emojiMap as $eKey => $eSymbol): ?>
+                    <?php $cnt = (int)($reactions[$eKey] ?? 0); if ($cnt > 0): ?>
+                      <span class="reaction-pill-badge" id="pill-<?= $commentId ?>-<?= $eKey ?>" style="font-size: 0.72rem; padding: 0.1rem 0.4rem; border-radius: 12px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); display: inline-flex; align-items: center; gap: 0.25rem;">
+                        <?= $eSymbol ?> <span class="cnt"><?= $cnt ?></span>
+                      </span>
+                    <?php endif; ?>
+                  <?php endforeach; ?>
+                </div>
               </div>
 
-              <!-- Compact Social Action Row Underneath Bubble -->
-              <div style="display: flex; align-items: center; gap: 0.85rem; font-size: 0.74rem; color: var(--ts-text-tertiary); margin-top: 0.25rem; padding-left: 0.5rem; flex-wrap: wrap;">
-                <span><?= \App\Core\DateHelper::render($c['created_at'], 'relative') ?></span>
+              <!-- Compact Social Action Row Underneath Bubble with Multi-Emoji Popover -->
+              <div style="display: flex; align-items: center; gap: 0.85rem; font-size: 0.74rem; color: var(--ts-text-tertiary); margin-top: 0.3rem; padding-left: 0.5rem; flex-wrap: wrap; position: relative;">
+                <span class="ts-time" data-timestamp="<?= strtotime($c['created_at']) ?>"><?= \App\Core\DateHelper::render($c['created_at'], 'relative') ?></span>
+
+                <!-- Multi-Emoji Reaction Trigger Bar [TS-SOC-04] -->
+                <div class="emoji-reaction-wrapper" style="position: relative; display: inline-block;">
+                  <button type="button" class="reaction-trigger-btn" onclick="toggleEmojiBar(<?= $commentId ?>)" style="background: none; border: none; font-weight: 600; color: var(--ts-text-secondary); cursor: pointer; padding: 0; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                    <span>React</span> 😊
+                  </button>
+
+                  <!-- Floating Reaction Bar (Desktop Hover / Mobile Click) -->
+                  <div id="emoji-bar-<?= $commentId ?>" class="emoji-reaction-bar" style="display: none; position: absolute; bottom: 120%; left: 0; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 30px; padding: 0.25rem 0.5rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 50; white-space: nowrap; gap: 0.35rem;">
+                    <?php foreach ($emojiMap as $eKey => $eSymbol): ?>
+                      <button type="button" onclick="sendEmojiReaction(<?= $commentId ?>, '<?= $eKey ?>')" title="<?= ucfirst($eKey) ?>" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; padding: 0.15rem 0.35rem; transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.35)'" onmouseout="this.style.transform='scale(1)'">
+                        <?= $eSymbol ?>
+                      </button>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
 
                 <!-- Helpful / Upvote Button -->
                 <button type="button" onclick="upvoteComment(<?= $commentId ?>)" id="upvote-badge-<?= $commentId ?>" data-upvoted="<?= $isUpvoted ? '1' : '0' ?>" style="background: none; border: none; font-weight: 600; color: <?= $isUpvoted ? 'var(--ts-success)' : 'var(--ts-text-secondary)' ?>; cursor: pointer; padding: 0; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 0.25rem;">
@@ -91,6 +156,13 @@ if (!function_exists('renderRedditCommentNode')) {
                 <?php if ($currentUser): ?>
                   <button type="button" onclick="toggleReplyBox(<?= $commentId ?>, '<?= htmlspecialchars($c['username']) ?>')" style="background: none; border: none; font-weight: 600; color: var(--ts-text-secondary); cursor: pointer; padding: 0; font-size: 0.74rem;">
                     Reply
+                  </button>
+                <?php endif; ?>
+
+                <?php if ($canPin): ?>
+                  <!-- Pin/Unpin Button [TS-SOC-07] -->
+                  <button type="button" onclick="togglePinComment(<?= $commentId ?>)" id="pin-btn-<?= $commentId ?>" style="background: none; border: none; font-weight: 600; color: <?= $isPinned ? '#eab308' : 'var(--ts-text-secondary)' ?>; cursor: pointer; padding: 0; font-size: 0.74rem;">
+                    <?= $isPinned ? '⭐ Unpin' : '📌 Pin Insight' ?>
                   </button>
                 <?php endif; ?>
 
@@ -114,9 +186,12 @@ if (!function_exists('renderRedditCommentNode')) {
               </div>
 
               <!-- Inline Nested Reply Composer Box -->
-              <div id="reply-box-<?= $commentId ?>" class="comment-reply-box" style="display: none; margin-top: 0.55rem; padding: 0.65rem 0.85rem; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 12px;">
+              <div id="reply-box-<?= $commentId ?>" class="comment-reply-box" style="display: none; margin-top: 0.55rem; padding: 0.65rem 0.85rem; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 12px; position: relative;">
                 <form onsubmit="submitComment(event, <?= $contentId ?>, <?= $commentId ?>, 'reply-text-<?= $commentId ?>')">
-                  <textarea id="reply-text-<?= $commentId ?>" rows="2" placeholder="Write a reply to @<?= htmlspecialchars($c['username']) ?>..." style="width: 100%; border-radius: 8px; padding: 0.45rem 0.75rem; font-size: 0.85rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); color: var(--ts-text-primary); resize: vertical;" required></textarea>
+                  <div style="position: relative;">
+                    <textarea id="reply-text-<?= $commentId ?>" rows="2" onkeyup="handleMentionLookup(event, 'reply-text-<?= $commentId ?>', 'reply-mention-dropdown-<?= $commentId ?>')" placeholder="Write a reply to @<?= htmlspecialchars($c['username']) ?>..." style="width: 100%; border-radius: 8px; padding: 0.45rem 0.75rem; font-size: 0.85rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); color: var(--ts-text-primary); resize: vertical;" required></textarea>
+                    <div id="reply-mention-dropdown-<?= $commentId ?>" class="ts-mention-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; width: 220px; max-height: 180px; overflow-y: auto; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.3); z-index: 100;"></div>
+                  </div>
                   <div style="display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.4rem;">
                     <button type="button" onclick="toggleReplyBox(<?= $commentId ?>)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.15rem 0.55rem;">Cancel</button>
                     <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.15rem 0.75rem;">Post Reply 💬</button>
@@ -182,8 +257,16 @@ if (!function_exists('renderRedditCommentNode')) {
     <?php endif; ?>
 
     <form id="main-comment-form" onsubmit="submitComment(event, <?= $contentId ?>, null, 'main-comment-text')">
+      <!-- Anti-Spam Notice [TS-SOC-03] -->
+      <div style="font-size: 0.74rem; color: var(--ts-text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+        <i data-lucide="shield-alert" style="width: 13px; height: 13px; color: #f59e0b;"></i>
+        <span><strong>Spam Protection:</strong> No links or email addresses are permitted in comments. Type <code>@</code> to mention members.</span>
+      </div>
+
       <div style="position: relative;">
-        <textarea id="main-comment-text" name="comment_text" maxlength="1000" rows="2" placeholder="<?= $currentUser ? 'Write a thoughtful comment or insight...' : 'Sign in to join the conversation...' ?>" style="width: 100%; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.9rem; line-height: 1.45; resize: vertical; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); color: var(--ts-text-primary);" required <?= $currentUser ? '' : 'disabled' ?>></textarea>
+        <textarea id="main-comment-text" name="comment_text" maxlength="1000" rows="2" onkeyup="handleMentionLookup(event, 'main-comment-text', 'main-mention-dropdown')" placeholder="<?= $currentUser ? 'Write a thoughtful comment or insight (Type @ to tag someone)...' : 'Sign in to join the conversation...' ?>" style="width: 100%; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.9rem; line-height: 1.45; resize: vertical; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); color: var(--ts-text-primary);" required <?= $currentUser ? '' : 'disabled' ?>></textarea>
+        <!-- @Username Mention Autocomplete Dropdown [TS-SOC-01] -->
+        <div id="main-mention-dropdown" class="ts-mention-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; width: 240px; max-height: 190px; overflow-y: auto; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); z-index: 100;"></div>
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
@@ -473,4 +556,193 @@ function sortComments(type) {
 
   nodes.forEach(n => container.appendChild(n));
 }
+
+// [TS-SOC-04] Multi-Emoji Reaction Handlers
+function toggleEmojiBar(commentId) {
+  const bar = document.getElementById('emoji-bar-' + commentId);
+  if (!bar) return;
+  const isHidden = bar.style.display === 'none' || !bar.style.display;
+  // Close any other open emoji bars
+  document.querySelectorAll('.emoji-reaction-bar').forEach(b => b.style.display = 'none');
+  bar.style.display = isHidden ? 'flex' : 'none';
+}
+
+async function sendEmojiReaction(commentId, emojiKey) {
+  try {
+    const baseUrl = getCommentsApiBase();
+    const res = await fetch(`${baseUrl}/api/v1/comments/${commentId}/react-emoji`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify({ emoji: emojiKey })
+    });
+    const data = await res.json();
+    if (data && data.success) {
+      const reactions = data.reactions || {};
+      const container = document.getElementById('reactions-display-' + commentId);
+      if (container) {
+        const emojiMap = { heart: '❤️', rocket: '🚀', idea: '💡', fire: '🔥', eyes: '👀' };
+        let html = '';
+        for (const [k, sym] of Object.entries(emojiMap)) {
+          const cnt = reactions[k] || 0;
+          if (cnt > 0) {
+            html += `<span class="reaction-pill-badge" id="pill-${commentId}-${k}" style="font-size: 0.72rem; padding: 0.1rem 0.4rem; border-radius: 12px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); display: inline-flex; align-items: center; gap: 0.25rem;">${sym} <span class="cnt">${cnt}</span></span>`;
+          }
+        }
+        container.innerHTML = html;
+      }
+      toggleEmojiBar(commentId);
+      if (typeof showToast === 'function') showToast('Reaction updated!', 'info');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// [TS-SOC-07] Pin "Best Answer" / Top Insight by Author or Admin
+async function togglePinComment(commentId) {
+  try {
+    const baseUrl = getCommentsApiBase();
+    const res = await fetch(`${baseUrl}/api/v1/comments/${commentId}/pin`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    const data = await res.json();
+    if (data && data.success) {
+      if (typeof showToast === 'function') {
+        showToast(data.is_pinned ? 'Insight pinned to top! ⭐' : 'Insight unpinned.', 'success');
+      }
+      setTimeout(() => location.reload(), 600);
+    } else if (data.error) {
+      if (typeof showToast === 'function') showToast(data.error, 'error');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// [TS-SOC-01] @Username Autocomplete Mentions
+let mentionDebounceTimer = null;
+function handleMentionLookup(e, textareaId, dropdownId) {
+  const textarea = document.getElementById(textareaId);
+  const dropdown = document.getElementById(dropdownId);
+  if (!textarea || !dropdown) return;
+
+  const text = textarea.value.substring(0, textarea.selectionStart);
+  const match = text.match(/@([a-zA-Z0-9_-]{1,20})$/);
+
+  if (!match) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  const query = match[1];
+  clearTimeout(mentionDebounceTimer);
+  mentionDebounceTimer = setTimeout(async () => {
+    try {
+      const baseUrl = getCommentsApiBase();
+      const res = await fetch(`${baseUrl}/api/v1/users/mentions?q=${encodeURIComponent(query)}`);
+      const users = await res.json();
+      if (!Array.isArray(users) || users.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      dropdown.innerHTML = users.map(u => `
+        <div onclick="selectMention('${escapeHtml(u.username)}', '${textareaId}', '${dropdownId}')" style="padding: 0.45rem 0.75rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; border-bottom: 1px solid var(--ts-border-subtle); transition: background 0.15s ease;" onmouseover="this.style.background='var(--ts-bg-surface)'" onmouseout="this.style.background='transparent'">
+          <img src="${u.author_avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80'}" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+          <span style="font-weight: 600; font-size: 0.82rem; color: var(--ts-text-primary);">@${escapeHtml(u.username)}</span>
+          <span style="font-size: 0.72rem; color: var(--ts-text-muted); margin-left: auto;">${escapeHtml(u.display_name || '')}</span>
+        </div>
+      `).join('');
+      dropdown.style.display = 'block';
+    } catch (err) {
+      dropdown.style.display = 'none';
+    }
+  }, 250);
+}
+
+function selectMention(username, textareaId, dropdownId) {
+  const textarea = document.getElementById(textareaId);
+  const dropdown = document.getElementById(dropdownId);
+  if (!textarea) return;
+  const text = textarea.value;
+  const cursor = textarea.selectionStart;
+  const textBefore = text.substring(0, cursor).replace(/@([a-zA-Z0-9_-]+)$/, `@${username} `);
+  textarea.value = textBefore + text.substring(cursor);
+  if (dropdown) dropdown.style.display = 'none';
+  textarea.focus();
+}
+
+// [TS-SOC-06] Long Polling Stream (60-120 second gentle interval)
+let lastPolledCommentTimestamp = Math.floor(Date.now() / 1000);
+function startCommentLongPolling(contentId) {
+  if (!contentId) return;
+  // 60-second gentle interval to prevent spam and false requests
+  setInterval(async () => {
+    try {
+      const baseUrl = getCommentsApiBase();
+      const res = await fetch(`${baseUrl}/api/v1/content/${contentId}/comments/poll?since=${lastPolledCommentTimestamp}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data && data.has_new && Array.isArray(data.comments) && data.comments.length > 0) {
+        lastPolledCommentTimestamp = Math.floor(Date.now() / 1000);
+        const container = document.getElementById('comments-stream-container');
+        const emptyPrompt = document.getElementById('no-comments-prompt');
+        if (emptyPrompt) emptyPrompt.remove();
+
+        data.comments.forEach(c => {
+          if (document.getElementById('comment-node-' + c.id)) return; // Avoid duplicate
+          const newNode = document.createElement('div');
+          newNode.className = 'root-comment-wrapper';
+          newNode.style.opacity = '0';
+          newNode.style.transform = 'translateY(-12px)';
+          newNode.style.transition = 'all 0.5s ease';
+          newNode.innerHTML = `
+            <div class="comment-node-wrapper comment-item" id="comment-node-${c.id}" data-upvotes="0" data-timestamp="${Math.floor(Date.now()/1000)}" style="margin-bottom: 0.95rem;">
+              <div style="display: flex; gap: 0.65rem; align-items: flex-start;">
+                <img src="${c.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--ts-border-main); flex-shrink: 0; margin-top: 2px;">
+                <div style="flex: 1;">
+                  <div class="ts-comment-bubble" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 16px; padding: 0.6rem 1rem; display: inline-block;">
+                    <div style="font-weight: 700; font-size: 0.85rem; color: var(--ts-text-primary);">${escapeHtml(c.display_name || c.username)}</div>
+                    <div class="comment-body-text" style="font-size: 0.88rem; line-height: 1.5; color: var(--ts-text-primary); word-break: break-word;">${escapeHtml(c.comment_text)}</div>
+                  </div>
+                  <div style="font-size: 0.74rem; color: var(--ts-text-tertiary); margin-top: 0.3rem; padding-left: 0.5rem;">
+                    <span class="ts-time" data-timestamp="${Math.floor(Date.now()/1000)}">Just now</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          if (container.firstChild) {
+            container.insertBefore(newNode, container.firstChild);
+          } else {
+            container.appendChild(newNode);
+          }
+          setTimeout(() => {
+            newNode.style.opacity = '1';
+            newNode.style.transform = 'translateY(0)';
+          }, 50);
+        });
+
+        // Update count badge
+        const badge = document.getElementById('total-comments-count');
+        if (badge) {
+          const currentCount = parseInt(badge.textContent) || 0;
+          badge.textContent = currentCount + data.comments.length;
+        }
+      }
+    } catch (e) {
+      // Gentle catch, no console spam
+    }
+  }, 60000); // 60-second timer
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  startCommentLongPolling(<?= $contentId ?>);
+});
 </script>
+

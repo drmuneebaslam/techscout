@@ -172,12 +172,27 @@ class DirectoryController {
             $isBookmarked = !empty($bm);
         }
 
+        $galleryImages = [];
+        try {
+            $galleryImages = Database::query("SELECT * FROM prompt_images WHERE prompt_id = ? ORDER BY sort_order ASC, id ASC", [(int)$prompt['id']]);
+        } catch (\Throwable $e) {}
+
+        $adDirectUrl = 'https://omg10.com/4/11737440';
+        try {
+            $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url'");
+            if (!empty($adRow['key_value'])) {
+                $adDirectUrl = $adRow['key_value'];
+            }
+        } catch (\Throwable $e) {}
+
         Response::view('directory/prompt_single', [
             'title' => $prompt['title'] . ' — Prompt Blueprint | TechScout',
             'prompt' => $prompt,
             'variables' => $variables,
             'models' => $models,
-            'isBookmarked' => $isBookmarked
+            'isBookmarked' => $isBookmarked,
+            'galleryImages' => $galleryImages,
+            'adDirectUrl' => $adDirectUrl
         ]);
     }
 

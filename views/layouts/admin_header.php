@@ -581,6 +581,53 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
         </div>
 
         <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <!-- [TS-TZ-03] Admin Multi-Timezone Dual Clock Pill -->
+          <div class="admin-dual-clock-pill" style="display: flex; align-items: center; gap: 0.5rem; background: var(--admin-card-bg, rgba(15,23,42,0.8)); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.25)); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.74rem; font-family: var(--admin-font-mono, monospace);">
+            <div style="display: flex; align-items: center; gap: 0.25rem;" title="Server Time (UTC)">
+              <span class="ts-badge ts-badge-cyan" style="font-size: 0.58rem; padding: 0.05rem 0.25rem;">SRV</span>
+              <span id="adminServerClock" style="color: var(--admin-text-main, #f8fafc); font-weight: 600;">--:--:-- UTC</span>
+            </div>
+            <span style="color: var(--admin-text-muted, #64748b);">|</span>
+            <div style="display: flex; align-items: center; gap: 0.25rem;" title="Visitor Local Time">
+              <span class="ts-badge ts-badge-indigo" style="font-size: 0.58rem; padding: 0.05rem 0.25rem;">LOC</span>
+              <span id="adminLocalClock" style="color: #38bdf8; font-weight: 600;">--:--:--</span>
+            </div>
+            <select id="adminTzPicker" onchange="switchAdminDisplayTimezone(this.value)" style="background: transparent; border: none; color: var(--admin-text-muted, #94a3b8); font-size: 0.68rem; outline: none; cursor: pointer;">
+              <option value="auto">Auto</option>
+              <option value="UTC">UTC</option>
+              <option value="Asia/Karachi">PKT (UTC+5)</option>
+              <option value="America/New_York">New York</option>
+              <option value="Europe/London">London</option>
+              <option value="Asia/Tokyo">Tokyo</option>
+            </select>
+          </div>
+          <script>
+            (function() {
+              function tickAdminDualClock() {
+                var now = new Date();
+                var srvEl = document.getElementById('adminServerClock');
+                var locEl = document.getElementById('adminLocalClock');
+                if (srvEl) {
+                  srvEl.textContent = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false }) + ' UTC';
+                }
+                if (locEl) {
+                  var picker = document.getElementById('adminTzPicker');
+                  var tz = (picker && picker.value !== 'auto') ? picker.value : undefined;
+                  try {
+                    locEl.textContent = now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                  } catch(e) {
+                    locEl.textContent = now.toLocaleTimeString();
+                  }
+                }
+              }
+              setInterval(tickAdminDualClock, 1000);
+              tickAdminDualClock();
+              window.switchAdminDisplayTimezone = function(val) {
+                tickAdminDualClock();
+              };
+            })();
+          </script>
+
           <!-- Theme Mode Switcher Button -->
           <button type="button" onclick="toggleTheme()" class="ts-btn ts-btn-outline ts-btn-sm" id="adminThemeToggleBtn" style="padding: 0.35rem 0.65rem;" title="Toggle Dark / Light Theme">
             <i data-lucide="moon" id="adminThemeIcon" style="width: 15px; height: 15px;"></i>

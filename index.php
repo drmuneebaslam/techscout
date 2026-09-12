@@ -374,6 +374,11 @@ $router->get('/admin/advertisements', [AdminController::class, 'advertisements']
 $router->post('/admin/advertisements/save', [AdminController::class, 'saveAdvertisement'], ['admin']);
 $router->post('/admin/advertisements/delete/{id}', [AdminController::class, 'deleteAdvertisement'], ['admin']);
 $router->post('/admin/advertisements/toggle/{id}', [AdminController::class, 'toggleAdStatus'], ['admin']);
+$router->post('/admin/advertisements/settings', [AdminController::class, 'saveAdSettings'], ['admin']);
+$router->post('/admin/advertisements/upload-image', [AdminController::class, 'uploadAdImage'], ['admin']);
+$router->post('/admin/advertisements/tips/verify/{id}', [AdminController::class, 'verifyAuthorTip'], ['admin']);
+$router->post('/admin/advertisements/tips/reject/{id}', [AdminController::class, 'rejectAuthorTip'], ['admin']);
+$router->post('/admin/advertisements/payouts/process/{id}', [AdminController::class, 'processAuthorTipPayout'], ['admin']);
 $router->post('/admin/sponsored/approve/{id}', [AdminController::class, 'approveSponsoredSubmission'], ['admin']);
 $router->post('/admin/sponsored/reject/{id}', [AdminController::class, 'rejectSponsoredSubmission'], ['admin']);
 
@@ -502,6 +507,11 @@ $router->post('/admin/db-manager/auto-repair-schema', [AdminController::class, '
 $router->post('/admin/db-manager/query', [AdminController::class, 'executeDbQuery'], ['admin']);
 $router->get('/admin/db-manager/table-rows', [AdminController::class, 'getTableRowsJson'], ['admin']);
 $router->post('/admin/db-manager/custom-export', [AdminController::class, 'downloadCustomExport'], ['admin']);
+$router->get('/admin/db-manager/export-sqlite', [AdminController::class, 'exportSqliteDb'], ['admin']);
+$router->post('/admin/db-manager/migrations/run', [AdminController::class, 'runMigrations'], ['admin']);
+$router->post('/admin/db-manager/migrations/rollback', [AdminController::class, 'rollbackMigration'], ['admin']);
+$router->post('/admin/db-manager/garbage/purge', [AdminController::class, 'purgeOrphanedMedia'], ['admin']);
+$router->post('/admin/db-manager/apply-index', [AdminController::class, 'applyIndexAdvisor'], ['admin']);
 
 // System Error Logs, Crash Forensics & Real-time Diagnostics
 $router->get('/admin/system-logs', [AdminController::class, 'systemLogs'], ['admin']);
@@ -630,8 +640,14 @@ $router->post('/admin/support/categories/{id}/subcategory/delete', [SupportContr
 // ----------------------------------------------------------------------------
 $router->post('/api/v1/content/{id}/react', [ApiController::class, 'react']);
 $router->post('/api/v1/content/{id}/comments', [ApiController::class, 'addComment']);
+$router->get('/api/v1/content/{id}/comments/poll', [ApiController::class, 'pollComments']);
 $router->post('/api/v1/comments/{id}/upvote', [ApiController::class, 'upvoteComment']);
 $router->post('/api/v1/comments/{id}/delete', [ApiController::class, 'deleteComment']);
+$router->post('/api/v1/comments/{id}/pin', [ApiController::class, 'togglePinComment']);
+$router->post('/api/v1/comments/{id}/react-emoji', [ApiController::class, 'reactCommentEmoji']);
+$router->get('/api/v1/users/mentions', [ApiController::class, 'searchMentions']);
+$router->post('/api/v1/tips/submit', [ApiController::class, 'submitCreatorTip']);
+$router->post('/api/v1/polls/{id}/vote', [ApiController::class, 'votePoll']);
 $router->post('/api/v1/prompts/{id}/copy', [ApiController::class, 'copyPrompt']);
 $router->post('/api/v1/author/draft/autosave', [ApiController::class, 'autosaveDraft']);
 $router->get('/api/v1/search', [ApiController::class, 'instantSearch']);

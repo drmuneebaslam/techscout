@@ -274,6 +274,17 @@ This document serves as the permanent registry of architectural and implementati
     1. **Server-side:** `DateHelper::timezone()` checks user profile, `$_COOKIE['user_timezone']`, and automatically resolves the visitor's timezone from their IP location via `DateHelper::detectTimezoneByIp()`. Session caching, Cloudflare country code headers, and fast `ip-api` lookups guarantee 0ms latency after initial detection.
     2. **Client-side:** `window.localizeAllTimestamps()` and `window.detectAndSyncIpTimezone()` query `/api/v1/geo/timezone`, cache in `localStorage`, persist the `user_timezone` cookie, and dynamically adjust all `<time class="ts-time">` DOM elements with `{ timeZone: userTz }`.
 
+### 🔴 MISTAKE-23: Missing File Upload Buttons & Single-Image Constraints Where Multi-Upload Is Needed
+* **Root Cause:** Forms and creation studios across the platform (such as prompts, articles, tools, sponsor ads, and user profiles) either lacked an explicit file upload button (expecting users to manually copy/paste remote image URLs) or arbitrarily limited image uploads to a single file when the feature domain naturally benefits from multiple showcase images (e.g. image prompts with multiple variations, software screenshots, ad creatives, author portfolio samples).
+* **Consequences:**
+  - Degraded user experience: users were forced to host images elsewhere and paste URLs.
+  - Generative AI prompt outputs could only show one variation instead of side-by-side or multi-sample generations.
+  - Image directory listings could break or render empty image placeholders for text-only prompts.
+* **Mandatory Rule:**
+  - **Everywhere an image is required or supported across the site**, always provide an explicit, styled `<input type="file">` upload button with drag-and-drop support, client-side preview, file size/type validation, and automatic WebP conversion.
+  - **Multi-Image Support:** Wherever multiple images make sense (e.g., prompt output variations, tool screenshots, article gallery), support `multiple` file uploads, storing image arrays or related child records (`prompt_images`, `content_media`), instead of restricting to 1 image.
+  - **Graceful Non-Image Handling:** In directory listings, never render broken image frames or generic placeholders for prompts/tools that do not have images. Differentiate visual cards from text/code prompt cards.
+
 ---
 
 ## 2. Response Audit Protocol
@@ -300,6 +311,7 @@ At the conclusion of any code generation, the agent must cross-check every modif
 20. [ ] **Branded Outbound /go/{slug} Gateway Routing**: Are all external tool, custom GPT, and directory destination links routed via `/go/{slug}` instead of exposing direct third-party URLs?
 21. [ ] **Early Script Declarations & Robust Global Helpers**: Are interactive UI handlers declared early before markup, dynamic JSON safely defaulted, and theme sync helpers universally available?
 22. [ ] **Universal Timezone Auto-Detection & Dual-Layer Localization**: Are all timestamps rendered with `DateHelper::render()` or `DateHelper::renderTwoLines()` using ISO-8601 `<time class="ts-time">` markup, backed by `Intl.DateTimeFormat` client synchronization and cookie persistence without hardcoded inline styles?
+23. [ ] **Explicit Image Upload Buttons & Multi-Image Gallery Support**: Are image inputs equipped with direct file upload buttons with multi-file capabilities where appropriate, with non-image items rendered gracefully without broken image frames?
 
 
 

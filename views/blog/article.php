@@ -1,4 +1,33 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php 
+require __DIR__ . '/../layouts/header.php'; 
+
+// Fetch Community Poll for this article [TS-SOC-11]
+$articlePoll = null;
+$articlePollOptions = [];
+$userVotedOptionId = null;
+try {
+    $articlePoll = \App\Core\Database::queryOne("SELECT * FROM article_polls WHERE article_id = ? AND is_active = 1 LIMIT 1", [(int)$article['id']]);
+    if ($articlePoll) {
+        $articlePollOptions = \App\Core\Database::query("SELECT * FROM article_poll_options WHERE poll_id = ? ORDER BY sort_order ASC", [(int)$articlePoll['id']]);
+        $currentUserId = \App\Core\Auth::id();
+        $ip = \App\Core\Request::ip();
+        if ($currentUserId) {
+            $voted = \App\Core\Database::queryOne("SELECT option_id FROM article_poll_votes WHERE poll_id = ? AND user_id = ?", [(int)$articlePoll['id'], $currentUserId]);
+        } else {
+            $voted = \App\Core\Database::queryOne("SELECT option_id FROM article_poll_votes WHERE poll_id = ? AND user_id IS NULL AND ip_address = ?", [(int)$articlePoll['id'], $ip]);
+        }
+        $userVotedOptionId = $voted ? (int)$voted['option_id'] : null;
+    }
+} catch (\Throwable $e) {}
+
+// Platform treasury wallets for author tipping [TS-CR-05]
+$tipWallets = [
+    'BTC' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_btc' LIMIT 1") ?: 'bc1qtechscoutcrypto7482910482910btcxx',
+    'ETH' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_eth' LIMIT 1") ?: '0x71C8A1bB722956276f5789129486c9A199859187',
+    'USDT' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_usdt' LIMIT 1") ?: '0x71C8A1bB722956276f5789129486c9A199859187',
+    'SOL' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_sol' LIMIT 1") ?: 'So11111111111111111111111111111111111111112',
+];
+?>
 
 <!-- Schema.org JSON-LD Structured Data -->
 <script type="application/ld+json">
@@ -133,6 +162,11 @@
       </div>
 
       <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+        <!-- [TS-ED-11] 1-Click PDF / ePub eBook Export Engine -->
+        <button type="button" onclick="window.print()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Export printable PDF whitepaper">
+          <i data-lucide="printer" style="width: 13px; height: 13px;"></i> PDF Whitepaper
+        </button>
+
         <button type="button" onclick="toggleBookmark(<?= (int)$article['id'] ?>)" id="top-bookmark-btn" class="ts-btn <?= !empty($isBookmarked) ? 'ts-btn-primary' : 'ts-btn-outline' ?> ts-btn-sm" style="<?= !empty($isBookmarked) ? 'background:#ec4899; border-color:#ec4899;' : 'color:#ec4899; border-color:rgba(236,72,153,0.3);' ?>">
           <span><?= !empty($isBookmarked) ? '🔖 Saved' : '🔖 Save' ?></span>
         </button>
@@ -148,15 +182,17 @@
       </div>
     <?php endif; ?>
 
-    <!-- Table of Contents Container -->
-    <div id="article-toc-card" class="article-toc-card" style="background: var(--ts-card-bg); border: 1px solid var(--ts-border-main); border-radius: var(--ts-radius-md); padding: 1.25rem; margin-bottom: 2rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-        <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--ts-text-primary); margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">Table of Contents</h3>
-        <button type="button" onclick="toggleMobileToc()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">
+    <!-- [TS-ED-02] Table of Contents Container (Collapsed by Default per Specification) -->
+    <div id="article-toc-card" class="article-toc-card" style="background: var(--ts-card-bg); border: 1px solid var(--ts-border-main); border-radius: var(--ts-radius-md); padding: 1rem 1.25rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 0.92rem; font-weight: 700; color: var(--ts-text-primary); margin: 0; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;">
+          <i data-lucide="list" style="width: 16px; height: 16px; color: var(--ts-primary);"></i> Table of Contents
+        </h3>
+        <button type="button" onclick="toggleMobileToc()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">
           <span id="toc-toggle-text">Show Sections</span> ▾
         </button>
       </div>
-      <div id="article-toc-wrapper" class="article-toc-list-collapsible">
+      <div id="article-toc-wrapper" class="article-toc-list-collapsible closed" style="display: none; margin-top: 0.75rem; border-top: 1px solid var(--ts-border-subtle); padding-top: 0.75rem;">
         <ul id="article-toc-list" class="article-toc-list" style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem;"></ul>
       </div>
     </div>
@@ -165,6 +201,40 @@
     <div class="article-body-content" style="font-size: 1.08rem; line-height: 1.85; color: var(--ts-text-primary); width: 100%;">
       <?= $article['body_html'] ?>
     </div>
+
+    <!-- [TS-SOC-11] Community Polls & Interactive Feedback Widgets -->
+    <?php if ($articlePoll && !empty($articlePollOptions)): 
+      $totalPollVotes = array_sum(array_column($articlePollOptions, 'vote_count'));
+    ?>
+      <div id="article-poll-box-<?= $articlePoll['id'] ?>" class="ts-card" style="margin: 2.5rem 0; padding: 1.5rem; border: 1px solid var(--ts-border-main); border-radius: 14px; background: var(--ts-bg-surface-elevated);">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span class="ts-badge ts-badge-indigo" style="font-size: 0.72rem;">COMMUNITY POLL</span>
+          <span style="font-size: 0.78rem; color: var(--ts-text-muted);"><span id="poll-total-votes"><?= $totalPollVotes ?></span> total votes</span>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ts-text-primary); margin: 0 0 1.25rem 0;">
+          <?= htmlspecialchars($articlePoll['question']) ?>
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;" id="poll-options-container">
+          <?php foreach ($articlePollOptions as $opt): 
+            $pct = $totalPollVotes > 0 ? round(((int)$opt['vote_count'] / $totalPollVotes) * 100, 1) : 0;
+            $isSelected = ($userVotedOptionId === (int)$opt['id']);
+          ?>
+            <div class="poll-option-row" onclick="submitPollVote(<?= (int)$articlePoll['id'] ?>, <?= (int)$opt['id'] ?>)" style="position: relative; padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid <?= $isSelected ? 'var(--ts-primary)' : 'var(--ts-border-subtle)' ?>; cursor: pointer; overflow: hidden; background: var(--ts-bg-surface); transition: transform 0.15s ease;">
+              <!-- Visual Percentage Progress Bar Fill -->
+              <div style="position: absolute; top: 0; left: 0; bottom: 0; width: <?= $pct ?>%; background: <?= $isSelected ? 'rgba(56,189,248,0.2)' : 'rgba(99,102,241,0.12)' ?>; transition: width 0.4s ease; z-index: 1;"></div>
+              
+              <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; font-size: 0.92rem;">
+                <span style="font-weight: <?= $isSelected ? '700' : '500' ?>; color: var(--ts-text-primary);">
+                  <?= $isSelected ? '✓ ' : '' ?><?= htmlspecialchars($opt['option_text']) ?>
+                </span>
+                <span style="font-weight: 700; color: var(--ts-primary); font-size: 0.88rem;"><?= $pct ?>%</span>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <!-- Tags -->
     <?php if (!empty($tags)): ?>
@@ -224,6 +294,111 @@
           <a href="<?= $authorProfileUrl ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">
             View Author Profile &amp; Research →
           </a>
+
+          <!-- [TS-CR-05] Creator Revenue Share & Crypto Tip Jar Button -->
+          <button type="button" onclick="openAuthorTipModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.75rem; background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 12px rgba(245,158,11,0.35);">
+            <i data-lucide="zap" style="width: 12px; height: 12px;"></i> Tip Author (Crypto)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- [TS-CR-05] Author Tip Jar Modal -->
+    <div id="author-tip-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="ts-card" style="max-width: 520px; width: 100%; padding: 2rem; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 16px; position: relative;">
+        <button type="button" onclick="closeAuthorTipModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.25rem; color: var(--ts-text-muted); cursor: pointer;">✕</button>
+        
+        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.5rem;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(245,158,11,0.2); color: #f59e0b; display: flex; align-items: center; justify-content: center;">
+            <i data-lucide="zap" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 1.25rem; margin: 0; color: var(--ts-text-primary);">Tip Author with Crypto</h3>
+            <span style="font-size: 0.78rem; color: var(--ts-text-muted);">Direct creator support via verified platform treasury</span>
+          </div>
+        </div>
+
+        <div style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 0.75rem; margin: 1rem 0; font-size: 0.8rem; color: var(--ts-text-secondary); line-height: 1.45;">
+          ℹ️ <strong>Platform Treasury Security:</strong> Tips are received at central platform wallets. The platform keeps a minimal 5% protocol maintenance fee, and <strong>95%</strong> is credited directly to <strong><?= htmlspecialchars($article['author_name'] ?? 'the author') ?></strong>'s payout ledger.
+        </div>
+
+        <form onsubmit="submitAuthorTip(event)">
+          <input type="hidden" name="article_id" value="<?= (int)$article['id'] ?>">
+          <input type="hidden" name="author_id" value="<?= (int)($article['author_id'] ?? 0) ?>">
+          <input type="hidden" name="article_url" value="<?= htmlspecialchars(url('/article/' . ($article['slug'] ?? ''))) ?>">
+          <input type="hidden" name="author_username" value="<?= htmlspecialchars($article['author_name'] ?? 'author') ?>">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label class="ts-form-label">Select Cryptocurrency</label>
+              <select name="crypto_symbol" id="tip_crypto_symbol" class="ts-form-input" onchange="updateTipWalletDisplay()">
+                <option value="SOL">Solana (SOL)</option>
+                <option value="ETH">Ethereum (ETH)</option>
+                <option value="USDT">Tether USD (USDT-ERC20)</option>
+                <option value="BTC">Bitcoin (BTC)</option>
+              </select>
+            </div>
+            <div>
+              <label class="ts-form-label">Estimated USD Value ($)</label>
+              <input type="number" name="amount_usd" min="1" step="0.5" value="10.00" class="ts-form-input" required>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label class="ts-form-label">Send Tip to Platform Treasury Address:</label>
+            <div style="display: flex; gap: 0.4rem;">
+              <input type="text" id="tip_wallet_address" class="ts-form-input" readonly style="font-family: monospace; font-size: 0.78rem; background: var(--ts-bg-surface);">
+              <button type="button" onclick="copyTipWallet()" class="ts-btn ts-btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">Copy</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label class="ts-form-label">Blockchain Transaction Hash (TXID)</label>
+            <input type="text" name="txid" class="ts-form-input" placeholder="Paste on-chain transaction hash..." required style="font-family: monospace; font-size: 0.8rem;">
+          </div>
+
+          <button type="submit" class="ts-btn ts-btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #f59e0b, #d97706);">
+            Submit Tip for Verification ⚡
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- [TS-SOC-08] Floating Quote Share Pill -->
+    <div id="quote-share-pill" style="display: none; position: absolute; z-index: 9999; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 20px; padding: 0.3rem 0.85rem; box-shadow: 0 8px 24px rgba(0,0,0,0.35); cursor: pointer; font-size: 0.78rem; font-weight: 700; color: var(--ts-text-primary); display: none; align-items: center; gap: 0.4rem;">
+      <i data-lucide="share-2" style="width: 12px; height: 12px; color: var(--ts-primary);"></i>
+      <span>Share Quote Card</span>
+    </div>
+
+    <!-- Quote Share Preview Modal -->
+    <div id="quote-share-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="ts-card" style="max-width: 580px; width: 100%; padding: 2rem; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 16px; position: relative;">
+        <button type="button" onclick="document.getElementById('quote-share-modal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.25rem; color: var(--ts-text-muted); cursor: pointer;">✕</button>
+        
+        <h3 style="font-size: 1.2rem; margin: 0 0 1rem 0; color: var(--ts-text-primary);">Branded Social Quote Card</h3>
+        
+        <!-- Rendered Card Preview Canvas -->
+        <div id="quote-card-canvas" style="background: linear-gradient(135deg, #090d16, #0f172a); border: 1px solid rgba(56,189,248,0.3); border-radius: 12px; padding: 1.75rem; margin-bottom: 1.25rem; position: relative; overflow: hidden;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.65rem;">
+            <span style="font-weight: 800; font-size: 0.92rem; color: #38bdf8; letter-spacing: 0.05em;">TECONSCOUT // INSIGHT</span>
+            <span style="font-size: 0.72rem; color: #94a3b8;"><?= htmlspecialchars($article['category_name'] ?? 'Tech') ?></span>
+          </div>
+          <blockquote id="quote-card-text" style="font-size: 1.15rem; font-style: italic; line-height: 1.6; color: #f8fafc; margin: 0 0 1.25rem 0; border-left: 3px solid #38bdf8; padding-left: 1rem;">
+            "..."
+          </blockquote>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #94a3b8;">
+            <span>— <?= htmlspecialchars($article['author_name'] ?? 'TechScout') ?></span>
+            <span style="font-family: monospace; font-size: 0.7rem; color: #38bdf8;"><?= htmlspecialchars(parse_url(url('/'), PHP_URL_HOST)) ?></span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" onclick="copyQuoteText()" class="ts-btn ts-btn-outline" style="flex: 1; padding: 0.6rem; font-size: 0.85rem;">
+            📋 Copy Quote Text
+          </button>
+          <button type="button" onclick="tweetQuoteCard()" class="ts-btn ts-btn-primary" style="flex: 1; padding: 0.6rem; font-size: 0.85rem; background: #1d9bf0;">
+            🐦 Share on X (Twitter)
+          </button>
         </div>
       </div>
     </div>
@@ -239,14 +414,158 @@ function toggleMobileToc() {
   const toggleText = document.getElementById('toc-toggle-text');
   if (!wrapper) return;
 
-  const isClosed = wrapper.classList.contains('closed');
+  const isClosed = wrapper.classList.contains('closed') || wrapper.style.display === 'none';
   if (isClosed) {
     wrapper.classList.remove('closed');
-    if (toggleText) toggleText.innerText = 'Hide Sections';
+    wrapper.style.display = 'block';
+    if (toggleText) toggleText.innerText = 'Hide Sections ▴';
   } else {
     wrapper.classList.add('closed');
-    if (toggleText) toggleText.innerText = 'Show Sections';
+    wrapper.style.display = 'none';
+    if (toggleText) toggleText.innerText = 'Show Sections ▾';
   }
+}
+
+// [TS-SOC-11] Community Poll Vote Handler
+async function submitPollVote(pollId, optionId) {
+  try {
+    const res = await fetch(`<?= url('/api/v1/polls/') ?>${pollId}/vote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify({ option_id: optionId })
+    });
+    const data = await res.json();
+    if (data.success && data.options) {
+      const container = document.getElementById('poll-options-container');
+      const totalEl = document.getElementById('poll-total-votes');
+      if (totalEl) totalEl.innerText = data.total_votes;
+
+      let html = '';
+      data.options.forEach(opt => {
+        const isSel = opt.id == optionId;
+        html += `
+          <div class="poll-option-row" onclick="submitPollVote(${pollId}, ${opt.id})" style="position: relative; padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid ${isSel ? 'var(--ts-primary)' : 'var(--ts-border-subtle)'}; cursor: pointer; overflow: hidden; background: var(--ts-bg-surface); transition: transform 0.15s ease;">
+            <div style="position: absolute; top: 0; left: 0; bottom: 0; width: ${opt.percent}%; background: ${isSel ? 'rgba(56,189,248,0.2)' : 'rgba(99,102,241,0.12)'}; transition: width 0.4s ease; z-index: 1;"></div>
+            <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; font-size: 0.92rem;">
+              <span style="font-weight: ${isSel ? '700' : '500'}; color: var(--ts-text-primary);">${isSel ? '✓ ' : ''}${escapeHtml(opt.option_text)}</span>
+              <span style="font-weight: 700; color: var(--ts-primary); font-size: 0.88rem;">${opt.percent}%</span>
+            </div>
+          </div>
+        `;
+      });
+      if (container) container.innerHTML = html;
+      if (typeof showToast === 'function') showToast('Vote recorded! 📊', 'success');
+    } else if (data.error) {
+      if (typeof showToast === 'function') showToast(data.error, 'info');
+    }
+  } catch (e) {}
+}
+
+// [TS-CR-05] Tip Author Modal Handlers
+const tipWallets = <?= json_encode($tipWallets) ?>;
+function openAuthorTipModal() {
+  document.getElementById('author-tip-modal').style.display = 'flex';
+  updateTipWalletDisplay();
+}
+function closeAuthorTipModal() {
+  document.getElementById('author-tip-modal').style.display = 'none';
+}
+function updateTipWalletDisplay() {
+  const sym = document.getElementById('tip_crypto_symbol').value;
+  const input = document.getElementById('tip_wallet_address');
+  if (input && tipWallets[sym]) {
+    input.value = tipWallets[sym];
+  }
+}
+function copyTipWallet() {
+  const input = document.getElementById('tip_wallet_address');
+  if (!input) return;
+  navigator.clipboard.writeText(input.value).then(() => {
+    if (typeof showToast === 'function') showToast('Treasury address copied! 📋', 'success');
+  });
+}
+async function submitAuthorTip(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = {
+    article_id: form.article_id.value,
+    author_id: form.author_id.value,
+    article_url: form.article_url.value,
+    author_username: form.author_username.value,
+    crypto_symbol: form.crypto_symbol.value,
+    amount_usd: form.amount_usd.value,
+    txid: form.txid.value
+  };
+  try {
+    const res = await fetch('<?= url('/api/v1/tips/submit') ?>', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (json.success) {
+      closeAuthorTipModal();
+      if (typeof showToast === 'function') showToast('Tip submitted! Pending blockchain confirmation & admin credit. 🚀', 'success');
+      form.reset();
+    } else {
+      if (typeof showToast === 'function') showToast(json.error || 'Failed to submit tip.', 'error');
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') showToast('Network error submitting tip.', 'error');
+  }
+}
+
+// [TS-SOC-08] Quote Share Card Engine
+let activeQuoteSelected = '';
+document.addEventListener('selectionchange', () => {
+  const sel = window.getSelection();
+  const pill = document.getElementById('quote-share-pill');
+  if (!sel || sel.isCollapsed || !pill) {
+    if (pill) pill.style.display = 'none';
+    return;
+  }
+  const text = sel.toString().trim();
+  if (text.length >= 15 && text.length <= 400) {
+    const range = sel.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    activeQuoteSelected = text;
+    pill.style.left = (window.scrollX + rect.left + rect.width / 2 - 60) + 'px';
+    pill.style.top = (window.scrollY + rect.top - 40) + 'px';
+    pill.style.display = 'inline-flex';
+  } else {
+    pill.style.display = 'none';
+  }
+});
+
+const quotePill = document.getElementById('quote-share-pill');
+if (quotePill) {
+  quotePill.addEventListener('click', () => {
+    if (!activeQuoteSelected) return;
+    const modal = document.getElementById('quote-share-modal');
+    const quoteTextEl = document.getElementById('quote-card-text');
+    if (quoteTextEl) quoteTextEl.innerText = `"${activeQuoteSelected}"`;
+    if (modal) modal.style.display = 'flex';
+    quotePill.style.display = 'none';
+  });
+}
+
+function copyQuoteText() {
+  if (!activeQuoteSelected) return;
+  const citation = `"${activeQuoteSelected}" — <?= htmlspecialchars(addslashes($article['author_name'] ?? 'TechScout')) ?> in <?= htmlspecialchars(addslashes($article['title'])) ?> (<?= url('/article/' . ($article['slug'] ?? '')) ?>)`;
+  navigator.clipboard.writeText(citation).then(() => {
+    if (typeof showToast === 'function') showToast('Quote copied to clipboard! 📋', 'success');
+  });
+}
+
+function tweetQuoteCard() {
+  if (!activeQuoteSelected) return;
+  const tweetText = `"${activeQuoteSelected.substring(0, 200)}..." via @TechScout`;
+  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(window.location.href)}`;
+  window.open(tweetUrl, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -264,7 +583,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (tocToggleText) {
-    tocToggleText.innerText = `Hide (${headings.length} Sections)`;
+    // Collapsed by default per specification [TS-ED-02]
+    tocToggleText.innerText = `Show Sections (${headings.length}) ▾`;
   }
 
   headings.forEach((heading, index) => {

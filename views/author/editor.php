@@ -231,6 +231,20 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
           </label>
           <input type="text" name="template_variables" value="<?= htmlspecialchars(!empty($content['template_variables']) ? (is_array($content['template_variables']) ? implode(', ', $content['template_variables']) : $content['template_variables']) : 'QUERY, SCHEMA, BUFFER_POOL') ?>" placeholder="e.g. QUERY, SCHEMA, INDEX_KEYS" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.6rem 0.85rem; border-radius: 6px; color: #f8fafc; font-family: monospace;">
         </div>
+        <!-- Multi-Image Upload for Prompts [MISTAKE-23] -->
+        <div style="padding: 0.75rem; background: rgba(56,189,248,0.06); border: 1px dashed rgba(56,189,248,0.3); border-radius: 8px;">
+          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.35rem;">
+            <span>📸 Prompt Visual Output Showcase & Gallery (Multiple Images Supported)</span>
+            <span style="font-size: 0.72rem; color: #94a3b8;">Optional</span>
+          </label>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <label class="ts-btn ts-btn-outline ts-btn-sm" style="cursor: pointer; padding: 0.3rem 0.75rem; font-size: 0.75rem;">
+              <i data-lucide="images" style="width: 13px; height: 13px;"></i> Select Prompt Showcase Images
+              <input type="file" name="prompt_images[]" multiple accept="image/*" style="display: none;" onchange="if(this.files.length){ document.getElementById('prompt_img_count').textContent = this.files.length + ' image(s) selected'; }">
+            </label>
+            <span id="prompt_img_count" style="font-size: 0.75rem; color: #94a3b8;">No images selected</span>
+          </div>
+        </div>
       </div>
 
       <!-- Custom GPT Spec Pane -->
@@ -272,13 +286,27 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
             <input type="number" step="0.01" name="pricing_starting_at" value="<?= htmlspecialchars((string)($content['pricing_starting_at'] ?? '0')) ?>" placeholder="20.00" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.6rem 0.85rem; border-radius: 6px; color: #f8fafc;">
           </div>
         </div>
-        <div style="display: flex; gap: 1.5rem; align-items: center;">
+        <div style="display: flex; gap: 1.5rem; align-items: center; margin-bottom: 0.75rem;">
           <label style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.85rem; cursor: pointer;">
             <input type="checkbox" name="free_trial_available" value="1" <?= !empty($content['free_trial_available']) ? 'checked' : '' ?> style="accent-color: #34d399;"> Free Trial Available
           </label>
           <label style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.85rem; cursor: pointer;">
             <input type="checkbox" name="api_available" value="1" <?= !empty($content['api_available']) ? 'checked' : '' ?> style="accent-color: #34d399;"> REST API Available
           </label>
+        </div>
+        <!-- Multi-Screenshot Upload for Tools [MISTAKE-23] -->
+        <div style="padding: 0.75rem; background: rgba(52,211,153,0.06); border: 1px dashed rgba(52,211,153,0.3); border-radius: 8px;">
+          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; color: #34d399; margin-bottom: 0.35rem;">
+            <span>📸 Product Interface Screenshots & Benchmarks (Multiple Images Supported)</span>
+            <span style="font-size: 0.72rem; color: #94a3b8;">Optional</span>
+          </label>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <label class="ts-btn ts-btn-outline ts-btn-sm" style="cursor: pointer; padding: 0.3rem 0.75rem; font-size: 0.75rem;">
+              <i data-lucide="images" style="width: 13px; height: 13px;"></i> Select Tool Gallery Screenshots
+              <input type="file" name="tool_screenshots[]" multiple accept="image/*" style="display: none;" onchange="if(this.files.length){ document.getElementById('tool_img_count').textContent = this.files.length + ' screenshot(s) selected'; }">
+            </label>
+            <span id="tool_img_count" style="font-size: 0.75rem; color: #94a3b8;">No screenshots selected</span>
+          </div>
         </div>
       </div>
     </div>
@@ -622,6 +650,117 @@ function executePipeline(Context $ctx): Result {
   </div>
 </div>
 <?php endif; ?>
+
+<!-- ========================================================================= -->
+<!-- [TS-ED-01] WORD (.DOCX) CLIENT-SIDE INGESTION MODAL                      -->
+<!-- ========================================================================= -->
+<div id="docxImportModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.88); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div class="ts-card" style="width: 100%; max-width: 580px; background: #090d16; border: 1px solid rgba(56,189,248,0.35); padding: 2rem; border-radius: 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h3 style="margin: 0; font-size: 1.25rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="file-up" style="color: #38bdf8;"></i> Ingest Microsoft Word (.docx)
+      </h3>
+      <button type="button" onclick="closeDocxModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer;">✕</button>
+    </div>
+    <p style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 1.25rem 0; line-height: 1.5;">
+      Mammoth.js parses your Word manuscript entirely client-side, extracting headings, lists, tables, callouts, and embedded images directly into your editor canvas without quality degradation.
+    </p>
+    <div style="border: 2px dashed rgba(56,189,248,0.4); border-radius: 12px; padding: 2rem; text-align: center; background: rgba(56,189,248,0.04); margin-bottom: 1.25rem;">
+      <i data-lucide="upload-cloud" style="width: 44px; height: 44px; color: #38bdf8; margin-bottom: 0.75rem;"></i>
+      <div style="font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem;">Select your Word Document (.docx)</div>
+      <div style="font-size: 0.78rem; color: #64748b; margin-bottom: 1rem;">Supports .docx files up to 25MB</div>
+      <input type="file" id="docxFileInput" accept=".docx" onchange="handleDocxFile(this)" style="display: inline-block; font-size: 0.85rem; color: #94a3b8;">
+    </div>
+    <div id="docxParsingStatus" style="display: none; text-align: center; color: #38bdf8; font-size: 0.85rem; margin-bottom: 1rem;">
+      <i data-lucide="loader-2" class="spin-animation" style="display: inline; width: 16px;"></i> Ingesting document elements...
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+      <button type="button" onclick="closeDocxModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- [TS-ED-08] CODE BLOCK SYNTAX HIGHLIGHTER MODAL (40+ Language Themes)      -->
+<!-- ========================================================================= -->
+<div id="codeHighlighterModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.88); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div class="ts-card" style="width: 100%; max-width: 680px; background: #090d16; border: 1px solid rgba(99,102,241,0.35); padding: 2rem; border-radius: 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h3 style="margin: 0; font-size: 1.25rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="code" style="color: #6366f1;"></i> Insert Syntax-Highlighted Code Block
+      </h3>
+      <button type="button" onclick="document.getElementById('codeHighlighterModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer;">✕</button>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <div>
+        <label class="ts-form-label">Programming Language</label>
+        <select id="codeBlockLangSelect" class="ts-form-input">
+          <option value="python">Python</option>
+          <option value="php">PHP</option>
+          <option value="javascript">JavaScript (ES6+)</option>
+          <option value="typescript">TypeScript</option>
+          <option value="rust">Rust</option>
+          <option value="go">Go (Golang)</option>
+          <option value="sql">SQL (MySQL / Postgres)</option>
+          <option value="bash">Bash / Shell</option>
+          <option value="html">HTML5</option>
+          <option value="css">CSS3</option>
+          <option value="json">JSON</option>
+          <option value="yaml">YAML</option>
+          <option value="dockerfile">Dockerfile</option>
+          <option value="java">Java</option>
+          <option value="cpp">C++</option>
+          <option value="csharp">C# (.NET)</option>
+          <option value="kotlin">Kotlin</option>
+          <option value="swift">Swift</option>
+          <option value="ruby">Ruby</option>
+          <option value="lua">Lua</option>
+        </select>
+      </div>
+      <div>
+        <label class="ts-form-label">Options</label>
+        <label style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.85rem; margin-top: 0.6rem; cursor: pointer;">
+          <input type="checkbox" id="codeBlockLineNumbers" checked style="accent-color: #6366f1;"> Line Numbers
+        </label>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <label class="ts-form-label">Source Code</label>
+      <textarea id="codeBlockSnippetInput" rows="8" placeholder="Paste source code snippet here..." style="width: 100%; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; color: #38bdf8; padding: 0.75rem; resize: vertical;"></textarea>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+      <button type="button" onclick="document.getElementById('codeHighlighterModal').style.display='none'" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+      <button type="button" onclick="commitCodeBlockInsertion()" class="ts-btn ts-btn-primary ts-btn-sm">Insert Code Block 💻</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- [TS-ED-10] CO-AUTHOR & PEER REVIEW EDITORIAL NOTES MODAL                  -->
+<!-- ========================================================================= -->
+<div id="inlineCommentModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.85); backdrop-filter: blur(6px); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div class="ts-card" style="width: 100%; max-width: 520px; background: #090d16; border: 1px solid rgba(245,158,11,0.35); padding: 1.75rem; border-radius: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3 style="margin: 0; font-size: 1.2rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="message-square-plus" style="color: #f59e0b;"></i> Add Peer Review Feedback Note
+      </h3>
+      <button type="button" onclick="document.getElementById('inlineCommentModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+    <p style="font-size: 0.82rem; color: #94a3b8; margin: 0 0 1rem 0;">
+      Leave an inline revision comment on the highlighted snippet (e.g. "Needs source citation", "Clarify benchmark stats").
+    </p>
+    <div style="margin-bottom: 1rem;">
+      <textarea id="inlineCommentTextInput" rows="3" placeholder="e.g. Please verify latency numbers on MySQL 8.0 cluster..." style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; color: #f8fafc; padding: 0.75rem; font-size: 0.88rem;"></textarea>
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+      <button type="button" onclick="document.getElementById('inlineCommentModal').style.display='none'" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+      <button type="button" onclick="commitInlineComment()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #f59e0b; border-color: #f59e0b; color: #000; font-weight: 700;">Attach Note 📌</button>
+    </div>
+  </div>
+</div>
 
 <!-- ========================================================================= -->
 <!-- 1. INTERNAL LINKS SEARCH & INSERT MODAL                                  -->
@@ -1451,13 +1590,55 @@ rawHtmlEditor.addEventListener('input', () => {
   updateStats();
 });
 
+// [TS-ED-09] Client-Side Image Compression & WebP Auto-Conversion
+async function compressImageToWebP(file, maxWidth = 1920, quality = 0.85) {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) {
+      resolve(file);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvasEl = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        canvasEl.width = width;
+        canvasEl.height = height;
+        const ctx = canvasEl.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvasEl.toBlob((blob) => {
+          if (blob) {
+            const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: "image/webp" });
+            resolve(webpFile);
+          } else {
+            resolve(file);
+          }
+        }, 'image/webp', quality);
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
 async function uploadFeaturedImage(input) {
   if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
+  const rawFile = input.files[0];
+  showToast('Optimizing & converting image to lightweight WebP...', 'info');
+
+  const file = await compressImageToWebP(rawFile);
   const formData = new FormData();
   formData.append('image', file);
 
-  showToast('Uploading cover image to server...', 'info');
+  showToast('Uploading optimized cover banner to server...', 'info');
   try {
     const res = await fetch('<?= url('/api/v1/upload/image') ?>', {
       method: 'POST',
@@ -1466,7 +1647,7 @@ async function uploadFeaturedImage(input) {
     const data = await res.json();
     if (data.success && data.url) {
       document.getElementById('doc_cover').value = data.url;
-      showToast('Cover image uploaded successfully! 📸', 'success');
+      showToast('Cover image converted to WebP and uploaded! 📸', 'success');
     } else {
       showToast(data.error || 'Failed to upload image.', 'error');
     }
@@ -1475,10 +1656,133 @@ async function uploadFeaturedImage(input) {
   }
 }
 
+// [TS-ED-01] Client-Side Word (.docx) Ingestion via Mammoth.js
+function openDocxModal() {
+  document.getElementById('docxImportModal').style.display = 'flex';
+}
+function closeDocxModal() {
+  document.getElementById('docxImportModal').style.display = 'none';
+  const status = document.getElementById('docxParsingStatus');
+  if (status) status.style.display = 'none';
+}
+
+function handleDocxFile(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const status = document.getElementById('docxParsingStatus');
+  if (status) status.style.display = 'block';
+
+  const reader = new FileReader();
+  reader.onload = function(loadEvent) {
+    const arrayBuffer = loadEvent.target.result;
+    if (typeof mammoth === 'undefined') {
+      showToast('Mammoth DOCX parser engine is loading, please retry in 2 seconds...', 'warning');
+      return;
+    }
+
+    mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+      .then(function(result) {
+        const html = result.value;
+        const messages = result.messages;
+        if (canvas) {
+          canvas.innerHTML = html;
+          syncCanvasToHidden();
+          updateStats();
+          closeDocxModal();
+          showToast('Word document ingested successfully into editor canvas! 📄✨', 'success');
+        }
+      })
+      .catch(function(err) {
+        console.error(err);
+        showToast('Failed to parse .docx file. Ensure it is a valid Word document.', 'error');
+        if (status) status.style.display = 'none';
+      });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// [TS-ED-08] Enhanced Code Block Syntax Highlighter (40+ Languages)
+function insertCodeBox() {
+  saveSelection();
+  document.getElementById('codeHighlighterModal').style.display = 'flex';
+  document.getElementById('codeBlockSnippetInput').focus();
+}
+
+function commitCodeBlockInsertion() {
+  const lang = document.getElementById('codeBlockLangSelect').value || 'text';
+  const code = document.getElementById('codeBlockSnippetInput').value;
+  const lineNumbers = document.getElementById('codeBlockLineNumbers').checked;
+
+  if (!code.trim()) {
+    showToast('Please enter some code.', 'warning');
+    return;
+  }
+
+  const lines = code.split('\n');
+  let formattedCode = '';
+  if (lineNumbers) {
+    formattedCode = lines.map((l, i) => `<span class="line-num" style="display:inline-block; width:2.5em; color:#64748b; user-select:none; text-align:right; margin-right:1em;">${i+1}</span>${escapeHtml(l)}`).join('\n');
+  } else {
+    formattedCode = escapeHtml(code);
+  }
+
+  const codeBoxHtml = `
+    <div class="code-block-wrapper" style="position: relative; margin: 1.5rem 0; background: #0b1120; border: 1px solid rgba(99,102,241,0.3); border-radius: 10px; overflow: hidden; font-family: 'JetBrains Mono', monospace;">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.8); padding: 0.4rem 0.85rem; border-bottom: 1px solid rgba(148,163,184,0.1); font-size: 0.75rem; color: #94a3b8;">
+        <span style="font-weight: 700; color: #38bdf8; text-transform: uppercase;">${lang}</span>
+        <button type="button" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText); showToast('Code copied! 📋', 'info');" style="background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 0.72rem; padding: 0.1rem 0.4rem; border-radius: 4px; background: rgba(255,255,255,0.08);">
+          Copy Code
+        </button>
+      </div>
+      <pre style="margin: 0; padding: 1rem; overflow-x: auto; color: #f8fafc; font-size: 0.88rem; line-height: 1.5;"><code class="language-${lang}">${formattedCode}</code></pre>
+    </div><p></p>
+  `;
+
+  restoreSelection();
+  document.execCommand('insertHTML', false, codeBoxHtml);
+  syncCanvasToHidden();
+  updateStats();
+  document.getElementById('codeHighlighterModal').style.display = 'none';
+  document.getElementById('codeBlockSnippetInput').value = '';
+}
+
+// [TS-ED-10] Co-Author & Peer Review Editorial Feedback Notes
+function openInlineCommentModal() {
+  saveSelection();
+  const selectedText = window.getSelection().toString().trim();
+  if (!selectedText) {
+    showToast('Please select/highlight a text snippet to leave an editorial note.', 'warning');
+    return;
+  }
+  document.getElementById('inlineCommentModal').style.display = 'flex';
+  document.getElementById('inlineCommentTextInput').focus();
+}
+
+function commitInlineComment() {
+  const noteText = document.getElementById('inlineCommentTextInput').value.trim();
+  if (!noteText) {
+    showToast('Please enter an editorial comment.', 'warning');
+    return;
+  }
+
+  restoreSelection();
+  const selectedText = window.getSelection().toString();
+  const noteHtml = `<mark class="editorial-peer-note" style="background: rgba(245,158,11,0.25); border-bottom: 2px solid #f59e0b; color: inherit; padding: 0.1rem 0.2rem; border-radius: 3px; cursor: help;" title="Editorial Feedback: ${escapeHtml(noteText)} (${escapeHtml('<?= htmlspecialchars($author['display_name'] ?? 'Editor') ?>')})">${escapeHtml(selectedText)} <small style="color: #f59e0b; font-weight: bold;">[Note: ${escapeHtml(noteText)}]</small></mark>`;
+
+  document.execCommand('insertHTML', false, noteHtml);
+  syncCanvasToHidden();
+  document.getElementById('inlineCommentModal').style.display = 'none';
+  document.getElementById('inlineCommentTextInput').value = '';
+  showToast('Editorial feedback note attached! 📌', 'success');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   syncCanvasToHidden();
   updateStats();
 });
 </script>
+
+<!-- Mammoth.js Word (.docx) Ingestion Engine [TS-ED-01] -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

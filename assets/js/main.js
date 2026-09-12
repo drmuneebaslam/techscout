@@ -891,6 +891,75 @@ window.localizeAllTimestamps = function(root, forcedTz) {
   }
 };
 
+// [TS-TZ-07] Localized "Relative Time" Live Ticker
+setInterval(function() {
+  document.querySelectorAll('time.ts-time[datetime][data-format-type="relative"], .ts-time[data-timestamp]').forEach(function(el) {
+    let timestamp = null;
+    if (el.getAttribute('data-timestamp')) {
+      timestamp = parseInt(el.getAttribute('data-timestamp'), 10) * 1000;
+    } else if (el.getAttribute('datetime')) {
+      const d = new Date(el.getAttribute('datetime'));
+      if (!isNaN(d.getTime())) timestamp = d.getTime();
+    }
+    if (!timestamp) return;
+
+    const diffSec = Math.floor((Date.now() - timestamp) / 1000);
+    if (diffSec < 45) el.textContent = 'Just now';
+    else if (diffSec < 90) el.textContent = '1m ago';
+    else if (diffSec < 3600) el.textContent = Math.floor(diffSec / 60) + 'm ago';
+    else if (diffSec < 86400) el.textContent = Math.floor(diffSec / 3600) + 'h ago';
+    else if (diffSec < 604800) el.textContent = Math.floor(diffSec / 86400) + 'd ago';
+  });
+}, 30000);
+
+// [TS-TZ-06] Intelligent Travel Mode Timezone Detection Prompt
+function checkTravelModeTimezoneShift(detectedTz, city) {
+  const currentTz = (typeof window.getUserTimezone === 'function') ? window.getUserTimezone() : null;
+  if (currentTz && detectedTz && currentTz !== detectedTz) {
+    const dismissed = sessionStorage.getItem('ts_travel_dismissed_' + detectedTz);
+    if (dismissed) return;
+
+    const locationName = city ? `${city} (${detectedTz})` : detectedTz;
+    const existing = document.getElementById('travel-tz-prompt-banner');
+    if (existing) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'travel-tz-prompt-banner';
+    banner.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 999999; background: var(--ts-bg-surface-elevated, #0f172a); border: 1px solid var(--ts-primary, #38bdf8); border-radius: 12px; padding: 1rem 1.25rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 360px; font-size: 0.85rem; color: var(--ts-text-primary, #f8fafc);';
+    banner.innerHTML = `
+      <div style="display: flex; gap: 0.6rem; align-items: flex-start;">
+        <span style="font-size: 1.25rem;">✈️</span>
+        <div style="flex: 1;">
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">Travel Mode Detected</div>
+          <div style="color: var(--ts-text-secondary, #94a3b8); font-size: 0.8rem; line-height: 1.4; margin-bottom: 0.65rem;">
+            We noticed you are in <strong>${locationName}</strong>. Would you like to update your display timezone?
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" onclick="acceptTravelTimezone('${detectedTz}')" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">Update to ${detectedTz.split('/')[1] || detectedTz}</button>
+            <button type="button" onclick="dismissTravelTimezone('${detectedTz}')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Keep ${currentTz.split('/')[1] || currentTz}</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(banner);
+  }
+}
+
+window.acceptTravelTimezone = function(tz) {
+  document.cookie = "user_timezone=" + encodeURIComponent(tz) + ";path=/;max-age=31536000;SameSite=Lax";
+  localStorage.setItem('ts_ip_timezone', tz);
+  if (typeof window.localizeAllTimestamps === 'function') window.localizeAllTimestamps(document, tz);
+  const b = document.getElementById('travel-tz-prompt-banner');
+  if (b) b.remove();
+  if (typeof showToast === 'function') showToast('Display timezone updated to ' + tz + ' ✈️', 'success');
+};
+
+window.dismissTravelTimezone = function(tz) {
+  sessionStorage.setItem('ts_travel_dismissed_' + tz, '1');
+  const b = document.getElementById('travel-tz-prompt-banner');
+  if (b) b.remove();
+};
+
 // Asynchronously resolve visitor IP location to Timezone
 window.detectAndSyncIpTimezone = function() {
   try {
@@ -902,8 +971,10 @@ window.detectAndSyncIpTimezone = function() {
           const oldTz = localStorage.getItem('ts_ip_timezone');
           localStorage.setItem('ts_ip_timezone', data.timezone);
           localStorage.setItem('ts_ip_timezone_time', Date.now().toString());
-          document.cookie = "user_timezone=" + encodeURIComponent(data.timezone) + ";path=/;max-age=31536000;SameSite=Lax";
-          if (oldTz !== data.timezone) {
+          if (oldTz && oldTz !== data.timezone) {
+            checkTravelModeTimezoneShift(data.timezone, data.city);
+          } else if (!oldTz) {
+            document.cookie = "user_timezone=" + encodeURIComponent(data.timezone) + ";path=/;max-age=31536000;SameSite=Lax";
             window.localizeAllTimestamps(document, data.timezone);
           }
         }
@@ -922,4 +993,5 @@ if (document.readyState === 'loading') {
   window.localizeAllTimestamps();
   window.detectAndSyncIpTimezone();
 }
+
 

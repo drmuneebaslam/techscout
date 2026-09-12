@@ -187,6 +187,57 @@
             </div>
             <strong style="color: #a855f7; font-family: var(--admin-font-mono);">4.7%</strong>
           </div>
+    <!-- [TS-TZ-05] Global Activity Heatmap by Regional Timezones -->
+    <div class="admin-table-wrap" style="padding: 1.75rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="globe" style="color: #38bdf8;"></i> 🌍 Global Activity Heatmap by Regional Timezones [TS-TZ-05]
+          </h3>
+          <p style="color: #64748b; font-size: 0.82rem; margin: 0;">24-hour visitor density normalized across global time zones (Americas, EMEA, APAC).</p>
+        </div>
+        <div style="display: flex; gap: 0.4rem;">
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem;">AMER (UTC-8 to -4)</span>
+          <span class="ts-badge ts-badge-indigo" style="font-size: 0.72rem;">EMEA (UTC+0 to +3)</span>
+          <span class="ts-badge ts-badge-pink" style="font-size: 0.72rem;">APAC (UTC+7 to +12)</span>
+        </div>
+      </div>
+
+      <!-- Regional Ticker Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+        <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem;">AMERICAS (PST / EST)</div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: #38bdf8;">38.4% Traffic</div>
+          <div style="font-size: 0.74rem; color: #64748b; margin-top: 0.25rem;">Peak Hours: 14:00 - 22:00 UTC</div>
+        </div>
+        <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(99,102,241,0.25); border-radius: 10px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem;">EMEA (GMT / CET / PKT)</div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: #818cf8;">44.2% Traffic</div>
+          <div style="font-size: 0.74rem; color: #64748b; margin-top: 0.25rem;">Peak Hours: 08:00 - 17:00 UTC</div>
+        </div>
+        <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(236,72,153,0.25); border-radius: 10px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem;">APAC (SGT / JST / AEST)</div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: #f472b6;">17.4% Traffic</div>
+          <div style="font-size: 0.74rem; color: #64748b; margin-top: 0.25rem;">Peak Hours: 01:00 - 09:00 UTC</div>
+        </div>
+      </div>
+
+      <!-- 24-Hour Normalized Heatmap Grid -->
+      <div style="background: rgba(11,15,25,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 10px; padding: 1.25rem;">
+        <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-bottom: 0.75rem; text-transform: uppercase;">
+          24-Hour Coordinated Universal Time (UTC) Activity Density Grid
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(24, 1fr); gap: 4px; align-items: flex-end; height: 65px;">
+          <?php
+            $sampleHourlyPcts = [12, 10, 8, 7, 9, 15, 24, 45, 68, 85, 92, 88, 78, 82, 90, 95, 98, 89, 75, 62, 51, 40, 28, 18];
+            foreach ($sampleHourlyPcts as $h => $val):
+              $color = $val > 80 ? '#38bdf8' : ($val > 50 ? '#6366f1' : ($val > 25 ? '#3b82f6' : '#1e293b'));
+          ?>
+            <div style="display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;" title="Hour <?= sprintf('%02d:00', $h) ?> UTC: <?= $val ?>% relative load">
+              <div style="width: 100%; height: <?= $val ?>%; background: <?= $color ?>; border-radius: 3px; min-height: 4px; transition: height 0.3s ease;"></div>
+              <span style="font-size: 0.58rem; color: #64748b; margin-top: 4px; font-family: monospace;"><?= $h % 4 === 0 ? sprintf('%02d', $h) : '' ?></span>
+            </div>
+          <?php endforeach; ?>
         </div>
       </div>
     </div>

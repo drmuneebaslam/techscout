@@ -138,9 +138,24 @@
         <textarea name="body_content" rows="4" class="ts-form-input" placeholder="Describe core features, pricing tiers, API access, integrations, and target audience..." required></textarea>
       </div>
 
-      <div style="margin-bottom: 2rem;">
-        <label class="ts-form-label">Logo Image URL</label>
+      <!-- MISTAKE-23 Direct Logo & Multi-Screenshot File Upload -->
+      <div style="margin-bottom: 1.5rem; background: var(--ts-bg-surface-elevated); padding: 1.25rem; border-radius: 12px; border: 1px dashed var(--ts-border-main);">
+        <label class="ts-form-label" style="font-weight: 700; margin-bottom: 0.35rem;">Tool Logo Image (Upload or URL)</label>
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <input type="file" name="logo_file" accept="image/*" class="ts-form-input" style="padding: 0.4rem; font-size: 0.82rem; flex: 1;">
+          <span style="font-size: 0.75rem; color: var(--ts-text-muted);">or paste URL below</span>
+        </div>
         <input type="url" name="image_url" class="ts-form-input" placeholder="https://codeforge.ai/logo.png">
+
+        <div style="margin-top: 1rem; border-top: 1px dashed var(--ts-border-subtle); padding-top: 0.85rem;">
+          <label class="ts-form-label" style="font-weight: 700; margin-bottom: 0.25rem;">
+            📸 Multi-Image Product Screenshots Gallery (Upload Multiple Files)
+          </label>
+          <div style="font-size: 0.78rem; color: var(--ts-text-muted); margin-bottom: 0.5rem;">
+            Upload 1 to 5 high-resolution UI screenshots showcasing your AI application interface and dashboard.
+          </div>
+          <input type="file" name="screenshot_files[]" multiple accept="image/*" class="ts-form-input" style="padding: 0.4rem; font-size: 0.82rem;">
+        </div>
       </div>
 
       <!-- Crypto Treasury Payment Strip -->
@@ -212,8 +227,32 @@
           <input type="url" name="target_url" class="ts-form-input" placeholder="https://lexai.io/enterprise">
         </div>
         <div>
-          <label class="ts-form-label">Featured Hero Image URL</label>
-          <input type="url" name="image_url" class="ts-form-input" placeholder="https://images.unsplash.com/...">
+          <label class="ts-form-label">Featured Hero Image (URL or Direct Upload)</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
+            <input type="url" name="image_url" id="article_hero_url" class="ts-form-input" placeholder="https://images.unsplash.com/..." style="flex: 1;">
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label class="ts-btn ts-btn-outline" style="cursor: pointer; font-size: 0.75rem; padding: 0.35rem 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+              <i data-lucide="upload" style="width: 13px; height: 13px;"></i> Choose Image File
+              <input type="file" name="hero_file" accept="image/*" style="display: none;" onchange="if(this.files[0]){ document.getElementById('article_hero_filename').textContent = this.files[0].name; }">
+            </label>
+            <span id="article_hero_filename" style="font-size: 0.75rem; color: var(--ts-text-muted);">No file chosen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-image Supplementary Figures Upload per MISTAKE-23 -->
+      <div style="margin-bottom: 1.25rem; padding: 0.85rem; border: 1px dashed var(--ts-border-main); border-radius: 8px; background: var(--ts-bg-surface-elevated);">
+        <label class="ts-form-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <span>📸 Article Visual Figures & Screenshots (Multiple Upload Support)</span>
+          <span style="font-size: 0.72rem; color: var(--ts-text-muted);">Optional - Multiple images allowed</span>
+        </label>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <label class="ts-btn ts-btn-secondary" style="cursor: pointer; font-size: 0.8rem; padding: 0.4rem 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="images" style="width: 14px; height: 14px;"></i> Select Multiple Images
+            <input type="file" name="article_gallery[]" multiple accept="image/*" style="display: none;" onchange="if(this.files.length){ document.getElementById('article_gallery_count').textContent = this.files.length + ' image(s) selected'; }">
+          </label>
+          <span id="article_gallery_count" style="font-size: 0.8rem; color: var(--ts-text-muted);">No additional images selected</span>
         </div>
       </div>
 

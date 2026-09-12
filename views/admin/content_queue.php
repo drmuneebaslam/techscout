@@ -14,6 +14,10 @@
     </div>
 
     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <!-- [TS-ED-07] Broken Link Scanner (Admin Only) -->
+      <button type="button" onclick="openBrokenLinkScanner()" class="ts-btn ts-btn-outline ts-btn-sm" style="border-color: #ef4444; color: #f87171;">
+        <i data-lucide="link-2-off"></i> Broken Link & Outdated URL Scanner 🔗
+      </button>
       <a href="<?= url('/admin/moderation') ?>" class="ts-btn ts-btn-outline ts-btn-sm">
         <i data-lucide="shield-alert"></i> Moderation Reports
       </a>
@@ -869,7 +873,82 @@ function saveInternalNotesFromModal() {
     }
   });
 }
+// [TS-ED-07] Automated Broken Link & Outdated URL Checker (ADMIN ONLY)
+function openBrokenLinkScanner() {
+  document.getElementById('brokenLinkScannerModal').style.display = 'flex';
+  const resultsContainer = document.getElementById('brokenLinkResultsList');
+  const loading = document.getElementById('brokenLinkLoading');
+  resultsContainer.innerHTML = '';
+  loading.style.display = 'block';
+
+  fetch('<?= url('/admin/content/scan-broken-links') ?>')
+    .then(r => r.json())
+    .then(data => {
+      loading.style.display = 'none';
+      if (!data.success || !data.issues || data.issues.length === 0) {
+        resultsContainer.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #10b981;">
+            <i data-lucide="check-circle-2" style="width: 36px; height: 36px; margin-bottom: 0.5rem;"></i>
+            <div style="font-weight: 700;">No broken links, insecure HTTP embeds, or expired URLs detected!</div>
+            <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">All publication links and assets are healthy.</div>
+          </div>
+        `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        return;
+      }
+
+      let html = '';
+      data.issues.forEach(issue => {
+        html += `
+          <div style="padding: 0.85rem; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; background: rgba(239,68,68,0.06); margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem;">
+              <span class="ts-badge ts-badge-red" style="font-size: 0.68rem;">${issue.issue_label}</span>
+              <span style="font-size: 0.75rem; color: #94a3b8;">Article ID #${issue.content_id}</span>
+            </div>
+            <div style="font-weight: 700; color: #f8fafc; font-size: 0.88rem; margin-bottom: 0.2rem;">${escapeHtml(issue.title)}</div>
+            <div style="font-size: 0.8rem; font-family: monospace; color: #f87171; word-break: break-all; margin-bottom: 0.4rem;">${escapeHtml(issue.url)}</div>
+            <div style="font-size: 0.75rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
+              <span>💡 ${escapeHtml(issue.recommendation)}</span>
+              <a href="<?= url('/author/editor?id=') ?>${issue.content_id}" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;">Edit Draft ↗</a>
+            </div>
+          </div>
+        `;
+      });
+      resultsContainer.innerHTML = html;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    })
+    .catch(err => {
+      loading.style.display = 'none';
+      resultsContainer.innerHTML = `<div style="color: #ef4444; padding: 1rem;">Failed to complete scan. Check server connection.</div>`;
+    });
+}
 </script>
+
+<!-- [TS-ED-07] Broken Link Scanner Modal (Admin Console Only) -->
+<div id="brokenLinkScannerModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.85); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div class="ts-card" style="width: 100%; max-width: 720px; background: #090d16; border: 1px solid rgba(239,68,68,0.4); padding: 2rem; border-radius: 16px; max-height: 85vh; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h3 style="margin: 0; font-size: 1.25rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="link-2-off" style="color: #ef4444;"></i> Automated Broken Link &amp; Outdated URL Checker
+      </h3>
+      <button type="button" onclick="document.getElementById('brokenLinkScannerModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer;">✕</button>
+    </div>
+    <p style="font-size: 0.84rem; color: #94a3b8; margin: 0 0 1rem 0;">
+      Scans manuscript drafts and publications across TechScout to identify 404 links, insecure HTTP embeds, and outdated URLs before public indexing.
+    </p>
+
+    <div id="brokenLinkLoading" style="display: none; text-align: center; padding: 2.5rem; color: #38bdf8;">
+      <i data-lucide="loader-2" class="spin-animation" style="width: 32px; height: 32px; margin-bottom: 0.5rem;"></i>
+      <div>Scanning database drafts &amp; publication HTML bodies...</div>
+    </div>
+
+    <div id="brokenLinkResultsList" style="flex: 1; overflow-y: auto; max-height: 420px; padding-right: 0.25rem;"></div>
+
+    <div style="display: flex; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.75rem;">
+      <button type="button" onclick="document.getElementById('brokenLinkScannerModal').style.display='none'" class="ts-btn ts-btn-outline ts-btn-sm">Close</button>
+    </div>
+  </div>
+</div>
 
 <?php require __DIR__ . '/components/editorial_badge_modal.php'; ?>
 

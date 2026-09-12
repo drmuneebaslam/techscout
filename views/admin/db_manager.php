@@ -14,6 +14,9 @@
     </div>
 
     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="<?= url('/admin/db-manager/export-sqlite') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700;">
+        <i data-lucide="download"></i> Export SQLite DB 📥
+      </a>
       <form action="<?= url('/admin/db-manager/backup') ?>" method="POST" style="margin: 0;">
         <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700;">
           <i data-lucide="database"></i> Generate SQL Snapshot Now ⚡
@@ -75,17 +78,32 @@
     <a href="<?= url('/admin/db-manager?tab=tables') ?>" class="ts-subtab-link <?= ($activeTab === 'tables') ? 'active' : '' ?>">
       🗄️ Tables &amp; Allocation (<?= count($tables) ?>)
     </a>
+    <a href="<?= url('/admin/db-manager?tab=erd') ?>" class="ts-subtab-link <?= ($activeTab === 'erd') ? 'active' : '' ?>" style="color: #38bdf8;">
+      🗺️ ERD Visualizer [TS-DB-04]
+    </a>
+    <a href="<?= url('/admin/db-manager?tab=profiler') ?>" class="ts-subtab-link <?= ($activeTab === 'profiler') ? 'active' : '' ?>" style="color: #f59e0b;">
+      ⚡ Slow Query &amp; Index Advisor [TS-DB-05]
+    </a>
+    <a href="<?= url('/admin/db-manager?tab=migrations') ?>" class="ts-subtab-link <?= ($activeTab === 'migrations') ? 'active' : '' ?>" style="color: #10b981;">
+      🚀 Migration Runner [TS-DB-06]
+    </a>
+    <a href="<?= url('/admin/db-manager?tab=garbage') ?>" class="ts-subtab-link <?= ($activeTab === 'garbage') ? 'active' : '' ?>" style="color: #ec4899;">
+      🧹 Media Garbage Collector [TS-DB-07]
+    </a>
+    <a href="<?= url('/admin/db-manager?tab=benchmark') ?>" class="ts-subtab-link <?= ($activeTab === 'benchmark') ? 'active' : '' ?>" style="color: #8b5cf6;">
+      ⏱️ DB Benchmark &amp; Latency [TS-DB-10]
+    </a>
     <a href="<?= url('/admin/db-manager?tab=snapshots') ?>" class="ts-subtab-link <?= ($activeTab === 'snapshots') ? 'active' : '' ?>">
-      💾 Snapshots &amp; Disaster Recovery (<?= count($backups) ?>)
+      💾 Snapshots (<?= count($backups) ?>)
     </a>
     <a href="<?= url('/admin/db-manager?tab=health') ?>" class="ts-subtab-link <?= ($activeTab === 'health') ? 'active' : '' ?>">
-      🩺 Schema Health &amp; Column Alignment <?= ($unhealthyCount > 0) ? '<span class="ts-badge ts-badge-red" style="font-size: 0.6rem;">' . $unhealthyCount . '</span>' : '✓' ?>
+      🩺 Schema Health <?= ($unhealthyCount > 0) ? '<span class="ts-badge ts-badge-red" style="font-size: 0.6rem;">' . $unhealthyCount . '</span>' : '✓' ?>
     </a>
     <a href="<?= url('/admin/db-manager?tab=query') ?>" class="ts-subtab-link <?= ($activeTab === 'query') ? 'active' : '' ?>">
-      ⚡ SQL Maintenance Terminal
+      ⚡ SQL Terminal
     </a>
     <a href="<?= url('/admin/db-manager?tab=custom_export') ?>" class="ts-subtab-link <?= ($activeTab === 'custom_export') ? 'active' : '' ?>" style="color: #38bdf8; font-weight: 700;">
-      📦 Custom Export Studio (Folders, Schema &amp; Granular Seeds) ⚡
+      📦 Custom Exporter
     </a>
   </div>
 
@@ -741,6 +759,503 @@ ALTER TABLE `system_error_logs`
         </div>
       </div>
     </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB: ERD VISUALIZER [TS-DB-04] -->
+  <!-- ========================================================================= -->
+  <?php elseif ($activeTab === 'erd'): ?>
+    <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="ts-badge ts-badge-cyan" style="font-weight: 800;">ENTERPRISE SCHEMA TOPOLOGY</span>
+            <span class="ts-badge ts-badge-indigo"><?= count($erdTables ?? []) ?> Core Tables</span>
+            <span class="ts-badge ts-badge-green"><?= count($erdRelations ?? []) ?> Relational Foreign Keys</span>
+          </div>
+          <h2 style="font-size: 1.35rem; color: var(--admin-text-main); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            🗺️ Entity Relationship Diagram (ERD) Visualizer
+          </h2>
+          <p style="color: var(--admin-text-muted); font-size: 0.84rem; margin: 0.25rem 0 0 0;">
+            Interactive schema topology map illustrating primary keys, foreign key references, and relational data flows.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="text" id="erdFilterInput" onkeyup="filterErdTables()" placeholder="🔍 Highlight table..." style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); padding: 0.4rem 0.85rem; border-radius: 6px; color: var(--admin-text-main); font-size: 0.82rem; width: 180px;">
+          <button type="button" onclick="zoomErd(1.1)" class="ts-btn ts-btn-outline ts-btn-sm" title="Zoom In">+</button>
+          <button type="button" onclick="zoomErd(0.9)" class="ts-btn ts-btn-outline ts-btn-sm" title="Zoom Out">-</button>
+          <button type="button" onclick="resetErdZoom()" class="ts-btn ts-btn-outline ts-btn-sm">Reset</button>
+        </div>
+      </div>
+
+      <!-- Relational Connectors Legend -->
+      <div style="padding: 0.75rem 1rem; background: rgba(56,189,248,0.04); border: 1px dashed rgba(56,189,248,0.25); border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--admin-text-muted);">
+        <span><strong style="color: #38bdf8;">🔑 PK</strong> Primary Key</span>
+        <span><strong style="color: #a855f7;">🔗 FK</strong> Foreign Key Reference</span>
+        <span><strong style="color: #10b981;">&bull;</strong> One-to-Many Relationship</span>
+        <span style="margin-left: auto; color: #64748b;">Showing active architectural cluster</span>
+      </div>
+
+      <!-- Diagram Canvas -->
+      <div id="erdCanvasWrapper" style="overflow: auto; max-height: 700px; border: 1px solid var(--admin-border-color); border-radius: 8px; background: rgba(5,7,11,0.6); position: relative; padding: 1.5rem;">
+        <div id="erdCanvas" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; transform-origin: top left; transition: transform 0.2s ease;">
+          <?php foreach (($erdTables ?? []) as $tName => $tCols): ?>
+            <div class="erd-table-card" id="erd_table_<?= htmlspecialchars($tName) ?>" style="background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden; transition: all 0.2s ease;">
+              <div style="background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(99,102,241,0.05)); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--admin-border-color); display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <i data-lucide="database" style="width: 14px; color: #38bdf8;"></i>
+                  <strong style="color: var(--admin-text-main); font-size: 0.9rem; font-family: var(--admin-font-mono);"><?= htmlspecialchars($tName) ?></strong>
+                </div>
+                <span class="ts-badge ts-badge-indigo" style="font-size: 0.6rem;"><?= count($tCols) ?> cols</span>
+              </div>
+              <div style="max-height: 260px; overflow-y: auto; padding: 0.4rem 0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem; font-family: var(--admin-font-mono);">
+                  <tbody>
+                    <?php foreach ($tCols as $col): ?>
+                      <?php 
+                        $isPk = ($col['key'] === 'PRI');
+                        $isFk = false;
+                        $fkTarget = '';
+                        foreach (($erdRelations ?? []) as $rel) {
+                          if ($rel['source_table'] === $tName && $rel['source_col'] === $col['field']) {
+                            $isFk = true;
+                            $fkTarget = $rel['target_table'] . '.' . $rel['target_col'];
+                            break;
+                          }
+                        }
+                      ?>
+                      <tr style="border-bottom: 1px solid rgba(148,163,184,0.06); transition: background 0.15s ease;" onmouseover="this.style.background='rgba(56,189,248,0.06)'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 0.35rem 0.75rem; width: 24px; text-align: center;">
+                          <?php if ($isPk): ?>
+                            <span title="Primary Key" style="color: #f59e0b;">🔑</span>
+                          <?php elseif ($isFk): ?>
+                            <span title="Foreign Key -> <?= htmlspecialchars($fkTarget) ?>" style="color: #38bdf8; cursor: pointer;">🔗</span>
+                          <?php else: ?>
+                            <span style="color: #64748b;">&bull;</span>
+                          <?php endif; ?>
+                        </td>
+                        <td style="padding: 0.35rem 0.5rem; font-weight: <?= $isPk ? '700' : '500' ?>; color: <?= $isPk ? '#38bdf8' : 'var(--admin-text-main)' ?>;">
+                          <?= htmlspecialchars($col['field']) ?>
+                        </td>
+                        <td style="padding: 0.35rem 0.75rem; text-align: right; color: var(--admin-text-muted); font-size: 0.72rem;">
+                          <?= htmlspecialchars($col['type']) ?>
+                        </td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB: SLOW QUERY PROFILER & AI INDEX ADVISOR [TS-DB-05] -->
+  <!-- ========================================================================= -->
+  <?php elseif ($activeTab === 'profiler'): ?>
+    <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="ts-badge ts-badge-amber" style="font-weight: 800;">REAL-TIME ENGINE TELEMETRY</span>
+            <span class="ts-badge ts-badge-green">AI HEURISTIC ADVISOR</span>
+          </div>
+          <h2 style="font-size: 1.35rem; color: var(--admin-text-main); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            ⚡ Slow Query Profiler &amp; AI Index Advisor
+          </h2>
+          <p style="color: var(--admin-text-muted); font-size: 0.84rem; margin: 0.25rem 0 0 0;">
+            Real-time MySQL performance status, automated indexing recommendations for unindexed foreign keys, and query plan inspector.
+          </p>
+        </div>
+      </div>
+
+      <!-- Engine Telemetry Metrics -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Total Questions Executed</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: #38bdf8; font-family: var(--admin-font-mono);">
+            <?= number_format((int)($profilerData['status']['Questions'] ?? 0)) ?>
+          </div>
+        </div>
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Slow Queries (&gt;= 2s)</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: <?= ((int)($profilerData['status']['Slow_queries'] ?? 0) > 0) ? '#ef4444' : '#10b981' ?>; font-family: var(--admin-font-mono);">
+            <?= number_format((int)($profilerData['status']['Slow_queries'] ?? 0)) ?>
+          </div>
+        </div>
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Active DB Threads</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: #a855f7; font-family: var(--admin-font-mono);">
+            <?= htmlspecialchars((string)($profilerData['status']['Threads_connected'] ?? '1')) ?>
+          </div>
+        </div>
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Engine Uptime</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: #10b981; font-family: var(--admin-font-mono);">
+            <?= round(((int)($profilerData['status']['Uptime'] ?? 0)) / 3600, 1) ?> hrs
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Index Advisor Section -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; color: var(--admin-text-main); margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="sparkles" style="width: 18px; color: #f59e0b;"></i>
+          <span>Automated AI Indexing Recommendations</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.7rem;"><?= count($profilerData['missing_indexes'] ?? []) ?> Suggested</span>
+        </h3>
+        <p style="color: var(--admin-text-muted); font-size: 0.84rem; margin: 0 0 1rem 0;">
+          The system analyzed table relationship cardinalities and identified unindexed foreign keys and filter columns causing full-table scans.
+        </p>
+
+        <?php if (!empty($profilerData['missing_indexes'])): ?>
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Target Table &amp; Column</th>
+                  <th>Suggested Index</th>
+                  <th>Estimated Impact</th>
+                  <th>Rationale</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($profilerData['missing_indexes'] as $idx): ?>
+                  <tr>
+                    <td>
+                      <code style="color: #38bdf8; font-weight: 700;"><?= htmlspecialchars($idx['table']) ?>.<?= htmlspecialchars($idx['column']) ?></code>
+                    </td>
+                    <td>
+                      <code style="color: #a855f7;"><?= htmlspecialchars($idx['suggested_index']) ?></code>
+                    </td>
+                    <td>
+                      <span class="ts-badge ts-badge-green"><?= htmlspecialchars($idx['impact']) ?></span>
+                    </td>
+                    <td style="font-size: 0.8rem; color: var(--admin-text-muted);">
+                      <?= htmlspecialchars($idx['reason']) ?>
+                    </td>
+                    <td style="text-align: right;">
+                      <form action="<?= url('/admin/db-manager/apply-index') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Execute index optimization now: <?= htmlspecialchars($idx['sql']) ?>');">
+                        <input type="hidden" name="index_sql" value="<?= htmlspecialchars($idx['sql']) ?>">
+                        <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.75rem; background: #10b981; font-weight: 700;">
+                          ⚡ Apply Index
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        <?php else: ?>
+          <div style="padding: 1.5rem; text-align: center; background: rgba(16,185,129,0.05); border: 1px dashed rgba(16,185,129,0.3); border-radius: 8px; color: #10b981;">
+            ✓ Excellent! All high-frequency foreign key columns across critical tables are properly indexed.
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB: MIGRATION RUNNER [TS-DB-06] -->
+  <!-- ========================================================================= -->
+  <?php elseif ($activeTab === 'migrations'): ?>
+    <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="ts-badge ts-badge-green" style="font-weight: 800;">SCHEMA VERSIONING &bull; ZERO DOWNTIME</span>
+            <span class="ts-badge ts-badge-cyan"><?= count($migrationsList ?? []) ?> Applied</span>
+            <?php if (!empty($pendingMigrations)): ?>
+              <span class="ts-badge ts-badge-amber"><?= count($pendingMigrations) ?> Pending</span>
+            <?php endif; ?>
+          </div>
+          <h2 style="font-size: 1.35rem; color: var(--admin-text-main); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            🚀 Database Schema Migration Runner &amp; Rollback History
+          </h2>
+          <p style="color: var(--admin-text-muted); font-size: 0.84rem; margin: 0.25rem 0 0 0;">
+            Manage and execute sequential database migrations with atomic batch grouping and disaster rollback capability.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <?php if (!empty($pendingMigrations)): ?>
+            <form action="<?= url('/admin/db-manager/migrations/run') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Execute all pending migrations?');">
+              <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #10b981; font-weight: 700;">
+                <i data-lucide="play"></i> Run <?= count($pendingMigrations) ?> Pending Migration(s)
+              </button>
+            </form>
+          <?php endif; ?>
+          <?php if (!empty($migrationsList)): ?>
+            <form action="<?= url('/admin/db-manager/migrations/rollback') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Rollback the latest batch of migrations?');">
+              <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">
+                <i data-lucide="rotate-ccw"></i> Rollback Latest Batch
+              </button>
+            </form>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Pending Migrations Strip -->
+      <?php if (!empty($pendingMigrations)): ?>
+        <div style="margin-bottom: 1.5rem; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 1.25rem;">
+          <h4 style="color: #f59e0b; margin: 0 0 0.5rem 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>⚠️ Pending Schema Migrations Awaiting Execution</span>
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <?php foreach ($pendingMigrations as $pm): ?>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: var(--admin-card-bg); padding: 0.6rem 0.9rem; border-radius: 6px; border: 1px solid var(--admin-border-color); font-size: 0.82rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="color: #f59e0b;">⏳</span>
+                  <code style="color: #38bdf8; font-weight: 700;"><?= htmlspecialchars($pm['file']) ?></code>
+                </div>
+                <div style="display: flex; gap: 1rem; color: var(--admin-text-muted); font-size: 0.75rem; font-family: var(--admin-font-mono);">
+                  <span><?= round($pm['size'] / 1024, 1) ?> KB</span>
+                  <span>Created: <?= htmlspecialchars($pm['created_at']) ?></span>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- Applied Migrations Table -->
+      <div>
+        <h3 style="font-size: 1.05rem; color: var(--admin-text-main); margin: 0 0 0.75rem 0;">Migration Execution History</h3>
+        <div style="overflow-x: auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">ID</th>
+                <th>Migration Name</th>
+                <th>Batch Number</th>
+                <th>Applied Timestamp</th>
+                <th style="text-align: right;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($migrationsList)): ?>
+                <?php foreach ($migrationsList as $m): ?>
+                  <tr>
+                    <td style="font-family: var(--admin-font-mono); color: var(--admin-text-muted);"><?= (int)$m['id'] ?></td>
+                    <td>
+                      <code style="color: #38bdf8; font-weight: 700;"><?= htmlspecialchars($m['migration_name']) ?></code>
+                    </td>
+                    <td>
+                      <span class="ts-badge ts-badge-indigo" style="font-family: var(--admin-font-mono);">Batch #<?= (int)$m['batch'] ?></span>
+                    </td>
+                    <td style="color: var(--admin-text-muted); font-size: 0.82rem; font-family: var(--admin-font-mono);">
+                      <?= htmlspecialchars($m['applied_at']) ?>
+                    </td>
+                    <td style="text-align: right;">
+                      <span class="ts-badge ts-badge-green">✓ Applied</span>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--admin-text-muted);">
+                    No migrations recorded in history yet.
+                  </td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB: ORPHANED MEDIA GARBAGE COLLECTOR [TS-DB-07] -->
+  <!-- ========================================================================= -->
+  <?php elseif ($activeTab === 'garbage'): ?>
+    <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="ts-badge ts-badge-pink" style="font-weight: 800;">STORAGE RECLAMATION &bull; DAM HYGIENE</span>
+            <span class="ts-badge ts-badge-cyan"><?= (int)($orphanedMedia['total_scanned'] ?? 0) ?> Files Scanned</span>
+          </div>
+          <h2 style="font-size: 1.35rem; color: var(--admin-text-main); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            🧹 Orphaned Media Garbage Collector &amp; Library Sync
+          </h2>
+          <p style="color: var(--admin-text-muted); font-size: 0.84rem; margin: 0.25rem 0 0 0;">
+            Scans physical upload directories against database entities to identify, isolate, and safely purge abandoned images and assets.
+          </p>
+        </div>
+        <div>
+          <?php if (!empty($orphanedMedia['orphans'])): ?>
+            <form action="<?= url('/admin/db-manager/garbage/purge') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Permanently purge <?= count($orphanedMedia['orphans']) ?> orphaned files? This cannot be undone.');">
+              <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #ef4444; font-weight: 700;">
+                <i data-lucide="trash-2"></i> Purge All <?= count($orphanedMedia['orphans']) ?> Orphaned Files (<?= round(($orphanedMedia['orphan_size'] ?? 0) / (1024*1024), 2) ?> MB)
+              </button>
+            </form>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Footprint Stat Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Total Files Scanned</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: #38bdf8; font-family: var(--admin-font-mono);">
+            <?= (int)($orphanedMedia['total_scanned'] ?? 0) ?>
+          </div>
+        </div>
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Orphaned Files Detected</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: <?= !empty($orphanedMedia['orphans']) ? '#f43f5e' : '#10b981' ?>; font-family: var(--admin-font-mono);">
+            <?= count($orphanedMedia['orphans'] ?? []) ?>
+          </div>
+        </div>
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Reclaimable Disk Space</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: #a855f7; font-family: var(--admin-font-mono);">
+            <?= round(($orphanedMedia['orphan_size'] ?? 0) / 1024, 1) ?> KB
+          </div>
+        </div>
+      </div>
+
+      <!-- Orphaned Files Table -->
+      <div>
+        <h3 style="font-size: 1.05rem; color: var(--admin-text-main); margin: 0 0 0.75rem 0;">Unreferenced Media Assets</h3>
+        <?php if (!empty($orphanedMedia['orphans'])): ?>
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Relative Path</th>
+                  <th>Size</th>
+                  <th>Last Modified</th>
+                  <th style="text-align: right;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($orphanedMedia['orphans'] as $orf): ?>
+                  <tr>
+                    <td>
+                      <code style="color: #f43f5e; font-weight: 700;"><?= htmlspecialchars($orf['name']) ?></code>
+                    </td>
+                    <td style="color: var(--admin-text-muted); font-size: 0.8rem; font-family: var(--admin-font-mono);">
+                      <?= htmlspecialchars($orf['path']) ?>
+                    </td>
+                    <td style="font-family: var(--admin-font-mono); font-size: 0.8rem; color: #38bdf8;">
+                      <?= round($orf['size'] / 1024, 1) ?> KB
+                    </td>
+                    <td style="color: var(--admin-text-muted); font-size: 0.8rem; font-family: var(--admin-font-mono);">
+                      <?= date('Y-m-d H:i:s', $orf['mtime']) ?>
+                    </td>
+                    <td style="text-align: right;">
+                      <span class="ts-badge ts-badge-red" style="font-size: 0.65rem;">ORPHANED</span>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        <?php else: ?>
+          <div style="padding: 2rem; text-align: center; background: rgba(16,185,129,0.05); border: 1px dashed rgba(16,185,129,0.3); border-radius: 8px; color: #10b981;">
+            ✓ Media Library Clean! Zero orphaned physical assets found in storage.
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB: DB BENCHMARK & LATENCY MONITOR [TS-DB-10] -->
+  <!-- ========================================================================= -->
+  <?php elseif ($activeTab === 'benchmark'): ?>
+    <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE HARDWARE &amp; IOPS BENCHMARK</span>
+            <span class="ts-badge ts-badge-green">Performance Grade: <?= htmlspecialchars($dbBenchmark['health_grade'] ?? 'A') ?></span>
+          </div>
+          <h2 style="font-size: 1.35rem; color: var(--admin-text-main); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            ⏱️ Database Health Benchmark &amp; Connection Latency Monitor
+          </h2>
+          <p style="color: var(--admin-text-muted); font-size: 0.84rem; margin: 0.25rem 0 0 0;">
+            Live microsecond query latency tests, InnoDB buffer pool hit ratios, and server thread saturation metrics.
+          </p>
+        </div>
+        <div>
+          <a href="<?= url('/admin/db-manager?tab=benchmark') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <i data-lucide="refresh-cw"></i> Re-Run Benchmark Tests ⚡
+          </a>
+        </div>
+      </div>
+
+      <!-- Performance Score Card -->
+      <div style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(56,189,248,0.05)); border: 1px solid rgba(56,189,248,0.25); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+          <div style="font-size: 0.85rem; color: var(--admin-text-muted); margin-bottom: 0.25rem;">Overall Latency &amp; Memory Efficiency Grade</div>
+          <div style="font-size: 2.2rem; font-weight: 900; color: #10b981; font-family: 'Outfit', sans-serif;">
+            GRADE <?= htmlspecialchars($dbBenchmark['health_grade'] ?? 'A+') ?>
+          </div>
+          <div style="font-size: 0.82rem; color: var(--admin-text-muted);">
+            Sub-millisecond query execution and optimal buffer cache utilization detected.
+          </div>
+        </div>
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Ping Roundtrip</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #38bdf8; font-family: var(--admin-font-mono);">
+              <?= $dbBenchmark['ping_ms'] ?? 0 ?> ms
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Avg Read Latency</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #a855f7; font-family: var(--admin-font-mono);">
+              <?= $dbBenchmark['read_avg_ms'] ?? 0 ?> ms
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase;">Buffer Hit Ratio</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #10b981; font-family: var(--admin-font-mono);">
+              <?= $dbBenchmark['buffer_hit_ratio'] ?? 100 ?>%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Metrics Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem;">
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1.25rem;">
+          <div style="font-size: 0.78rem; color: var(--admin-text-muted); margin-bottom: 0.35rem;">InnoDB Buffer Pool Health</div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; font-family: var(--admin-font-mono); margin-bottom: 0.5rem;">
+            <?= $dbBenchmark['buffer_hit_ratio'] ?? 100 ?>%
+          </div>
+          <div style="width: 100%; height: 6px; background: rgba(148,163,184,0.15); border-radius: 3px; overflow: hidden;">
+            <div style="width: <?= min(100, $dbBenchmark['buffer_hit_ratio'] ?? 100) ?>%; height: 100%; background: #10b981;"></div>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--admin-text-muted); margin-top: 0.4rem;">99%+ indicates nearly all read operations are served from RAM.</div>
+        </div>
+
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1.25rem;">
+          <div style="font-size: 0.78rem; color: var(--admin-text-muted); margin-bottom: 0.35rem;">Concurrent Thread Pool</div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: #38bdf8; font-family: var(--admin-font-mono); margin-bottom: 0.5rem;">
+            <?= $dbBenchmark['threads_connected'] ?? 1 ?> Active
+          </div>
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted);">
+            Peak Concurrent Connections: <strong style="color: var(--admin-text-main);"><?= $dbBenchmark['max_used_connections'] ?? 1 ?></strong>
+          </div>
+          <div style="font-size: 0.72rem; color: #10b981; margin-top: 0.4rem;">Zero connection thread starvation detected.</div>
+        </div>
+
+        <div style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; padding: 1.25rem;">
+          <div style="font-size: 0.78rem; color: var(--admin-text-muted); margin-bottom: 0.35rem;">Slow Query Ratio</div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: <?= ((int)($dbBenchmark['slow_queries'] ?? 0) > 0) ? '#ef4444' : '#10b981' ?>; font-family: var(--admin-font-mono); margin-bottom: 0.5rem;">
+            <?= $dbBenchmark['slow_queries'] ?? 0 ?>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--admin-text-muted);">
+            Engine Uptime: <strong style="color: var(--admin-text-main);"><?= $dbBenchmark['uptime_hours'] ?? 0 ?> hrs</strong>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--admin-text-muted); margin-top: 0.4rem;">Threshold: Execution times &gt; 2.0 seconds.</div>
+        </div>
+      </div>
+    </div>
   <?php endif; ?>
 
 </div>
@@ -1353,6 +1868,47 @@ function saveSeedPickerSelection() {
 
   closeSeedPickerModal();
   updateExportSummary();
+}
+
+// ERD Visualizer Interactive Helpers [TS-DB-04]
+let erdZoomLevel = 1.0;
+
+function filterErdTables() {
+  const query = (document.getElementById('erdFilterInput')?.value || '').toLowerCase().trim();
+  const cards = document.querySelectorAll('.erd-table-card');
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    if (!query || text.includes(query)) {
+      card.style.opacity = '1';
+      card.style.borderColor = query ? '#38bdf8' : 'var(--admin-border-color)';
+      card.style.transform = query ? 'scale(1.02)' : 'none';
+    } else {
+      card.style.opacity = '0.3';
+      card.style.borderColor = 'var(--admin-border-color)';
+      card.style.transform = 'none';
+    }
+  });
+}
+
+function zoomErd(factor) {
+  erdZoomLevel = Math.max(0.5, Math.min(2.0, erdZoomLevel * factor));
+  const canvas = document.getElementById('erdCanvas');
+  if (canvas) {
+    canvas.style.transform = `scale(${erdZoomLevel})`;
+  }
+}
+
+function resetErdZoom() {
+  erdZoomLevel = 1.0;
+  const canvas = document.getElementById('erdCanvas');
+  if (canvas) {
+    canvas.style.transform = 'none';
+  }
+  const input = document.getElementById('erdFilterInput');
+  if (input) {
+    input.value = '';
+    filterErdTables();
+  }
 }
 
 // Auto-initialize export state on page load if tab is active

@@ -155,8 +155,8 @@
         ?>
         <div class="ts-card" style="display: flex; flex-direction: column; overflow: hidden; padding: 0; border: 1px solid var(--ts-border-main); border-radius: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
           
-          <?php if (!empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/'): ?>
-            <!-- Card Thumbnail with Lightbox trigger -->
+          <?php if (($activeTab ?? '') === 'image' && !empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/'): ?>
+            <!-- Card Thumbnail with Lightbox trigger (Exclusive to Image Tab or verified image prompts) -->
             <div style="position: relative; height: 190px; overflow: hidden; background: var(--ts-bg-surface-elevated); cursor: pointer;" onclick="openPromptLightbox(<?= htmlspecialchars(json_encode([
               'title' => $p['title'],
               'image' => $imageUrl,
@@ -180,7 +180,7 @@
                 <?= htmlspecialchars($p['category_name'] ?? 'Prompt') ?>
               </span>
               <span style="font-size: 0.8rem; color: var(--ts-text-tertiary);">
-                <i data-lucide="copy" style="width: 12px; display: inline;"></i> <?= number_format((int)($p['copy_count'] ?? 0)) ?> copies
+                <i data-lucide="eye" style="width: 12px; display: inline;"></i> <?= number_format((int)($p['copy_count'] ?? 0)) ?> views
               </span>
             </div>
 
@@ -194,19 +194,19 @@
               <?= htmlspecialchars($p['summary']) ?>
             </p>
 
-            <!-- Quick Copy Box -->
+            <!-- Preview Snippet (No Direct Copy Button in Directory) -->
             <div style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.5rem 0.75rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
               <span style="font-family: var(--ts-font-mono); font-size: 0.76rem; color: var(--ts-text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
                 <?= htmlspecialchars(substr($promptText, 0, 75)) ?>...
               </span>
-              <button type="button" onclick="quickCopyPrompt(<?= (int)$p['id'] ?>, <?= htmlspecialchars(json_encode($promptText)) ?>)" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; flex-shrink: 0;" title="1-Click Copy Blueprint">
-                <i data-lucide="copy" style="width: 11px; height: 11px;"></i> Copy
-              </button>
+              <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem; padding: 0.15rem 0.45rem; flex-shrink: 0;">
+                <i data-lucide="lock" style="width: 10px; height: 10px; display: inline;"></i> Unlock
+              </span>
             </div>
 
             <div style="display: flex; gap: 0.5rem;">
               <a href="<?= url('/prompts/' . $p['slug']) ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="flex: 1; text-align: center;">
-                <?= $isImagePrompt ? 'View Parameters &amp; Variations 🎨' : 'Inject Variables &amp; Copy ⚡' ?>
+                <?= $isImagePrompt ? 'View Parameters &amp; Unlock 🎨' : 'View Blueprint &amp; Copy ⚡' ?>
               </a>
               <?php if (!empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/'): ?>
                 <button type="button" class="ts-btn ts-btn-outline ts-btn-sm" onclick="openPromptLightbox(<?= htmlspecialchars(json_encode([

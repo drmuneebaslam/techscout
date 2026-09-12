@@ -394,6 +394,31 @@ $userBadgeLabel = ($user['custom_badge_label'] ?? '') ?: ($user['verification_ba
               <span class="ts-slider"></span>
             </label>
           </div>
+
+          <!-- [TS-TZ-04] Localized Date & Time Format Preferences -->
+          <div class="ts-pref-item" style="flex-direction: column; align-items: flex-start; gap: 0.75rem;">
+            <div class="ts-pref-text">
+              <strong class="ts-pref-title">🌐 Date &amp; Time Display Preferences [TS-TZ-04]</strong>
+              <span class="ts-pref-sub">Customize how timestamps, publish dates, and logs are rendered across your sessions.</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%;">
+              <div>
+                <label class="ts-input-label">Clock Format</label>
+                <select id="pref_time_format" class="ts-form-input" onchange="saveTimeFormatPref('clock', this.value)">
+                  <option value="12">12-Hour (e.g. 02:30 PM)</option>
+                  <option value="24">24-Hour (e.g. 14:30)</option>
+                </select>
+              </div>
+              <div>
+                <label class="ts-input-label">Date Syntax Convention</label>
+                <select id="pref_date_syntax" class="ts-form-input" onchange="saveTimeFormatPref('syntax', this.value)">
+                  <option value="middle">Middle-Endian (MM/DD/YYYY - US Standard)</option>
+                  <option value="little">Little-Endian (DD/MM/YYYY - International)</option>
+                  <option value="iso">ISO-8601 (YYYY-MM-DD - Engineering)</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1297,7 +1322,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('nav-btn-' + tab);
     switchSettingsTab(tab, btn);
   }
+
+  // Load saved date/time preferences [TS-TZ-04]
+  const clockPref = localStorage.getItem('ts_clock_format') || '12';
+  const syntaxPref = localStorage.getItem('ts_date_syntax') || 'middle';
+  const clockEl = document.getElementById('pref_time_format');
+  const syntaxEl = document.getElementById('pref_date_syntax');
+  if (clockEl) clockEl.value = clockPref;
+  if (syntaxEl) syntaxEl.value = syntaxPref;
 });
+
+function saveTimeFormatPref(type, val) {
+  if (type === 'clock') {
+    localStorage.setItem('ts_clock_format', val);
+  } else if (type === 'syntax') {
+    localStorage.setItem('ts_date_syntax', val);
+    document.cookie = "ts_date_syntax=" + val + ";path=/;max-age=31536000;SameSite=Lax";
+  }
+  if (typeof window.localizeAllTimestamps === 'function') {
+    window.localizeAllTimestamps();
+  }
+  if (typeof showToast === 'function') {
+    showToast('Date & time preference updated! 🌐', 'success');
+  }
+}
 </script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
