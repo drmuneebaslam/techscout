@@ -164,59 +164,24 @@
     </form>
   </div>
 
-  <!-- System Audit Logs Stream -->
-  <div class="admin-table-wrap">
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0; font-weight: 700; display: flex; align-items: center; gap: 0.45rem;">
-          <i data-lucide="shield" style="color: #38bdf8; width: 16px; height: 16px;"></i> Live System Audit Records Stream
-        </h3>
-        <p style="color: #64748b; font-size: 0.8rem; margin: 0.2rem 0 0 0;">Recent administrative operations, logins, approvals, and system state modifications.</p>
+  <!-- Dedicated Audit Station Quick Launcher (Replaces legacy embedded table) -->
+  <div class="admin-table-wrap" style="padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-color: rgba(56,189,248,0.25);">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="shield-check" style="color: #38bdf8; width: 24px; height: 24px;"></i>
       </div>
-      <a href="<?= url('/admin/audit-logs') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.78rem;">
-        Launch Full Audit Station ↗
-      </a>
+      <div>
+        <h3 style="font-size: 1.1rem; color: #f8fafc; margin: 0; font-weight: 700;">
+          Full System Audit Logs &amp; Forensics Station
+        </h3>
+        <p style="color: #94a3b8; font-size: 0.85rem; margin: 0.2rem 0 0 0;">
+          All administrative actions, security modifications, and authentication telemetry are archived in the centralized Audit Station.
+        </p>
+      </div>
     </div>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Timestamp (PKT)</th>
-          <th>User / Actor</th>
-          <th>Action</th>
-          <th>Target Entity</th>
-          <th>IP &amp; Country</th>
-          <th>Device &amp; Browser</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (!empty($auditLogs)): ?>
-          <?php foreach ($auditLogs as $log): ?>
-            <tr>
-              <td style="color: #64748b; font-size: 0.78rem; font-family: var(--admin-font-mono); white-space: nowrap;">
-                <div style="font-weight: 600; color: #f8fafc;"><?= date('H:i:s', strtotime($log['created_at'])) ?></div>
-                <div style="font-size: 0.7rem; color: #64748b;"><?= date('M j, Y', strtotime($log['created_at'])) ?></div>
-              </td>
-              <td style="color: #f8fafc; font-weight: 600; font-size: 0.88rem;">
-                <a href="<?= url('/admin/audit-logs?user_id=' . ($log['user_id'] ?? '')) ?>" style="color: #38bdf8; text-decoration: none;">
-                  <?= htmlspecialchars($log['display_name'] ?? $log['username'] ?? 'System') ?>
-                </a>
-              </td>
-              <td><span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; font-family: var(--admin-font-mono);"><?= htmlspecialchars($log['action']) ?></span></td>
-              <td style="color: #cbd5e1; font-size: 0.82rem;"><?= htmlspecialchars(str_replace('_', ' ', $log['entity_type'] ?? '-')) ?> <?= !empty($log['entity_id']) ? '#' . (int)$log['entity_id'] : '' ?></td>
-              <td>
-                <div style="font-family: var(--admin-font-mono); font-size: 0.78rem; color: #38bdf8;"><?= htmlspecialchars($log['ip_address']) ?></div>
-                <div style="font-size: 0.72rem; color: #10b981; font-weight: 600;"><?= htmlspecialchars($log['country'] ?? 'Pakistan 🇵🇰') ?></div>
-              </td>
-              <td style="font-size: 0.78rem; color: #94a3b8; max-width: 200px;">
-                <?= htmlspecialchars($log['device_info'] ?? 'Desktop Client') ?>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <tr><td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">No recent audit records found.</td></tr>
-        <?php endif; ?>
-      </tbody>
-    </table>
+    <a href="<?= url('/admin/audit-logs') ?>" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.4rem;">
+      <i data-lucide="external-link" style="width: 15px; height: 15px;"></i> Launch Dedicated Audit Station ↗
+    </a>
   </div>
 </div>
 

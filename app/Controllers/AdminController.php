@@ -2783,7 +2783,6 @@ class AdminController {
     // 13. SYSTEM, SETTINGS & BACKUPS
     // ------------------------------------------------------------------------
     public function system(Request $request): void {
-        $auditLogs = AuditLog::recent(30);
         $settingsRows = Database::query("SELECT key_name, key_value FROM site_settings");
         $settings = [];
         foreach ($settingsRows as $row) {
@@ -2792,7 +2791,6 @@ class AdminController {
 
         Response::view('admin/system', [
             'title' => 'System Settings, Social Media & Disaster Recovery | Admin Hub',
-            'auditLogs' => $auditLogs,
             'settings' => $settings
         ]);
     }
@@ -4372,7 +4370,8 @@ class AdminController {
         };
 
         $contentTimeFilter = $timeIntervalSql ? "WHERE created_at >= {$timeIntervalSql}" : "";
-        $contentTimeFilterAnd = $timeIntervalSql ? "AND c.created_at >= {$timeIntervalSql}" : "";
+        $contentTimeFilterAnd = $timeIntervalSql ? "AND created_at >= {$timeIntervalSql}" : "";
+        $contentTimeFilterAndAliased = $timeIntervalSql ? "AND c.created_at >= {$timeIntervalSql}" : "";
         $usersTimeFilter = $timeIntervalSql ? "WHERE created_at >= {$timeIntervalSql}" : "";
         $usersTimeFilterAnd = $timeIntervalSql ? "AND created_at >= {$timeIntervalSql}" : "";
 
@@ -4502,7 +4501,7 @@ class AdminController {
                                         LEFT JOIN articles art ON c.id = art.content_id
                                         LEFT JOIN authors a ON c.author_id = a.id
                                         LEFT JOIN categories cat ON c.category_id = cat.id
-                                        WHERE c.status = 'published' {$contentTimeFilterAnd}
+                                        WHERE c.status = 'published' {$contentTimeFilterAndAliased}
                                         ORDER BY c.view_count DESC
                                         LIMIT 10");
 

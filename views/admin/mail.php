@@ -1590,26 +1590,86 @@
       <form id="createCustomTriggerForm" onsubmit="submitCreateCustomTrigger(event)">
         <input type="hidden" id="ct_id" value="">
         <div style="margin-bottom: 1rem;">
-          <label class="admin-modal-label">Trigger Name <span style="color:#ef4444;">*</span></label>
-          <input type="text" id="ct_name" placeholder="e.g. Instant Payout Disbursement Notification" class="admin-modal-input" required>
+          <label class="admin-modal-label">Trigger Friendly Name <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="ct_name" placeholder="e.g. Creator Payout Approved & Disbursed" class="admin-modal-input" required oninput="this.removeAttribute('data-auto')">
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
           <div>
             <label class="admin-modal-label">Trigger Engine Type</label>
             <select id="ct_type" class="admin-modal-select" onchange="toggleCustomTriggerTypeNotice(this.value)">
+              <option value="event">⚡ Platform System Event Key (Zero Code)</option>
               <option value="url_pattern">🌐 Specific URL Path Pattern (No Code)</option>
-              <option value="event">⚡ Custom System Event Key (Zero Code)</option>
             </select>
           </div>
           <div>
             <label class="admin-modal-label">Pattern or Event Key <span style="color:#ef4444;">*</span></label>
-            <input type="text" id="ct_key_or_pattern" placeholder="e.g. /admin/revenue/process-payout" class="admin-modal-input" style="font-family: monospace;" required>
+            <input type="text" id="ct_key_or_pattern" list="ct_event_keys_datalist" placeholder="e.g. payout_approved" class="admin-modal-input" style="font-family: monospace;" required>
+            <datalist id="ct_event_keys_datalist">
+              <?php if (!empty($eventTriggers)): ?>
+                <?php foreach ($eventTriggers as $eKey => $eVal): ?>
+                  <option value="<?= htmlspecialchars($eKey) ?>"><?= htmlspecialchars($eVal['name']) ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </datalist>
           </div>
         </div>
 
+        <!-- Quick Event Presets Dropdown (When type is 'event') -->
+        <div id="ct_event_preset_wrap" style="margin-bottom: 1rem;">
+          <label class="admin-modal-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>⚡ Select from Platform PHP Event Keys (<?= count($eventTriggers ?? []) ?> Built-in)</span>
+            <span style="font-size: 0.72rem; color: #a855f7; font-weight: normal;">1-Click Auto-configures trigger</span>
+          </label>
+          <select id="ct_event_key_preset" class="admin-modal-select" onchange="onSelectPresetEventKey(this.value)" style="border-color: rgba(168,85,247,0.4); color: #c084fc; font-weight: 700;">
+            <option value="">-- Choose Platform Event Trigger --</option>
+            <optgroup label="🔐 Authentication &amp; Account Security">
+              <?php foreach (['user_registered', 'email_verification_requested', 'account_activated', 'account_email_verify', 'magic_login_link', 'login_security_alert', 'new_device_login_alert', 'password_reset_requested', 'security_password_changed', 'security_email_changed', 'data_export_ready'] as $k): ?>
+                <?php if (isset($eventTriggers[$k])): ?>
+                  <option value="<?= $k ?>">⚡ <?= htmlspecialchars($eventTriggers[$k]['name']) ?> (<?= $k ?>)</option>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </optgroup>
+            <optgroup label="💰 Creator Payouts &amp; Treasury">
+              <?php foreach (['payout_requested', 'payout_approved', 'payout_rejected', 'payout_failed_alert', 'payout_method_linked', 'payout_method_removed', 'tip_received', 'tip_sent_confirmation'] as $k): ?>
+                <?php if (isset($eventTriggers[$k])): ?>
+                  <option value="<?= $k ?>">⚡ <?= htmlspecialchars($eventTriggers[$k]['name']) ?> (<?= $k ?>)</option>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </optgroup>
+            <optgroup label="📝 Editorial, Publications &amp; Reviews">
+              <?php foreach (['article_submitted', 'editorial_review_started', 'editorial_revisions_requested', 'article_approved', 'article_archived_notice', 'article_trending_alert'] as $k): ?>
+                <?php if (isset($eventTriggers[$k])): ?>
+                  <option value="<?= $k ?>">⚡ <?= htmlspecialchars($eventTriggers[$k]['name']) ?> (<?= $k ?>)</option>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </optgroup>
+            <optgroup label="🤝 Community, Creators &amp; Growth">
+              <?php foreach (['author_approved', 'author_profile_updated', 'creator_tier_promoted', 'campaign_submission_received', 'comment_mention_alert', 'new_follower_alert', 'ticket_reply_received', 'weekly_digest_roundup'] as $k): ?>
+                <?php if (isset($eventTriggers[$k])): ?>
+                  <option value="<?= $k ?>">⚡ <?= htmlspecialchars($eventTriggers[$k]['name']) ?> (<?= $k ?>)</option>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </optgroup>
+            <option value="__custom__">✏️ Custom / Other Event Key (Enter Manually)</option>
+          </select>
+        </div>
+
+        <!-- Quick URL Pattern Presets (When type is 'url_pattern') -->
+        <div id="ct_url_preset_wrap" style="display: none; margin-bottom: 1rem;">
+          <label class="admin-modal-label">🌐 Recommended Route Patterns</label>
+          <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+            <button type="button" onclick="document.getElementById('ct_key_or_pattern').value='/admin/revenue/process-payout'; document.getElementById('ct_name').value='Payout Disbursement Notice';" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #38bdf8;">/admin/revenue/process-payout</button>
+            <button type="button" onclick="document.getElementById('ct_key_or_pattern').value='/author/apply'; document.getElementById('ct_name').value='Author Application Receipt';" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #38bdf8;">/author/apply</button>
+            <button type="button" onclick="document.getElementById('ct_key_or_pattern').value='/auth/register'; document.getElementById('ct_name').value='New Registration Welcome';" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #38bdf8;">/auth/register</button>
+            <button type="button" onclick="document.getElementById('ct_key_or_pattern').value='/contact'; document.getElementById('ct_name').value='Contact Inquiry Received';" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #38bdf8;">/contact</button>
+          </div>
+        </div>
+
+        <div id="ct_event_desc_box" style="display: none; font-size: 0.76rem; color: #c084fc; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 1.15rem; line-height: 1.5;"></div>
+
         <div id="ct_type_notice" style="font-size: 0.78rem; color: #38bdf8; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 1.15rem; line-height: 1.5;">
-          Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>process-payout</code>) and automatically dispatches the assigned HTML template with session user context!
+          ⚡ <strong>Platform Event Trigger:</strong> Choose any system event key fired from PHP or type a custom event name. Automatically delivers the assigned HTML template when triggered!
         </div>
 
         <div style="margin-bottom: 1rem;">
@@ -3095,7 +3155,47 @@ function submitTestEventTrigger(e) {
   });
 }
 
-// Custom Dynamic Trigger Functions
+// Custom Dynamic Trigger Functions & Platform Event Catalog
+const platformSystemEvents = <?= json_encode($eventTriggers ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+
+function onSelectPresetEventKey(val) {
+  if (!val || val === '__custom__') {
+    const keyInput = document.getElementById('ct_key_or_pattern');
+    if (keyInput && val === '__custom__') {
+      keyInput.value = '';
+      keyInput.focus();
+    }
+    const descBox = document.getElementById('ct_event_desc_box');
+    if (descBox) descBox.style.display = 'none';
+    return;
+  }
+
+  const ev = platformSystemEvents[val];
+  if (!ev) return;
+
+  const keyInput = document.getElementById('ct_key_or_pattern');
+  const nameInput = document.getElementById('ct_name');
+  const tmplSelect = document.getElementById('ct_template_key');
+  const singleCheckbox = document.getElementById('ct_single_delivery');
+  const descBox = document.getElementById('ct_event_desc_box');
+
+  if (keyInput) keyInput.value = val;
+  if (nameInput && (!nameInput.value || nameInput.getAttribute('data-auto') === '1')) {
+    nameInput.value = ev.name || val;
+    nameInput.setAttribute('data-auto', '1');
+  }
+  if (tmplSelect && (ev.mapped_template || ev.default_template)) {
+    tmplSelect.value = ev.mapped_template || ev.default_template;
+  }
+  if (singleCheckbox) {
+    singleCheckbox.checked = !!ev.single_delivery;
+  }
+  if (descBox) {
+    descBox.style.display = 'block';
+    descBox.innerHTML = `<strong>⚡ ${ev.name}:</strong> ${ev.description || ''} <span style="display:inline-block;margin-left:6px;opacity:0.8;">(Default template: <code>${ev.default_template}</code>)</span>`;
+  }
+}
+
 function openCreateCustomTriggerModal() {
   const modal = document.getElementById('createCustomTriggerModal');
   if (modal) {
@@ -3109,7 +3209,13 @@ function openCreateCustomTriggerModal() {
     if (testResult) testResult.style.display = 'none';
     const title = document.querySelector('#createCustomTriggerModal .admin-modal-title');
     if (title) title.innerText = '⚡ Visual Automation Trigger Studio';
-    toggleCustomTriggerTypeNotice(document.getElementById('ct_type')?.value || 'url_pattern');
+    const typeSelect = document.getElementById('ct_type');
+    if (typeSelect) typeSelect.value = 'event';
+    const presetSelect = document.getElementById('ct_event_key_preset');
+    if (presetSelect) presetSelect.value = '';
+    const descBox = document.getElementById('ct_event_desc_box');
+    if (descBox) descBox.style.display = 'none';
+    toggleCustomTriggerTypeNotice('event');
     switchCustomTriggerModalTab('config');
     modal.style.display = 'flex';
   }
@@ -3130,20 +3236,38 @@ function openEditCustomTriggerModal(ct) {
   const submitBtn = document.getElementById('ct_submit_btn');
   const title = document.querySelector('#createCustomTriggerModal .admin-modal-title');
   const testResult = document.getElementById('ct_modal_test_result');
+  const presetSelect = document.getElementById('ct_event_key_preset');
+  const descBox = document.getElementById('ct_event_desc_box');
 
   if (idField) idField.value = ct.id || '';
-  if (nameInput) nameInput.value = ct.name || '';
-  if (typeSelect) {
-    typeSelect.value = ct.type || 'url_pattern';
-    toggleCustomTriggerTypeNotice(typeSelect.value);
+  if (nameInput) {
+    nameInput.value = ct.name || '';
+    nameInput.removeAttribute('data-auto');
   }
+  const trigType = ct.type || 'event';
+  if (typeSelect) {
+    typeSelect.value = trigType;
+  }
+  toggleCustomTriggerTypeNotice(trigType);
+
   if (keyInput) keyInput.value = ct.key_or_pattern || '';
+  if (presetSelect) {
+    presetSelect.value = platformSystemEvents[ct.key_or_pattern] ? ct.key_or_pattern : '__custom__';
+  }
   if (tmplSelect) tmplSelect.value = ct.template_key || '';
   if (subjInput) subjInput.value = ct.subject_override || '';
   if (singleCheckbox) singleCheckbox.checked = !!parseInt(ct.single_delivery || '0');
   if (submitBtn) submitBtn.innerText = 'Update Automation Trigger 💾';
   if (title) title.innerText = '✏️ Edit Automation Trigger';
   if (testResult) testResult.style.display = 'none';
+
+  if (descBox && platformSystemEvents[ct.key_or_pattern]) {
+    const ev = platformSystemEvents[ct.key_or_pattern];
+    descBox.style.display = 'block';
+    descBox.innerHTML = `<strong>⚡ ${ev.name}:</strong> ${ev.description || ''}`;
+  } else if (descBox) {
+    descBox.style.display = 'none';
+  }
 
   switchCustomTriggerModalTab('config');
   modal.style.display = 'flex';
@@ -3196,6 +3320,7 @@ function prefillTriggerSample(patternOrKey, name, type, templateKey, subject, si
   const tmplSelect = document.getElementById('ct_template_key');
   const subjInput = document.getElementById('ct_subject_override');
   const singleCheckbox = document.getElementById('ct_single_delivery');
+  const presetSelect = document.getElementById('ct_event_key_preset');
 
   if (nameInput) nameInput.value = name;
   if (typeSelect) {
@@ -3203,6 +3328,9 @@ function prefillTriggerSample(patternOrKey, name, type, templateKey, subject, si
     toggleCustomTriggerTypeNotice(type);
   }
   if (keyInput) keyInput.value = patternOrKey;
+  if (presetSelect && type === 'event') {
+    presetSelect.value = platformSystemEvents[patternOrKey] ? patternOrKey : '__custom__';
+  }
   if (tmplSelect) tmplSelect.value = templateKey;
   if (subjInput) subjInput.value = subject || '';
   if (singleCheckbox) singleCheckbox.checked = !!singleDelivery;
@@ -3213,14 +3341,25 @@ function prefillTriggerSample(patternOrKey, name, type, templateKey, subject, si
 function toggleCustomTriggerTypeNotice(type) {
   const notice = document.getElementById('ct_type_notice');
   const input = document.getElementById('ct_key_or_pattern');
-  if (notice && input) {
-    if (type === 'url_pattern') {
-      notice.innerHTML = 'Matches requested route path (e.g. <code>/admin/revenue/process-payout</code> or <code>/author/apply</code>) and automatically dispatches assigned HTML template on request!';
-      input.placeholder = 'e.g. /admin/revenue/process-payout';
-    } else {
-      notice.innerHTML = 'Custom automation event key (e.g. <code>payout_approved</code>, <code>vip_upgrade</code>). Can be fired via 1-click test simulation or automated triggers without touching PHP code!';
-      input.placeholder = 'e.g. payout_approved';
+  const eventPresetWrap = document.getElementById('ct_event_preset_wrap');
+  const urlPresetWrap = document.getElementById('ct_url_preset_wrap');
+  const descBox = document.getElementById('ct_event_desc_box');
+
+  if (type === 'url_pattern') {
+    if (eventPresetWrap) eventPresetWrap.style.display = 'none';
+    if (urlPresetWrap) urlPresetWrap.style.display = 'block';
+    if (descBox) descBox.style.display = 'none';
+    if (notice) {
+      notice.innerHTML = '🌐 <strong>Route Path Interceptor:</strong> Matches requested HTTP route path (e.g. <code>/admin/revenue/process-payout</code> or <code>/author/apply</code>) and automatically dispatches the assigned HTML template with session recipient context.';
     }
+    if (input) input.placeholder = 'e.g. /admin/revenue/process-payout';
+  } else {
+    if (eventPresetWrap) eventPresetWrap.style.display = 'block';
+    if (urlPresetWrap) urlPresetWrap.style.display = 'none';
+    if (notice) {
+      notice.innerHTML = '⚡ <strong>Platform Event Trigger:</strong> Choose any system event key fired from PHP or type a custom event name. Automatically delivers the assigned HTML template when triggered!';
+    }
+    if (input) input.placeholder = 'e.g. payout_approved or select above';
   }
 }
 

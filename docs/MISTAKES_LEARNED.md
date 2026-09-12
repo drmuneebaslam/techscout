@@ -117,6 +117,17 @@ This document serves as the permanent registry of architectural and implementati
   - Never hardcode inline `style="..."` colors on UI tags.
   - ONLY the email canvas preview card (representing the email viewport) and the actual dispatched email HTML are styled with a clean white email body.
 
+### 🔴 MISTAKE-11: Unaliased Table Columns in Dynamic WHERE Clauses
+* **Root Cause:** 
+  - Applying SQL WHERE filter conditions with hardcoded table alias prefixes (e.g. `AND c.created_at >= ...`) to queries where the FROM table was NOT assigned that alias (e.g., `SELECT COUNT(*) as c FROM contents WHERE content_type = 'ai_tool' AND c.created_at >= ...`).
+* **Consequences:**
+  - MySQL / MariaDB throws `SQLSTATE[42S22]: Column not found: 1054 Unknown column 'c.created_at' in 'WHERE'`, crashing admin analytics, telemetry HUDs, or background query dispatchers.
+* **Mandatory Rule:**
+  - When constructing dynamic SQL conditions, ensure the table alias used in the WHERE condition exactly matches the table alias defined in the FROM clause of each individual query.
+  - For unaliased single-table queries, use unqualified column names (e.g. `created_at`) or qualify with the full table name (`contents.created_at`).
+  - For joined multi-table queries where column name collision is possible (such as multiple tables having `created_at`), define an explicit aliased condition (e.g. `c.created_at`) and ensure the FROM table explicitly declares that alias (`FROM contents c`).
+  - Never share a single aliased filter string across both aliased and unaliased queries.
+
 ---
 
 ## 2. Response Audit Protocol
@@ -131,6 +142,7 @@ At the conclusion of any code generation, the agent must cross-check every modif
 8. [ ] **Branded Dynamic Error Pages**: Are error pages written as dynamic PHP scripts incorporating official header/footer layouts?
 9. [ ] **Dual-Mode Editor Insertion & Cohesive Theme**: Do editor tag/block insertion tools support both WYSIWYG caret and raw HTML textarea modes with light theme consistency?
 10. [ ] **Dual-Theme (Dark/Light) UI Preservation & No Hardcoded Inline Tag Styles**: Are web components styled via CSS with both dark and light modes supported, reserving white backgrounds strictly for the email preview canvas and email body?
+11. [ ] **Accurate Table Aliases in Dynamic SQL**: Are WHERE filter clauses strictly verified against the FROM clause of each query to ensure alias consistency and prevent 1054 Unknown Column errors?
 
 
 
