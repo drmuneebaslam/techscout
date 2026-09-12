@@ -28,32 +28,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const baseUrl = getTsApiBase();
 
   // 1. Theme Toggler (Global window function with universal icon & tab synchronization)
-  function syncAllThemeButtons(theme) {
+  let isToggling = false;
+  window.syncAllThemeButtons = function(theme) {
     document.querySelectorAll('#theme-toggle, #adminThemeToggleBtn, .ts-theme-toggle').forEach(btn => {
-      const icon = btn.querySelector('i, svg');
-      if (icon) {
-        icon.setAttribute('data-lucide', theme === 'light' ? 'sun' : 'moon');
-      }
+      btn.innerHTML = '<i data-lucide="' + (theme === 'light' ? 'sun' : 'moon') + '" style="width: 15px; height: 15px;"></i>';
     });
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
+    if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+      lucide.createIcons();
+    }
+  };
 
   window.toggleTheme = function() {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    if (isToggling) return;
+    isToggling = true;
+    setTimeout(() => { isToggling = false; }, 250);
+
+    const html = document.documentElement;
+    const body = document.body;
+    const current = (html.getAttribute('data-theme') === 'light' || html.classList.contains('theme-light')) ? 'light' : 'dark';
     const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
+
+    html.setAttribute('data-theme', next);
     if (next === 'light') {
-      document.documentElement.classList.add('theme-light');
+      html.classList.add('theme-light');
     } else {
-      document.documentElement.classList.remove('theme-light');
+      html.classList.remove('theme-light');
     }
 
-    if (document.body) {
-      document.body.setAttribute('data-theme', next);
+    if (body) {
+      body.setAttribute('data-theme', next);
       if (next === 'light') {
-        document.body.classList.add('theme-light');
+        body.classList.add('theme-light');
       } else {
-        document.body.classList.remove('theme-light');
+        body.classList.remove('theme-light');
       }
     }
 
@@ -62,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.cookie = "ts_theme=" + next + "; path=/; max-age=31536000; SameSite=Lax";
     } catch(e) {}
 
-    syncAllThemeButtons(next);
+    window.syncAllThemeButtons(next);
     window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: next } }));
   };
 
@@ -85,10 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('theme-light');
     }
   }
-  syncAllThemeButtons(currentTheme);
+  window.syncAllThemeButtons(currentTheme);
 
   const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
+  if (themeToggle && !themeToggle.getAttribute('onclick')) {
     themeToggle.addEventListener('click', window.toggleTheme);
   }
 

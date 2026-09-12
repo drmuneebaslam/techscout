@@ -210,34 +210,43 @@
     });
 
     // Theme Switcher Sync for Admin Hub
-    window.toggleTheme = function() {
-      const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('ts_theme') || 'dark';
-      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', nextTheme);
-      if (document.body) {
-        document.body.setAttribute('data-theme', nextTheme);
-        if (nextTheme === 'light') {
-          document.body.classList.add('theme-light');
-          document.documentElement.classList.add('theme-light');
-        } else {
-          document.body.classList.remove('theme-light');
-          document.documentElement.classList.remove('theme-light');
-        }
-      }
-      try { 
-        localStorage.setItem('ts_theme', nextTheme); 
-        document.cookie = "ts_theme=" + nextTheme + "; path=/; max-age=31536000; SameSite=Lax";
-      } catch(e) {}
-      syncAdminThemeIcon();
-    };
+    if (!window.toggleTheme || window.toggleTheme.toString().indexOf('isToggling') === -1) {
+      let isToggling = false;
+      window.toggleTheme = function() {
+        if (isToggling) return;
+        isToggling = true;
+        setTimeout(() => { isToggling = false; }, 250);
 
-    function syncAdminThemeIcon() {
-      const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('ts_theme') || 'dark';
-      const icon = document.getElementById('adminThemeIcon');
-      if (icon) {
-        icon.setAttribute('data-lucide', currentTheme === 'light' ? 'sun' : 'moon');
-        if (window.lucide) lucide.createIcons();
-      }
+        const html = document.documentElement;
+        const body = document.body;
+        const currentTheme = (html.getAttribute('data-theme') === 'light' || html.classList.contains('theme-light')) ? 'light' : 'dark';
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+        html.setAttribute('data-theme', nextTheme);
+        if (nextTheme === 'light') {
+          html.classList.add('theme-light');
+        } else {
+          html.classList.remove('theme-light');
+        }
+
+        if (body) {
+          body.setAttribute('data-theme', nextTheme);
+          if (nextTheme === 'light') {
+            body.classList.add('theme-light');
+          } else {
+            body.classList.remove('theme-light');
+          }
+        }
+
+        try { 
+          localStorage.setItem('ts_theme', nextTheme); 
+          document.cookie = "ts_theme=" + nextTheme + "; path=/; max-age=31536000; SameSite=Lax";
+        } catch(e) {}
+
+        if (typeof window.syncAllThemeButtons === 'function') {
+          window.syncAllThemeButtons(nextTheme);
+        }
+      };
     }
 
     // Initialize Sidebar Width & Scroll Position Retention
@@ -450,7 +459,6 @@
       };
     })();
   </script>
-  <script src="<?= url('/assets/js/main.js') ?>"></script>
   <script src="<?= url('/assets/js/admin_table_paginator.js') ?>"></script>
 </body>
 </html>

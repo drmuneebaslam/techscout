@@ -216,6 +216,21 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-19: Duplicate Click Event Triggers & Immediate Inversion on Theme Toggling
+* **Root Cause:**
+  - Having both an inline `onclick="toggleTheme()"` in HTML and a programmatic `addEventListener('click', window.toggleTheme)` in JavaScript on the same button element.
+  - When the user clicks the button once, the browser dispatches the inline handler (dark -> light) followed immediately by the event listener (light -> dark) in the exact same event cycle (within 0.1ms).
+  - Also omitting an early theme restoration script in the admin header `<head>`, causing admin pages to desynchronize with `localStorage`.
+* **Consequences:**
+  - The theme button appears completely unresponsive or broken ("toggle theme button is not working") because the theme is toggled twice in rapid succession, reverting instantly to the original state.
+* **Mandatory Rule:**
+  - In `window.toggleTheme()`, implement a strict debounce/re-entrancy guard (`isToggling` timeout window of 250ms) to ignore any duplicate triggers during the same click event.
+  - In `assets/js/main.js`, do not attach programmatic click listeners to buttons that already declare an inline `onclick` attribute.
+  - Synchronize theme button icons using `btn.innerHTML = '<i data-lucide="..."></i>'` followed by `lucide.createIcons()` so that Lucide re-renders a fresh SVG rather than failing on pre-existing `<svg>` nodes.
+  - Include the early theme initialization script in both `views/layouts/header.php` and `views/layouts/admin_header.php`.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -236,6 +251,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 16. [ ] **Single-Consumption Session Flash Extraction**: Is `Session::getFlash()` called exactly once per key and assigned to a local variable to prevent early wipeout before rendering?
 17. [ ] **Semantic Dual-Theme Modals & CSS Variables**: Are modal dialogs and inspectors styled using semantic classes and CSS variables without hardcoded tag colors or unwanted generic class overrides?
 18. [ ] **Comprehensive Role Auth & Dual-Mode Form Controls**: Is `Auth::requireRole` implemented and are base form controls explicitly themed with dark `:root` and light tokens to prevent user-agent white background leaks?
+19. [ ] **Debounced Theme Toggling & Single Event Listener Enforcement**: Does `window.toggleTheme()` contain a debounce re-entrancy guard, avoiding double-invocation from combined inline and programmatic event listeners?
+
 
 
 

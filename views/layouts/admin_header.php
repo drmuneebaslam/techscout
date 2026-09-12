@@ -39,7 +39,65 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
           }
         }
       } catch (e) {}
+      var urlParams = new URLSearchParams(window.location.search);
+      var cookieMatch = document.cookie.match(/(^|;)\s*ts_theme=([^;]+)/);
+      var cookieTheme = cookieMatch ? cookieMatch[2].trim() : null;
+      var storedTheme = null;
+      try { storedTheme = localStorage.getItem('ts_theme'); } catch(e) {}
+      var t = urlParams.get('theme') || storedTheme || cookieTheme || '<?= $activeAdminTheme ?>';
+      if (t !== 'light' && t !== 'dark') t = 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      if (t === 'light') {
+        document.documentElement.classList.add('theme-light');
+      } else {
+        document.documentElement.classList.remove('theme-light');
+      }
       window.TS_BASE_URL = '<?= rtrim(\App\Core\Config::url('/'), '/') ?>';
+
+      var isToggling = false;
+      window.syncAllThemeButtons = function(theme) {
+        document.querySelectorAll('#theme-toggle, #adminThemeToggleBtn, .ts-theme-toggle').forEach(function(btn) {
+          btn.innerHTML = '<i data-lucide="' + (theme === 'light' ? 'sun' : 'moon') + '" style="width: 15px; height: 15px;"></i>';
+        });
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+          lucide.createIcons();
+        }
+      };
+
+      window.toggleTheme = function() {
+        if (isToggling) return;
+        isToggling = true;
+        setTimeout(function() { isToggling = false; }, 250);
+
+        var html = document.documentElement;
+        var body = document.body;
+        var current = (html.getAttribute('data-theme') === 'light' || html.classList.contains('theme-light')) ? 'light' : 'dark';
+        var next = current === 'dark' ? 'light' : 'dark';
+
+        html.setAttribute('data-theme', next);
+        if (next === 'light') {
+          html.classList.add('theme-light');
+        } else {
+          html.classList.remove('theme-light');
+        }
+
+        if (body) {
+          body.setAttribute('data-theme', next);
+          if (next === 'light') {
+            body.classList.add('theme-light');
+          } else {
+            body.classList.remove('theme-light');
+          }
+        }
+
+        try {
+          localStorage.setItem('ts_theme', next);
+          document.cookie = "ts_theme=" + next + "; path=/; max-age=31536000; SameSite=Lax";
+        } catch(e) {}
+
+        window.syncAllThemeButtons(next);
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: next } }));
+      };
     })();
   </script>
   <script src="<?= url('/assets/js/telemetry-error-logger.js') ?>"></script>
