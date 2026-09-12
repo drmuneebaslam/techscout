@@ -40,6 +40,7 @@ use App\Controllers\ApiController;
 use App\Controllers\SupportController;
 use App\Controllers\InboxController;
 use App\Controllers\PageController;
+use App\Controllers\InstallController;
 
 // Start secure session
 Session::start();
@@ -111,8 +112,28 @@ try {
 }
 Config::set('app_url', $baseUrl);
 
+// First-Run Web Installer Auto-Detector & Router
+$lockPath = __DIR__ . '/storage/installed.lock';
+$reqUri = $_SERVER['REQUEST_URI'] ?? '/';
+$isStaticAsset = str_starts_with($reqUri, '/assets/') 
+    || str_contains($reqUri, 'favicon.ico')
+    || str_contains($reqUri, 'robots.txt');
+$isInstallRoute = str_contains($reqUri, '/install');
+
+if (!file_exists($lockPath) && !$isStaticAsset && !$isInstallRoute) {
+    header('Location: ' . $baseUrl . '/install');
+    exit;
+}
+
 $router = new Router();
 $request = new Request();
+
+// ----------------------------------------------------------------------------
+// 0. WEB INSTALLER & SETUP WIZARD ROUTES
+// ----------------------------------------------------------------------------
+$router->get('/install', [InstallController::class, 'index']);
+$router->post('/install/test-db', [InstallController::class, 'testDb']);
+$router->post('/install/process', [InstallController::class, 'process']);
 
 // ----------------------------------------------------------------------------
 // 1. PUBLIC DISCOVERY & STATIC ROUTES
@@ -120,6 +141,10 @@ $request = new Request();
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/contact', [HomeController::class, 'contact']);
 $router->post('/contact', [HomeController::class, 'submitContact']);
+$router->get('/sponsor', [HomeController::class, 'sponsor']);
+$router->get('/advertise', [HomeController::class, 'sponsor']);
+$router->post('/sponsor/submit-tool', [HomeController::class, 'submitSponsoredTool']);
+$router->post('/sponsor/submit-post', [HomeController::class, 'submitSponsoredPost']);
 
 // ----------------------------------------------------------------------------
 // 2. BLOG & EDITORIAL ROUTES
@@ -349,6 +374,8 @@ $router->get('/admin/advertisements', [AdminController::class, 'advertisements']
 $router->post('/admin/advertisements/save', [AdminController::class, 'saveAdvertisement'], ['admin']);
 $router->post('/admin/advertisements/delete/{id}', [AdminController::class, 'deleteAdvertisement'], ['admin']);
 $router->post('/admin/advertisements/toggle/{id}', [AdminController::class, 'toggleAdStatus'], ['admin']);
+$router->post('/admin/sponsored/approve/{id}', [AdminController::class, 'approveSponsoredSubmission'], ['admin']);
+$router->post('/admin/sponsored/reject/{id}', [AdminController::class, 'rejectSponsoredSubmission'], ['admin']);
 
 // Ad Banner Manager & Sponsored Placements
 $router->get('/admin/ad-manager', [AdminController::class, 'adManager'], ['admin']);
@@ -473,6 +500,8 @@ $router->post('/admin/db-manager/check-table/{name}', [AdminController::class, '
 $router->post('/admin/db-manager/repair-table/{name}', [AdminController::class, 'repairTable'], ['admin']);
 $router->post('/admin/db-manager/auto-repair-schema', [AdminController::class, 'autoRepairSchema'], ['admin']);
 $router->post('/admin/db-manager/query', [AdminController::class, 'executeDbQuery'], ['admin']);
+$router->get('/admin/db-manager/table-rows', [AdminController::class, 'getTableRowsJson'], ['admin']);
+$router->post('/admin/db-manager/custom-export', [AdminController::class, 'downloadCustomExport'], ['admin']);
 
 // System Error Logs, Crash Forensics & Real-time Diagnostics
 $router->get('/admin/system-logs', [AdminController::class, 'systemLogs'], ['admin']);
@@ -484,6 +513,7 @@ $router->post('/admin/system-logs/clear', [AdminController::class, 'clearSystemL
 // CMS Master Settings & Analytics Telemetry HUD
 $router->get('/admin/settings', [AdminController::class, 'settings'], ['admin']);
 $router->post('/admin/settings/save', [AdminController::class, 'saveUnifiedSettings'], ['admin']);
+$router->post('/admin/settings/launch-installer', [AdminController::class, 'launchInstaller'], ['admin']);
 $router->get('/admin/analytics', [AdminController::class, 'analytics'], ['admin']);
 $router->get('/admin/analytics/realtime', [AdminController::class, 'realtimeTelemetryJson'], ['admin']);
 $router->get('/admin/analytics/content/{id}', [AdminController::class, 'contentAnalytics'], ['admin']);

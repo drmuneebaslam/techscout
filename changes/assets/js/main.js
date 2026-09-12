@@ -845,6 +845,7 @@ window.localizeAllTimestamps = function(root, forcedTz) {
         } catch(e) {}
 
         const timeStr = d.toLocaleTimeString('en-GB', { timeZone: userTz, hour12: false });
+        const timeStr12 = d.toLocaleTimeString('en-US', { timeZone: userTz, hour: 'numeric', minute: '2-digit', hour12: true });
         const dateStr = d.toLocaleDateString('en-US', { timeZone: userTz, month: 'short', day: 'numeric', year: 'numeric' });
         const fullTitle = dateStr + ' ' + timeStr + (userTz ? ' (' + userTz + ')' : '');
 
@@ -856,16 +857,27 @@ window.localizeAllTimestamps = function(root, forcedTz) {
             datePart.innerHTML = dateStr + (tzAbbr ? ' <span class="ts-tz-abbr">(' + tzAbbr + ')</span>' : '');
           }
           el.setAttribute('title', fullTitle);
+        } else if (formatType === 'datetime') {
+          el.textContent = dateStr + ' • ' + timeStr12;
+          el.setAttribute('title', fullTitle);
         } else if (formatType === 'date') {
           el.textContent = dateStr;
           el.setAttribute('title', fullTitle);
         } else if (formatType === 'time') {
-          el.textContent = timeStr;
+          el.textContent = timeStr12;
           el.setAttribute('title', fullTitle);
         } else if (formatType === 'short') {
           const shortDate = d.toLocaleDateString('en-US', { timeZone: userTz, month: 'short', day: 'numeric' });
-          const shortTime = d.toLocaleTimeString('en-GB', { timeZone: userTz, hour: '2-digit', minute: '2-digit', hour12: false });
+          const shortTime = d.toLocaleTimeString('en-US', { timeZone: userTz, hour: 'numeric', minute: '2-digit', hour12: true });
           el.textContent = shortDate + ', ' + shortTime;
+          el.setAttribute('title', fullTitle);
+        } else if (formatType === 'relative') {
+          const diffSec = Math.floor((Date.now() - d.getTime()) / 1000);
+          if (diffSec < 60) el.textContent = 'Just now';
+          else if (diffSec < 3600) el.textContent = Math.floor(diffSec / 60) + 'm ago';
+          else if (diffSec < 86400) el.textContent = Math.floor(diffSec / 3600) + 'h ago';
+          else if (diffSec < 604800) el.textContent = Math.floor(diffSec / 86400) + 'd ago';
+          else el.textContent = dateStr;
           el.setAttribute('title', fullTitle);
         } else if (formatType === 'full') {
           el.textContent = dateStr + ' ' + timeStr + (tzAbbr ? ' (' + tzAbbr + ')' : '');

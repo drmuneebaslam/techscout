@@ -30,8 +30,18 @@ class Content {
         }
 
         if ($category && $category !== 'all') {
-            $sql .= " AND cat.slug = ?";
+            $sql .= " AND (cat.slug = ? OR cat.parent_id IN (SELECT subc.id FROM categories subc WHERE subc.slug = ?))";
             $params[] = $category;
+            $params[] = $category;
+        }
+
+        // Prompt Kind Filter (Text vs Image)
+        if (!empty($filters['prompt_kind']) && $filters['prompt_kind'] !== 'all') {
+            if ($filters['prompt_kind'] === 'image') {
+                $sql .= " AND (cat.slug IN ('ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion') OR p.target_models LIKE '%Midjourney%' OR p.target_models LIKE '%DALL-E%' OR p.target_models LIKE '%Flux%' OR p.target_models LIKE '%Stable Diffusion%')";
+            } elseif ($filters['prompt_kind'] === 'text') {
+                $sql .= " AND (cat.slug NOT IN ('ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion') AND (p.target_models IS NULL OR (p.target_models NOT LIKE '%Midjourney%' AND p.target_models NOT LIKE '%Flux%' AND p.target_models NOT LIKE '%Stable Diffusion%')))";
+            }
         }
 
         // Search Filter

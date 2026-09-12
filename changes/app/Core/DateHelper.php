@@ -201,6 +201,7 @@ class DateHelper {
 
     /**
      * Converts a database timestamp (stored in Asia/Karachi, UTC+5) to a DateTime in target timezone.
+     * Conversion path: PKT (Asia/Karachi) -> GMT (UTC) -> Target Timezone.
      */
     public static function toDateTime(string|int|null $time, ?string $targetTimezone = null): ?\DateTime {
         if (!$time) return null;
@@ -208,9 +209,11 @@ class DateHelper {
         try {
             $tzObj = new \DateTimeZone($targetTz);
             $appTz = new \DateTimeZone('Asia/Karachi');
+            $utcTz = new \DateTimeZone('UTC');
 
             if (is_numeric($time)) {
                 $dt = new \DateTime('@' . (int)$time);
+                $dt->setTimezone($utcTz);
                 $dt->setTimezone($tzObj);
             } else {
                 $timeStr = trim((string)$time);
@@ -219,9 +222,12 @@ class DateHelper {
                 if (preg_match('/[+-]\d{2}:?\d{2}|Z$/', $timeStr)) {
                     $dt = new \DateTime($timeStr);
                 } else {
-                    // Raw database DATETIME strings were saved in Asia/Karachi (UTC+5)
+                    // Raw database DATETIME strings were saved in Pakistan Standard Time (Asia/Karachi, UTC+5)
                     $dt = new \DateTime($timeStr, $appTz);
                 }
+                // Step 1: Explicitly convert PKT to GMT/UTC
+                $dt->setTimezone($utcTz);
+                // Step 2: Convert from GMT/UTC to target visitor timezone
                 $dt->setTimezone($tzObj);
             }
             return $dt;
@@ -231,11 +237,12 @@ class DateHelper {
     }
 
     /**
-     * Generates a standardized ISO-8601 string (with explicit +05:00 offset) for client-side JavaScript date parsing.
+     * Generates a standardized UTC ISO-8601 string ending in 'Z' for universal client-side JavaScript date parsing.
+     * Ensures consistent browser local time rendering worldwide without offset ambiguity.
      */
     public static function iso8601(string|int|null $time): string {
-        $dt = self::toDateTime($time, 'Asia/Karachi');
-        return $dt ? $dt->format(\DateTimeInterface::ATOM) : '';
+        $dt = self::toDateTime($time, 'UTC');
+        return $dt ? $dt->format('Y-m-d\TH:i:s\Z') : '';
     }
 
     /**

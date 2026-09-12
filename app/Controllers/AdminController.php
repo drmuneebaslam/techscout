@@ -2692,10 +2692,32 @@ class AdminController {
     // ------------------------------------------------------------------------
     public function advertisements(Request $request): void {
         $ads = Database::query("SELECT a.*, u.username as advertiser_name FROM advertisements a LEFT JOIN users u ON a.advertiser_user_id = u.id ORDER BY a.created_at DESC");
+        
+        $sponsoredSubmissions = [];
+        try {
+            $sponsoredSubmissions = Database::query("SELECT s.*, c.name as category_name FROM sponsored_submissions s LEFT JOIN categories c ON s.category_id = c.id ORDER BY s.created_at DESC LIMIT 50");
+        } catch (\Throwable $e) {}
+
         Response::view('admin/advertisements', [
             'title' => 'Ad Placements & Sponsorship Scheduler | Admin Hub',
-            'ads' => $ads
+            'ads' => $ads,
+            'sponsoredSubmissions' => $sponsoredSubmissions,
+            'activeTab' => $request->query('tab', 'ads')
         ]);
+    }
+
+    public function approveSponsoredSubmission(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        Database::execute("UPDATE sponsored_submissions SET status = 'approved', updated_at = NOW() WHERE id = ?", [$id]);
+        Session::flash('success', 'Sponsored placement approved and activated.');
+        Response::redirect('/admin/advertisements?tab=sponsored');
+    }
+
+    public function rejectSponsoredSubmission(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        Database::execute("UPDATE sponsored_submissions SET status = 'rejected', updated_at = NOW() WHERE id = ?", [$id]);
+        Session::flash('success', 'Sponsored submission marked as rejected.');
+        Response::redirect('/admin/advertisements?tab=sponsored');
     }
 
     public function adManager(Request $request): void {
@@ -4188,7 +4210,9 @@ class AdminController {
             'healthChecks' => $healthChecks,
             'unhealthyCount' => $unhealthyCount,
             'backups' => $backups,
-            'activeTab' => $activeTab
+            'activeTab' => $activeTab,
+            'directoryTree' => \App\Models\CustomExporter::getDirectoryTree(),
+            'tablesWithMeta' => \App\Models\CustomExporter::getTablesMetadata()
         ]);
     }
 
@@ -4327,6 +4351,63 @@ class AdminController {
         Response::redirect('/admin/db-manager?tab=query');
     }
 
+    public function getTableRowsJson(Request $request): void {
+        $table = (string)$request->query('table', '');
+        $search = (string)$request->query('search', '');
+        $limit = min(100, max(10, (int)$request->query('limit', 50)));
+        $offset = max(0, (int)$request->query('offset', 0));
+
+        $data = \App\Models\CustomExporter::getTableRowsForSelection($table, $limit, $offset, $search);
+        Response::json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+    public function downloadCustomExport(Request $request): void {
+        $folders = (array)$request->post('folders', []);
+        $includeRoot = !empty($request->post('include_root_files'));
+        $tablesConfigRaw = $request->post('tables_config', '');
+
+        $tablesConfig = [];
+        if (is_array($tablesConfigRaw)) {
+            $tablesConfig = $tablesConfigRaw;
+        } elseif (is_string($tablesConfigRaw) && !empty($tablesConfigRaw)) {
+            $decoded = json_decode($tablesConfigRaw, true);
+            if (is_array($decoded)) {
+                $tablesConfig = $decoded;
+            }
+        }
+
+        try {
+            $zipPath = \App\Models\CustomExporter::generateCustomZip(
+                $folders,
+                $includeRoot,
+                $tablesConfig,
+                Auth::id()
+            );
+
+            if (!file_exists($zipPath)) {
+                throw new \RuntimeException("Zip archive generation failed.");
+            }
+
+            $filename = basename($zipPath);
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($zipPath));
+            readfile($zipPath);
+            @unlink($zipPath);
+            exit;
+        } catch (\Throwable $e) {
+            Session::flash('error', "Export failed: " . $e->getMessage());
+            Response::redirect('/admin/db-manager?tab=custom_export');
+        }
+    }
+
     // ========================================================================
     // 23. CMS SYSTEM SETTINGS (19 ENTERPRISE MODULES)
     // ========================================================================
@@ -4416,6 +4497,13 @@ class AdminController {
 
         Session::flash('success', "Settings for '" . ucfirst($activeTab) . "' saved successfully!");
         Response::redirect('/admin/settings?tab=' . urlencode($activeTab));
+    }
+
+    public function launchInstaller(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+        $_SESSION['reinstall_authorized'] = true;
+        Session::flash('success', 'Web Setup Wizard authorized. You can now reconfigure database, branding, or credentials.');
+        Response::redirect('/install');
     }
 
     // ========================================================================

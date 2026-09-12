@@ -46,9 +46,9 @@
 
           <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem; line-height: 1.2;"><?= htmlspecialchars($gpt['title']) ?></h1>
           <div style="font-size: 0.82rem; color: var(--ts-text-tertiary); margin-bottom: 0.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-            <span>Published <?= \App\Core\DateHelper::formatDateTime($gpt['created_at'] ?? 'now') ?></span>
+            <span>Published <?= \App\Core\DateHelper::render($gpt['created_at'] ?? 'now', 'M j, Y • g:i A', 'datetime') ?></span>
             <?php if (!empty($gpt['updated_at']) && strtotime($gpt['updated_at']) > strtotime($gpt['created_at'] ?? 'now') + 60): ?>
-              <span style="color: #38bdf8;">&bull; Updated <?= \App\Core\DateHelper::formatDateTime($gpt['updated_at']) ?></span>
+              <span style="color: #38bdf8;">&bull; Updated <?= \App\Core\DateHelper::render($gpt['updated_at'], 'M j, Y • g:i A', 'datetime') ?></span>
             <?php endif; ?>
           </div>
           <p style="color: var(--ts-text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 1.25rem;">

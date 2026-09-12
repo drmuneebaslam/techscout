@@ -1,6 +1,6 @@
 <?php
 /**
- * Reddit-Grade Multi-Level Nested Community Discussion & Reply Tree Component
+ * Social-Grade Compact Threaded Discussion Component (Instagram / Facebook Style)
  * 
  * @var array $comments
  * @var array $content (or $article / $tool / $gpt)
@@ -40,94 +40,98 @@ if (!function_exists('renderRedditCommentNode')) {
         $commentId = (int)$c['id'];
         $hasReplies = !empty($c['replies']);
         $replyCount = $hasReplies ? count($c['replies']) : 0;
-        $maxDepthIndent = min($depth * 0.85, 3.5); // compact visual boundary
+        $maxDepthIndent = min($depth * 1.5, 4.5);
         $isUpvoted = in_array($commentId, $userUpvotedCommentIds, true);
+        $avatarSize = $depth === 0 ? 34 : 26;
         ?>
         <div class="comment-node-wrapper <?= $depth === 0 ? 'comment-item' : 'comment-reply-node' ?>" 
              id="comment-node-<?= $commentId ?>" 
              data-upvotes="<?= $upvotes ?>" 
              data-timestamp="<?= strtotime($c['created_at']) ?>"
-             style="<?= $depth > 0 ? "margin-left: {$maxDepthIndent}rem; border-left: 2px solid rgba(99,102,241,0.35); padding-left: 0.75rem; margin-top: 0.5rem;" : "margin-bottom: 0.75rem;" ?>">
+             style="<?= $depth > 0 ? "margin-left: {$maxDepthIndent}rem; border-left: 2px solid var(--ts-border-subtle); padding-left: 0.85rem; margin-top: 0.5rem;" : "margin-bottom: 0.85rem;" ?>">
           
-          <div class="ts-card comment-card-inner" style="padding: 0.85rem 1.15rem; border-radius: 8px;">
-            <!-- Top Header & Collapse Toggle -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
-              <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-                <!-- Collapse / Expand Thread Button -->
-                <button type="button" onclick="toggleCollapseThread(<?= $commentId ?>)" id="collapse-btn-<?= $commentId ?>" style="background: none; border: none; color: #64748b; font-family: var(--ts-font-mono); font-size: 0.75rem; cursor: pointer; padding: 0 0.15rem;" title="Collapse/Expand thread">[-]</button>
-                
-                <img src="<?= htmlspecialchars(image_url($c['avatar_url'] ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80')) ?>" alt="<?= htmlspecialchars($c['username']) ?>" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(148,163,184,0.25);">
-                
-                <span class="comment-author-name" style="font-size: 0.88rem;">
-                  <?= htmlspecialchars($c['display_name'] ?? $c['username']) ?>
-                </span>
-                
-                <?php if ($isAuthorComment): ?>
-                  <span class="ts-badge ts-badge-pink" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Author ✍️</span>
-                <?php elseif (($c['role'] ?? '') === 'super_admin' || ($c['role'] ?? '') === 'admin'): ?>
-                  <span class="ts-badge ts-badge-cyan" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Staff 🛡️</span>
-                <?php endif; ?>
+          <div style="display: flex; gap: 0.65rem; align-items: flex-start;">
+            <!-- Social Avatar -->
+            <img src="<?= htmlspecialchars(image_url($c['avatar_url'] ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80')) ?>" 
+                 alt="<?= htmlspecialchars($c['username']) ?>" 
+                 style="width: <?= $avatarSize ?>px; height: <?= $avatarSize ?>px; border-radius: 50%; object-fit: cover; border: 1px solid var(--ts-border-main); flex-shrink: 0; margin-top: 2px;">
 
-                <?php if (!empty($c['is_pinned'])): ?>
-                  <span class="ts-badge ts-badge-green" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Pinned ⭐</span>
-                <?php endif; ?>
+            <div style="flex: 1; max-width: calc(100% - <?= $avatarSize + 12 ?>px);">
+              <!-- Compact Social Speech Bubble (Instagram / FB Style) -->
+              <div class="ts-comment-bubble" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 16px; padding: 0.55rem 0.95rem; display: inline-block; max-width: 100%;">
+                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem; flex-wrap: wrap;">
+                  <span style="font-weight: 700; font-size: 0.85rem; color: var(--ts-text-primary);">
+                    <?= htmlspecialchars($c['display_name'] ?? $c['username']) ?>
+                  </span>
+
+                  <?php if ($isAuthorComment): ?>
+                    <span class="ts-badge ts-badge-pink" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Author ✍️</span>
+                  <?php elseif (($c['role'] ?? '') === 'super_admin' || ($c['role'] ?? '') === 'admin'): ?>
+                    <span class="ts-badge ts-badge-cyan" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Staff 🛡️</span>
+                  <?php endif; ?>
+
+                  <?php if (!empty($c['is_pinned'])): ?>
+                    <span class="ts-badge ts-badge-green" style="font-size: 0.6rem; padding: 0.05rem 0.35rem;">Pinned ⭐</span>
+                  <?php endif; ?>
+                </div>
+
+                <div class="comment-body-text" style="font-size: 0.88rem; line-height: 1.5; color: var(--ts-text-primary); word-break: break-word; white-space: pre-wrap;"><?= htmlspecialchars($c['comment_text']) ?></div>
               </div>
 
-              <div style="font-size: 0.72rem; color: #64748b; font-family: var(--ts-font-mono);">
-                <?= \App\Core\DateHelper::format($c['created_at']) ?>
-              </div>
-            </div>
+              <!-- Compact Social Action Row Underneath Bubble -->
+              <div style="display: flex; align-items: center; gap: 0.85rem; font-size: 0.74rem; color: var(--ts-text-tertiary); margin-top: 0.25rem; padding-left: 0.5rem; flex-wrap: wrap;">
+                <span><?= \App\Core\DateHelper::render($c['created_at'], 'relative') ?></span>
 
-            <!-- Collapsible Body Content -->
-            <div id="comment-collapsible-body-<?= $commentId ?>">
-              <div class="comment-body-text" style="font-size: 0.92rem; line-height: 1.6; margin-bottom: 0.65rem; white-space: pre-wrap; word-break: break-word;"><?= htmlspecialchars($c['comment_text']) ?></div>
-
-              <!-- Bottom Action Bar (Upvote, Reply, Delete) -->
-              <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.45rem;">
-                <button type="button" onclick="upvoteComment(<?= $commentId ?>)" class="ts-badge <?= $isUpvoted ? 'ts-badge-green' : 'ts-badge-cyan' ?>" id="upvote-badge-<?= $commentId ?>" data-upvoted="<?= $isUpvoted ? '1' : '0' ?>" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; padding: 0.15rem 0.5rem; <?= $isUpvoted ? 'background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.5); color: #34d399;' : '' ?>" title="<?= $isUpvoted ? 'Click to undo helpful vote' : 'Mark as helpful' ?>">
+                <!-- Helpful / Upvote Button -->
+                <button type="button" onclick="upvoteComment(<?= $commentId ?>)" id="upvote-badge-<?= $commentId ?>" data-upvoted="<?= $isUpvoted ? '1' : '0' ?>" style="background: none; border: none; font-weight: 600; color: <?= $isUpvoted ? 'var(--ts-success)' : 'var(--ts-text-secondary)' ?>; cursor: pointer; padding: 0; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 0.25rem;">
                   <i data-lucide="thumbs-up" style="width: 11px; height: 11px;"></i> Helpful (<span id="upvote-count-<?= $commentId ?>"><?= $upvotes ?></span>)
                 </button>
 
+                <!-- Reply Button -->
                 <?php if ($currentUser): ?>
-                  <button type="button" onclick="toggleReplyBox(<?= $commentId ?>, '<?= htmlspecialchars($c['username']) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.55rem; font-size: 0.72rem;">
-                    <i data-lucide="corner-down-right" style="width: 11px; height: 11px;"></i> Reply
+                  <button type="button" onclick="toggleReplyBox(<?= $commentId ?>, '<?= htmlspecialchars($c['username']) ?>')" style="background: none; border: none; font-weight: 600; color: var(--ts-text-secondary); cursor: pointer; padding: 0; font-size: 0.74rem;">
+                    Reply
                   </button>
                 <?php endif; ?>
 
                 <?php if ($hasReplies): ?>
-                  <span style="color: #64748b; font-size: 0.72rem; margin-left: 0.2rem;">
-                    <i data-lucide="message-square" style="width: 11px; height: 11px; display: inline;"></i> <?= $replyCount ?> <?= $replyCount === 1 ? 'reply' : 'replies' ?>
-                  </span>
+                  <button type="button" onclick="toggleCollapseThread(<?= $commentId ?>)" id="collapse-btn-<?= $commentId ?>" style="background: none; border: none; color: var(--ts-text-tertiary); cursor: pointer; padding: 0; font-size: 0.74rem;">
+                    <?= $replyCount ?> <?= $replyCount === 1 ? 'reply' : 'replies' ?>
+                  </button>
                 <?php endif; ?>
 
-                <button type="button" onclick="openReportModal('comment', <?= $commentId ?>, 'Comment by @<?= htmlspecialchars($c['username']) ?>', window.location.href)" style="background: none; border: none; color: #64748b; font-size: 0.72rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem; margin-left: auto;" title="Report comment to moderators">
-                  <i data-lucide="flag" style="width: 11px; height: 11px; color: #ef4444;"></i> Report
+                <!-- Report Action -->
+                <button type="button" onclick="openReportModal('comment', <?= $commentId ?>, 'Comment by @<?= htmlspecialchars($c['username']) ?>', window.location.href)" style="background: none; border: none; color: var(--ts-text-tertiary); cursor: pointer; padding: 0; font-size: 0.74rem; margin-left: auto;" title="Report comment">
+                  Report
                 </button>
 
+                <!-- Delete Action -->
                 <?php if ($currentUser && (\App\Core\Auth::isAdmin() || (int)$c['user_id'] === (int)$currentUser['id'])): ?>
-                  <button type="button" onclick="deleteComment(<?= $commentId ?>)" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.12rem 0.45rem; font-size: 0.7rem; color: #ef4444;">
-                    <i data-lucide="trash-2" style="width: 10px; height: 10px;"></i> Delete
+                  <button type="button" onclick="deleteComment(<?= $commentId ?>)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 0; font-size: 0.74rem;">
+                    Delete
                   </button>
                 <?php endif; ?>
               </div>
 
               <!-- Inline Nested Reply Composer Box -->
-              <div id="reply-box-<?= $commentId ?>" class="comment-reply-box" style="display: none; margin-top: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px;">
+              <div id="reply-box-<?= $commentId ?>" class="comment-reply-box" style="display: none; margin-top: 0.55rem; padding: 0.65rem 0.85rem; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 12px;">
                 <form onsubmit="submitComment(event, <?= $contentId ?>, <?= $commentId ?>, 'reply-text-<?= $commentId ?>')">
-                  <textarea id="reply-text-<?= $commentId ?>" class="comment-composer-textarea" rows="2" placeholder="Write your reply to @<?= htmlspecialchars($c['username']) ?>..." style="width: 100%; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.88rem; resize: vertical;" required></textarea>
-                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.5rem;">
-                    <button type="button" onclick="toggleReplyBox(<?= $commentId ?>)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">Cancel</button>
-                    <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.75rem;">Post Reply 💬</button>
+                  <textarea id="reply-text-<?= $commentId ?>" rows="2" placeholder="Write a reply to @<?= htmlspecialchars($c['username']) ?>..." style="width: 100%; border-radius: 8px; padding: 0.45rem 0.75rem; font-size: 0.85rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); color: var(--ts-text-primary); resize: vertical;" required></textarea>
+                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.4rem;">
+                    <button type="button" onclick="toggleReplyBox(<?= $commentId ?>)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.15rem 0.55rem;">Cancel</button>
+                    <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.15rem 0.75rem;">Post Reply 💬</button>
                   </div>
                 </form>
               </div>
 
               <!-- Nested Sub-Replies Thread Container -->
-              <div id="replies-container-<?= $commentId ?>" class="replies-sub-tree">
+              <div id="replies-container-<?= $commentId ?>" class="replies-sub-tree" style="margin-top: 0.45rem;">
                 <?php if ($hasReplies): ?>
-                  <?php foreach ($c['replies'] as $subReply): ?>
-                    <?php renderRedditCommentNode($subReply, $contentId, $contentAuthorId, $currentUser, $depth + 1, $userUpvotedCommentIds); ?>
-                  <?php endforeach; ?>
+                  <div id="comment-collapsible-body-<?= $commentId ?>">
+                    <?php foreach ($c['replies'] as $subReply): ?>
+                      <?php renderRedditCommentNode($subReply, $contentId, $contentAuthorId, $currentUser, $depth + 1, $userUpvotedCommentIds); ?>
+                    <?php endforeach; ?>
+                  </div>
                 <?php endif; ?>
               </div>
             </div>
@@ -142,17 +146,17 @@ if (!function_exists('renderRedditCommentNode')) {
   <!-- Section Header with Sorting -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
     <div>
-      <h3 style="font-size: 1.3rem; color: var(--ts-text-primary); margin: 0 0 0.15rem 0; display: flex; align-items: center; gap: 0.5rem; font-family: 'Outfit', sans-serif;">
-        <i data-lucide="message-square" style="color: var(--ts-primary); width: 20px; height: 20px;"></i> Technical Discussion &amp; Insights
+      <h3 style="font-size: 1.25rem; color: var(--ts-text-primary); margin: 0 0 0.15rem 0; display: flex; align-items: center; gap: 0.5rem; font-family: 'Outfit', sans-serif;">
+        <i data-lucide="message-circle" style="color: var(--ts-primary); width: 20px; height: 20px;"></i> Discussion &amp; Feedback
         <span class="ts-badge ts-badge-cyan" id="total-comments-count" style="font-size: 0.75rem;"><?= $totalComments ?></span>
       </h3>
-      <p style="font-size: 0.82rem; color: var(--ts-text-tertiary); margin: 0;">Recursive threaded comments, peer architecture reviews, and benchmark discussions.</p>
+      <p style="font-size: 0.82rem; color: var(--ts-text-tertiary); margin: 0;">Compact social discussion feed. Join the conversation below.</p>
     </div>
 
     <!-- Sorting Controls -->
-    <div class="comment-sort-bar" style="display: flex; gap: 0.3rem; padding: 0.25rem; border-radius: 6px;">
+    <div class="comment-sort-bar" style="display: flex; gap: 0.3rem; padding: 0.2rem; border-radius: 6px;">
       <button type="button" onclick="sortComments('top')" id="sort-btn-top" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px;">
-        🔥 Most Helpful
+        🔥 Top
       </button>
       <button type="button" onclick="sortComments('newest')" id="sort-btn-newest" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px;">
         ⚡ Newest
@@ -164,72 +168,66 @@ if (!function_exists('renderRedditCommentNode')) {
   </div>
 
   <!-- Primary Comment Composer Box -->
-  <div class="ts-card comment-composer-card" style="margin-bottom: 1.75rem; padding: 1.25rem; border-radius: 10px;">
+  <div class="ts-card comment-composer-card" style="margin-bottom: 1.75rem; padding: 1rem 1.25rem; border-radius: 14px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main);">
     <?php if ($currentUser): ?>
-      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-        <img src="<?= htmlspecialchars(image_url($currentUser['author_avatar'] ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80')) ?>" alt="<?= htmlspecialchars($currentUser['username']) ?>" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--ts-primary);">
+      <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem;">
+        <img src="<?= htmlspecialchars(image_url($currentUser['author_avatar'] ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80')) ?>" alt="<?= htmlspecialchars($currentUser['username']) ?>" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--ts-primary);">
         <div>
-          <div style="font-weight: 600; color: var(--ts-text-primary); font-size: 0.9rem;">
+          <div style="font-weight: 600; color: var(--ts-text-primary); font-size: 0.88rem;">
             <?= htmlspecialchars($currentUser['display_name'] ?? $currentUser['username']) ?>
-            <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem; padding: 0.05rem 0.35rem;"><?= htmlspecialchars($currentUser['role']) ?></span>
+            <span class="ts-badge ts-badge-cyan" style="font-size: 0.62rem; padding: 0.05rem 0.35rem;"><?= htmlspecialchars($currentUser['role']) ?></span>
           </div>
-          <div style="font-size: 0.75rem; color: #64748b;">Post as verified builder</div>
         </div>
       </div>
     <?php endif; ?>
 
-    <!-- Formatting Ribbon for Comments -->
-    <div class="comment-formatting-ribbon" style="display: flex; gap: 0.35rem; margin-bottom: 0.5rem; padding: 0.4rem; border-radius: 6px; flex-wrap: wrap;">
-      <button type="button" onclick="insertCommentFormat('bold', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; font-weight: 800;" title="Bold">B</button>
-      <button type="button" onclick="insertCommentFormat('italic', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; font-style: italic;" title="Italic">I</button>
-      <button type="button" onclick="insertCommentFormat('code', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; font-family: monospace;" title="Inline Code">&lt;/&gt;</button>
-      <button type="button" onclick="insertCommentFormat('codeblock', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; font-family: monospace;" title="Code Block">```</button>
-      <button type="button" onclick="insertCommentFormat('quote', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" title="Quote">"</button>
-      <span style="font-size: 0.75rem; color: #64748b; margin-left: auto; align-self: center;">Markdown & Code Supported</span>
-    </div>
-
     <form id="main-comment-form" onsubmit="submitComment(event, <?= $contentId ?>, null, 'main-comment-text')">
-      <textarea id="main-comment-text" name="comment_text" maxlength="1000" class="comment-composer-textarea" rows="3" placeholder="<?= $currentUser ? 'Share your architectural critique, benchmarks, or question...' : 'Sign in to share your technical feedback or ask a question...' ?>" style="width: 100%; border-radius: 6px; padding: 0.85rem 1rem; font-size: 0.95rem; line-height: 1.5; resize: vertical;" required <?= $currentUser ? '' : 'disabled' ?>></textarea>
+      <div style="position: relative;">
+        <textarea id="main-comment-text" name="comment_text" maxlength="1000" rows="2" placeholder="<?= $currentUser ? 'Write a thoughtful comment or insight...' : 'Sign in to join the conversation...' ?>" style="width: 100%; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.9rem; line-height: 1.45; resize: vertical; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); color: var(--ts-text-primary);" required <?= $currentUser ? '' : 'disabled' ?>></textarea>
+      </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; flex-wrap: wrap; gap: 0.75rem;">
-        <div style="font-size: 0.75rem; color: #64748b;">
-          💡 Tip: Markdown formatted code blocks, benchmarks, and nested replies supported. (Max 1,000 chars)
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+        <!-- Formatting Ribbon -->
+        <div style="display: flex; gap: 0.25rem;">
+          <button type="button" onclick="insertCommentFormat('bold', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.72rem; font-weight: 800;" title="Bold">B</button>
+          <button type="button" onclick="insertCommentFormat('italic', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.72rem; font-style: italic;" title="Italic">I</button>
+          <button type="button" onclick="insertCommentFormat('code', 'main-comment-text')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.72rem; font-family: monospace;" title="Code">&lt;/&gt;</button>
         </div>
 
         <?php if ($currentUser): ?>
-          <button type="submit" id="main-submit-btn" class="ts-btn ts-btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
-            <i data-lucide="send" style="width: 14px;"></i> Post Technical Thought
+          <button type="submit" id="main-submit-btn" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.35rem 1.15rem; font-size: 0.85rem; border-radius: 20px;">
+            <i data-lucide="send" style="width: 13px;"></i> Post Comment
           </button>
         <?php else: ?>
-          <a href="<?= url('/auth/login') ?>" class="ts-btn ts-btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
-            <i data-lucide="log-in" style="width: 14px;"></i> Sign in to Join Discussion
+          <a href="<?= url('/auth/login') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.35rem 1rem; font-size: 0.85rem; border-radius: 20px;">
+            <i data-lucide="log-in" style="width: 13px;"></i> Sign in to Comment
           </a>
         <?php endif; ?>
       </div>
     </form>
   </div>
 
-  <!-- Comments Live Stream Thread Tree -->
+  <!-- Comments Live Stream Thread Tree (Lazy Loaded 5 at a time) -->
   <div id="comments-stream-container" style="display: flex; flex-direction: column;">
     <?php if (!empty($comments)): ?>
       <?php foreach ($comments as $index => $c): ?>
-        <div class="root-comment-wrapper" style="<?= $index >= 10 ? 'display:none;' : '' ?>">
+        <div class="root-comment-wrapper" style="<?= $index >= 5 ? 'display:none;' : '' ?>">
           <?php renderRedditCommentNode($c, $contentId, $contentAuthorId, $currentUser, 0, $userUpvotedCommentIds); ?>
         </div>
       <?php endforeach; ?>
 
-      <?php if (count($comments) > 10): ?>
-        <div id="load-more-comments-wrap" style="text-align: center; margin-top: 1.5rem;">
-          <button type="button" onclick="loadMoreRootComments()" class="ts-btn ts-btn-outline" style="padding: 0.65rem 2rem;">
-            <i data-lucide="chevrons-down" style="width: 16px;"></i> Load More Comments (<?= count($comments) - 10 ?> remaining)
+      <?php if (count($comments) > 5): ?>
+        <div id="load-more-comments-wrap" style="text-align: center; margin-top: 1.25rem;">
+          <button type="button" onclick="loadMoreRootComments()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.55rem 1.75rem; border-radius: 20px; font-weight: 600;">
+            <i data-lucide="chevrons-down" style="width: 15px; display: inline;"></i> Load More Comments (<span id="remaining-comments-count"><?= count($comments) - 5 ?></span> remaining)
           </button>
         </div>
       <?php endif; ?>
     <?php else: ?>
-      <div id="no-comments-prompt" class="ts-card" style="text-align: center; padding: 3rem; color: #64748b;">
-        <i data-lucide="message-circle" style="width: 36px; height: 36px; color: var(--ts-primary); margin-bottom: 0.75rem;"></i>
-        <h4 style="font-size: 1.1rem; color: var(--ts-text-primary); margin-bottom: 0.25rem;">No technical insights yet</h4>
-        <p style="font-size: 0.85rem; margin: 0;">Be the first to analyze this architecture or share benchmarks!</p>
+      <div id="no-comments-prompt" class="ts-card" style="text-align: center; padding: 2.5rem; color: var(--ts-text-tertiary); background: var(--ts-bg-surface); border: 1px dashed var(--ts-border-main); border-radius: 12px;">
+        <i data-lucide="message-circle" style="width: 32px; height: 32px; color: var(--ts-primary); margin-bottom: 0.6rem;"></i>
+        <h4 style="font-size: 1.05rem; color: var(--ts-text-primary); margin-bottom: 0.2rem;">No comments yet</h4>
+        <p style="font-size: 0.85rem; margin: 0;">Be the first to share your thoughts!</p>
       </div>
     <?php endif; ?>
   </div>
@@ -242,22 +240,35 @@ function toggleCollapseThread(commentId) {
   if (!body || !btn) return;
   const isCollapsed = body.style.display === 'none';
   body.style.display = isCollapsed ? 'block' : 'none';
-  btn.textContent = isCollapsed ? '[-]' : '[+] (collapsed)';
+  if (isCollapsed) {
+    btn.innerText = btn.getAttribute('data-original-text') || 'Collapse replies';
+  } else {
+    if (!btn.getAttribute('data-original-text')) btn.setAttribute('data-original-text', btn.innerText);
+    btn.innerText = 'Show replies';
+  }
 }
 
 function loadMoreRootComments() {
   const hiddenRoots = document.querySelectorAll('.root-comment-wrapper[style*="display:none"], .root-comment-wrapper[style*="display: none"]');
   let shown = 0;
   hiddenRoots.forEach(node => {
-    if (shown < 10) {
+    if (shown < 5) {
       node.style.display = 'block';
       shown++;
     }
   });
-  if (hiddenRoots.length <= 10) {
+  
+  const remaining = hiddenRoots.length - shown;
+  const countSpan = document.getElementById('remaining-comments-count');
+  if (countSpan) countSpan.innerText = remaining;
+
+  if (remaining <= 0) {
     const wrap = document.getElementById('load-more-comments-wrap');
     if (wrap) wrap.style.display = 'none';
   }
+
+  if (window.lucide) lucide.createIcons();
+  if (window.localizeAllTimestamps) window.localizeAllTimestamps();
 }
 
 function insertCommentFormat(type, textareaId) {
@@ -277,12 +288,6 @@ function insertCommentFormat(type, textareaId) {
       break;
     case 'code':
       replacement = `\`${selected || 'code'}\``;
-      break;
-    case 'codeblock':
-      replacement = `\n\`\`\`javascript\n${selected || '// benchmark code here'}\n\`\`\`\n`;
-      break;
-    case 'quote':
-      replacement = `\n> ${selected || 'Quote text'}\n`;
       break;
   }
 
@@ -341,54 +346,33 @@ async function submitComment(e, contentId, parentId, textareaId) {
 
     const data = await res.json();
     if (data.error) {
-      if (typeof tsModal !== 'undefined') {
-        tsModal.alert(data.error, 'Discussion Notice');
-      } else if (typeof showToast === 'function') {
-        showToast(data.error, 'error');
-      }
+      if (typeof showToast === 'function') showToast(data.error, 'error');
       return;
     }
 
-    if (typeof showToast === 'function') showToast('Technical comment posted successfully! 🚀', 'success');
+    if (typeof showToast === 'function') showToast('Comment posted! 🚀', 'success');
     textarea.value = '';
 
     if (parentId) {
       toggleReplyBox(parentId);
-      // Append nested reply node dynamically into replies container
       const replyContainer = document.getElementById('replies-container-' + parentId);
       if (replyContainer) {
         const replyId = data.comment.id;
         const replyHtml = `
-          <div class="comment-node-wrapper comment-reply-node" id="comment-node-${replyId}" data-upvotes="0" data-timestamp="${Math.floor(Date.now()/1000)}" style="margin-left: 1.5rem; border-left: 2px solid rgba(99,102,241,0.35); padding-left: 0.75rem; margin-top: 0.5rem;">
-            <div class="ts-card comment-card-inner" style="padding: 0.85rem 1.15rem; border-radius: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
-                <div style="display: flex; align-items: center; gap: 0.45rem;">
-                  <button type="button" onclick="toggleCollapseThread(${replyId})" id="collapse-btn-${replyId}" style="background: none; border: none; color: #64748b; font-family: var(--ts-font-mono); font-size: 0.75rem; cursor: pointer; padding: 0 0.15rem;">[-]</button>
-                  <img src="${data.comment.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}" alt="${data.comment.username}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;">
-                  <span class="comment-author-name" style="font-size: 0.88rem;">${data.comment.display_name || data.comment.username}</span>
+          <div class="comment-node-wrapper comment-reply-node" id="comment-node-${replyId}" data-upvotes="0" data-timestamp="${Math.floor(Date.now()/1000)}" style="margin-left: 1.5rem; border-left: 2px solid var(--ts-border-subtle); padding-left: 0.85rem; margin-top: 0.5rem;">
+            <div style="display: flex; gap: 0.65rem; align-items: flex-start;">
+              <img src="${data.comment.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}" alt="${escapeHtml(data.comment.username)}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--ts-border-main); flex-shrink: 0; margin-top: 2px;">
+              <div style="flex: 1; max-width: calc(100% - 38px);">
+                <div class="ts-comment-bubble" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 16px; padding: 0.55rem 0.95rem; display: inline-block; max-width: 100%;">
+                  <div style="font-weight: 700; font-size: 0.85rem; color: var(--ts-text-primary); margin-bottom: 0.15rem;">${escapeHtml(data.comment.display_name || data.comment.username)}</div>
+                  <div class="comment-body-text" style="font-size: 0.88rem; line-height: 1.5; color: var(--ts-text-primary); word-break: break-word; white-space: pre-wrap;">${escapeHtml(data.comment.comment_text)}</div>
                 </div>
-                <div style="font-size: 0.72rem; color: #64748b; font-family: var(--ts-font-mono);">Just now</div>
-              </div>
-              <div id="comment-collapsible-body-${replyId}">
-                <div class="comment-body-text" style="font-size: 0.92rem; line-height: 1.6; margin-bottom: 0.65rem; white-space: pre-wrap; word-break: break-word;">${escapeHtml(data.comment.comment_text)}</div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.45rem;">
-                  <button type="button" onclick="upvoteComment(${replyId})" class="ts-badge ts-badge-cyan" id="upvote-badge-${replyId}" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; padding: 0.15rem 0.5rem;">
-                    <i data-lucide="thumbs-up" style="width: 11px; height: 11px;"></i> Helpful (<span id="upvote-count-${replyId}">0</span>)
-                  </button>
-                  <button type="button" onclick="toggleReplyBox(${replyId}, '${escapeHtml(data.comment.username)}')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.55rem; font-size: 0.72rem;">
-                    <i data-lucide="corner-down-right" style="width: 11px; height: 11px;"></i> Reply
+                <div style="display: flex; align-items: center; gap: 0.85rem; font-size: 0.74rem; color: var(--ts-text-tertiary); margin-top: 0.25rem; padding-left: 0.5rem;">
+                  <span>Just now</span>
+                  <button type="button" onclick="upvoteComment(${replyId})" id="upvote-badge-${replyId}" style="background: none; border: none; font-weight: 600; color: var(--ts-text-secondary); cursor: pointer; padding: 0; font-size: 0.74rem;">
+                    Helpful (<span id="upvote-count-${replyId}">0</span>)
                   </button>
                 </div>
-                <div id="reply-box-${replyId}" class="comment-reply-box" style="display: none; margin-top: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px;">
-                  <form onsubmit="submitComment(event, ${contentId}, ${replyId}, 'reply-text-${replyId}')">
-                    <textarea id="reply-text-${replyId}" class="comment-composer-textarea" rows="2" placeholder="Write your reply..." style="width: 100%; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.88rem;" required></textarea>
-                    <div style="display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.5rem;">
-                      <button type="button" onclick="toggleReplyBox(${replyId})" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">Cancel</button>
-                      <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.75rem;">Post Reply 💬</button>
-                    </div>
-                  </form>
-                </div>
-                <div id="replies-container-${replyId}" class="replies-sub-tree"></div>
               </div>
             </div>
           </div>
@@ -418,62 +402,30 @@ async function upvoteComment(commentId) {
     if (data && data.success) {
       const countEl = document.getElementById('upvote-count-' + commentId);
       if (countEl) countEl.innerText = data.upvotes;
-      const nodeWrapper = document.getElementById('comment-node-' + commentId);
-      if (nodeWrapper) nodeWrapper.setAttribute('data-upvotes', data.upvotes);
       const badgeEl = document.getElementById('upvote-badge-' + commentId);
       if (badgeEl) {
         if (data.upvoted) {
-          badgeEl.className = 'ts-badge ts-badge-green';
+          badgeEl.style.color = 'var(--ts-success)';
           badgeEl.setAttribute('data-upvoted', '1');
-          badgeEl.style.background = 'rgba(16,185,129,0.2)';
-          badgeEl.style.border = '1px solid rgba(16,185,129,0.5)';
-          badgeEl.style.color = '#34d399';
-          badgeEl.title = 'Click to undo helpful vote';
         } else {
-          badgeEl.className = 'ts-badge ts-badge-cyan';
+          badgeEl.style.color = 'var(--ts-text-secondary)';
           badgeEl.setAttribute('data-upvoted', '0');
-          badgeEl.style.background = '';
-          badgeEl.style.border = '';
-          badgeEl.style.color = '';
-          badgeEl.title = 'Mark as helpful';
         }
       }
       if (typeof showToast === 'function') {
-        if (data.upvoted) {
-          showToast('Marked comment as helpful! 💡', 'success');
-        } else {
-          showToast('Helpful vote removed (undone).', 'info');
-        }
-      }
-    } else {
-      if (typeof showToast === 'function') {
-        showToast(data.error || 'Error updating comment vote', 'error');
+        showToast(data.upvoted ? 'Marked helpful! 💡' : 'Vote removed.', 'info');
       }
     }
-  } catch (err) {
-    if (typeof showToast === 'function') {
-      showToast('Error updating comment vote: ' + err.message, 'error');
-    }
-  }
+  } catch (err) {}
 }
 
 async function deleteComment(commentId) {
-  let confirmed = false;
-  if (typeof tsModal !== 'undefined') {
-    confirmed = await tsModal.confirm('Permanently delete this comment and its replies?', 'Delete Comment');
-  } else {
-    confirmed = confirm('Permanently delete this comment?');
-  }
-  if (!confirmed) return;
-
+  if (!confirm('Permanently delete this comment?')) return;
   try {
     const baseUrl = getCommentsApiBase();
     const res = await fetch(`${baseUrl}/api/v1/comments/${commentId}/delete`, {
       method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      }
+      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
     });
     const data = await res.json();
     if (data.success) {
@@ -481,9 +433,7 @@ async function deleteComment(commentId) {
       if (node) node.remove();
       if (typeof showToast === 'function') showToast('Comment deleted', 'success');
     }
-  } catch (err) {
-    if (typeof showToast === 'function') showToast('Error deleting comment', 'error');
-  }
+  } catch (err) {}
 }
 
 function sortComments(type) {

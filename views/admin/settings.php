@@ -234,6 +234,25 @@
             <label class="admin-modal-label">Custom Global CSS Injections</label>
             <textarea name="brand_custom_css" rows="4" placeholder="/* Custom CSS overrides */" class="admin-modal-textarea" style="font-family: var(--admin-font-mono);"><?= htmlspecialchars($settings['brand_custom_css'] ?? '') ?></textarea>
           </div>
+
+          <!-- White-Labeling & Web Setup Wizard Launcher -->
+          <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                  <span class="ts-badge ts-badge-cyan" style="font-size: 0.7rem; font-weight: 800;">WHITE-LABEL SYSTEM</span>
+                  <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">WEB INSTALLER</span>
+                </div>
+                <h4 style="font-size: 1.05rem; color: #f8fafc; margin: 0 0 0.25rem 0;">✨ Launch Web Setup Wizard &amp; White-Labeling</h4>
+                <p style="color: #94a3b8; font-size: 0.82rem; margin: 0; max-width: 550px;">
+                  Re-launch the 5-step installer wizard to reconfigure database connection parameters, custom white-label identity, or master administrative credentials.
+                </p>
+              </div>
+              <button type="button" onclick="launchWebInstaller()" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #0284c7, #38bdf8); font-weight: 700;">
+                <i data-lucide="sparkles"></i> Launch Web Setup Wizard 🚀
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- ================================================================= -->
@@ -416,6 +435,45 @@
             <div>
               <label class="admin-modal-label">Promo Credits per 100 XP</label>
               <input type="number" name="payment_credits_per_xp" value="<?= htmlspecialchars($settings['payment_credits_per_xp'] ?? '10') ?>" class="admin-modal-input">
+            </div>
+          </div>
+
+          <!-- Enterprise Crypto Wallet Addresses Configuration -->
+          <div style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span class="ts-badge ts-badge-gold" style="font-weight: 800;">DECENTRALIZED TREASURY</span>
+              <span class="ts-badge ts-badge-cyan">SPONSORSHIPS &amp; ADS</span>
+            </div>
+            <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 0.25rem 0;">🪙 Cryptocurrency Payment Wallets</h3>
+            <p style="color: #94a3b8; font-size: 0.82rem; margin: 0 0 1.25rem 0;">
+              Configure official crypto deposit addresses for sponsored tool submissions, sponsored posts, and advertiser contracts.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+              <div>
+                <label class="admin-modal-label">Bitcoin (BTC) Wallet Address</label>
+                <input type="text" name="crypto_btc_address" value="<?= htmlspecialchars($settings['crypto_btc_address'] ?? '') ?>" placeholder="bc1q... or 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" class="admin-modal-input" style="font-family: var(--admin-font-mono);">
+              </div>
+              <div>
+                <label class="admin-modal-label">Ethereum (ETH / ERC-20) Wallet Address</label>
+                <input type="text" name="crypto_eth_address" value="<?= htmlspecialchars($settings['crypto_eth_address'] ?? '') ?>" placeholder="0x..." class="admin-modal-input" style="font-family: var(--admin-font-mono);">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+              <div>
+                <label class="admin-modal-label">Tether (USDT - TRC-20 / ERC-20) Address</label>
+                <input type="text" name="crypto_usdt_address" value="<?= htmlspecialchars($settings['crypto_usdt_address'] ?? '') ?>" placeholder="T... or 0x..." class="admin-modal-input" style="font-family: var(--admin-font-mono);">
+              </div>
+              <div>
+                <label class="admin-modal-label">Solana (SOL) Wallet Address</label>
+                <input type="text" name="crypto_sol_address" value="<?= htmlspecialchars($settings['crypto_sol_address'] ?? '') ?>" placeholder="Solana public key address..." class="admin-modal-input" style="font-family: var(--admin-font-mono);">
+              </div>
+            </div>
+
+            <div>
+              <label class="admin-modal-label">Crypto Payment Notes &amp; Network Instructions</label>
+              <textarea name="crypto_payment_instructions" rows="3" placeholder="e.g. Please transfer exact amount in USDT (TRC-20) or BTC. Include your Transaction Hash (TXID) when submitting." class="admin-modal-textarea"><?= htmlspecialchars($settings['crypto_payment_instructions'] ?? 'Transfer exact USD equivalent to any wallet address above. Confirm network type carefully before dispatching.') ?></textarea>
             </div>
           </div>
         </div>
@@ -902,6 +960,17 @@ function switchSettingsTab(tabKey) {
   window.history.replaceState({}, '', url);
 
   if (window.lucide) lucide.createIcons();
+}
+
+function launchWebInstaller() {
+  if (!confirm('Authorize and launch the 5-step Web Setup Wizard to reconfigure platform branding and database parameters?')) {
+    return;
+  }
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '<?= url("/admin/settings/launch-installer") ?>';
+  document.body.appendChild(form);
+  form.submit();
 }
 </script>
 

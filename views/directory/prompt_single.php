@@ -15,9 +15,9 @@
       </div>
       <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;"><?= htmlspecialchars($prompt['title']) ?></h1>
       <div style="font-size: 0.82rem; color: var(--ts-text-tertiary); margin-bottom: 0.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-        <span>Published <?= \App\Core\DateHelper::formatDateTime($prompt['created_at'] ?? 'now') ?></span>
+        <span>Published <?= \App\Core\DateHelper::render($prompt['created_at'] ?? 'now', 'M j, Y • g:i A', 'datetime') ?></span>
         <?php if (!empty($prompt['updated_at']) && strtotime($prompt['updated_at']) > strtotime($prompt['created_at'] ?? 'now') + 60): ?>
-          <span style="color: #38bdf8;">&bull; Updated <?= \App\Core\DateHelper::formatDateTime($prompt['updated_at']) ?></span>
+          <span style="color: #38bdf8;">&bull; Updated <?= \App\Core\DateHelper::render($prompt['updated_at'], 'M j, Y • g:i A', 'datetime') ?></span>
         <?php endif; ?>
       </div>
       <p style="color: var(--ts-text-secondary); font-size: 1.1rem;"><?= htmlspecialchars($prompt['summary']) ?></p>

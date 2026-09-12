@@ -49,3 +49,14 @@
     ExpiresByType font/woff2 "access plus 1 month"
     ExpiresByType font/woff "access plus 1 month"
 </IfModule>
+
+# Cache-Control Headers & CDN Optimization
+<IfModule mod_headers.c>
+    <FilesMatch "\.(ico|pdf|jpg|jpeg|png|gif|webp|svg|js|css|woff|woff2|ttf|eot)$">
+        Header set Cache-Control "max-age=2592000, public, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(html|htm|php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+

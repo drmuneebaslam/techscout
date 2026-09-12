@@ -1973,3 +1973,87 @@ body.theme-light .audit-inspector-footer {
   font-weight: 600;
 }
 
+/* ==========================================================================
+   100X ADMIN UI & UX VISUAL POLISH SYSTEM
+   Glassmorphism, Micro-Glow Effects, Interactive Polish & High-DPI Contrast
+   ========================================================================== */
+.admin-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.admin-card:hover {
+  border-color: var(--admin-border-focus);
+  box-shadow: 0 10px 30px -10px var(--admin-primary-glow);
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background-color: var(--admin-bg-elevated);
+}
+
+.admin-btn {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-btn:active {
+  transform: scale(0.97);
+}
+
+.admin-btn-primary {
+  box-shadow: 0 2px 10px var(--admin-primary-glow);
+}
+
+.admin-btn-primary:hover {
+  box-shadow: 0 4px 18px var(--admin-primary-glow);
+  transform: translateY(-1px);
+}
+
+/* Custom Sleek Scrollbar */
+.admin-sidebar::-webkit-scrollbar,
+.admin-table-wrap::-webkit-scrollbar,
+.custom-export-pane::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track,
+.admin-table-wrap::-webkit-scrollbar-track,
+.custom-export-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb,
+.admin-table-wrap::-webkit-scrollbar-thumb,
+.custom-export-pane::-webkit-scrollbar-thumb {
+  background: var(--admin-border-main);
+  border-radius: 9999px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover,
+.admin-table-wrap::-webkit-scrollbar-thumb:hover,
+.custom-export-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-primary);
+}
+
+/* Micro Status Badges */
+.admin-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 20px;
+  border: 1px solid transparent;
+}
+
+

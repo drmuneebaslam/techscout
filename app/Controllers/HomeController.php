@@ -243,4 +243,99 @@ class HomeController {
             'totalPages' => $totalPages
         ]);
     }
+
+    public function sponsor(Request $request): void {
+        $tab = $request->query('tab', 'tool');
+        $categories = Database::query("SELECT id, name, slug FROM categories ORDER BY sort_order ASC, name ASC");
+
+        $flashSuccess = \App\Core\Session::getFlash('success');
+        $flashError = \App\Core\Session::getFlash('error');
+
+        Response::view('public/sponsor', [
+            'title' => 'Sponsored Placements & Advertiser Treasury | TechScout',
+            'currentTab' => $tab,
+            'categories' => $categories,
+            'flashSuccess' => $flashSuccess,
+            'flashError' => $flashError
+        ]);
+    }
+
+    public function submitSponsoredTool(Request $request): void {
+        $title = trim((string)$request->post('title', ''));
+        $targetUrl = trim((string)$request->post('target_url', ''));
+        $categoryId = (int)$request->post('category_id', 1);
+        $authorName = trim((string)$request->post('author_name', ''));
+        $authorEmail = trim((string)$request->post('author_email', ''));
+        $summary = trim((string)$request->post('summary', ''));
+        $bodyContent = trim((string)$request->post('body_content', ''));
+        $imageUrl = trim((string)$request->post('image_url', ''));
+        $cryptoCurrency = (string)$request->post('crypto_currency', 'USDT');
+        $cryptoTxid = trim((string)$request->post('crypto_txid', ''));
+
+        if (empty($title) || empty($targetUrl) || empty($authorEmail) || empty($cryptoTxid)) {
+            \App\Core\Session::flash('error', 'Please complete all required fields including the transaction hash (TXID).');
+            Response::redirect('/sponsor?tab=tool');
+            return;
+        }
+
+        try {
+            Database::execute(
+                "INSERT INTO sponsored_submissions 
+                (type, title, target_url, category_id, author_name, author_email, summary, body_content, image_url, pricing_amount_usd, crypto_currency, crypto_txid, status, created_at)
+                VALUES ('tool', ?, ?, ?, ?, ?, ?, ?, ?, 149.00, ?, ?, 'pending_review', NOW())",
+                [$title, $targetUrl, $categoryId, $authorName, $authorEmail, $summary, $bodyContent, $imageUrl, $cryptoCurrency, $cryptoTxid]
+            );
+
+            \App\Core\Session::flash('success', 'Your sponsored AI tool submission and payment proof have been received! Our team will verify the TXID on-chain and publish within 24 hours.');
+        } catch (\Throwable $e) {
+            \App\Core\Session::flash('error', 'Submission error: ' . $e->getMessage());
+        }
+
+        Response::redirect('/sponsor?tab=tool');
+    }
+
+    public function submitSponsoredPost(Request $request): void {
+        $title = trim((string)$request->post('title', ''));
+        $targetUrl = trim((string)$request->post('target_url', ''));
+        $categoryId = (int)$request->post('category_id', 1);
+        $authorName = trim((string)$request->post('author_name', ''));
+        $authorEmail = trim((string)$request->post('author_email', ''));
+        $summary = trim((string)$request->post('summary', ''));
+        $bodyContent = trim((string)$request->post('body_content', ''));
+        $imageUrl = trim((string)$request->post('image_url', ''));
+        $cryptoCurrency = (string)$request->post('crypto_currency', 'USDT');
+        $cryptoTxid = trim((string)$request->post('crypto_txid', ''));
+
+        if (empty($title) || empty($authorEmail) || empty($cryptoTxid)) {
+            \App\Core\Session::flash('error', 'Please provide article headline, email, and crypto transaction hash.');
+            Response::redirect('/sponsor?tab=article');
+            return;
+        }
+
+        // Handle uploaded .docx or .doc file if provided
+        if (!empty($_FILES['article_docx']['tmp_name']) && is_uploaded_file($_FILES['article_docx']['tmp_name'])) {
+            $uploadDir = dirname(__DIR__, 2) . '/assets/uploads/sponsored_docs';
+            if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+            $ext = pathinfo($_FILES['article_docx']['name'], PATHINFO_EXTENSION);
+            $filename = 'spons_doc_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+            if (move_uploaded_file($_FILES['article_docx']['tmp_name'], $uploadDir . '/' . $filename)) {
+                $bodyContent .= "\n\n[Uploaded Document Manuscript: " . $filename . "]";
+            }
+        }
+
+        try {
+            Database::execute(
+                "INSERT INTO sponsored_submissions 
+                (type, title, target_url, category_id, author_name, author_email, summary, body_content, image_url, pricing_amount_usd, crypto_currency, crypto_txid, status, created_at)
+                VALUES ('article', ?, ?, ?, ?, ?, ?, ?, ?, 299.00, ?, ?, 'pending_review', NOW())",
+                [$title, $targetUrl, $categoryId, $authorName, $authorEmail, $summary, $bodyContent, $imageUrl, $cryptoCurrency, $cryptoTxid]
+            );
+
+            \App\Core\Session::flash('success', 'Your sponsored article manuscript and payment proof have been received! Our editorial team is reviewing your piece and will notify you at ' . htmlspecialchars($authorEmail) . '.');
+        } catch (\Throwable $e) {
+            \App\Core\Session::flash('error', 'Submission error: ' . $e->getMessage());
+        }
+
+        Response::redirect('/sponsor?tab=article');
+    }
 }

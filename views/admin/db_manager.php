@@ -84,6 +84,9 @@
     <a href="<?= url('/admin/db-manager?tab=query') ?>" class="ts-subtab-link <?= ($activeTab === 'query') ? 'active' : '' ?>">
       ⚡ SQL Maintenance Terminal
     </a>
+    <a href="<?= url('/admin/db-manager?tab=custom_export') ?>" class="ts-subtab-link <?= ($activeTab === 'custom_export') ? 'active' : '' ?>" style="color: #38bdf8; font-weight: 700;">
+      📦 Custom Export Studio (Folders, Schema &amp; Granular Seeds) ⚡
+    </a>
   </div>
 
   <!-- ========================================================================= -->
@@ -478,6 +481,266 @@ ALTER TABLE `system_error_logs`
       </div>
 
     </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB 5: CUSTOM EXPORT STUDIO (FOLDERS, SCHEMA & GRANULAR SEEDS) -->
+  <!-- ========================================================================= -->
+  <?php elseif ($activeTab === 'custom_export'): ?>
+    <?php
+      $dirInfo = $directoryTree ?? \App\Models\CustomExporter::getDirectoryTree();
+      $tablesMeta = $tablesWithMeta ?? \App\Models\CustomExporter::getTablesMetadata();
+    ?>
+    <form id="customExportForm" action="<?= url('/admin/db-manager/custom-export') ?>" method="POST">
+      <input type="hidden" name="tables_config" id="tables_config_json" value="{}">
+
+      <!-- Studio Header & Quick Presets -->
+      <div class="admin-table-wrap" style="padding: 1.75rem; margin-bottom: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <span class="ts-badge ts-badge-cyan" style="font-weight: 800;">ENTERPRISE DEPLOYMENT STUDIO</span>
+              <span class="ts-badge ts-badge-green">GRANULAR SEED SELECTOR</span>
+            </div>
+            <h2 style="font-size: 1.4rem; color: var(--admin-text-main); margin: 0 0 0.25rem 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+              📦 Selective Workspace &amp; Database Exporter
+            </h2>
+            <p style="color: var(--admin-text-muted); font-size: 0.85rem; margin: 0;">
+              Select exactly which project folders to package, live database table schemas to extract, and pick specific records as SQL seeds.
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" onclick="selectPreset('recommended')" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+              ✨ Production Core Preset
+            </button>
+            <button type="button" onclick="selectPreset('all')" class="ts-btn ts-btn-outline ts-btn-sm">
+              📁 Select All Files &amp; Schemas
+            </button>
+            <button type="button" onclick="selectPreset('reset')" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">
+              🔄 Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid: Section 1 (Directories) & Section 2 (Tables / Seeds) -->
+      <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        
+        <!-- =================================================================== -->
+        <!-- 1. DIRECTORY TREE SELECTOR -->
+        <!-- =================================================================== -->
+        <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.1rem; color: var(--admin-text-main); margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📁 Workspace Project Folders</span>
+                <span id="selected_folders_count_badge" class="ts-badge ts-badge-cyan" style="font-size: 0.7rem;">0 folders selected</span>
+              </h3>
+              <p style="color: var(--admin-text-muted); font-size: 0.8rem; margin: 0;">Choose root directories to compress into the deployment archive</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" onclick="toggleAllFolders(true)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Check All</button>
+              <button type="button" onclick="toggleAllFolders(false)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Uncheck All</button>
+            </div>
+          </div>
+
+          <!-- Directory Cards Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+            <?php foreach (($dirInfo['directories'] ?? []) as $dirKey => $dir): ?>
+              <label class="folder-select-card" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border-radius: 8px; border: 1px solid var(--admin-border-color); background: var(--admin-input-bg); cursor: pointer; transition: all 0.2s ease;">
+                <input type="checkbox" name="folders[]" value="<?= htmlspecialchars($dirKey) ?>" class="folder-checkbox" <?= !empty($dir['recommended']) ? 'checked' : '' ?> onchange="updateExportSummary()" style="margin-top: 0.25rem; width: 16px; height: 16px; accent-color: #38bdf8;">
+                <div style="flex: 1;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                    <strong style="color: var(--admin-text-main); font-size: 0.92rem;"><?= htmlspecialchars($dir['name']) ?></strong>
+                    <?php if (!empty($dir['recommended'])): ?>
+                      <span class="ts-badge ts-badge-indigo" style="font-size: 0.58rem;">CORE</span>
+                    <?php endif; ?>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--admin-text-muted); margin-bottom: 0.45rem;">
+                    <?= htmlspecialchars($dir['desc']) ?>
+                  </div>
+                  <div style="display: flex; gap: 0.75rem; font-size: 0.72rem; color: #38bdf8; font-family: var(--admin-font-mono);">
+                    <span>📄 <?= number_format($dir['file_count']) ?> files</span>
+                    <span>💾 <?= htmlspecialchars($dir['size_formatted']) ?></span>
+                  </div>
+                </div>
+              </label>
+            <?php endforeach; ?>
+          </div>
+
+          <!-- Root Files Checkbox Strip -->
+          <div style="padding: 0.85rem 1rem; background: rgba(56,189,248,0.04); border: 1px dashed rgba(56,189,248,0.25); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; margin: 0;">
+              <input type="checkbox" name="include_root_files" value="1" checked onchange="updateExportSummary()" style="width: 16px; height: 16px; accent-color: #38bdf8;">
+              <div>
+                <strong style="color: var(--admin-text-main); font-size: 0.85rem;">Include Root Deployment Files</strong>
+                <span style="font-size: 0.78rem; color: var(--admin-text-muted); margin-left: 0.35rem;">
+                  (<code>index.php</code>, <code>.htaccess</code>, <code>favicon.ico</code>, <code>robots.txt</code>, <code>composer.json</code>)
+                </span>
+              </div>
+            </label>
+            <span style="font-size: 0.78rem; color: #38bdf8; font-family: var(--admin-font-mono);">
+              <?= count($dirInfo['root_files'] ?? []) ?> files (~<?= $dirInfo['root_files_total_size'] ?? '0 KB' ?>)
+            </span>
+          </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 2. DATABASE SCHEMA & GRANULAR SEED EXPORTER -->
+        <!-- =================================================================== -->
+        <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.1rem; color: var(--admin-text-main); margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🗄️ Database Schemas &amp; Granular Seed Picker</span>
+                <span id="selected_schemas_count_badge" class="ts-badge ts-badge-green" style="font-size: 0.7rem;">0 schemas</span>
+                <span id="selected_seeds_count_badge" class="ts-badge ts-badge-pink" style="font-size: 0.7rem;">0 seeds</span>
+              </h3>
+              <p style="color: var(--admin-text-muted); font-size: 0.8rem; margin: 0;">Extract real DDL CREATE TABLE structures and pick exact records as INSERT INTO seeds</p>
+            </div>
+            
+            <!-- Quick Filter & Fast Selectors -->
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              <input type="text" id="exportTableSearch" onkeyup="filterExportTables()" placeholder="🔍 Filter table..." style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); padding: 0.35rem 0.75rem; border-radius: 6px; color: var(--admin-text-main); font-size: 0.82rem; width: 170px;">
+              <button type="button" onclick="setAllSchemas(true)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">All Schemas</button>
+              <button type="button" onclick="setAllSchemas(false)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">No Schemas</button>
+              <button type="button" onclick="setAllSeedsMode('none')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Clear Seeds</button>
+            </div>
+          </div>
+
+          <!-- Tables & Seed Mode List -->
+          <div style="overflow-x: auto; max-height: 600px; border: 1px solid var(--admin-border-color); border-radius: 8px;">
+            <table class="admin-table" id="exportTablesGrid" style="margin: 0;">
+              <thead style="position: sticky; top: 0; z-index: 5; background: var(--admin-card-bg);">
+                <tr>
+                  <th style="width: 45px; text-align: center;">DDL</th>
+                  <th>Table Name</th>
+                  <th>Total Rows</th>
+                  <th>Engine / Footprint</th>
+                  <th style="width: 380px;">Seed Generation Mode</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($tablesMeta as $tblName => $tm): ?>
+                  <tr class="export-table-row" data-table="<?= htmlspecialchars($tblName) ?>">
+                    <td style="text-align: center;">
+                      <input type="checkbox" id="schema_<?= htmlspecialchars($tblName) ?>" class="table-schema-checkbox" checked onchange="updateTableConfig('<?= htmlspecialchars($tblName) ?>')" style="width: 16px; height: 16px; accent-color: #10b981;" title="Include CREATE TABLE schema">
+                    </td>
+                    <td>
+                      <label for="schema_<?= htmlspecialchars($tblName) ?>" style="cursor: pointer; margin: 0;">
+                        <strong style="color: var(--admin-text-main); font-family: var(--admin-font-mono); font-size: 0.88rem;"><?= htmlspecialchars($tblName) ?></strong>
+                        <?php if (in_array($tblName, ['users', 'contents', 'site_settings', 'categories', 'mail_templates'], true)): ?>
+                          <span class="ts-badge ts-badge-cyan" style="font-size: 0.58rem; margin-left: 0.25rem;">KEY SEED</span>
+                        <?php endif; ?>
+                      </label>
+                    </td>
+                    <td>
+                      <span style="font-family: var(--admin-font-mono); font-size: 0.84rem; color: var(--admin-text-main);">
+                        <?= number_format($tm['rows']) ?>
+                      </span>
+                    </td>
+                    <td>
+                      <span style="font-size: 0.75rem; color: var(--admin-text-muted); font-family: var(--admin-font-mono);">
+                        <?= htmlspecialchars($tm['engine']) ?> &bull; <?= htmlspecialchars($tm['size_formatted']) ?>
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                        <label style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; cursor: pointer; margin: 0; color: var(--admin-text-muted);">
+                          <input type="radio" name="seed_mode_<?= htmlspecialchars($tblName) ?>" value="none" checked onchange="setTableSeedMode('<?= htmlspecialchars($tblName) ?>', 'none')" style="accent-color: #94a3b8;">
+                          <span>No Seeds</span>
+                        </label>
+                        <?php if ($tm['rows'] > 0): ?>
+                          <label style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; cursor: pointer; margin: 0; color: #10b981;">
+                            <input type="radio" name="seed_mode_<?= htmlspecialchars($tblName) ?>" value="all" onchange="setTableSeedMode('<?= htmlspecialchars($tblName) ?>', 'all')" style="accent-color: #10b981;">
+                            <span>All (<?= number_format($tm['rows']) ?>)</span>
+                          </label>
+                          <label style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; cursor: pointer; margin: 0; color: #38bdf8;">
+                            <input type="radio" name="seed_mode_<?= htmlspecialchars($tblName) ?>" value="selected" onchange="setTableSeedMode('<?= htmlspecialchars($tblName) ?>', 'selected')" style="accent-color: #38bdf8;">
+                            <span>Selective</span>
+                          </label>
+                          <button type="button" id="btn_pick_<?= htmlspecialchars($tblName) ?>" onclick="openSeedPickerModal('<?= htmlspecialchars($tblName) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="display: none; font-size: 0.7rem; padding: 0.15rem 0.5rem; color: #f43f5e; border-color: rgba(244,63,94,0.3);">
+                            🔍 Pick Rows (<span id="count_label_<?= htmlspecialchars($tblName) ?>">0</span>)
+                          </button>
+                        <?php else: ?>
+                          <span style="font-size: 0.72rem; color: #64748b; font-style: italic;">(Table is empty)</span>
+                        <?php endif; ?>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Floating Sticky Action Dock -->
+      <div style="position: sticky; bottom: 1.5rem; z-index: 50; padding: 1.25rem 1.75rem; background: var(--admin-card-bg); border: 1px solid rgba(56,189,248,0.3); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; backdrop-filter: blur(12px);">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.95rem; font-weight: 700; color: var(--admin-text-main);">
+            <span>🚀 Custom Export Summary:</span>
+            <span id="hud_folders_count" style="color: #38bdf8;">0 Folders</span>
+            <span>&bull;</span>
+            <span id="hud_schemas_count" style="color: #10b981;">0 Schemas</span>
+            <span>&bull;</span>
+            <span id="hud_seeds_count" style="color: #f43f5e;">0 Seeds</span>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--admin-text-muted); margin-top: 0.2rem;">
+            Ready to generate packaged deployment archive with manifest and custom SQL file.
+          </div>
+        </div>
+
+        <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #0284c7, #38bdf8); padding: 0.75rem 1.75rem; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 15px rgba(56,189,248,0.35);">
+          <i data-lucide="download"></i> Download Customized Archive (.ZIP) ⚡
+        </button>
+      </div>
+    </form>
+
+    <!-- Interactive Seed Row Selection Modal -->
+    <div id="seedPickerModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="admin-table-wrap" style="width: 100%; max-width: 850px; max-height: 85vh; display: flex; flex-direction: column; padding: 1.75rem; background: var(--admin-card-bg); border: 1px solid rgba(56,189,248,0.4); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--admin-border-color); padding-bottom: 0.75rem;">
+          <div>
+            <h3 style="font-size: 1.2rem; color: var(--admin-text-main); margin: 0;" id="seedModalTitle">Select Specific Seed Rows</h3>
+            <span style="font-size: 0.78rem; color: var(--admin-text-muted);" id="seedModalSubtitle">Table: <code>users</code></span>
+          </div>
+          <button type="button" onclick="closeSeedPickerModal()" style="background: none; border: none; color: var(--admin-text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.75rem; flex-wrap: wrap;">
+          <input type="text" id="seedRowSearchInput" onkeyup="searchSeedRowsDebounced()" placeholder="🔍 Search records..." style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); padding: 0.4rem 0.85rem; border-radius: 6px; color: var(--admin-text-main); font-size: 0.82rem; flex: 1; min-width: 200px;">
+          <div style="display: flex; gap: 0.4rem;">
+            <button type="button" onclick="toggleAllModalRows(true)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem;">Select All Visible</button>
+            <button type="button" onclick="toggleAllModalRows(false)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem;">Deselect All Visible</button>
+          </div>
+        </div>
+
+        <div id="seedModalLoading" style="padding: 2.5rem; text-align: center; color: var(--admin-text-muted); font-size: 0.9rem;">
+          Loading records from database...
+        </div>
+
+        <div id="seedModalTableContainer" style="overflow-y: auto; flex: 1; border: 1px solid var(--admin-border-color); border-radius: 6px; display: none;">
+          <table class="admin-table" id="seedModalRowsTable" style="margin: 0; font-size: 0.8rem;">
+            <thead style="position: sticky; top: 0; z-index: 2; background: var(--admin-card-bg);">
+              <tr id="seedModalThead"></tr>
+            </thead>
+            <tbody id="seedModalTbody"></tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; border-top: 1px solid var(--admin-border-color); padding-top: 0.75rem;">
+          <span id="seedModalSelectedCount" style="font-size: 0.85rem; color: #38bdf8; font-weight: 700;">0 rows selected</span>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" onclick="closeSeedPickerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+            <button type="button" onclick="saveSeedPickerSelection()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #10b981; font-weight: 700;">
+              Confirm Selected Seeds ✓
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   <?php endif; ?>
 
 </div>
@@ -802,6 +1065,302 @@ function copyAlterStatements() {
     alert('SQL ALTER Statements copied to clipboard! Paste into phpMyAdmin or MySQL terminal.');
   });
 }
+
+/* ========================================================================== */
+/* CUSTOM EXPORT STUDIO JAVASCRIPT STATE ENGINE                               */
+/* ========================================================================== */
+const exportState = {
+  tables: {},
+  activeModalTable: null,
+  activeModalRows: [],
+  selectedIdsTemp: new Set()
+};
+
+function initExportState() {
+  document.querySelectorAll('.export-table-row').forEach(tr => {
+    const tbl = tr.getAttribute('data-table');
+    const hasSchema = document.getElementById('schema_' + tbl)?.checked ?? true;
+    exportState.tables[tbl] = {
+      include_schema: hasSchema,
+      seed_mode: 'none',
+      selected_ids: []
+    };
+  });
+  updateExportSummary();
+}
+
+function updateTableConfig(tbl) {
+  if (!exportState.tables[tbl]) {
+    exportState.tables[tbl] = { include_schema: true, seed_mode: 'none', selected_ids: [] };
+  }
+  exportState.tables[tbl].include_schema = !!document.getElementById('schema_' + tbl)?.checked;
+  updateExportSummary();
+}
+
+function setTableSeedMode(tbl, mode) {
+  if (!exportState.tables[tbl]) {
+    exportState.tables[tbl] = { include_schema: true, seed_mode: 'none', selected_ids: [] };
+  }
+  exportState.tables[tbl].seed_mode = mode;
+  const btn = document.getElementById('btn_pick_' + tbl);
+  if (btn) {
+    btn.style.display = (mode === 'selected') ? 'inline-flex' : 'none';
+  }
+  if (mode === 'selected' && (!exportState.tables[tbl].selected_ids || !exportState.tables[tbl].selected_ids.length)) {
+    openSeedPickerModal(tbl);
+  }
+  updateExportSummary();
+}
+
+function toggleAllFolders(checked) {
+  document.querySelectorAll('.folder-checkbox').forEach(cb => cb.checked = checked);
+  updateExportSummary();
+}
+
+function setAllSchemas(checked) {
+  document.querySelectorAll('.table-schema-checkbox').forEach(cb => {
+    cb.checked = checked;
+    const tbl = cb.id.replace('schema_', '');
+    if (exportState.tables[tbl]) exportState.tables[tbl].include_schema = checked;
+  });
+  updateExportSummary();
+}
+
+function setAllSeedsMode(mode) {
+  Object.keys(exportState.tables).forEach(tbl => {
+    const radio = document.querySelector(`input[name="seed_mode_${tbl}"][value="${mode}"]`);
+    if (radio) {
+      radio.checked = true;
+      setTableSeedMode(tbl, mode);
+    }
+  });
+  updateExportSummary();
+}
+
+function selectPreset(preset) {
+  if (preset === 'recommended') {
+    const core = ['app', 'views', 'assets', 'database', 'public'];
+    document.querySelectorAll('.folder-checkbox').forEach(cb => {
+      cb.checked = core.includes(cb.value);
+    });
+    const rootCb = document.querySelector('input[name="include_root_files"]');
+    if (rootCb) rootCb.checked = true;
+    setAllSchemas(true);
+    setAllSeedsMode('none');
+    ['site_settings', 'categories'].forEach(tbl => {
+      const radio = document.querySelector(`input[name="seed_mode_${tbl}"][value="all"]`);
+      if (radio) {
+        radio.checked = true;
+        setTableSeedMode(tbl, 'all');
+      }
+    });
+  } else if (preset === 'all') {
+    toggleAllFolders(true);
+    const rootCb = document.querySelector('input[name="include_root_files"]');
+    if (rootCb) rootCb.checked = true;
+    setAllSchemas(true);
+    setAllSeedsMode('all');
+  } else if (preset === 'reset') {
+    toggleAllFolders(false);
+    const rootCb = document.querySelector('input[name="include_root_files"]');
+    if (rootCb) rootCb.checked = false;
+    setAllSchemas(false);
+    setAllSeedsMode('none');
+  }
+  updateExportSummary();
+}
+
+function filterExportTables() {
+  const q = (document.getElementById('exportTableSearch')?.value || '').toLowerCase();
+  document.querySelectorAll('.export-table-row').forEach(tr => {
+    const name = (tr.getAttribute('data-table') || '').toLowerCase();
+    tr.style.display = name.includes(q) ? '' : 'none';
+  });
+}
+
+function updateExportSummary() {
+  const foldersChecked = document.querySelectorAll('.folder-checkbox:checked').length;
+  const rootChecked = document.querySelector('input[name="include_root_files"]')?.checked ? 1 : 0;
+  const totalFoldersLabel = `${foldersChecked} folder${foldersChecked !== 1 ? 's' : ''}` + (rootChecked ? ' + root files' : '');
+  
+  const selectedFoldersBadge = document.getElementById('selected_folders_count_badge');
+  if (selectedFoldersBadge) selectedFoldersBadge.innerText = totalFoldersLabel;
+  const hudFolders = document.getElementById('hud_folders_count');
+  if (hudFolders) hudFolders.innerText = `${foldersChecked + rootChecked} Dirs/Files`;
+
+  let schemasCount = 0;
+  let seedsCount = 0;
+  Object.keys(exportState.tables).forEach(tbl => {
+    const t = exportState.tables[tbl];
+    if (t.include_schema) schemasCount++;
+    if (t.seed_mode === 'all') {
+      const rowText = document.querySelector(`tr[data-table="${tbl}"] td:nth-child(3)`)?.innerText.replace(/,/g, '') || '0';
+      seedsCount += parseInt(rowText, 10) || 0;
+    } else if (t.seed_mode === 'selected') {
+      seedsCount += (t.selected_ids ? t.selected_ids.length : 0);
+    }
+    const countLabel = document.getElementById('count_label_' + tbl);
+    if (countLabel) countLabel.innerText = (t.selected_ids ? t.selected_ids.length : 0);
+  });
+
+  const schemasBadge = document.getElementById('selected_schemas_count_badge');
+  if (schemasBadge) schemasBadge.innerText = `${schemasCount} schemas`;
+  const hudSchemas = document.getElementById('hud_schemas_count');
+  if (hudSchemas) hudSchemas.innerText = `${schemasCount} Schemas`;
+
+  const seedsBadge = document.getElementById('selected_seeds_count_badge');
+  if (seedsBadge) seedsBadge.innerText = `${seedsCount} seeds`;
+  const hudSeeds = document.getElementById('hud_seeds_count');
+  if (hudSeeds) hudSeeds.innerText = `${seedsCount} Seeds`;
+
+  const jsonField = document.getElementById('tables_config_json');
+  if (jsonField) jsonField.value = JSON.stringify(exportState.tables);
+}
+
+/* Modal Granular Row Selector */
+let searchDebounceTimer = null;
+function searchSeedRowsDebounced() {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    const q = document.getElementById('seedRowSearchInput')?.value || '';
+    if (exportState.activeModalTable) {
+      loadTableRows(exportState.activeModalTable, q);
+    }
+  }, 300);
+}
+
+function openSeedPickerModal(tableName) {
+  exportState.activeModalTable = tableName;
+  const modal = document.getElementById('seedPickerModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  document.getElementById('seedModalTitle').innerText = `Select Seed Rows from \`${tableName}\``;
+  document.getElementById('seedModalSubtitle').innerHTML = `Table: <code>${tableName}</code> &bull; Checked rows will be compiled into INSERT statements`;
+  document.getElementById('seedRowSearchInput').value = '';
+
+  exportState.selectedIdsTemp = new Set(exportState.tables[tableName]?.selected_ids || []);
+  updateModalSelectedCounter();
+  loadTableRows(tableName, '');
+}
+
+function closeSeedPickerModal() {
+  const modal = document.getElementById('seedPickerModal');
+  if (modal) modal.style.display = 'none';
+  exportState.activeModalTable = null;
+}
+
+function loadTableRows(tableName, search) {
+  const loader = document.getElementById('seedModalLoading');
+  const container = document.getElementById('seedModalTableContainer');
+  if (loader) loader.style.display = 'block';
+  if (container) container.style.display = 'none';
+
+  const url = `<?= url("/admin/db-manager/table-rows") ?>?table=${encodeURIComponent(tableName)}&search=${encodeURIComponent(search)}&limit=100`;
+  fetch(url, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(res => {
+      if (loader) loader.style.display = 'none';
+      if (!res.success || !res.data) {
+        if (loader) {
+          loader.innerText = 'Failed to load records.';
+          loader.style.display = 'block';
+        }
+        return;
+      }
+      exportState.activeModalRows = res.data.rows || [];
+      renderSeedModalRows(res.data);
+      if (container) container.style.display = 'block';
+    })
+    .catch(err => {
+      if (loader) {
+        loader.innerText = 'Network error loading records.';
+        loader.style.display = 'block';
+      }
+    });
+}
+
+function renderSeedModalRows(data) {
+  const thead = document.getElementById('seedModalThead');
+  const tbody = document.getElementById('seedModalTbody');
+  if (!thead || !tbody) return;
+
+  const pk = data.pk || 'id';
+  const previewCols = data.preview_columns || [];
+
+  let thHtml = `<th style="width: 40px; text-align: center;"><input type="checkbox" id="modalSelectAllHeader" onchange="toggleAllModalRows(this.checked)" style="width: 15px; height: 15px; accent-color: #38bdf8;"></th>`;
+  thHtml += `<th style="width: 80px;">${escapeHtml(pk)}</th>`;
+  previewCols.forEach(c => {
+    if (c !== pk) thHtml += `<th>${escapeHtml(c)}</th>`;
+  });
+  thead.innerHTML = thHtml;
+
+  if (!data.rows || !data.rows.length) {
+    tbody.innerHTML = `<tr><td colspan="${previewCols.length + 2}" style="text-align: center; color: var(--admin-text-muted); padding: 2rem;">No matching rows found in table.</td></tr>`;
+    return;
+  }
+
+  let trHtml = '';
+  data.rows.forEach(r => {
+    const rowId = String(r[pk] ?? '');
+    const isChecked = exportState.selectedIdsTemp.has(rowId);
+    trHtml += `<tr>`;
+    trHtml += `<td style="text-align: center;"><input type="checkbox" value="${escapeHtml(rowId)}" class="seed-row-cb" ${isChecked ? 'checked' : ''} onchange="toggleModalRowId('${escapeHtml(rowId)}', this.checked)" style="width: 15px; height: 15px; accent-color: #38bdf8;"></td>`;
+    trHtml += `<td style="font-family: var(--admin-font-mono); font-weight: 700; color: #38bdf8;">${escapeHtml(rowId)}</td>`;
+    previewCols.forEach(c => {
+      if (c !== pk) {
+        const val = r[c] !== null ? String(r[c]) : '<span style="color: #64748b; font-style: italic;">NULL</span>';
+        const displayVal = val.length > 50 ? escapeHtml(val.substring(0, 50)) + '...' : escapeHtml(val);
+        trHtml += `<td>${displayVal}</td>`;
+      }
+    });
+    trHtml += `</tr>`;
+  });
+  tbody.innerHTML = trHtml;
+}
+
+function toggleModalRowId(rowId, isChecked) {
+  if (isChecked) {
+    exportState.selectedIdsTemp.add(rowId);
+  } else {
+    exportState.selectedIdsTemp.delete(rowId);
+  }
+  updateModalSelectedCounter();
+}
+
+function toggleAllModalRows(checked) {
+  document.querySelectorAll('.seed-row-cb').forEach(cb => {
+    cb.checked = checked;
+    const rowId = cb.value;
+    if (checked) exportState.selectedIdsTemp.add(rowId);
+    else exportState.selectedIdsTemp.delete(rowId);
+  });
+  updateModalSelectedCounter();
+}
+
+function updateModalSelectedCounter() {
+  const counter = document.getElementById('seedModalSelectedCount');
+  if (counter) counter.innerText = `${exportState.selectedIdsTemp.size} row(s) selected`;
+}
+
+function saveSeedPickerSelection() {
+  if (!exportState.activeModalTable) return;
+  const tbl = exportState.activeModalTable;
+  exportState.tables[tbl].selected_ids = Array.from(exportState.selectedIdsTemp);
+  exportState.tables[tbl].seed_mode = exportState.tables[tbl].selected_ids.length > 0 ? 'selected' : 'none';
+  
+  const radio = document.querySelector(`input[name="seed_mode_${tbl}"][value="${exportState.tables[tbl].seed_mode}"]`);
+  if (radio) radio.checked = true;
+
+  closeSeedPickerModal();
+  updateExportSummary();
+}
+
+// Auto-initialize export state on page load if tab is active
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.location.search.includes('tab=custom_export')) {
+    initExportState();
+  }
+});
 </script>
 
 <?php require __DIR__ . '/../layouts/admin_footer.php'; ?>

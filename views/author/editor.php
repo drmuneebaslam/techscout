@@ -71,6 +71,29 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
       </div>
     <?php endif; ?>
 
+    <!-- Prominent Author Recommendation Banner: Prefer Word (.docx) Submissions -->
+    <div class="ts-card ts-docx-recommendation-card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+      <div style="display: flex; align-items: flex-start; gap: 0.85rem; flex: 1; min-width: 280px;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(56, 189, 248, 0.18); display: flex; align-items: center; justify-content: center; color: #38bdf8; flex-shrink: 0;">
+          <i data-lucide="file-text" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div>
+          <div style="font-weight: 700; color: var(--ts-text-primary); font-size: 0.98rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span>Editorial Submission Recommendation: Word (.docx) Submissions Strongly Preferred</span>
+            <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">FASTER REVIEW</span>
+          </div>
+          <p style="margin: 0.25rem 0 0 0; font-size: 0.86rem; color: var(--ts-text-secondary); line-height: 1.45;">
+            Authors are strongly encouraged to submit manuscripts in Microsoft Word (<code>.docx</code>) format. Word documents preserve embedded architecture diagrams, formatted tables, code listings, callouts, and heading hierarchies with 100% fidelity.
+          </p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button type="button" onclick="openDocxModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #0284c7, #0ea5e9); border: none; font-weight: 600; padding: 0.5rem 1.15rem; border-radius: 8px;">
+          <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Upload .docx File
+        </button>
+      </div>
+    </div>
+
     <!-- Document Metadata & Configuration Card -->
     <div class="ts-card" style="padding: 1.75rem; margin-bottom: 1.5rem; background: rgba(13,19,34,0.85); border-color: rgba(99,102,241,0.25);">
       <div style="margin-bottom: 1.25rem;">
@@ -399,8 +422,25 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
 
         <div class="ribbon-separator"></div>
 
+        <!-- Real-Time Metrics HUD (Word Counter, Character Counter, Reading Time) -->
+        <div class="ribbon-group" style="margin-left: auto; display: flex; align-items: center; gap: 0.6rem; background: var(--ts-bg-surface-elevated); padding: 0.3rem 0.75rem; border-radius: 8px; border: 1px solid var(--ts-border-subtle);">
+          <span style="font-size: 0.78rem; color: #38bdf8; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+            <i data-lucide="file-text" style="width: 12px; height: 12px;"></i> <span id="ribbonWordCount">0</span> words
+          </span>
+          <span style="color: var(--ts-border-subtle);">&bull;</span>
+          <span style="font-size: 0.78rem; color: var(--ts-text-secondary); font-weight: 600;">
+            <span id="ribbonCharCount">0</span> chars
+          </span>
+          <span style="color: var(--ts-border-subtle);">&bull;</span>
+          <span style="font-size: 0.78rem; color: var(--ts-success); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+            <i data-lucide="clock" style="width: 12px; height: 12px;"></i> <span id="ribbonReadTime">~1 min read</span>
+          </span>
+        </div>
+
+        <div class="ribbon-separator"></div>
+
         <!-- Group 7: Utility Tools -->
-        <div class="ribbon-group" style="margin-left: auto;">
+        <div class="ribbon-group">
           <button type="button" class="ribbon-btn" onclick="execCmd('removeFormat')" title="Clear Formatting">
             <i data-lucide="eraser"></i>
           </button>
@@ -1357,9 +1397,20 @@ function updateStats() {
   const chars = text.length;
   const readMins = Math.max(1, Math.ceil(words / 200));
 
-  document.getElementById('statWordCount').innerText = words;
-  document.getElementById('statCharCount').innerText = chars;
-  document.getElementById('statReadTime').innerText = `~${readMins} min read`;
+  const wordCountEl = document.getElementById('statWordCount');
+  const charCountEl = document.getElementById('statCharCount');
+  const readTimeEl = document.getElementById('statReadTime');
+  if (wordCountEl) wordCountEl.innerText = words.toLocaleString();
+  if (charCountEl) charCountEl.innerText = chars.toLocaleString();
+  if (readTimeEl) readTimeEl.innerText = `~${readMins} min`;
+
+  // Top ribbon counters
+  const ribbonWords = document.getElementById('ribbonWordCount');
+  const ribbonChars = document.getElementById('ribbonCharCount');
+  const ribbonTime = document.getElementById('ribbonReadTime');
+  if (ribbonWords) ribbonWords.innerText = words.toLocaleString();
+  if (ribbonChars) ribbonChars.innerText = chars.toLocaleString();
+  if (ribbonTime) ribbonTime.innerText = `~${readMins} min read`;
 
   // Quality score calculation
   let score = 50;

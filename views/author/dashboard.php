@@ -53,6 +53,9 @@ $getEntityUrl = function($type, $slug) {
         <button type="button" onclick="openProfileModal()" class="ts-btn ts-btn-outline ts-btn-sm">
           <i data-lucide="user"></i> Edit Profile ⚙️
         </button>
+        <a href="<?= url('/author/editor') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="border-color: #38bdf8; color: #38bdf8;">
+          <i data-lucide="file-up"></i> Import Word (.docx) 📄
+        </a>
         <a href="<?= url('/author/editor') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700;">
           <i data-lucide="plus-circle"></i> Create Publication ⚡
         </a>

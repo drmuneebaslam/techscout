@@ -108,9 +108,9 @@
             </a>
           </div>
           <div style="font-size: 0.8rem; color: var(--ts-text-tertiary); display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
-            <span>Published <?= \App\Core\DateHelper::formatDateTime($article['published_at'] ?? $article['created_at'] ?? 'now') ?></span>
+            <span>Published <?= \App\Core\DateHelper::render($article['published_at'] ?? $article['created_at'] ?? 'now', 'M j, Y • g:i A', 'datetime') ?></span>
             <?php if (!empty($article['updated_at']) && strtotime($article['updated_at']) > strtotime($article['published_at'] ?? $article['created_at'] ?? 'now') + 60): ?>
-              <span style="color: #38bdf8; font-weight: 500;">&bull; Updated <?= \App\Core\DateHelper::formatDateTime($article['updated_at']) ?></span>
+              <span style="color: #38bdf8; font-weight: 500;">&bull; Updated <?= \App\Core\DateHelper::render($article['updated_at'], 'M j, Y • g:i A', 'datetime') ?></span>
             <?php endif; ?>
             <span>&bull; <?= $article['reading_time_mins'] ?? 5 ?> min read</span>
           </div>

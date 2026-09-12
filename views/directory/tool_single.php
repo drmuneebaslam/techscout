@@ -240,9 +240,9 @@
           </h1>
 
           <div class="tool-hero-meta" style="font-size: 0.82rem; color: var(--ts-text-tertiary); margin-bottom: 0.85rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-            <span>Added <?= \App\Core\DateHelper::formatDateTime($tool['created_at'] ?? 'now') ?></span>
+            <span>Added <?= \App\Core\DateHelper::render($tool['created_at'] ?? 'now', 'M j, Y • g:i A', 'datetime') ?></span>
             <?php if (!empty($tool['updated_at']) && strtotime($tool['updated_at']) > strtotime($tool['created_at'] ?? 'now') + 60): ?>
-              <span style="color: #38bdf8;">&bull; Updated <?= \App\Core\DateHelper::formatDateTime($tool['updated_at']) ?></span>
+              <span style="color: #38bdf8;">&bull; Updated <?= \App\Core\DateHelper::render($tool['updated_at'], 'M j, Y • g:i A', 'datetime') ?></span>
             <?php endif; ?>
             <span>&bull; Category: <strong style="color: var(--ts-text-secondary);"><?= htmlspecialchars($tool['category_name'] ?? 'AI') ?></strong></span>
           </div>

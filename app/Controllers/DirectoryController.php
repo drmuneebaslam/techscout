@@ -91,14 +91,29 @@ class DirectoryController {
         $sort = $request->query('sort', 'popular');
         $search = trim((string)$request->query('search', ''));
         $model = $request->query('model');
+        $tab = $request->query('tab', '');
+
+        $imageCategorySlugs = ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion'];
+        $isImageCategory = $category && in_array($category, $imageCategorySlugs, true);
+
+        if ($tab === 'image' || $isImageCategory) {
+            $activeTab = 'image';
+        } elseif ($tab === 'text') {
+            $activeTab = 'text';
+        } else {
+            $activeTab = 'all';
+        }
 
         $filters = [
             'search' => $search,
-            'model' => $model
+            'model' => $model,
+            'prompt_kind' => ($activeTab === 'image') ? 'image' : (($activeTab === 'text') ? 'text' : 'all')
         ];
 
         $prompts = Content::getFeed('prompt', $category, $sort, 24, 0, $filters);
         $categories = Database::query("SELECT c.*, p.name as parent_name FROM categories c LEFT JOIN categories p ON c.parent_id = p.id WHERE c.applicable_to IN ('all', 'prompt') ORDER BY c.sort_order ASC, c.name ASC");
+
+        $imageCategories = Database::query("SELECT * FROM categories WHERE slug IN ('midjourney', 'dall-e', 'flux', 'stable-diffusion') OR parent_id = 30 ORDER BY sort_order ASC");
 
         $categoryInfo = null;
         if ($category && $category !== 'all') {
@@ -109,11 +124,13 @@ class DirectoryController {
             'title' => ($categoryInfo ? $categoryInfo['name'] . ' — ' : '') . 'Engineering Prompt Library & Variable Injector | TechScout',
             'prompts' => $prompts,
             'categories' => $categories,
+            'imageCategories' => $imageCategories,
             'currentCategory' => $category,
             'categoryInfo' => $categoryInfo,
             'currentSort' => $sort,
             'currentSearch' => $search,
-            'currentModel' => $model
+            'currentModel' => $model,
+            'activeTab' => $activeTab
         ]);
     }
 
