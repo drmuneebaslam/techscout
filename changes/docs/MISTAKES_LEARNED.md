@@ -179,6 +179,30 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-16: Session Flash Premature Consumption in UI Views
+* **Root Cause:** 
+  - Calling `\App\Core\Session::getFlash('query_results')` multiple times inside a single view (e.g., first inside a `<textarea>` to restore the query SQL, and later in an `if (!empty($queryFlash))` check).
+  - In `Session::getFlash($key)`, retrieving a flash key unsets it from `$_SESSION['_flash'][$key]`.
+* **Consequences:**
+  - The first call consumes and destroys the flash data, causing the subsequent block to always receive `null`.
+  - As a result, database query outputs, validation payloads, or success grids fail to display ("when i run query it does not show anything").
+* **Mandatory Rule:**
+  - In view templates, always retrieve flash data ONCE at the top of the relevant block into a local variable (e.g. `$queryFlash = \App\Core\Session::getFlash('query_results');`), and reference that variable for all subsequent checks and field bindings.
+
+---
+
+### 🔴 MISTAKE-17: Modal Dark-Mode Inversion from Hardcoded Inline Styles & Generic Overrides
+* **Root Cause:** 
+  - Applying hardcoded dark inline styles (`background: #090d16; color: #f8fafc;`) to modal elements while generic stylesheet rules (e.g. `[data-theme="light"] .admin-modal-box { background: #ffffff !important; }`) indiscriminately override the element when the body or HTML tag has `theme-light` active.
+  - Using hardcoded colors prevents modal components from responding smoothly to dual theme changes.
+* **Consequences:**
+  - Modals (such as Audit Log Forensic Inspector and Error Logs Inspector) appear inverted, white, or broken in dark mode ("admin-modal-box in audit log inspector is weired and light even in dark mode").
+* **Mandatory Rule:**
+  - Create dedicated semantic classes (e.g. `.audit-inspector-box`, `.audit-inspector-card`, `.audit-inspector-code`) using CSS variables (`var(--admin-card-bg)`, `var(--admin-text-main)`, `var(--admin-border-color)`).
+  - Decouple specialized inspector telemetry modals from generic class overrides (`.admin-modal-box`), ensuring complete visual fidelity in both Obsidian Dark and Clean Light modes.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -196,6 +220,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 13. [ ] **Symmetric Theme Toggling & Clean Dual-Mode Isolation**: Are `data-theme` and `theme-light` updated symmetrically on both `document.documentElement` and `document.body`, with light theme tokens strictly scoped to root selectors to prevent dark mode leakage?
 14. [ ] **Segregated Local vs. Hosted Environment Credentials**: Are local configurations configured for localhost execution while `changes/app/Core/Config.php` preserves hosted production credentials?
 15. [ ] **Isolated Direct FTP Deployment & Zero Mutation of Unrelated Remote Folders**: Are uploads to `/htdocs/` via FTP restricted solely to the modified files, strictly preserving all pre-existing folders (`old/`, `old2/`, `oldlat/`, `tech/`, etc.) untouched?
+16. [ ] **Single-Consumption Session Flash Extraction**: Is `Session::getFlash()` called exactly once per key and assigned to a local variable to prevent early wipeout before rendering?
+17. [ ] **Semantic Dual-Theme Modals & CSS Variables**: Are modal dialogs and inspectors styled using semantic classes and CSS variables without hardcoded tag colors or unwanted generic class overrides?
 
 
 

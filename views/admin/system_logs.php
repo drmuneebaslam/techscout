@@ -288,23 +288,23 @@ require __DIR__ . '/../layouts/admin_header.php';
 <!-- COMPREHENSIVE SUB-TAB FORENSIC INSPECTOR MODAL -->
 <!-- ========================================================================= -->
 <div id="errorInspectorModal" class="admin-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
-  <div class="admin-modal-box" style="max-width: 980px; width: 100%; max-height: 90vh; background: #090d16; border: 1px solid rgba(239,68,68,0.35); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 35px rgba(239,68,68,0.15); display: flex; flex-direction: column; overflow: hidden;">
+  <div class="audit-inspector-box inspector-error" style="max-width: 980px; width: 100%; max-height: 90vh;">
     
     <!-- Modal Top Header -->
-    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(148,163,184,0.12); background: #0c1220; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex: 0 0 auto;">
+    <div class="audit-inspector-header">
       <div>
         <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
           <span id="modalErrorTypeBadge" class="ts-badge ts-badge-red" style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; padding: 0.3rem 0.75rem; letter-spacing: 0.5px;"></span>
           <span id="modalFileLocation" style="font-size: 0.8rem; color: #38bdf8; font-family: var(--admin-font-mono); background: rgba(56,189,248,0.1); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(56,189,248,0.2);"></span>
-          <span id="modalLoggedTime" style="font-size: 0.75rem; color: #94a3b8; font-family: var(--admin-font-mono);"></span>
+          <span id="modalLoggedTime" style="font-size: 0.75rem; color: var(--admin-text-muted); font-family: var(--admin-font-mono);"></span>
         </div>
         <h3 id="modalErrorMessage" style="color: #f87171; font-size: 1.05rem; margin: 0; line-height: 1.45; word-break: break-word; font-family: 'Outfit', sans-serif;"></h3>
       </div>
-      <button type="button" onclick="closeErrorInspector()" style="background: transparent; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0.2rem 0.5rem; line-height: 1;">✕</button>
+      <button type="button" onclick="closeErrorInspector()" style="background: transparent; border: none; color: var(--admin-text-muted); font-size: 1.4rem; cursor: pointer; padding: 0.2rem 0.5rem; line-height: 1;">✕</button>
     </div>
 
     <!-- Inspector Navigation Sub-Tabs -->
-    <div style="display: flex; border-bottom: 1px solid rgba(148,163,184,0.12); background: #070a12; padding: 0 1.5rem; overflow-x: auto; gap: 0.5rem; flex: 0 0 auto;">
+    <div class="audit-inspector-tabs">
       <button type="button" class="inspector-tab-btn active" onclick="switchInspectorTab('tab-trace')" id="tabBtn-trace">
         💥 Exception &amp; Trace
       </button>
@@ -323,46 +323,46 @@ require __DIR__ . '/../layouts/admin_header.php';
     </div>
 
     <!-- Inspector Tab Content Panels -->
-    <div style="padding: 1.5rem; overflow-y: auto; flex: 1 1 auto; background: #090d16;">
+    <div class="audit-inspector-body">
       
       <!-- SUB-TAB 1: TRACE & SOURCE CODE -->
       <div id="panel-tab-trace" class="inspector-panel active">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <label style="font-size: 0.85rem; font-weight: 700; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px;">Call Stack Execution Trail</label>
+          <label style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text-main); text-transform: uppercase; letter-spacing: 0.5px;">Call Stack Execution Trail</label>
           <button type="button" onclick="copyTraceToClipboard()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">📋 Copy Trace</button>
         </div>
-        <pre id="modalErrorTrace" style="background: #05070b; border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 1.25rem; color: #cbd5e1; font-family: var(--admin-font-mono); font-size: 0.8rem; line-height: 1.6; white-space: pre-wrap; word-break: break-all; max-height: 420px; overflow-y: auto; margin: 0;"></pre>
+        <pre id="modalErrorTrace" class="audit-inspector-code" style="border-color: rgba(239,68,68,0.35);"></pre>
       </div>
 
       <!-- SUB-TAB 2: REQUEST & PAYLOAD -->
       <div id="panel-tab-request" class="inspector-panel" style="display: none;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
-          <div style="background: #05070b; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
-            <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 700;">HTTP Method</div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.7rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700;">HTTP Method</div>
             <div id="modalReqMethod" style="font-size: 1rem; font-weight: 800; color: #34d399; font-family: var(--admin-font-mono); margin-top: 0.2rem;"></div>
           </div>
-          <div style="background: #05070b; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
-            <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Request URI</div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.7rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700;">Request URI</div>
             <div id="modalReqUri" style="font-size: 0.92rem; font-weight: 700; color: #38bdf8; font-family: var(--admin-font-mono); margin-top: 0.2rem; word-break: break-all;"></div>
           </div>
         </div>
 
         <div style="margin-bottom: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <label style="font-size: 0.85rem; font-weight: 700; color: #f8fafc;">Captured Request Body &amp; Parameters</label>
-            <span style="font-size: 0.7rem; color: #94a3b8;">Passwords &amp; secrets automatically masked</span>
+            <label style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text-main);">Captured Request Body &amp; Parameters</label>
+            <span style="font-size: 0.7rem; color: var(--admin-text-muted);">Passwords &amp; secrets automatically masked</span>
           </div>
-          <pre id="modalReqPayload" style="background: #05070b; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 1.25rem; color: #e2e8f0; font-family: var(--admin-font-mono); font-size: 0.8rem; line-height: 1.5; white-space: pre-wrap; word-break: break-all; max-height: 320px; overflow-y: auto; margin: 0;"></pre>
+          <pre id="modalReqPayload" class="audit-inspector-code"></pre>
         </div>
       </div>
 
       <!-- SUB-TAB 3: HTTP HEADERS -->
       <div id="panel-tab-headers" class="inspector-panel" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <label style="font-size: 0.85rem; font-weight: 700; color: #f8fafc;">Captured Client Request Headers</label>
+          <label style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text-main);">Captured Client Request Headers</label>
           <button type="button" onclick="copyHeadersToClipboard()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">📋 Copy Headers</button>
         </div>
-        <div id="modalHeadersTableWrap" style="background: #05070b; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; max-height: 420px; overflow-y: auto;">
+        <div id="modalHeadersTableWrap" class="audit-inspector-card" style="padding: 0; max-height: 420px; overflow-y: auto;">
           <table class="admin-table" style="margin: 0; font-size: 0.8rem;">
             <thead>
               <tr>
@@ -379,31 +379,31 @@ require __DIR__ . '/../layouts/admin_header.php';
       <div id="panel-tab-device" class="inspector-panel" style="display: none;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
           <!-- IP & Country -->
-          <div style="background: #05070b; padding: 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
-            <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Client IP &amp; Geolocation</div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.7rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700;">Client IP &amp; Geolocation</div>
             <div id="modalClientIp" style="font-size: 1.05rem; font-weight: 800; color: #38bdf8; font-family: var(--admin-font-mono); margin-top: 0.2rem;"></div>
             <div id="modalLocationName" style="font-size: 0.85rem; color: #34d399; font-weight: 600; margin-top: 0.3rem;"></div>
-            <div id="modalRegionCity" style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.15rem;"></div>
+            <div id="modalRegionCity" style="font-size: 0.75rem; color: var(--admin-text-muted); margin-top: 0.15rem;"></div>
           </div>
 
           <!-- OS & Platform -->
-          <div style="background: #05070b; padding: 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
-            <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Operating System</div>
-            <div id="modalDeviceOs" style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin-top: 0.2rem;"></div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.7rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700;">Operating System</div>
+            <div id="modalDeviceOs" style="font-size: 1.05rem; font-weight: 800; color: var(--admin-text-main); margin-top: 0.2rem;"></div>
             <div id="modalDeviceType" style="font-size: 0.82rem; color: #c084fc; font-weight: 600; margin-top: 0.3rem;"></div>
           </div>
 
           <!-- Web Browser -->
-          <div style="background: #05070b; padding: 1rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
-            <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Browser Client</div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.7rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700;">Browser Client</div>
             <div id="modalDeviceBrowser" style="font-size: 1.05rem; font-weight: 800; color: #38bdf8; margin-top: 0.2rem;"></div>
-            <div id="modalBrowserVersion" style="font-size: 0.75rem; color: #94a3b8; font-family: var(--admin-font-mono); margin-top: 0.3rem;"></div>
+            <div id="modalBrowserVersion" style="font-size: 0.75rem; color: var(--admin-text-muted); font-family: var(--admin-font-mono); margin-top: 0.3rem;"></div>
           </div>
         </div>
 
         <div>
-          <label style="font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem; display: block;">Raw Client User-Agent Header</label>
-          <pre id="modalRawUserAgent" style="background: #05070b; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 1rem; color: #cbd5e1; font-family: var(--admin-font-mono); font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; word-break: break-all; margin: 0;"></pre>
+          <label style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text-main); margin-bottom: 0.4rem; display: block;">Raw Client User-Agent Header</label>
+          <pre id="modalRawUserAgent" class="audit-inspector-code"></pre>
         </div>
       </div>
 
@@ -415,11 +415,11 @@ require __DIR__ . '/../layouts/admin_header.php';
     </div>
 
     <!-- Modal Footer Actions -->
-    <div style="padding: 1rem 1.5rem; border-top: 1px solid rgba(148,163,184,0.12); background: #070a12; display: flex; justify-content: space-between; align-items: center; flex: 0 0 auto;">
+    <div class="audit-inspector-footer">
       <button type="button" onclick="copyFullForensicJson()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
         📋 Copy Complete Forensic JSON
       </button>
-      <button type="button" onclick="closeErrorInspector()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #334155; border-color: #334155; font-weight: 700;">
+      <button type="button" onclick="closeErrorInspector()" class="ts-btn ts-btn-primary ts-btn-sm">
         Close Inspector
       </button>
     </div>

@@ -30,7 +30,7 @@
   --admin-font-mono: 'JetBrains Mono', monospace;
 }
 
-[data-theme="light"] {
+html[data-theme="light"], html.theme-light, body[data-theme="light"], body.theme-light {
   --admin-bg-base: #f8fafc;
   --admin-bg-surface: #ffffff;
   --admin-bg-elevated: #f1f5f9;
@@ -697,6 +697,179 @@ body.admin-body {
 .admin-modal-box.modal-cyan {
   border-color: rgba(56, 189, 248, 0.45);
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
+}
+
+/* ==========================================================================
+   AUDIT & ERROR FORENSIC INSPECTOR DUAL-THEME MODAL SYSTEM
+   ========================================================================== */
+.audit-inspector-box {
+  max-width: 980px;
+  width: 100%;
+  max-height: 90vh;
+  background: var(--admin-bg-surface);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(99, 102, 241, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--admin-text-primary);
+}
+
+.audit-inspector-box.inspector-error {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(239, 68, 68, 0.15);
+}
+
+.audit-inspector-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--admin-border-subtle);
+  background: var(--admin-bg-elevated);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 0 0 auto;
+}
+
+.audit-inspector-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--admin-border-subtle);
+  background: var(--admin-bg-base);
+  padding: 0 1.5rem;
+  overflow-x: auto;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.audit-inspector-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  background: var(--admin-bg-surface);
+}
+
+.audit-inspector-card {
+  background: var(--admin-bg-base);
+  border: 1px solid var(--admin-border-main);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.audit-inspector-code {
+  background: var(--admin-bg-base);
+  border: 1px solid var(--admin-border-main);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--admin-text-secondary);
+  font-family: var(--admin-font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+.audit-inspector-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--admin-border-subtle);
+  background: var(--admin-bg-elevated);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.audit-tab-btn, .inspector-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--admin-text-tertiary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.audit-tab-btn:hover, .inspector-tab-btn:hover {
+  color: var(--admin-text-primary);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.audit-tab-btn.active, .inspector-tab-btn.active {
+  color: var(--admin-primary);
+  border-bottom-color: var(--admin-primary);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Light Theme Overrides for Audit / Error Inspector */
+html[data-theme="light"] .audit-inspector-box,
+html.theme-light .audit-inspector-box,
+body[data-theme="light"] .audit-inspector-box,
+body.theme-light .audit-inspector-box {
+  background: #ffffff !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 0 25px rgba(99, 102, 241, 0.08) !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .audit-inspector-box.inspector-error,
+html.theme-light .audit-inspector-box.inspector-error,
+body[data-theme="light"] .audit-inspector-box.inspector-error,
+body.theme-light .audit-inspector-box.inspector-error {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 0 25px rgba(239, 68, 68, 0.08) !important;
+}
+
+html[data-theme="light"] .audit-inspector-header,
+html.theme-light .audit-inspector-header,
+body[data-theme="light"] .audit-inspector-header,
+body.theme-light .audit-inspector-header {
+  background: #f8fafc !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .audit-inspector-tabs,
+html.theme-light .audit-inspector-tabs,
+body[data-theme="light"] .audit-inspector-tabs,
+body.theme-light .audit-inspector-tabs {
+  background: #f1f5f9 !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .audit-inspector-body,
+html.theme-light .audit-inspector-body,
+body[data-theme="light"] .audit-inspector-body,
+body.theme-light .audit-inspector-body {
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] .audit-inspector-card,
+html.theme-light .audit-inspector-card,
+body[data-theme="light"] .audit-inspector-card,
+body.theme-light .audit-inspector-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .audit-inspector-code,
+html.theme-light .audit-inspector-code,
+body[data-theme="light"] .audit-inspector-code,
+body.theme-light .audit-inspector-code {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .audit-inspector-footer,
+html.theme-light .audit-inspector-footer,
+body[data-theme="light"] .audit-inspector-footer,
+body.theme-light .audit-inspector-footer {
+  background: #f8fafc !important;
+  border-top-color: #e2e8f0 !important;
 }
 
 .admin-modal-header {

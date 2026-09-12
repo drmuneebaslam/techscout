@@ -4229,16 +4229,32 @@ class AdminController {
 
     public function executeDbQuery(Request $request): void {
         $query = trim((string)$request->post('sql_query', ''));
+        $isAjax = $request->isAjax() 
+            || strpos((string)$request->header('Accept'), 'application/json') !== false
+            || (string)$request->post('format') === 'json'
+            || (string)$request->query('format') === 'json';
+
         if (empty($query)) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => 'Please provide a SQL query.'], 400);
+                return;
+            }
             Session::flash('error', 'Please provide a SQL query.');
             Response::redirect('/admin/db-manager?tab=query');
             return;
         }
 
-        // Only allow safe read-only queries from the query tab
-        $firstWord = strtoupper(strtok($query, " \t\n\r"));
-        if (!in_array($firstWord, ['SELECT', 'SHOW', 'EXPLAIN', 'DESCRIBE', 'CHECK', 'OPTIMIZE'], true)) {
-            Session::flash('error', "Safety restriction: Terminal only permits diagnostic queries (SELECT, SHOW, EXPLAIN, DESCRIBE, CHECK). For destructive schema mutations, run via phpMyAdmin or Schema Auto-Repair.");
+        // Clean leading SQL comments (-- or /* */) or whitespace before checking keyword
+        $cleaned = preg_replace('/^\s*(--[^\n]*\n|\/\*.*?\*\/|\s)*/s', '', $query);
+        $firstWord = strtoupper((string)strtok($cleaned, " \t\n\r();"));
+
+        if (!in_array($firstWord, ['SELECT', 'SHOW', 'EXPLAIN', 'DESCRIBE', 'CHECK', 'OPTIMIZE', 'WITH'], true)) {
+            $msg = "Safety restriction: Terminal only permits diagnostic queries (SELECT, SHOW, EXPLAIN, DESCRIBE, CHECK, OPTIMIZE, WITH). For destructive schema mutations, run via phpMyAdmin or Schema Auto-Repair.";
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => $msg], 403);
+                return;
+            }
+            Session::flash('error', $msg);
             Response::redirect('/admin/db-manager?tab=query');
             return;
         }
@@ -4247,13 +4263,35 @@ class AdminController {
             $start = microtime(true);
             $results = Database::query($query);
             $duration = round((microtime(true) - $start) * 1000, 2);
+            $totalCount = count($results);
+            $previewRows = array_slice($results, 0, 250);
+            $columns = !empty($previewRows) ? array_keys($previewRows[0]) : [];
+
+            if ($isAjax) {
+                Response::json([
+                    'success' => true,
+                    'sql' => $query,
+                    'columns' => $columns,
+                    'rows' => $previewRows,
+                    'total_count' => $totalCount,
+                    'duration_ms' => $duration
+                ]);
+                return;
+            }
+
             Session::flash('query_results', [
                 'sql' => $query,
-                'rows' => array_slice($results, 0, 100),
-                'total_count' => count($results),
+                'columns' => $columns,
+                'rows' => $previewRows,
+                'total_count' => $totalCount,
                 'duration_ms' => $duration
             ]);
+            Session::flash('success', "Query executed successfully: {$totalCount} row(s) returned in {$duration} ms.");
         } catch (\Throwable $e) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => 'SQL Error: ' . $e->getMessage()], 400);
+                return;
+            }
             Session::flash('error', "SQL Error: " . $e->getMessage());
         }
 

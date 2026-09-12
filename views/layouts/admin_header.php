@@ -107,8 +107,12 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
         }
       } catch (e) {}
       var urlParams = new URLSearchParams(window.location.search);
-      var cookieTheme = (document.cookie.match(/ts_theme=([^;]+)/) || [])[1];
-      var t = urlParams.get('theme') || cookieTheme || localStorage.getItem('ts_theme') || '<?= $activeAdminTheme ?>';
+      var cookieMatch = document.cookie.match(/(^|;)\s*ts_theme=([^;]+)/);
+      var cookieTheme = cookieMatch ? cookieMatch[2].trim() : null;
+      var storedTheme = null;
+      try { storedTheme = localStorage.getItem('ts_theme'); } catch(e) {}
+      var t = urlParams.get('theme') || storedTheme || cookieTheme || '<?= $activeAdminTheme ?>';
+      if (t !== 'light' && t !== 'dark') t = 'dark';
       document.documentElement.setAttribute('data-theme', t);
       if (t === 'light') {
         document.documentElement.classList.add('theme-light');
@@ -122,6 +126,17 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   </script>
 </head>
 <body data-theme="<?= $activeAdminTheme ?>" class="admin-body <?= $activeAdminTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($adminSiteSettings['enable_bg_grid_lines']) && $adminSiteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
+<script>
+  (function() {
+    var t = document.documentElement.getAttribute('data-theme') || 'dark';
+    document.body.setAttribute('data-theme', t);
+    if (t === 'light') {
+      document.body.classList.add('theme-light');
+    } else {
+      document.body.classList.remove('theme-light');
+    }
+  })();
+</script>
   <!-- Top Slim High-Tech Progress Bar for SPA PJAX Transitions -->
   <div id="adminPjaxProgressBar"></div>
   <?php if (\App\Core\Auth::isImpersonating()): ?>

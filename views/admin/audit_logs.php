@@ -402,26 +402,27 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
 </div>
 
 <!-- ========================================================================= -->
+<!-- ========================================================================= -->
 <!-- COMPREHENSIVE AUDIT FORENSIC INSPECTOR MODAL -->
 <!-- ========================================================================= -->
 <div id="auditInspectorModal" class="admin-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
-  <div class="admin-modal-box" style="max-width: 980px; width: 100%; max-height: 90vh; background: #090d16; border: 1px solid rgba(99,102,241,0.35); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 35px rgba(99,102,241,0.15); display: flex; flex-direction: column; overflow: hidden;">
+  <div class="audit-inspector-box" style="max-width: 980px; width: 100%; max-height: 90vh;">
     
     <!-- Modal Header -->
-    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(148,163,184,0.12); background: #0c1220; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex: 0 0 auto;">
+    <div class="audit-inspector-header">
       <div>
         <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
           <span class="ts-badge ts-badge-cyan" style="font-size: 0.75rem; font-weight: 800;">AUDIT FORENSIC TELEMETRY</span>
           <span id="auditModalActionBadge" class="ts-badge ts-badge-indigo" style="font-size: 0.75rem; font-weight: 700; font-family: var(--admin-font-mono);"></span>
-          <span id="auditModalTimestamp" style="font-size: 0.75rem; color: #94a3b8; font-family: var(--admin-font-mono);"></span>
+          <span id="auditModalTimestamp" style="font-size: 0.75rem; color: var(--admin-text-muted); font-family: var(--admin-font-mono);"></span>
         </div>
-        <h3 id="auditModalTitle" style="color: #f8fafc; font-size: 1.1rem; margin: 0; font-family: 'Outfit', sans-serif;"></h3>
+        <h3 id="auditModalTitle" style="color: var(--admin-text-main); font-size: 1.1rem; margin: 0; font-family: 'Outfit', sans-serif;"></h3>
       </div>
-      <button type="button" onclick="closeAuditInspector()" style="background: transparent; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0.2rem 0.5rem; line-height: 1;">✕</button>
+      <button type="button" onclick="closeAuditInspector()" style="background: transparent; border: none; color: var(--admin-text-muted); font-size: 1.4rem; cursor: pointer; padding: 0.2rem 0.5rem; line-height: 1;">✕</button>
     </div>
 
     <!-- Modal Sub-Tabs -->
-    <div style="display: flex; border-bottom: 1px solid rgba(148,163,184,0.12); background: #070a12; padding: 0 1.5rem; overflow-x: auto; gap: 0.5rem; flex: 0 0 auto;">
+    <div class="audit-inspector-tabs">
       <button type="button" class="audit-tab-btn active" onclick="switchAuditTab('atab-overview')" id="atabBtn-overview">
         📌 Overview &amp; Linked Entity
       </button>
@@ -434,19 +435,19 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
     </div>
 
     <!-- Modal Tab Content -->
-    <div style="padding: 1.5rem; overflow-y: auto; flex: 1 1 auto; background: #090d16;">
+    <div class="audit-inspector-body">
       
       <!-- SUB-TAB 1: OVERVIEW & LINKED ENTITY -->
       <div id="panel-atab-overview" class="audit-panel active">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
           
           <!-- Actor Card -->
-          <div style="background: #05070b; border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
-            <div style="font-size: 0.72rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Actor / Operator Profile</div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.72rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Actor / Operator Profile</div>
             <div style="display: flex; align-items: center; gap: 0.75rem;">
               <div id="auditActorInitial" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: #fff;"></div>
               <div>
-                <div id="auditActorName" style="color: #f8fafc; font-weight: 800; font-size: 0.95rem;"></div>
+                <div id="auditActorName" style="color: var(--admin-text-main); font-weight: 800; font-size: 0.95rem;"></div>
                 <div id="auditActorRole" style="font-size: 0.75rem; color: #38bdf8; font-family: var(--admin-font-mono);"></div>
               </div>
             </div>
@@ -454,29 +455,29 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
           </div>
 
           <!-- Target Entity Card -->
-          <div style="background: #05070b; border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
-            <div style="font-size: 0.72rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Linked Target Entity</div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.72rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Linked Target Entity</div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
               <span id="auditEntityNameBadge" class="ts-badge ts-badge-cyan" style="font-size: 0.75rem; font-weight: 800;"></span>
-              <span id="auditEntityIdBadge" style="font-family: var(--admin-font-mono); color: #cbd5e1; font-weight: 700;"></span>
+              <span id="auditEntityIdBadge" style="font-family: var(--admin-font-mono); color: var(--admin-text-main); font-weight: 700;"></span>
             </div>
             <div id="auditEntityDirectBtnWrap" style="margin-top: 0.75rem;"></div>
           </div>
 
           <!-- Network & Device Card -->
-          <div style="background: #05070b; border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
-            <div style="font-size: 0.72rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Network &amp; Device Context</div>
+          <div class="audit-inspector-card">
+            <div style="font-size: 0.72rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Network &amp; Device Context</div>
             <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--admin-font-mono); font-size: 0.88rem; color: #38bdf8; font-weight: 700;">
               <span id="auditClientIp"></span>
             </div>
             <div id="auditCountryLocation" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-top: 0.2rem;"></div>
-            <div id="auditDeviceInfo" style="font-size: 0.75rem; color: #cbd5e1; margin-top: 0.35rem;"></div>
+            <div id="auditDeviceInfo" style="font-size: 0.75rem; color: var(--admin-text-muted); margin-top: 0.35rem;"></div>
           </div>
         </div>
 
         <div>
-          <label style="font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem; display: block;">Raw User-Agent Header</label>
-          <pre id="auditRawUserAgent" style="background: #05070b; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 1rem; color: #cbd5e1; font-family: var(--admin-font-mono); font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; word-break: break-all; margin: 0;"></pre>
+          <label style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text-main); margin-bottom: 0.4rem; display: block;">Raw User-Agent Header</label>
+          <pre id="auditRawUserAgent" class="audit-inspector-code"></pre>
         </div>
       </div>
 
@@ -487,13 +488,13 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
             <label style="font-size: 0.85rem; font-weight: 700; color: #f87171; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem;">
               <span>⏮ Before State (Original)</span>
             </label>
-            <pre id="auditBeforeState" style="background: #05070b; border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 1.25rem; color: #cbd5e1; font-family: var(--admin-font-mono); font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; word-break: break-all; max-height: 380px; overflow-y: auto; margin: 0;"></pre>
+            <pre id="auditBeforeState" class="audit-inspector-code" style="border-color: rgba(239,68,68,0.35);"></pre>
           </div>
           <div>
             <label style="font-size: 0.85rem; font-weight: 700; color: #34d399; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem;">
               <span>⏭ After State (Mutated)</span>
             </label>
-            <pre id="auditAfterState" style="background: #05070b; border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 1.25rem; color: #cbd5e1; font-family: var(--admin-font-mono); font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; word-break: break-all; max-height: 380px; overflow-y: auto; margin: 0;"></pre>
+            <pre id="auditAfterState" class="audit-inspector-code" style="border-color: rgba(16,185,129,0.35);"></pre>
           </div>
         </div>
       </div>
@@ -501,20 +502,20 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
       <!-- SUB-TAB 3: PAYLOAD & METADATA -->
       <div id="panel-atab-payload" class="audit-panel" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <label style="font-size: 0.85rem; font-weight: 700; color: #f8fafc;">Captured Event Metadata &amp; Parameters</label>
+          <label style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text-main);">Captured Event Metadata &amp; Parameters</label>
           <button type="button" onclick="copyAuditPayload()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">📋 Copy JSON</button>
         </div>
-        <pre id="auditPayloadContent" style="background: #05070b; border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 1.25rem; color: #38bdf8; font-family: var(--admin-font-mono); font-size: 0.8rem; line-height: 1.5; white-space: pre-wrap; word-break: break-all; max-height: 380px; overflow-y: auto; margin: 0;"></pre>
+        <pre id="auditPayloadContent" class="audit-inspector-code" style="color: #38bdf8;"></pre>
       </div>
 
     </div>
 
     <!-- Modal Footer -->
-    <div style="padding: 1rem 1.5rem; border-top: 1px solid rgba(148,163,184,0.12); background: #070a12; display: flex; justify-content: space-between; align-items: center; flex: 0 0 auto;">
+    <div class="audit-inspector-footer">
       <button type="button" onclick="copyFullAuditJson()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
         📋 Copy Complete Forensic Record
       </button>
-      <button type="button" onclick="closeAuditInspector()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #334155; border-color: #334155; font-weight: 700;">
+      <button type="button" onclick="closeAuditInspector()" class="ts-btn ts-btn-primary ts-btn-sm">
         Close Inspector
       </button>
     </div>
