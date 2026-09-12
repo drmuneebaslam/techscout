@@ -147,16 +147,8 @@ class DirectoryController {
             'model' => $model
         ];
 
-        $allPrompts = Content::getFilteredPrompts($filters, $sort);
-        $prompts = array_values(array_filter($allPrompts, function($p) {
-            $modelsStr = is_string($p['target_models'] ?? '') ? $p['target_models'] : json_encode($p['target_models'] ?? []);
-            $hasImageModel = (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || stripos($modelsStr, 'Leonardo') !== false);
-            $hasImageCat = in_array($p['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion', 'photorealism', '3d-renders', 'cyberpunk', 'anime', 'architecture', 'fantasy']);
-            $hasImage = !empty($p['featured_image_url']) && $p['featured_image_url'] !== 'https://funwithcoding.free.nf/';
-            return $hasImageModel || $hasImageCat || $hasImage;
-        }));
-
-        $categories = Category::getByType('prompt');
+        $prompts = Content::getFeed('prompt', $category, $sort, 50, 0, $filters);
+        $categories = Database::query("SELECT c.*, p.name as parent_name FROM categories c LEFT JOIN categories p ON c.parent_id = p.id WHERE c.applicable_to IN ('all', 'prompt') ORDER BY c.sort_order ASC, c.name ASC");
 
         Response::view('directory/prompts_images', [
             'title' => 'AI Image Prompts Sub-Directory & Visual Blueprints | TechScout',

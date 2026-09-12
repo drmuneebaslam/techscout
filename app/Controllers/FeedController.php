@@ -13,7 +13,14 @@ class FeedController {
     // RSS 2.0 Prompts Feed [TS-API-05]
     public function promptsXml(Request $request): void {
         header('Content-Type: application/xml; charset=utf-8');
-        $prompts = Database::query("SELECT p.*, c.name as category_name FROM prompts p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'published' ORDER BY p.created_at DESC LIMIT 50");
+        $prompts = Database::query(
+            "SELECT c.title, c.slug, c.summary, c.created_at, cat.name as category_name 
+             FROM contents c 
+             JOIN prompts p ON c.id = p.content_id 
+             LEFT JOIN categories cat ON c.category_id = cat.id 
+             WHERE c.status = 'published' 
+             ORDER BY c.created_at DESC LIMIT 50"
+        );
         $baseUrl = rtrim(Config::url('/'), '/');
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -46,7 +53,15 @@ class FeedController {
     // RSS 2.0 Articles Feed
     public function articlesXml(Request $request): void {
         header('Content-Type: application/xml; charset=utf-8');
-        $articles = Database::query("SELECT a.*, c.name as category_name, u.display_name as author_name FROM articles a LEFT JOIN categories c ON a.category_id = c.id LEFT JOIN users u ON a.author_id = u.id WHERE a.status = 'published' ORDER BY a.created_at DESC LIMIT 50");
+        $articles = Database::query(
+            "SELECT c.title, c.slug, c.summary, c.published_at, c.created_at, cat.name as category_name, u.username as author_name 
+             FROM contents c 
+             JOIN articles a ON c.id = a.content_id 
+             LEFT JOIN categories cat ON c.category_id = cat.id 
+             LEFT JOIN users u ON c.author_id = u.id 
+             WHERE c.status = 'published' 
+             ORDER BY c.created_at DESC LIMIT 50"
+        );
         $baseUrl = rtrim(Config::url('/'), '/');
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -80,7 +95,15 @@ class FeedController {
     // JSON Feed Specification v1.1
     public function articlesJson(Request $request): void {
         header('Content-Type: application/feed+json; charset=utf-8');
-        $articles = Database::query("SELECT a.*, c.name as category_name, u.display_name as author_name FROM articles a LEFT JOIN categories c ON a.category_id = c.id LEFT JOIN users u ON a.author_id = u.id WHERE a.status = 'published' ORDER BY a.created_at DESC LIMIT 50");
+        $articles = Database::query(
+            "SELECT c.title, c.slug, c.summary, c.published_at, c.created_at, cat.name as category_name, u.username as author_name 
+             FROM contents c 
+             JOIN articles a ON c.id = a.content_id 
+             LEFT JOIN categories cat ON c.category_id = cat.id 
+             LEFT JOIN users u ON c.author_id = u.id 
+             WHERE c.status = 'published' 
+             ORDER BY c.created_at DESC LIMIT 50"
+        );
         $baseUrl = rtrim(Config::url('/'), '/');
 
         $items = [];
@@ -126,7 +149,13 @@ class FeedController {
 
     public function sitemapArticles(Request $request): void {
         header('Content-Type: application/xml; charset=utf-8');
-        $articles = Database::query("SELECT slug, updated_at, created_at FROM articles WHERE status = 'published' ORDER BY id DESC LIMIT 5000");
+        $articles = Database::query(
+            "SELECT c.slug, c.updated_at, c.created_at 
+             FROM contents c 
+             JOIN articles a ON c.id = a.content_id 
+             WHERE c.status = 'published' 
+             ORDER BY c.id DESC LIMIT 5000"
+        );
         $baseUrl = rtrim(Config::url('/'), '/');
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -141,7 +170,13 @@ class FeedController {
 
     public function sitemapTools(Request $request): void {
         header('Content-Type: application/xml; charset=utf-8');
-        $tools = Database::query("SELECT slug, updated_at, created_at FROM ai_tools WHERE status = 'published' ORDER BY id DESC LIMIT 5000");
+        $tools = Database::query(
+            "SELECT c.slug, c.updated_at, c.created_at 
+             FROM contents c 
+             JOIN ai_tools t ON c.id = t.content_id 
+             WHERE c.status = 'published' 
+             ORDER BY c.id DESC LIMIT 5000"
+        );
         $baseUrl = rtrim(Config::url('/'), '/');
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -156,7 +191,13 @@ class FeedController {
 
     public function sitemapPrompts(Request $request): void {
         header('Content-Type: application/xml; charset=utf-8');
-        $prompts = Database::query("SELECT slug, updated_at, created_at FROM prompts WHERE status = 'published' ORDER BY id DESC LIMIT 5000");
+        $prompts = Database::query(
+            "SELECT c.slug, c.updated_at, c.created_at 
+             FROM contents c 
+             JOIN prompts p ON c.id = p.content_id 
+             WHERE c.status = 'published' 
+             ORDER BY c.id DESC LIMIT 5000"
+        );
         $baseUrl = rtrim(Config::url('/'), '/');
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
