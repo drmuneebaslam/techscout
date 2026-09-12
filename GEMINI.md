@@ -24,3 +24,14 @@ Always follow this mandatory workflow for every prompt and code modification in 
 6. **Git Commit & Push Every Change**:
    Execute a `git commit` detailing each and every change made in the commit message, and push to remote repository (`https://github.com/drmuneebaslam/techscout.git` branch `main`).
 
+7. **Direct FTP Deployment of Changed Files to `/htdocs`**:
+   - For every change, connect via FTP and upload ONLY the newly modified files directly to their corresponding destination inside `/htdocs/`:
+     - **FTP Hostname**: `ftpupload.net` (Port: `21`)
+     - **FTP Username**: `if0_40102772`
+     - **FTP Password**: `Fp9QFWfj5fm`
+     - **Target Directory**: `/htdocs/`
+   - **CRITICAL PRESERVATION & SAFETY DIRECTIVE**:
+     - **NEVER** delete, modify, rename, or touch any existing folders or files that are already present on the hosting account that are not part of the active change (such as `old/`, `old2/`, `oldlat/`, `tech/`, `DO NOT UPLOAD FILES HERE`, `hbdfbfj.loveslife.biz`, or any non-project folders).
+     - Only create required parent subdirectories (e.g. `/htdocs/app/Core`, `/htdocs/assets/css`, `/htdocs/views/layouts`, etc.) if they do not already exist.
+     - Ensure `app/Core/Config.php` uploaded to FTP contains the hosted InfinityFree credentials (`sql306.infinityfree.com`, `if0_40102772_techscoutmainafterallchanges`, `if0_40102772`, `Fp9QFWfj5fm`, `https://funwithcoding.free.nf`).
+

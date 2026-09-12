@@ -167,6 +167,16 @@ This document serves as the permanent registry of architectural and implementati
   - Local repository configuration (`app/Core/Config.php` in main workspace) must use local development credentials (`127.0.0.1`, `techscout_db`, `root`, ``, or auto-environment detection) for fast and reliable local execution.
   - The `changes/` staging folder (`changes/app/Core/Config.php`) must strictly preserve the production hosted InfinityFree credentials (`sql306.infinityfree.com`, `if0_40102772_techscoutmainafterallchanges`, `if0_40102772`, `Fp9QFWfj5fm`, `https://funwithcoding.free.nf`) so deployments remain fully functional without manual intervention.
 
+### 🔴 MISTAKE-15: Non-Isolated FTP Sync & Mutation of Existing Hosting Directories
+* **Root Cause:** 
+  - Using broad FTP sync scripts, root directory wiping, or un-scoped directory mirroring when deploying to hosted accounts containing existing subdirectories (such as `old/`, `old2/`, `oldlat/`, `tech/`, subdomain folders, or legacy files).
+* **Consequences:**
+  - Accidental deletion or corruption of existing historical archives, secondary domains, or unrelated hosted applications.
+* **Mandatory Rule:**
+  - FTP deployment scripts must strictly target `/htdocs/` and upload ONLY the specific files tracked in `changes/` that were modified during the task.
+  - It is strictly forbidden to run destructive file deletions, recursive wipes, or modify any directories outside the active project scope.
+  - Ensure all uploaded configuration files (`app/Core/Config.php`) contain hosted production credentials.
+
 ---
 
 ## 2. Response Audit Protocol
@@ -185,6 +195,7 @@ At the conclusion of any code generation, the agent must cross-check every modif
 12. [ ] **Extension Table Parent Column Awareness**: Do queries on child/extension tables (e.g. `prompts`, `articles`) join their parent `contents` table when filtering by timestamps or common metadata?
 13. [ ] **Symmetric Theme Toggling & Clean Dual-Mode Isolation**: Are `data-theme` and `theme-light` updated symmetrically on both `document.documentElement` and `document.body`, with light theme tokens strictly scoped to root selectors to prevent dark mode leakage?
 14. [ ] **Segregated Local vs. Hosted Environment Credentials**: Are local configurations configured for localhost execution while `changes/app/Core/Config.php` preserves hosted production credentials?
+15. [ ] **Isolated Direct FTP Deployment & Zero Mutation of Unrelated Remote Folders**: Are uploads to `/htdocs/` via FTP restricted solely to the modified files, strictly preserving all pre-existing folders (`old/`, `old2/`, `oldlat/`, `tech/`, etc.) untouched?
 
 
 
