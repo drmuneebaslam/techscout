@@ -128,6 +128,16 @@ This document serves as the permanent registry of architectural and implementati
   - For joined multi-table queries where column name collision is possible (such as multiple tables having `created_at`), define an explicit aliased condition (e.g. `c.created_at`) and ensure the FROM table explicitly declares that alias (`FROM contents c`).
   - Never share a single aliased filter string across both aliased and unaliased queries.
 
+### 🔴 MISTAKE-12: Assuming Extension Tables Mirror Parent Columns in Telemetry Queries
+* **Root Cause:** 
+  - Querying `SELECT SUM(copy_count) FROM prompts WHERE created_at >= ...` when `prompts` is an extension table linked to `contents` (`content_id -> contents.id`) and stores prompt-specific metadata, while timestamps (`created_at`, `updated_at`) historically lived exclusively on the parent `contents` table.
+* **Consequences:**
+  - MySQL / MariaDB throws `SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'WHERE'`, crashing `GET /admin/analytics`.
+* **Mandatory Rule:**
+  - In extension / child tables, verify whether timestamp columns reside on the child or the parent table. Always join the parent table (e.g. `prompts p LEFT JOIN contents c ON p.content_id = c.id WHERE c.created_at >= ...`) when querying creation dates.
+  - Auxiliary and telemetry queries must be wrapped in safe try/catch blocks with sensible fallback values so minor metric calculations never crash primary analytics dashboards.
+  - Provide a standalone, non-destructive SQL upgrade script (`database/prompts_telemetry_fix.sql`) and keep `database/schema.sql` synchronized.
+
 ---
 
 ## 2. Response Audit Protocol
@@ -135,7 +145,7 @@ At the conclusion of any code generation, the agent must cross-check every modif
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
 2. [ ] **No Unchecked Silent Errors**: Are database operations verified so silent errors do not occur, while keeping meaningful error logging intact?
 3. [ ] **Safe JSON Handling**: Are all JSON column values guaranteed to be valid JSON strings (defaulting to `'[]'` or valid JSON, never `false` or empty string)?
-4. [ ] **Graceful Telemetry Operations**: Are auxiliary telemetry queries (like `post_views`) guarded so they never crash requests?
+4. [ ] **Graceful Telemetry Operations**: Are auxiliary telemetry queries (like `post_views`, `prompts`) guarded with try/catch and sensible fallbacks so they never crash requests?
 5. [ ] **Non-Destructive Upgrade SQL Provided**: Has an upgrade SQL script been provided for any database schema changes that preserves all existing data?
 6. [ ] **Syntax-Verified Scripts**: Are all JavaScript view scripts and inline blocks verified with a JS parser to prevent `SyntaxError` and `ReferenceError`?
 7. [ ] **Idempotent Reaction Toggling**: Do user reaction/helpful counters maintain state via user/IP tracking with toggle (add/undo) functionality?
@@ -143,6 +153,7 @@ At the conclusion of any code generation, the agent must cross-check every modif
 9. [ ] **Dual-Mode Editor Insertion & Cohesive Theme**: Do editor tag/block insertion tools support both WYSIWYG caret and raw HTML textarea modes with light theme consistency?
 10. [ ] **Dual-Theme (Dark/Light) UI Preservation & No Hardcoded Inline Tag Styles**: Are web components styled via CSS with both dark and light modes supported, reserving white backgrounds strictly for the email preview canvas and email body?
 11. [ ] **Accurate Table Aliases in Dynamic SQL**: Are WHERE filter clauses strictly verified against the FROM clause of each query to ensure alias consistency and prevent 1054 Unknown Column errors?
+12. [ ] **Extension Table Parent Column Awareness**: Do queries on child/extension tables (e.g. `prompts`, `articles`) join their parent `contents` table when filtering by timestamps or common metadata?
 
 
 

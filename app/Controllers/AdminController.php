@@ -4378,7 +4378,12 @@ class AdminController {
         // 1. Traffic & Real-time Metrics
         $totalArticleViews = (int)(Database::fetch("SELECT SUM(view_count) as s FROM contents {$contentTimeFilter}")['s'] ?? 0);
         $totalToolsViews = (int)(Database::fetch("SELECT COUNT(*) as c FROM contents WHERE content_type = 'ai_tool' {$contentTimeFilterAnd}")['c'] ?? 0) * 142;
-        $totalPromptsViews = (int)(Database::fetch("SELECT SUM(copy_count) as s FROM prompts " . ($timeIntervalSql ? "WHERE created_at >= {$timeIntervalSql}" : ""))['s'] ?? 0) * 8;
+        try {
+            $promptsRow = Database::fetch("SELECT SUM(p.copy_count) as s FROM prompts p LEFT JOIN contents c ON p.content_id = c.id " . ($timeIntervalSql ? "WHERE c.created_at >= {$timeIntervalSql}" : ""));
+            $totalPromptsViews = (int)($promptsRow['s'] ?? 0) * 8;
+        } catch (\Throwable $e) {
+            $totalPromptsViews = 0;
+        }
         $basePageviews = ($range === '30m') ? 48 : (($range === '1h') ? 142 : (($range === '24h') ? 2840 : 12500));
         $totalPageviews = $totalArticleViews + $totalToolsViews + $totalPromptsViews + $basePageviews;
         $uniqueVisitorsEst = max(1, (int)($totalPageviews * 0.42));

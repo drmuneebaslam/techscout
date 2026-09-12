@@ -1708,3 +1708,53 @@ body.admin-body {
 .admin-pagination-container .paginator-inline-search:focus {
   border-color: var(--admin-primary);
 }
+
+/* ==========================================================================
+   Admin System & Settings Controls (Dual-Theme Preserved)
+   ========================================================================== */
+.social-net-card {
+  background: var(--admin-bg-surface);
+  border: 1px solid var(--admin-border-main);
+  border-radius: 8px;
+  padding: 1.15rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="light"] .social-net-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.social-net-card:hover {
+  border-color: var(--admin-primary);
+}
+
+.system-card-box {
+  background: var(--admin-bg-surface);
+  border: 1px solid var(--admin-border-main);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme="light"] .system-card-box {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.system-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.system-subtext {
+  font-size: 0.75rem;
+  color: var(--admin-text-tertiary);
+  margin-bottom: 0.25rem;
+}
+
