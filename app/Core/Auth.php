@@ -53,6 +53,13 @@ class Auth {
 
     public static function requireAdmin(string $redirect = '/auth/login'): void {
         if (!self::check() || !self::isAdmin()) {
+            $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+                || (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json'))
+                || (isset($_SERVER['REQUEST_URI']) && (str_contains($_SERVER['REQUEST_URI'], '/api/') || str_contains($_SERVER['REQUEST_URI'], '/realtime')));
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => 'Access denied. Administrator privileges required.'], 403);
+                exit;
+            }
             Session::flash('error', 'Access denied. Administrator privileges required.');
             Response::redirect($redirect);
             exit;
@@ -61,8 +68,11 @@ class Auth {
 
     public static function requireRole(array $roles, string $redirect = '/auth/login'): void {
         if (!self::check() || !self::hasRole($roles)) {
-            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-                Response::json(['success' => false, 'message' => 'Access denied. Insufficient privileges.'], 403);
+            $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+                || (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json'))
+                || (isset($_SERVER['REQUEST_URI']) && (str_contains($_SERVER['REQUEST_URI'], '/api/') || str_contains($_SERVER['REQUEST_URI'], '/realtime')));
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => 'Access denied. Insufficient role permissions.'], 403);
                 exit;
             }
             Session::flash('error', 'Access denied. Insufficient role permissions.');

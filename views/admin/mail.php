@@ -142,6 +142,42 @@
     </div>
   </div>
 
+  <!-- Early switchMailTab definition (guarantees onclick works even before full body/scripts are evaluated) -->
+  <script>
+    window.switchMailTab = function(tab) {
+      document.querySelectorAll('.mail-tab-btn').forEach(function(b) {
+        b.classList.remove('ts-btn-primary');
+        b.classList.add('ts-btn-outline');
+      });
+      var activeBtn = document.getElementById('mtab-btn-' + tab);
+      if (activeBtn) {
+        activeBtn.classList.remove('ts-btn-outline');
+        activeBtn.classList.add('ts-btn-primary');
+      }
+
+      document.querySelectorAll('.mail-tab-content').forEach(function(c) { c.style.display = 'none'; });
+      var target = document.getElementById('mail-tab-' + tab);
+      if (target) {
+        target.style.display = 'block';
+      }
+
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.set('tab', tab);
+        window.history.replaceState(null, '', url.toString());
+      } catch (e) {}
+
+      if (window.lucide && typeof lucide.createIcons === 'function') {
+        try { lucide.createIcons(); } catch (e) {}
+      }
+
+      if (window.refreshAdminTablePaginators) {
+        try { window.refreshAdminTablePaginators(); } catch (e) {}
+      }
+    };
+    var switchMailTab = window.switchMailTab;
+  </script>
+
   <!-- Navigation Tabs -->
   <div style="display: flex; gap: 0.5rem; margin-bottom: 1.75rem; flex-wrap: wrap;">
     <button type="button" onclick="switchMailTab('compose')" class="ts-btn ts-btn-sm ts-btn-primary mail-tab-btn" id="mtab-btn-compose">
@@ -1970,7 +2006,7 @@
 
 <script>
 // JSON Dictionary of all templates (var avoids fatal identifier already declared syntax error on re-navigation)
-var MAIL_TEMPLATES = window.MAIL_TEMPLATES = <?= json_encode($templateLibrary, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+var MAIL_TEMPLATES = window.MAIL_TEMPLATES = <?= json_encode($templateLibrary ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | (defined('JSON_INVALID_UTF8_SUBSTITUTE') ? JSON_INVALID_UTF8_SUBSTITUTE : 0)) ?: '{}' ?>;
 
 var switchMailTab = window.switchMailTab = function switchMailTab(tab) {
   document.querySelectorAll('.mail-tab-btn').forEach(b => {

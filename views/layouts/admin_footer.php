@@ -249,6 +249,14 @@
       };
     }
 
+    function syncAdminThemeIcon(theme) {
+      var currentTheme = theme || ((document.documentElement.getAttribute('data-theme') === 'light' || document.documentElement.classList.contains('theme-light')) ? 'light' : 'dark');
+      if (typeof window.syncAllThemeButtons === 'function') {
+        window.syncAllThemeButtons(currentTheme);
+      }
+    }
+    window.syncAdminThemeIcon = syncAdminThemeIcon;
+
     // Initialize Sidebar Width & Scroll Position Retention
     function initSidebarState() {
       const shell = document.getElementById('adminShell');

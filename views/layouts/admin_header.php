@@ -63,6 +63,12 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
           lucide.createIcons();
         }
       };
+      window.syncAdminThemeIcon = function(theme) {
+        var t = theme || ((document.documentElement.getAttribute('data-theme') === 'light' || document.documentElement.classList.contains('theme-light')) ? 'light' : 'dark');
+        if (typeof window.syncAllThemeButtons === 'function') {
+          window.syncAllThemeButtons(t);
+        }
+      };
 
       window.toggleTheme = function() {
         if (isToggling) return;

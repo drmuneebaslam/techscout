@@ -2543,7 +2543,11 @@ class AdminController {
     }
 
     public function createCustomTrigger(Request $request): void {
-        Auth::requireRole(['admin', 'super_admin']);
+        if (method_exists(Auth::class, 'requireRole')) {
+            Auth::requireRole(['admin', 'super_admin']);
+        } else {
+            Auth::requireAdmin();
+        }
         $isAjax = $request->isAjax();
         $name = trim((string)$request->post('name', ''));
         $type = trim((string)$request->post('type', 'event'));
@@ -2597,7 +2601,11 @@ class AdminController {
     }
 
     public function deleteCustomTrigger(Request $request): void {
-        Auth::requireRole(['admin', 'super_admin']);
+        if (method_exists(Auth::class, 'requireRole')) {
+            Auth::requireRole(['admin', 'super_admin']);
+        } else {
+            Auth::requireAdmin();
+        }
         $isAjax = $request->isAjax();
         $id = trim((string)$request->post('id', ''));
 
@@ -4435,8 +4443,16 @@ class AdminController {
         $usersTimeFilterAnd = $timeIntervalSql ? "AND created_at >= {$timeIntervalSql}" : "";
 
         // 1. Traffic & Real-time Metrics
-        $totalArticleViews = (int)(Database::fetch("SELECT SUM(view_count) as s FROM contents {$contentTimeFilter}")['s'] ?? 0);
-        $totalToolsViews = (int)(Database::fetch("SELECT COUNT(*) as c FROM contents WHERE content_type = 'ai_tool' {$contentTimeFilterAnd}")['c'] ?? 0) * 142;
+        try {
+            $totalArticleViews = (int)(Database::fetch("SELECT SUM(view_count) as s FROM contents {$contentTimeFilter}")['s'] ?? 0);
+        } catch (\Throwable $e) {
+            $totalArticleViews = 0;
+        }
+        try {
+            $totalToolsViews = (int)(Database::fetch("SELECT COUNT(*) as c FROM contents WHERE content_type = 'ai_tool' {$contentTimeFilterAnd}")['c'] ?? 0) * 142;
+        } catch (\Throwable $e) {
+            $totalToolsViews = 0;
+        }
         try {
             $promptsRow = Database::fetch("SELECT SUM(p.copy_count) as s FROM prompts p LEFT JOIN contents c ON p.content_id = c.id " . ($timeIntervalSql ? "WHERE c.created_at >= {$timeIntervalSql}" : ""));
             $totalPromptsViews = (int)($promptsRow['s'] ?? 0) * 8;
@@ -4600,8 +4616,13 @@ class AdminController {
         $aiToolsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM contents WHERE content_type = 'ai_tool'")['c'] ?? 0);
         $verifiedToolsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM contents WHERE content_type = 'ai_tool' AND status = 'published'")['c'] ?? 0);
         $gptsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM contents WHERE content_type = 'gpt_listing'")['c'] ?? 0);
-        $promptsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM prompts")['c'] ?? 0);
-        $promptCopiesTotal = (int)(Database::fetch("SELECT SUM(copy_count) as s FROM prompts")['s'] ?? 0);
+        try {
+            $promptsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM prompts")['c'] ?? 0);
+            $promptCopiesTotal = (int)(Database::fetch("SELECT SUM(copy_count) as s FROM prompts")['s'] ?? 0);
+        } catch (\Throwable $e) {
+            $promptsCount = 0;
+            $promptCopiesTotal = 0;
+        }
 
         Response::view('admin/analytics', [
             'title' => 'CMS Analytics & Platform Telemetry HUD | Admin Hub',
@@ -4674,7 +4695,11 @@ class AdminController {
      * High-speed real-time telemetry HUD JSON endpoint for dynamic auto-refresh.
      */
     public function realtimeTelemetryJson(Request $request): void {
-        Auth::requireRole(['admin', 'super_admin']);
+        if (method_exists(Auth::class, 'requireRole')) {
+            Auth::requireRole(['admin', 'super_admin']);
+        } else {
+            Auth::requireAdmin();
+        }
         $range = (string)$request->query('range', '30m');
 
         $timeIntervalSql = match ($range) {
@@ -4689,7 +4714,11 @@ class AdminController {
 
         $contentFilter = $timeIntervalSql ? "WHERE created_at >= {$timeIntervalSql}" : "";
 
-        $pageviewsTotal = (int)(Database::fetch("SELECT SUM(view_count) as s FROM contents {$contentFilter}")['s'] ?? 0);
+        try {
+            $pageviewsTotal = (int)(Database::fetch("SELECT SUM(view_count) as s FROM contents {$contentFilter}")['s'] ?? 0);
+        } catch (\Throwable $e) {
+            $pageviewsTotal = 0;
+        }
         $baseViews = match($range) {
             '30m' => rand(38, 85),
             '1h'  => rand(120, 240),
@@ -5893,7 +5922,11 @@ class AdminController {
     }
 
     public function distributeRevenuePool(Request $request): void {
-        Auth::requireRole(['admin', 'super_admin']);
+        if (method_exists(Auth::class, 'requireRole')) {
+            Auth::requireRole(['admin', 'super_admin']);
+        } else {
+            Auth::requireAdmin();
+        }
 
         $grossRevenue = (float)$request->post('gross_revenue', 0.0);
         $periodLabel = trim((string)$request->post('period_label', 'Author Royalty Pool'));
