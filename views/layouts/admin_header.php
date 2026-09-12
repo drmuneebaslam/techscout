@@ -29,14 +29,51 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
     (function() {
+      // 1. IP Location & Timezone Auto-Detection
       try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (tz) {
-          const match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
-          const currentTz = match ? decodeURIComponent(match[2]) : null;
-          if (currentTz !== tz) {
-            document.cookie = "user_timezone=" + encodeURIComponent(tz) + ";path=/;max-age=31536000;SameSite=Lax";
+        var baseUri = '<?= rtrim(\App\Core\Config::url('/'), '/') ?>';
+        var cookieMatch = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+        var currentTz = cookieMatch ? decodeURIComponent(cookieMatch[2].trim()) : null;
+        var cachedIpTz = null;
+        var cachedTime = null;
+        try {
+          cachedIpTz = localStorage.getItem('ts_ip_timezone');
+          cachedTime = localStorage.getItem('ts_ip_timezone_time');
+        } catch(e) {}
+
+        // If cached within 12 hours, keep synchronized
+        if (cachedIpTz && cachedTime && (Date.now() - parseInt(cachedTime, 10) < 43200000)) {
+          if (currentTz !== cachedIpTz) {
+            document.cookie = "user_timezone=" + encodeURIComponent(cachedIpTz) + ";path=/;max-age=31536000;SameSite=Lax";
           }
+        } else {
+          // Asynchronously query IP Geolocation to Timezone API
+          var geoEndpoint = (baseUri || '') + '/api/v1/geo/timezone';
+          fetch(geoEndpoint, { credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              if (d && d.success && d.timezone) {
+                try {
+                  localStorage.setItem('ts_ip_timezone', d.timezone);
+                  localStorage.setItem('ts_ip_timezone_time', Date.now().toString());
+                } catch(e) {}
+                if (currentTz !== d.timezone) {
+                  document.cookie = "user_timezone=" + encodeURIComponent(d.timezone) + ";path=/;max-age=31536000;SameSite=Lax";
+                  if (typeof window.localizeAllTimestamps === 'function') {
+                    window.localizeAllTimestamps(document, d.timezone);
+                  }
+                }
+              }
+            })
+            .catch(function() {
+              // Browser Intl fallback if offline
+              try {
+                var browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                if (browserTz && currentTz !== browserTz) {
+                  document.cookie = "user_timezone=" + encodeURIComponent(browserTz) + ";path=/;max-age=31536000;SameSite=Lax";
+                }
+              } catch(e) {}
+            });
         }
       } catch (e) {}
       var urlParams = new URLSearchParams(window.location.search);

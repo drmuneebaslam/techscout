@@ -1268,5 +1268,34 @@ class ApiController {
 
         Response::json(['received' => true, 'logged' => true]);
     }
+
+    /**
+     * Automatic IP Geolocation to Timezone Resolution API
+     * Returns detected timezone for client IP with offset and current time
+     */
+    public function getIpTimezone(Request $request): void {
+        $clientIp = \App\Core\DateHelper::getClientIp();
+        $queryIp = trim((string)($request->get('ip') ?: ''));
+        $targetIp = (!empty($queryIp) && filter_var($queryIp, FILTER_VALIDATE_IP)) ? $queryIp : $clientIp;
+        $tz = \App\Core\DateHelper::detectTimezoneByIp($targetIp);
+
+        if (!headers_sent() && empty($_COOKIE['user_timezone'])) {
+            @setcookie('user_timezone', $tz, time() + 31536000, '/', '', false, false);
+            $_COOKIE['user_timezone'] = $tz;
+        }
+
+        $now = new \DateTime('now', new \DateTimeZone($tz));
+
+        Response::json([
+            'success' => true,
+            'ip' => $targetIp,
+            'client_ip' => $clientIp,
+            'timezone' => $tz,
+            'offset' => $now->format('P'),
+            'abbreviation' => $now->format('T'),
+            'formatted_time' => $now->format('Y-m-d H:i:s T')
+        ]);
+    }
 }
+
 

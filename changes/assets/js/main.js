@@ -794,12 +794,28 @@ window.uploadImageToInput = async function(fileInput, targetInputId, folder = 'g
 };
 
 // ============================================================================
-// AUTOMATIC TIMEZONE DETECTION & CLIENT-SIDE TIMESTAMP LOCALIZATION
-// Converts stored Pakistan Standard Time (UTC+5) to the user's active timezone
+// AUTOMATIC IP-BASED TIMEZONE AUTO-DETECTION & DYNAMIC LOCALIZER
+// Resolves visitor timezone by IP location and converts Pakistan Time (UTC+5)
 // ============================================================================
-window.localizeAllTimestamps = function(root) {
+window.getUserTimezone = function() {
   try {
-    const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    var match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+    if (match && match[2]) return decodeURIComponent(match[2].trim());
+  } catch(e) {}
+  try {
+    var cached = localStorage.getItem('ts_ip_timezone');
+    if (cached) return cached;
+  } catch(e) {}
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Karachi';
+  } catch(e) {
+    return 'Asia/Karachi';
+  }
+};
+
+window.localizeAllTimestamps = function(root, forcedTz) {
+  try {
+    const userTz = forcedTz || window.getUserTimezone();
     if (userTz) {
       const match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
       const currentCookie = match ? decodeURIComponent(match[2]) : null;
@@ -823,13 +839,13 @@ window.localizeAllTimestamps = function(root) {
         
         let tzAbbr = '';
         try {
-          const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(d);
+          const parts = new Intl.DateTimeFormat('en-US', { timeZone: userTz, timeZoneName: 'short' }).formatToParts(d);
           const tzPart = parts.find(p => p.type === 'timeZoneName');
           if (tzPart && tzPart.value) tzAbbr = tzPart.value;
         } catch(e) {}
 
-        const timeStr = d.toLocaleTimeString('en-GB', { hour12: false });
-        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr = d.toLocaleTimeString('en-GB', { timeZone: userTz, hour12: false });
+        const dateStr = d.toLocaleDateString('en-US', { timeZone: userTz, month: 'short', day: 'numeric', year: 'numeric' });
         const fullTitle = dateStr + ' ' + timeStr + (userTz ? ' (' + userTz + ')' : '');
 
         if (formatType === 'compact_two_lines') {
@@ -847,8 +863,8 @@ window.localizeAllTimestamps = function(root) {
           el.textContent = timeStr;
           el.setAttribute('title', fullTitle);
         } else if (formatType === 'short') {
-          const shortDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          const shortTime = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+          const shortDate = d.toLocaleDateString('en-US', { timeZone: userTz, month: 'short', day: 'numeric' });
+          const shortTime = d.toLocaleTimeString('en-GB', { timeZone: userTz, hour: '2-digit', minute: '2-digit', hour12: false });
           el.textContent = shortDate + ', ' + shortTime;
           el.setAttribute('title', fullTitle);
         } else if (formatType === 'full') {
@@ -863,12 +879,35 @@ window.localizeAllTimestamps = function(root) {
   }
 };
 
+// Asynchronously resolve visitor IP location to Timezone
+window.detectAndSyncIpTimezone = function() {
+  try {
+    const baseUri = window.getTsApiBase ? window.getTsApiBase() : (window.TS_BASE_URL || '');
+    fetch(baseUri + '/api/v1/geo/timezone', { credentials: 'same-origin' })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && data.timezone) {
+          const oldTz = localStorage.getItem('ts_ip_timezone');
+          localStorage.setItem('ts_ip_timezone', data.timezone);
+          localStorage.setItem('ts_ip_timezone_time', Date.now().toString());
+          document.cookie = "user_timezone=" + encodeURIComponent(data.timezone) + ";path=/;max-age=31536000;SameSite=Lax";
+          if (oldTz !== data.timezone) {
+            window.localizeAllTimestamps(document, data.timezone);
+          }
+        }
+      })
+      .catch(() => {});
+  } catch(e) {}
+};
+
 // Auto-run timestamp localization on DOM ready and PJAX/AJAX mutations
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function() {
     window.localizeAllTimestamps();
+    window.detectAndSyncIpTimezone();
   });
 } else {
   window.localizeAllTimestamps();
+  window.detectAndSyncIpTimezone();
 }
 

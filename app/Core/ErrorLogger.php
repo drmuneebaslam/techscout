@@ -387,7 +387,7 @@ class ErrorLogger {
             'country_name' => $country,
             'city' => $city,
             'region' => $region,
-            'timezone' => $_SERVER['HTTP_CF_TIMEZONE'] ?? 'Asia/Karachi'
+            'timezone' => DateHelper::detectTimezoneByIp($ip)
         ];
 
         return json_encode($details, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}';

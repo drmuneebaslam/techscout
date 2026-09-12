@@ -560,6 +560,8 @@ $router->get('/admin/engagement-studio', [AdminController::class, 'engagementStu
 $router->post('/admin/engagement-studio/simulate', [AdminController::class, 'simulateEngagement'], ['admin']);
 $router->get('/api/v1/content/preview/{id}', [ApiController::class, 'contentPreview'], ['admin']);
 $router->get('/api/v1/auth/check-availability', [ApiController::class, 'checkAuthAvailability']);
+$router->get('/api/v1/geo/timezone', [ApiController::class, 'getIpTimezone']);
+
 
 // Public Dynamic SEO Feeds
 $router->get('/sitemap.xml', function() {

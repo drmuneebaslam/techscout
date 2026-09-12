@@ -271,8 +271,8 @@ This document serves as the permanent registry of architectural and implementati
   - Always render database timestamps using `\App\Core\DateHelper::render($time, $format, $formatType)` or `\App\Core\DateHelper::renderTwoLines($time)`.
   - Always output semantic `<time class="ts-time" datetime="YYYY-MM-DDTHH:mm:ss+05:00" data-format-type="...">` wrappers without hardcoded inline tag colors. Use CSS classes (`.ts-time-part`, `.ts-date-part`, `.ts-tz-abbr`) defined with CSS custom properties (`var(--admin-text-primary)`).
   - Implement dual-layer timezone localization:
-    1. **Server-side:** `DateHelper::timezone()` detects `$_COOKIE['user_timezone']` or user profile and adjusts timestamps using `DateTime` and `DateTimeZone`.
-    2. **Client-side:** `window.localizeAllTimestamps()` runs on DOM load and PJAX transitions, querying `Intl.DateTimeFormat().resolvedOptions().timeZone` to synchronize `<time class="ts-time">` elements and persist the `user_timezone` cookie.
+    1. **Server-side:** `DateHelper::timezone()` checks user profile, `$_COOKIE['user_timezone']`, and automatically resolves the visitor's timezone from their IP location via `DateHelper::detectTimezoneByIp()`. Session caching, Cloudflare country code headers, and fast `ip-api` lookups guarantee 0ms latency after initial detection.
+    2. **Client-side:** `window.localizeAllTimestamps()` and `window.detectAndSyncIpTimezone()` query `/api/v1/geo/timezone`, cache in `localStorage`, persist the `user_timezone` cookie, and dynamically adjust all `<time class="ts-time">` DOM elements with `{ timeZone: userTz }`.
 
 ---
 

@@ -466,45 +466,61 @@
         if (url) window.location.href = url;
       };
 
-      // Automatic Timezone Detection & Dynamic Timestamp Localizer
-      window.localizeAllTimestamps = function(root) {
+      // Automatic IP-based Timezone Auto-Detection & Dynamic Timestamp Localizer
+      window.getUserTimezone = function() {
         try {
-          const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          var match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+          if (match && match[2]) return decodeURIComponent(match[2].trim());
+        } catch(e) {}
+        try {
+          var cached = localStorage.getItem('ts_ip_timezone');
+          if (cached) return cached;
+        } catch(e) {}
+        try {
+          return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Karachi';
+        } catch(e) {
+          return 'Asia/Karachi';
+        }
+      };
+
+      window.localizeAllTimestamps = function(root, forcedTz) {
+        try {
+          var userTz = forcedTz || window.getUserTimezone();
           if (userTz) {
-            const match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
-            const currentCookie = match ? decodeURIComponent(match[2]) : null;
+            var match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+            var currentCookie = match ? decodeURIComponent(match[2]) : null;
             if (currentCookie !== userTz) {
               document.cookie = "user_timezone=" + encodeURIComponent(userTz) + ";path=/;max-age=31536000;SameSite=Lax";
             }
           }
           
-          const scope = (root && root.querySelectorAll) ? root : document;
-          const timeEls = scope.querySelectorAll('time.ts-time[datetime]');
+          var scope = (root && root.querySelectorAll) ? root : document;
+          var timeEls = scope.querySelectorAll('time.ts-time[datetime]');
           if (!timeEls || !timeEls.length) return;
 
           timeEls.forEach(function(el) {
             try {
-              const iso = el.getAttribute('datetime');
+              var iso = el.getAttribute('datetime');
               if (!iso) return;
-              const d = new Date(iso);
+              var d = new Date(iso);
               if (isNaN(d.getTime())) return;
 
-              const formatType = el.getAttribute('data-format-type') || 'full';
+              var formatType = el.getAttribute('data-format-type') || 'full';
               
-              let tzAbbr = '';
+              var tzAbbr = '';
               try {
-                const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(d);
-                const tzPart = parts.find(p => p.type === 'timeZoneName');
+                var parts = new Intl.DateTimeFormat('en-US', { timeZone: userTz, timeZoneName: 'short' }).formatToParts(d);
+                var tzPart = parts.find(function(p) { return p.type === 'timeZoneName'; });
                 if (tzPart && tzPart.value) tzAbbr = tzPart.value;
               } catch(e) {}
 
-              const timeStr = d.toLocaleTimeString('en-GB', { hour12: false });
-              const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-              const fullTitle = dateStr + ' ' + timeStr + (userTz ? ' (' + userTz + ')' : '');
+              var timeStr = d.toLocaleTimeString('en-GB', { timeZone: userTz, hour12: false });
+              var dateStr = d.toLocaleDateString('en-US', { timeZone: userTz, month: 'short', day: 'numeric', year: 'numeric' });
+              var fullTitle = dateStr + ' ' + timeStr + (userTz ? ' (' + userTz + ')' : '');
 
               if (formatType === 'compact_two_lines') {
-                const timePart = el.querySelector('.ts-time-part');
-                const datePart = el.querySelector('.ts-date-part');
+                var timePart = el.querySelector('.ts-time-part');
+                var datePart = el.querySelector('.ts-date-part');
                 if (timePart) timePart.textContent = timeStr;
                 if (datePart) {
                   datePart.innerHTML = dateStr + (tzAbbr ? ' <span class="ts-tz-abbr">(' + tzAbbr + ')</span>' : '');
@@ -517,8 +533,8 @@
                 el.textContent = timeStr;
                 el.setAttribute('title', fullTitle);
               } else if (formatType === 'short') {
-                const shortDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const shortTime = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                var shortDate = d.toLocaleDateString('en-US', { timeZone: userTz, month: 'short', day: 'numeric' });
+                var shortTime = d.toLocaleTimeString('en-GB', { timeZone: userTz, hour: '2-digit', minute: '2-digit', hour12: false });
                 el.textContent = shortDate + ', ' + shortTime;
                 el.setAttribute('title', fullTitle);
               } else if (formatType === 'full') {
@@ -533,12 +549,35 @@
         }
       };
 
+      // Auto-detect IP location timezone in background
+      window.detectAndSyncIpTimezone = function() {
+        try {
+          var baseUri = window.TS_BASE_URL || '';
+          fetch(baseUri + '/api/v1/geo/timezone', { credentials: 'same-origin' })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+              if (data && data.success && data.timezone) {
+                var oldTz = localStorage.getItem('ts_ip_timezone');
+                localStorage.setItem('ts_ip_timezone', data.timezone);
+                localStorage.setItem('ts_ip_timezone_time', Date.now().toString());
+                document.cookie = "user_timezone=" + encodeURIComponent(data.timezone) + ";path=/;max-age=31536000;SameSite=Lax";
+                if (oldTz !== data.timezone) {
+                  window.localizeAllTimestamps(document, data.timezone);
+                }
+              }
+            })
+            .catch(function() {});
+        } catch(e) {}
+      };
+
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
           window.localizeAllTimestamps();
+          window.detectAndSyncIpTimezone();
         });
       } else {
         window.localizeAllTimestamps();
+        window.detectAndSyncIpTimezone();
       }
     })();
   </script>
