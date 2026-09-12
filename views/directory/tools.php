@@ -10,17 +10,17 @@
   </div>
 
   <!-- Interactive Filter & Sorting Command HUD -->
-  <div class="ts-card" style="margin-bottom: 2.25rem; padding: 1.25rem 1.5rem; background: rgba(13,21,39,0.75); border: 1px solid rgba(236,72,153,0.25); border-radius: 14px;">
+  <div class="ts-card ts-filter-hud-card" style="margin-bottom: 2.25rem; padding: 1.25rem 1.5rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); border-radius: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       
       <!-- Search Input -->
       <div style="flex: 1; min-width: 240px; position: relative;">
-        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #64748b;"></i>
+        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ts-text-tertiary);"></i>
         <input type="text" id="toolSearchInput" value="<?= htmlspecialchars($currentSearch ?? '') ?>" placeholder="Search AI tools, LLMs, code assistants, devops..." 
-               style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; color: #f8fafc; font-size: 0.88rem;"
+               style="width: 100%; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; color: var(--ts-text-primary); font-size: 0.88rem;"
                onkeydown="if(event.key==='Enter') applyToolFilters()">
         <?php if (!empty($currentSearch)): ?>
-          <button onclick="document.getElementById('toolSearchInput').value=''; applyToolFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem;">&times;</button>
+          <button onclick="document.getElementById('toolSearchInput').value=''; applyToolFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--ts-text-secondary); cursor: pointer; font-size: 1rem;">&times;</button>
         <?php endif; ?>
       </div>
 
@@ -28,7 +28,7 @@
       <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
         <!-- Category Dropdown -->
         <div>
-          <select id="toolCategorySelect" onchange="applyToolFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="toolCategorySelect" onchange="applyToolFilters()" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 0.85rem; color: var(--ts-text-primary); font-size: 0.88rem; cursor: pointer;">
             <option value="">All Tool Domains</option>
             <?php foreach (($categories ?? []) as $c): ?>
               <option value="<?= htmlspecialchars($c['slug']) ?>" <?= ($currentCategory ?? '') === $c['slug'] ? 'selected' : '' ?>>
@@ -40,7 +40,7 @@
 
         <!-- Pricing Filter -->
         <div>
-          <select id="toolPricingSelect" onchange="applyToolFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="toolPricingSelect" onchange="applyToolFilters()" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 0.85rem; color: var(--ts-text-primary); font-size: 0.88rem; cursor: pointer;">
             <option value="">All Pricing Models</option>
             <option value="free" <?= strtolower($currentPricing ?? '') === 'free' ? 'selected' : '' ?>>🟢 100% Free</option>
             <option value="freemium" <?= strtolower($currentPricing ?? '') === 'freemium' ? 'selected' : '' ?>>🟡 Freemium</option>
@@ -51,8 +51,8 @@
 
         <!-- Sort Dropdown -->
         <div style="display: flex; align-items: center; gap: 0.4rem;">
-          <span style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Sort:</span>
-          <select id="toolSortSelect" onchange="applyToolFilters()" style="background: #05070b; border: 1px solid rgba(236,72,153,0.35); border-radius: 8px; padding: 0.6rem 0.85rem; color: #ec4899; font-weight: 600; font-size: 0.88rem; cursor: pointer;">
+          <span style="font-size: 0.8rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700;">Sort:</span>
+          <select id="toolSortSelect" onchange="applyToolFilters()" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 0.85rem; color: var(--ts-secondary); font-weight: 600; font-size: 0.88rem; cursor: pointer;">
             <option value="popular" <?= ($currentSort ?? 'popular') === 'popular' ? 'selected' : '' ?>>Most Popular</option>
             <option value="rating" <?= ($currentSort ?? '') === 'rating' ? 'selected' : '' ?>>Top Rated ⭐</option>
             <option value="trending" <?= ($currentSort ?? '') === 'trending' ? 'selected' : '' ?>>Trending Now 🔥</option>

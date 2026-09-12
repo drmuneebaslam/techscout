@@ -3446,6 +3446,8 @@ function submitCreateCustomTrigger(e) {
 
   const formData = new FormData();
   if (id) formData.append('id', id);
+  formData.append('csrf_token', '<?= csrf_token() ?>');
+  formData.append('_csrf_token', '<?= csrf_token() ?>');
   formData.append('name', name);
   formData.append('type', type);
   formData.append('key_or_pattern', keyOrPattern);
@@ -3477,6 +3479,8 @@ function deleteCustomTrigger(id) {
   if (!confirm('Are you sure you want to delete this custom trigger?')) return;
   const formData = new FormData();
   formData.append('id', id);
+  formData.append('csrf_token', '<?= csrf_token() ?>');
+  formData.append('_csrf_token', '<?= csrf_token() ?>');
 
   fetch('<?= url('/admin/mail/trigger/delete') ?>', {
     method: 'POST',

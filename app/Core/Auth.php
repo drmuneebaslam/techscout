@@ -59,6 +59,18 @@ class Auth {
         }
     }
 
+    public static function requireRole(array $roles, string $redirect = '/auth/login'): void {
+        if (!self::check() || !self::hasRole($roles)) {
+            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                Response::json(['success' => false, 'message' => 'Access denied. Insufficient privileges.'], 403);
+                exit;
+            }
+            Session::flash('error', 'Access denied. Insufficient role permissions.');
+            Response::redirect($redirect);
+            exit;
+        }
+    }
+
     public static function requireAuthor(string $redirect = '/auth/login'): void {
         if (!self::check() || !self::isAuthor()) {
             Session::flash('error', 'Access denied. Author privileges required.');

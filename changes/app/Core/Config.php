@@ -12,7 +12,7 @@ class Config {
         'db_user' => 'if0_40102772',
         'db_pass' => 'Fp9QFWfj5fm',
         'session_lifetime' => 86400 * 7,
-        'environment' => 'production' // 'development' or 'production'
+        'environment' => 'development' // 'development' or 'production'
     ];
 
     public static function get(string $key, $default = null) {

@@ -18,17 +18,18 @@
   </div>
 
   <!-- Interactive Filter & Sorting Command HUD -->
-  <div class="ts-card" style="margin-bottom: 2.25rem; padding: 1.25rem 1.5rem; background: rgba(13,21,39,0.75); border: 1px solid rgba(236,72,153,0.25); border-radius: 14px;">
+  <div class="ts-card ts-filter-hud-card" style="margin-bottom: 2.25rem; padding: 1.25rem 1.5rem; border-radius: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       
       <!-- Search Input -->
       <div style="flex: 1; min-width: 240px; position: relative;">
-        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #64748b;"></i>
+        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ts-text-tertiary);"></i>
         <input type="text" id="gptSearchInput" value="<?= htmlspecialchars($currentSearch ?? '') ?>" placeholder="Search specialized GPTs, agents, system architects, assistants..." 
-               style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; color: #f8fafc; font-size: 0.88rem;"
+               class="ts-filter-hud-input"
+               style="width: 100%; border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; font-size: 0.88rem;"
                onkeydown="if(event.key==='Enter') applyGptFilters()">
         <?php if (!empty($currentSearch)): ?>
-          <button onclick="document.getElementById('gptSearchInput').value=''; applyGptFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem;">&times;</button>
+          <button onclick="document.getElementById('gptSearchInput').value=''; applyGptFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--ts-text-secondary); cursor: pointer; font-size: 1rem;">&times;</button>
         <?php endif; ?>
       </div>
 
@@ -36,7 +37,7 @@
       <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
         <!-- Category Dropdown -->
         <div>
-          <select id="gptCategorySelect" onchange="applyGptFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="gptCategorySelect" onchange="applyGptFilters()" class="ts-filter-hud-select" style="border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.88rem; cursor: pointer;">
             <option value="">All Agent Domains</option>
             <?php foreach (($categories ?? []) as $c): ?>
               <option value="<?= htmlspecialchars($c['slug']) ?>" <?= ($currentCategory ?? '') === $c['slug'] ? 'selected' : '' ?>>
@@ -48,22 +49,21 @@
 
         <!-- Target Model Architecture Filter -->
         <div>
-          <select id="gptModelSelect" onchange="applyGptFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="gptModelSelect" onchange="applyGptFilters()" class="ts-filter-hud-select" style="border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.88rem; cursor: pointer;">
             <option value="">All Architectures</option>
             <option value="GPT-4o" <?= ($currentModel ?? '') === 'GPT-4o' ? 'selected' : '' ?>>OpenAI GPT-4o / Canvas</option>
             <option value="Claude" <?= ($currentModel ?? '') === 'Claude' ? 'selected' : '' ?>>Claude 3.5 Sonnet Artifacts</option>
             <option value="DeepSeek" <?= ($currentModel ?? '') === 'DeepSeek' ? 'selected' : '' ?>>DeepSeek R1 Agent</option>
-            <option value="Custom" <?= ($currentModel ?? '') === 'Custom' ? 'selected' : '' ?>>Autonomous Multi-Agent</option>
           </select>
         </div>
 
-        <!-- Sort Dropdown -->
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
-          <span style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Sort:</span>
-          <select id="gptSortSelect" onchange="applyGptFilters()" style="background: #05070b; border: 1px solid rgba(236,72,153,0.35); border-radius: 8px; padding: 0.6rem 0.85rem; color: #ec4899; font-weight: 600; font-size: 0.88rem; cursor: pointer;">
-            <option value="popular" <?= ($currentSort ?? 'popular') === 'popular' ? 'selected' : '' ?>>Most Popular ⚡</option>
-            <option value="trending" <?= ($currentSort ?? '') === 'trending' ? 'selected' : '' ?>>Trending Now 🔥</option>
-            <option value="latest" <?= ($currentSort ?? '') === 'latest' ? 'selected' : '' ?>>Recently Launched</option>
+        <!-- Sort Control -->
+        <div>
+          <select id="gptSortSelect" onchange="applyGptFilters()" class="ts-filter-hud-select" style="border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.88rem; cursor: pointer;">
+            <option value="popular" <?= ($currentSort ?? '') === 'popular' ? 'selected' : '' ?>>🔥 Most Popular</option>
+            <option value="rating" <?= ($currentSort ?? '') === 'rating' ? 'selected' : '' ?>>⭐ Highest Rated</option>
+            <option value="recent" <?= ($currentSort ?? '') === 'recent' ? 'selected' : '' ?>>⚡ Recently Added</option>
+            <option value="title" <?= ($currentSort ?? '') === 'title' ? 'selected' : '' ?>>🔤 Title (A-Z)</option>
           </select>
         </div>
       </div>

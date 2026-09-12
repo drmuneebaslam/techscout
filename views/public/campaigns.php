@@ -10,17 +10,18 @@
   </div>
 
   <!-- Interactive Hackathon & Campaign Command HUD -->
-  <div class="ts-card" style="margin-bottom: 2.25rem; padding: 1.25rem 1.5rem; background: rgba(13,21,39,0.75); border: 1px solid rgba(244,63,94,0.25); border-radius: 14px;">
+  <div class="ts-card ts-filter-hud-card" style="margin-bottom: 2.25rem; padding: 1.25rem 1.5rem; border-radius: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       
       <!-- Search Input -->
       <div style="flex: 1; min-width: 240px; position: relative;">
-        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #64748b;"></i>
+        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ts-text-tertiary);"></i>
         <input type="text" id="campaignSearchInput" value="<?= htmlspecialchars($currentSearch ?? '') ?>" placeholder="Search hackathons, sponsor bounties, prize pools..." 
-               style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; color: #f8fafc; font-size: 0.88rem;"
+               class="ts-filter-hud-input"
+               style="width: 100%; border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; font-size: 0.88rem;"
                onkeydown="if(event.key==='Enter') applyCampaignFilters()">
         <?php if (!empty($currentSearch)): ?>
-          <button onclick="document.getElementById('campaignSearchInput').value=''; applyCampaignFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem;">&times;</button>
+          <button onclick="document.getElementById('campaignSearchInput').value=''; applyCampaignFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--ts-text-secondary); cursor: pointer; font-size: 1rem;">&times;</button>
         <?php endif; ?>
       </div>
 
@@ -28,7 +29,7 @@
       <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
         <!-- Category Dropdown -->
         <div>
-          <select id="campaignCategorySelect" onchange="applyCampaignFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="campaignCategorySelect" onchange="applyCampaignFilters()" class="ts-filter-hud-select" style="border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.88rem; cursor: pointer;">
             <option value="">All Challenge Domains</option>
             <?php foreach (($categories ?? []) as $c): ?>
               <option value="<?= htmlspecialchars($c['slug']) ?>" <?= ($currentCategory ?? '') === $c['slug'] ? 'selected' : '' ?>>
@@ -40,7 +41,7 @@
 
         <!-- Challenge Status Filter -->
         <div>
-          <select id="campaignStatusSelect" onchange="applyCampaignFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="campaignStatusSelect" onchange="applyCampaignFilters()" class="ts-filter-hud-select" style="border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.88rem; cursor: pointer;">
             <option value="all" <?= ($currentStatus ?? 'all') === 'all' ? 'selected' : '' ?>>All Statuses</option>
             <option value="active" <?= ($currentStatus ?? '') === 'active' ? 'selected' : '' ?>>Active Challenges 🔥</option>
             <option value="completed" <?= ($currentStatus ?? '') === 'completed' ? 'selected' : '' ?>>Archived / Concluded</option>
@@ -48,9 +49,8 @@
         </div>
 
         <!-- Sort Dropdown -->
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
-          <span style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Sort:</span>
-          <select id="campaignSortSelect" onchange="applyCampaignFilters()" style="background: #05070b; border: 1px solid rgba(244,63,94,0.35); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f43f5e; font-weight: 600; font-size: 0.88rem; cursor: pointer;">
+        <div>
+          <select id="campaignSortSelect" onchange="applyCampaignFilters()" class="ts-filter-hud-select" style="border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.88rem; cursor: pointer;">
             <option value="latest" <?= ($currentSort ?? 'latest') === 'latest' ? 'selected' : '' ?>>Recently Launched</option>
             <option value="popular" <?= ($currentSort ?? '') === 'popular' ? 'selected' : '' ?>>Most Submissions ⚡</option>
           </select>

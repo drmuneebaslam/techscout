@@ -2544,6 +2544,7 @@ class AdminController {
 
     public function createCustomTrigger(Request $request): void {
         Auth::requireRole(['admin', 'super_admin']);
+        $isAjax = $request->isAjax();
         $name = trim((string)$request->post('name', ''));
         $type = trim((string)$request->post('type', 'event'));
         $keyOrPattern = trim((string)$request->post('key_or_pattern', ''));
@@ -2554,8 +2555,8 @@ class AdminController {
         $id = trim((string)$request->post('id', ''));
 
         if (empty($name) || empty($keyOrPattern)) {
-            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-                Response::json(['success' => false, 'message' => 'Trigger name and key/URL pattern are required.']);
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => 'Trigger name and key/URL pattern are required.'], 400);
                 return;
             }
             Session::flash('error', 'Trigger name and key/URL pattern are required.');
@@ -2563,43 +2564,63 @@ class AdminController {
             return;
         }
 
-        $res = \App\Core\EventTriggerEngine::saveCustomTrigger([
-            'id' => $id,
-            'name' => $name,
-            'type' => $type,
-            'key_or_pattern' => $keyOrPattern,
-            'description' => $desc,
-            'template_key' => $tmplKey,
-            'subject_override' => $subject,
-            'single_delivery' => $singleDelivery,
-            'is_active' => true
-        ]);
+        try {
+            $res = \App\Core\EventTriggerEngine::saveCustomTrigger([
+                'id' => $id,
+                'name' => $name,
+                'type' => $type,
+                'key_or_pattern' => $keyOrPattern,
+                'description' => $desc,
+                'template_key' => $tmplKey,
+                'subject_override' => $subject,
+                'single_delivery' => $singleDelivery,
+                'is_active' => true
+            ]);
 
-        AuditLog::log('admin.create_custom_trigger', 'site_settings', 0, ['trigger_name' => $name, 'key_or_pattern' => $keyOrPattern]);
+            AuditLog::log('admin.create_custom_trigger', 'site_settings', null, ['trigger_name' => $name, 'key_or_pattern' => $keyOrPattern]);
 
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-            Response::json(['success' => true, 'message' => "Custom trigger '{$name}' created successfully!", 'trigger' => $res['trigger'] ?? null]);
-            return;
+            if ($isAjax) {
+                Response::json(['success' => true, 'message' => "Custom trigger '{$name}' created successfully!", 'trigger' => $res['trigger'] ?? null]);
+                return;
+            }
+
+            Session::flash('success', "Custom trigger '{$name}' saved!");
+        } catch (\Throwable $e) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => 'Error saving trigger: ' . $e->getMessage()], 500);
+                return;
+            }
+            Session::flash('error', 'Error saving trigger: ' . $e->getMessage());
         }
 
-        Session::flash('success', "Custom trigger '{$name}' saved!");
         Response::redirect('/admin/mail?tab=triggers');
     }
 
     public function deleteCustomTrigger(Request $request): void {
         Auth::requireRole(['admin', 'super_admin']);
+        $isAjax = $request->isAjax();
         $id = trim((string)$request->post('id', ''));
-        if (!empty($id)) {
-            \App\Core\EventTriggerEngine::deleteCustomTrigger($id);
-            AuditLog::log('admin.delete_custom_trigger', 'site_settings', 0, ['trigger_id' => $id]);
+
+        try {
+            if (!empty($id)) {
+                \App\Core\EventTriggerEngine::deleteCustomTrigger($id);
+                AuditLog::log('admin.delete_custom_trigger', 'site_settings', null, ['trigger_id' => $id]);
+            }
+
+            if ($isAjax) {
+                Response::json(['success' => true, 'message' => 'Custom trigger deleted successfully.']);
+                return;
+            }
+
+            Session::flash('success', 'Custom trigger deleted.');
+        } catch (\Throwable $e) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'message' => 'Error deleting trigger: ' . $e->getMessage()], 500);
+                return;
+            }
+            Session::flash('error', 'Error deleting trigger: ' . $e->getMessage());
         }
 
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-            Response::json(['success' => true, 'message' => 'Custom trigger deleted successfully.']);
-            return;
-        }
-
-        Session::flash('success', 'Custom trigger deleted.');
         Response::redirect('/admin/mail?tab=triggers');
     }
 

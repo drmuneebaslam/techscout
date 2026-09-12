@@ -42,7 +42,7 @@
       <?php if (!isset($sectionsMap['topics']) || (int)$sectionsMap['topics']['is_enabled'] === 1): ?>
         <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.75rem;">
           <?php foreach (array_slice($allTopics ?? [], 0, 5) as $t): ?>
-            <a href="<?= url('/topic/' . $t['slug']) ?>" class="ts-badge" style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.18); color: #cbd5e1; text-decoration: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 9999px;">
+            <a href="<?= url('/topic/' . $t['slug']) ?>" class="ts-badge" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); color: var(--ts-text-secondary); text-decoration: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 9999px;">
               <i data-lucide="<?= htmlspecialchars($t['icon_name'] ?: 'layers') ?>" style="width: 12px; height: 12px; color: <?= htmlspecialchars($t['color_hex'] ?: '#6366f1') ?>;"></i>
               <?= htmlspecialchars($t['name']) ?>
             </a>
@@ -69,11 +69,11 @@
   ?>
 
   <?php if ($showTrending || $showFeatured || $showLatest || ($isLoggedIn && $showRecommended)): ?>
-    <div style="margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid rgba(148,163,184,0.12); padding-bottom: 1rem; margin-top: 2rem;">
+    <div style="margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--ts-border-main); padding-bottom: 1rem; margin-top: 2rem;">
       <div>
         <div style="display: flex; gap: 0.5rem; align-items: center;">
           <span class="ts-badge ts-badge-cyan">RADAR FEED</span>
-          <h2 style="font-size: 1.5rem; margin: 0; color: #f8fafc; font-family: 'Outfit', sans-serif;">
+          <h2 style="font-size: 1.5rem; margin: 0; color: var(--ts-text-primary); font-family: 'Outfit', sans-serif;">
             <?= htmlspecialchars($sectionsMap['latest']['title'] ?? $sectionsMap['trending']['title'] ?? 'Engineering Publications & Architecture') ?>
           </h2>
         </div>
@@ -83,7 +83,7 @@
       </div>
 
       <!-- Feed Switch Tabs -->
-      <div style="display: flex; gap: 0.35rem; background: #05070b; padding: 0.25rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.18);">
+      <div style="display: flex; gap: 0.35rem; background: var(--ts-bg-surface-elevated); padding: 0.25rem; border-radius: 8px; border: 1px solid var(--ts-border-main);">
         <?php if ($isLoggedIn && $showRecommended): ?>
           <button type="button" id="tab-for-you-btn" onclick="switchHomeFeedTab('for-you')" class="ts-btn ts-btn-sm <?= $showForYouActive ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="padding: 0.35rem 0.85rem; font-size: 0.8rem; <?= !$showForYouActive ? 'border:none;' : '' ?>">
             🌟 For You
@@ -112,14 +112,14 @@
 
     <?php if ($isLoggedIn && !$hasSubscriptions): ?>
       <!-- Topic Follow Banner (Only for logged in users with 0 subs) -->
-      <div class="ts-card" style="background: rgba(99,102,241,0.05); border-color: rgba(99,102,241,0.2); padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
+      <div class="ts-card" style="background: var(--ts-bg-surface); border-color: var(--ts-border-main); padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.85rem;">
           <div style="display: flex; align-items: center; gap: 0.4rem;">
             <i data-lucide="sparkles" style="color: #ec4899; width: 16px;"></i>
-            <strong style="color: #f8fafc; font-size: 0.95rem;">Personalize Your Developer Feed:</strong>
-            <span style="font-size: 0.82rem; color: #94a3b8;">Follow topics you work with to build your custom radar.</span>
+            <strong style="color: var(--ts-text-primary); font-size: 0.95rem;">Personalize Your Developer Feed:</strong>
+            <span style="font-size: 0.82rem; color: var(--ts-text-secondary);">Follow topics you work with to build your custom radar.</span>
           </div>
-          <a href="<?= url('/topics') ?>" style="color: #38bdf8; font-size: 0.8rem; text-decoration: none;">View All 100+ Categories →</a>
+          <a href="<?= url('/topics') ?>" style="color: var(--ts-text-accent); font-size: 0.8rem; text-decoration: none;">View All 100+ Categories →</a>
         </div>
 
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -418,9 +418,9 @@
         <div class="ts-card" style="text-align: center; padding: 1.5rem 1rem;">
           <img src="<?= htmlspecialchars(image_url($author['avatar_url'] ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120')) ?>" alt="<?= htmlspecialchars($author['display_name']) ?>" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; margin: 0 auto 0.75rem auto; border: 2px solid var(--ts-primary);">
           <h3 style="font-size: 1.05rem; margin-bottom: 0.25rem;">
-            <a href="<?= url('/author/profile/' . $author['slug']) ?>" style="color: #f8fafc; text-decoration: none;"><?= htmlspecialchars($author['display_name']) ?></a>
+            <a href="<?= url('/author/profile/' . $author['slug']) ?>" style="color: var(--ts-text-primary); text-decoration: none;"><?= htmlspecialchars($author['display_name']) ?></a>
           </h3>
-          <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.75rem;"><?= htmlspecialchars($author['headline'] ?: 'Technical Writer & Scout') ?></div>
+          <div style="font-size: 0.75rem; color: var(--ts-text-tertiary); margin-bottom: 0.75rem;"><?= htmlspecialchars($author['headline'] ?: 'Technical Writer & Scout') ?></div>
           <a href="<?= url('/author/profile/' . $author['slug']) ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.75rem;">View Profile ↗</a>
         </div>
       <?php endforeach; ?>
@@ -451,14 +451,14 @@
               <span style="font-weight: 700; color: #10b981; font-size: 0.9rem;">🏆 $<?= number_format((float)($camp['prize_pool_usd'] ?? 500)) ?> Prize</span>
             </div>
             <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">
-              <a href="<?= url('/campaigns/' . $camp['slug']) ?>" style="color: #f8fafc; text-decoration: none;"><?= htmlspecialchars($camp['title']) ?></a>
+              <a href="<?= url('/campaigns/' . $camp['slug']) ?>" style="color: var(--ts-text-primary); text-decoration: none;"><?= htmlspecialchars($camp['title']) ?></a>
             </h3>
-            <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5;">
+            <p style="font-size: 0.85rem; color: var(--ts-text-secondary); line-height: 1.5;">
               <?= htmlspecialchars($camp['summary']) ?>
             </p>
           </div>
-          <div style="margin-top: 1rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.75rem; color: #64748b;">Deadline: <?= htmlspecialchars($camp['end_date'] ?? 'Ongoing') ?></span>
+          <div style="margin-top: 1rem; border-top: 1px solid var(--ts-border-main); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75rem; color: var(--ts-text-tertiary);">Deadline: <?= htmlspecialchars($camp['end_date'] ?? 'Ongoing') ?></span>
             <a href="<?= url('/campaigns/' . $camp['slug']) ?>" class="ts-btn ts-btn-primary ts-btn-sm">Join Challenge 🚀</a>
           </div>
         </div>
@@ -474,14 +474,14 @@
     ?>
     <div class="ts-card" style="margin-top: 4.5rem; background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(56,189,248,0.1)); border: 1px solid rgba(99,102,241,0.35); border-radius: 16px; padding: 2.5rem 2rem; text-align: center;">
       <span class="ts-badge ts-badge-cyan" style="margin-bottom: 0.75rem;">WEEKLY RADAR DISPATCH</span>
-      <h2 style="font-size: 1.85rem; color: #f8fafc; margin: 0 0 0.5rem 0; font-family: 'Outfit', sans-serif;">
+      <h2 style="font-size: 1.85rem; color: var(--ts-text-primary); margin: 0 0 0.5rem 0; font-family: 'Outfit', sans-serif;">
         <?= htmlspecialchars($newsSec['title'] ?? 'TechScout Dispatch Newsletter') ?>
       </h2>
-      <p style="color: #94a3b8; font-size: 0.95rem; max-width: 600px; margin: 0 auto 1.5rem auto; line-height: 1.5;">
+      <p style="color: var(--ts-text-secondary); font-size: 0.95rem; max-width: 600px; margin: 0 auto 1.5rem auto; line-height: 1.5;">
         <?= htmlspecialchars($newsCfg['pitch'] ?? $newsSec['subtitle'] ?? 'Join 48,000+ software engineers receiving our curated breakdown of top AI tools, production prompts, and architecture patterns.') ?>
       </p>
       <form onsubmit="handleHomeNewsletter(event, this)" style="display: flex; gap: 0.5rem; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
-        <input type="email" name="email" id="home_newsletter_email" placeholder="Enter your email (e.g. builder@scale.io)" style="flex: 1; min-width: 220px; background: #05070b; border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.9rem;" required>
+        <input type="email" name="email" id="home_newsletter_email" placeholder="Enter your email (e.g. builder@scale.io)" style="flex: 1; min-width: 220px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.75rem 1rem; color: var(--ts-text-primary); font-size: 0.9rem;" required>
         <button type="submit" id="home_newsletter_btn" class="ts-btn ts-btn-primary" style="padding: 0.75rem 1.25rem; font-weight: 700;">Subscribe ✉️</button>
       </form>
       <div id="home_newsletter_msg" style="display: none; margin-top: 0.75rem; font-size: 0.88rem; font-weight: 600;"></div>
@@ -547,12 +547,12 @@
       $ctaCfg = !empty($ctaSec['config_json']) ? (is_array($ctaSec['config_json']) ? $ctaSec['config_json'] : json_decode($ctaSec['config_json'], true)) : [];
       $ctaTarget = $ctaCfg['target_url'] ?? '/author/apply';
     ?>
-    <div class="ts-card" style="margin-top: 3rem; background: #090d16; border: 1px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+    <div class="ts-card" style="margin-top: 3rem; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 16px; padding: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
       <div>
-        <h3 style="font-size: 1.4rem; color: #f8fafc; margin: 0 0 0.35rem 0; font-family: 'Outfit', sans-serif;">
+        <h3 style="font-size: 1.4rem; color: var(--ts-text-primary); margin: 0 0 0.35rem 0; font-family: 'Outfit', sans-serif;">
           <?= htmlspecialchars($ctaSec['title'] ?? 'Are you a Technical Author or AI Researcher?') ?>
         </h3>
-        <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
+        <p style="color: var(--ts-text-secondary); font-size: 0.9rem; margin: 0;">
           <?= htmlspecialchars($ctaSec['subtitle'] ?? 'Publish deep-dives, earn creator rewards, and showcase your engineering radar to 100k+ builders.') ?>
         </p>
       </div>

@@ -11,17 +11,17 @@
   </div>
 
   <!-- Interactive Filter & Sorting Command HUD -->
-  <div class="ts-card" style="margin-bottom: 2rem; padding: 1.25rem 1.5rem; background: rgba(13,21,39,0.75); border: 1px solid rgba(99,102,241,0.25); border-radius: 14px;">
+  <div class="ts-card ts-filter-hud-card" style="margin-bottom: 2rem; padding: 1.25rem 1.5rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); border-radius: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       
       <!-- Search Input -->
       <div style="flex: 1; min-width: 240px; position: relative;">
-        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #64748b;"></i>
+        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ts-text-tertiary);"></i>
         <input type="text" id="blogSearchInput" value="<?= htmlspecialchars($currentSearch ?? '') ?>" placeholder="Search technical articles, kubernetes, LLMs, cloud..." 
-               style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; color: #f8fafc; font-size: 0.88rem;"
+               style="width: 100%; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 2.2rem 0.6rem 2.2rem; color: var(--ts-text-primary); font-size: 0.88rem;"
                onkeydown="if(event.key==='Enter') applyBlogFilters()">
         <?php if (!empty($currentSearch)): ?>
-          <button onclick="document.getElementById('blogSearchInput').value=''; applyBlogFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem;">&times;</button>
+          <button onclick="document.getElementById('blogSearchInput').value=''; applyBlogFilters();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--ts-text-secondary); cursor: pointer; font-size: 1rem;">&times;</button>
         <?php endif; ?>
       </div>
 
@@ -29,7 +29,7 @@
       <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
         <!-- Category Dropdown -->
         <div>
-          <select id="blogCategorySelect" onchange="applyBlogFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="blogCategorySelect" onchange="applyBlogFilters()" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 0.85rem; color: var(--ts-text-primary); font-size: 0.88rem; cursor: pointer;">
             <option value="">All Categories &amp; Domains</option>
             <?php foreach (($categories ?? []) as $c): ?>
               <option value="<?= htmlspecialchars($c['slug']) ?>" <?= ($currentCategory ?? '') === $c['slug'] ? 'selected' : '' ?>>
@@ -41,7 +41,7 @@
 
         <!-- Reading Time Filter -->
         <div>
-          <select id="blogReadingTimeSelect" onchange="applyBlogFilters()" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.6rem 0.85rem; color: #f8fafc; font-size: 0.88rem; cursor: pointer;">
+          <select id="blogReadingTimeSelect" onchange="applyBlogFilters()" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 0.85rem; color: var(--ts-text-primary); font-size: 0.88rem; cursor: pointer;">
             <option value="">Any Reading Duration</option>
             <option value="short" <?= ($currentReadingTime ?? '') === 'short' ? 'selected' : '' ?>>⚡ Quick Read (&le; 5 min)</option>
             <option value="medium" <?= ($currentReadingTime ?? '') === 'medium' ? 'selected' : '' ?>>📖 Standard (5–10 min)</option>
@@ -51,8 +51,8 @@
 
         <!-- Sort Dropdown -->
         <div style="display: flex; align-items: center; gap: 0.4rem;">
-          <span style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Sort:</span>
-          <select id="blogSortSelect" onchange="applyBlogFilters()" style="background: #05070b; border: 1px solid rgba(99,102,241,0.35); border-radius: 8px; padding: 0.6rem 0.85rem; color: #38bdf8; font-weight: 600; font-size: 0.88rem; cursor: pointer;">
+          <span style="font-size: 0.8rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700;">Sort:</span>
+          <select id="blogSortSelect" onchange="applyBlogFilters()" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 0.6rem 0.85rem; color: var(--ts-text-accent); font-weight: 600; font-size: 0.88rem; cursor: pointer;">
             <option value="latest" <?= ($currentSort ?? 'latest') === 'latest' ? 'selected' : '' ?>>Latest Publications</option>
             <option value="popular" <?= ($currentSort ?? '') === 'popular' ? 'selected' : '' ?>>Most Popular (Views &amp; Upvotes)</option>
             <option value="trending" <?= ($currentSort ?? '') === 'trending' ? 'selected' : '' ?>>Trending Now 🔥</option>

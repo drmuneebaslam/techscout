@@ -227,7 +227,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
         </button>
 
         <!-- Theme Toggle -->
-        <button id="theme-toggle" class="ts-btn ts-btn-outline ts-btn-sm" title="Toggle Theme">
+        <button id="theme-toggle" type="button" onclick="toggleTheme()" class="ts-btn ts-btn-outline ts-btn-sm" title="Toggle Theme">
           <i data-lucide="moon" style="width: 15px; height: 15px;"></i>
         </button>
 

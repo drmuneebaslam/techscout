@@ -203,6 +203,19 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-18: Missing Role Auth Methods & Unscoped Form Control Fallback to User-Agent White
+* **Root Cause:**
+  - Invoking `Auth::requireRole(...)` across administrative controllers without declaring the method in `App\Core\Auth`, triggering fatal 500 errors on routes like `/admin/mail/trigger/create` and `/admin/revenue/distribute-pool`.
+  - Defining theme variables with subtle name mismatches (`--ts-bg` vs `--ts-bg-base`, `--ts-card-bg` vs `--ts-bg-surface`) and omitting default `:root` styling for form controls (`input`, `select`, `textarea`). In the absence of dark-mode base definitions, browser user-agent stylesheets apply `#ffffff` background and black text to inputs even in dark mode.
+* **Consequences:**
+  - Admins experience 500 Internal Server Errors when creating automation triggers or executing role-protected actions.
+  - Public visitors see inputs, textareas, dropdowns, and cards rendering as jarring white boxes in dark mode ("public site all things are light even in dark mode except a few things all look weird").
+* **Mandatory Rule:**
+  - Always implement `Auth::requireRole(array $roles, string $redirect = '/auth/login'): void` supporting both AJAX JSON responses (HTTP 403) and session redirect fallback.
+  - In `assets/css/style.css`, specify `color-scheme: dark;` on `:root` and `color-scheme: light;` on `[data-theme="light"]`. Define explicit default dark styling and background colors for all `input`, `textarea`, and `select` elements in `:root`, alongside alias tokens (`--ts-bg`, `--ts-card-bg`, `--ts-border-subtle`, `--ts-text-muted`) to ensure consistent dual-theme rendering across all public and admin views.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -222,6 +235,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 15. [ ] **Isolated Direct FTP Deployment & Zero Mutation of Unrelated Remote Folders**: Are uploads to `/htdocs/` via FTP restricted solely to the modified files, strictly preserving all pre-existing folders (`old/`, `old2/`, `oldlat/`, `tech/`, etc.) untouched?
 16. [ ] **Single-Consumption Session Flash Extraction**: Is `Session::getFlash()` called exactly once per key and assigned to a local variable to prevent early wipeout before rendering?
 17. [ ] **Semantic Dual-Theme Modals & CSS Variables**: Are modal dialogs and inspectors styled using semantic classes and CSS variables without hardcoded tag colors or unwanted generic class overrides?
+18. [ ] **Comprehensive Role Auth & Dual-Mode Form Controls**: Is `Auth::requireRole` implemented and are base form controls explicitly themed with dark `:root` and light tokens to prevent user-agent white background leaks?
+
 
 
 

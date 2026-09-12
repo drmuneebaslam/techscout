@@ -25,8 +25,10 @@
   --admin-rose: #ef4444;
 
   --admin-text-primary: #f8fafc;
+  --admin-text-main: #f8fafc;
   --admin-text-secondary: #94a3b8;
   --admin-text-tertiary: #64748b;
+  --admin-text-muted: #64748b;
   --admin-font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -52,8 +54,10 @@ html[data-theme="light"], html.theme-light, body[data-theme="light"], body.theme
   --admin-rose: #dc2626;
 
   --admin-text-primary: #0f172a;
+  --admin-text-main: #0f172a;
   --admin-text-secondary: #334155;
   --admin-text-tertiary: #64748b;
+  --admin-text-muted: #64748b;
 }
 
 *, *::before, *::after {
@@ -668,11 +672,12 @@ body.admin-body {
 .admin-modal-box {
   width: 100%;
   max-width: 560px;
-  background: #080d1a;
-  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: var(--admin-bg-surface);
+  color: var(--admin-text-primary);
+  border: 1px solid var(--admin-border-main);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(99, 102, 241, 0.15);
   position: relative;
   overflow: hidden;
   max-height: 90vh;
@@ -681,22 +686,22 @@ body.admin-body {
 
 .admin-modal-box.modal-amber {
   border-color: rgba(245, 158, 11, 0.45);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.15);
 }
 
 .admin-modal-box.modal-rose {
   border-color: rgba(239, 68, 68, 0.45);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(239, 68, 68, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(239, 68, 68, 0.15);
 }
 
 .admin-modal-box.modal-pink {
   border-color: rgba(236, 72, 153, 0.45);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(236, 72, 153, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(236, 72, 153, 0.15);
 }
 
 .admin-modal-box.modal-cyan {
   border-color: rgba(56, 189, 248, 0.45);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.15);
 }
 
 /* ==========================================================================
