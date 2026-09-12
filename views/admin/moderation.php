@@ -118,7 +118,7 @@
                   </a>
                 <?php endif; ?>
                 <div style="font-size: 0.7rem; color: #64748b; margin-top: 0.2rem; font-family: monospace;">
-                  Submitted: <?= date('M j, Y H:i', strtotime($r['created_at'] ?? 'now')) ?>
+                  Submitted: <?= \App\Core\DateHelper::render($r['created_at'] ?? 'now', 'M j, Y H:i', 'short') ?>
                 </div>
               </td>
 

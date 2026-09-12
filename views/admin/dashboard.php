@@ -252,8 +252,8 @@ require __DIR__ . '/../layouts/admin_header.php';
                 <strong style="color: #34d399; font-size: 0.95rem; font-family: var(--admin-font-mono);"><?= $rev['quality_score'] ?></strong>
                 <span style="font-size: 0.72rem; color: #64748b;">/ 100</span>
               </td>
-              <td style="font-size: 0.78rem; color: #64748b; font-family: var(--admin-font-mono);">
-                <?= date('M j, Y H:i', strtotime($rev['created_at'])) ?>
+              <td style="font-size: 0.78rem; font-family: var(--admin-font-mono);">
+                <?= \App\Core\DateHelper::render($rev['created_at'], 'M j, Y H:i') ?>
               </td>
               <td style="text-align: right;">
                 <a href="<?= url('/admin/articles') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.3rem 0.75rem; font-size: 0.78rem;">
@@ -300,8 +300,8 @@ require __DIR__ . '/../layouts/admin_header.php';
                   <?php if (!empty($app['requested_gpts'])): ?><span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">GPTs</span><?php endif; ?>
                 </div>
               </td>
-              <td style="font-size: 0.78rem; color: #64748b; font-family: var(--admin-font-mono);">
-                <?= date('M j, Y', strtotime($app['created_at'])) ?>
+              <td style="font-size: 0.78rem; font-family: var(--admin-font-mono);">
+                <?= \App\Core\DateHelper::render($app['created_at'], 'M j, Y', 'date') ?>
               </td>
               <td style="text-align: right;">
                 <form action="<?= url('/admin/applications/action/' . $app['id']) ?>" method="POST" style="display: inline;" onsubmit="return confirm('Approve this author application and grant initial creator badge?');">
@@ -349,8 +349,8 @@ require __DIR__ . '/../layouts/admin_header.php';
                   <?= htmlspecialchars($pay['payout_address']) ?>
                 </div>
               </td>
-              <td style="font-size: 0.78rem; color: #64748b; font-family: var(--admin-font-mono);">
-                <?= date('M j, Y H:i', strtotime($pay['created_at'])) ?>
+              <td style="font-size: 0.78rem; font-family: var(--admin-font-mono);">
+                <?= \App\Core\DateHelper::render($pay['created_at'], 'M j, Y H:i') ?>
               </td>
               <td style="text-align: right;">
                 <a href="<?= url('/admin/revenue?tab=payouts') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
@@ -388,7 +388,7 @@ require __DIR__ . '/../layouts/admin_header.php';
               </td>
               <td><span class="ts-badge ts-badge-pink"><?= htmlspecialchars($rep['reason']) ?></span></td>
               <td style="font-size: 0.8rem; color: #94a3b8;">@<?= htmlspecialchars($rep['reporter_username'] ?? 'guest') ?></td>
-              <td style="font-size: 0.78rem; color: #64748b; font-family: var(--admin-font-mono);"><?= date('M j, Y', strtotime($rep['created_at'])) ?></td>
+              <td style="font-size: 0.78rem; font-family: var(--admin-font-mono);"><?= \App\Core\DateHelper::render($rep['created_at'], 'M j, Y', 'date') ?></td>
               <td style="text-align: right;">
                 <a href="<?= url('/admin/moderation') ?>" class="ts-btn ts-btn-outline ts-btn-sm">Review Report</a>
               </td>
@@ -419,7 +419,7 @@ require __DIR__ . '/../layouts/admin_header.php';
       <div style="background: rgba(13, 21, 39, 0.6); border: 1px solid var(--admin-border-subtle); border-radius: 8px; padding: 0.75rem 1rem;">
         <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 0.25rem;">
           <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem; padding: 0.1rem 0.35rem;"><?= htmlspecialchars($log['action']) ?></span>
-          <span style="font-family: var(--admin-font-mono); color: #64748b;"><?= date('H:i:s M j', strtotime($log['created_at'])) ?></span>
+          <span style="font-family: var(--admin-font-mono); color: #94a3b8;"><?= \App\Core\DateHelper::render($log['created_at'], 'H:i:s M j') ?></span>
         </div>
         <div style="color: #f8fafc; font-size: 0.82rem; font-weight: 600;">
           Entity: <?= htmlspecialchars($log['entity_type'] ?? 'system') ?> #<?= $log['entity_id'] ?? '' ?>

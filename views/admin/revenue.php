@@ -167,9 +167,9 @@
                   <?= !empty($p['transaction_reference']) ? htmlspecialchars($p['transaction_reference']) : '<span style="color:#64748b;">Pending Tx</span>' ?>
                 </td>
                 <td style="font-size: 0.78rem; color: #64748b;">
-                  <div>Req: <?= date('M j, Y', strtotime($p['created_at'])) ?></div>
+                  <div>Req: <?= \App\Core\DateHelper::render($p['created_at'], 'M j, Y', 'date') ?></div>
                   <?php if (!empty($p['processed_at'])): ?>
-                    <div style="color: #38bdf8;">Proc: <?= date('M j, Y', strtotime($p['processed_at'])) ?></div>
+                    <div style="color: #38bdf8;">Proc: <?= \App\Core\DateHelper::render($p['processed_at'], 'M j, Y', 'date') ?></div>
                   <?php endif; ?>
                 </td>
                 <td>
@@ -1360,7 +1360,7 @@
                 <td style="font-family: var(--admin-font-mono); font-weight: 800; color: #10b981;">
                   $<?= number_format((float)$r['amount_usd'], 2) ?>
                 </td>
-                <td style="font-size: 0.8rem; color: #64748b;"><?= date('M j, Y H:i', strtotime($r['created_at'])) ?></td>
+                <td style="font-size: 0.8rem; color: #64748b;"><?= \App\Core\DateHelper::render($r['created_at'], 'M j, Y H:i', 'short') ?></td>
               </tr>
             <?php endforeach; ?>
           <?php else: ?>

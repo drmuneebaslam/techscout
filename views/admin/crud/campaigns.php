@@ -74,7 +74,7 @@
               </td>
               <td><strong style="color: #34d399; font-size: 0.95rem; font-family: 'Outfit', sans-serif;"><?= htmlspecialchars($c['prize_pool']) ?></strong></td>
               <td style="font-size: 0.8rem; color: #94a3b8; font-family: var(--admin-font-mono);">
-                <?= date('M j', strtotime($c['start_date'])) ?> – <?= date('M j, Y', strtotime($c['end_date'])) ?>
+                <?= \App\Core\DateHelper::render($c['start_date'], 'M j', 'date') ?> – <?= \App\Core\DateHelper::render($c['end_date'], 'M j, Y', 'date') ?>
               </td>
               <td style="text-align: center;">
                 <span class="ts-badge ts-badge-cyan" style="font-weight: 700; font-size: 0.75rem;">

@@ -165,9 +165,9 @@
                 </div>
                 <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">
                   Author: <strong style="color: #38bdf8;"><?= htmlspecialchars($item['author_name'] ?? 'Staff') ?></strong>
-                  &bull; Created: <?= date('M j, Y', strtotime($item['created_at'])) ?>
+                  &bull; Created: <?= \App\Core\DateHelper::render($item['created_at'], 'M j, Y', 'date') ?>
                   <?php if (!empty($item['published_at'])): ?>
-                    &bull; Published: <?= date('M j, Y', strtotime($item['published_at'])) ?>
+                    &bull; Published: <?= \App\Core\DateHelper::render($item['published_at'], 'M j, Y', 'date') ?>
                   <?php endif; ?>
                 </div>
                 <?php if (!empty($item['internal_notes'])): ?>

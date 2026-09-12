@@ -465,6 +465,81 @@
       window.pjaxNavigate = function(url) {
         if (url) window.location.href = url;
       };
+
+      // Automatic Timezone Detection & Dynamic Timestamp Localizer
+      window.localizeAllTimestamps = function(root) {
+        try {
+          const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          if (userTz) {
+            const match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+            const currentCookie = match ? decodeURIComponent(match[2]) : null;
+            if (currentCookie !== userTz) {
+              document.cookie = "user_timezone=" + encodeURIComponent(userTz) + ";path=/;max-age=31536000;SameSite=Lax";
+            }
+          }
+          
+          const scope = (root && root.querySelectorAll) ? root : document;
+          const timeEls = scope.querySelectorAll('time.ts-time[datetime]');
+          if (!timeEls || !timeEls.length) return;
+
+          timeEls.forEach(function(el) {
+            try {
+              const iso = el.getAttribute('datetime');
+              if (!iso) return;
+              const d = new Date(iso);
+              if (isNaN(d.getTime())) return;
+
+              const formatType = el.getAttribute('data-format-type') || 'full';
+              
+              let tzAbbr = '';
+              try {
+                const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(d);
+                const tzPart = parts.find(p => p.type === 'timeZoneName');
+                if (tzPart && tzPart.value) tzAbbr = tzPart.value;
+              } catch(e) {}
+
+              const timeStr = d.toLocaleTimeString('en-GB', { hour12: false });
+              const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              const fullTitle = dateStr + ' ' + timeStr + (userTz ? ' (' + userTz + ')' : '');
+
+              if (formatType === 'compact_two_lines') {
+                const timePart = el.querySelector('.ts-time-part');
+                const datePart = el.querySelector('.ts-date-part');
+                if (timePart) timePart.textContent = timeStr;
+                if (datePart) {
+                  datePart.innerHTML = dateStr + (tzAbbr ? ' <span class="ts-tz-abbr">(' + tzAbbr + ')</span>' : '');
+                }
+                el.setAttribute('title', fullTitle);
+              } else if (formatType === 'date') {
+                el.textContent = dateStr;
+                el.setAttribute('title', fullTitle);
+              } else if (formatType === 'time') {
+                el.textContent = timeStr;
+                el.setAttribute('title', fullTitle);
+              } else if (formatType === 'short') {
+                const shortDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const shortTime = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                el.textContent = shortDate + ', ' + shortTime;
+                el.setAttribute('title', fullTitle);
+              } else if (formatType === 'full') {
+                el.textContent = dateStr + ' ' + timeStr + (tzAbbr ? ' (' + tzAbbr + ')' : '');
+                el.setAttribute('title', fullTitle);
+              }
+              el.setAttribute('data-localized', 'true');
+            } catch(innerErr) {}
+          });
+        } catch(err) {
+          console.warn('Admin timestamp localization error:', err);
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          window.localizeAllTimestamps();
+        });
+      } else {
+        window.localizeAllTimestamps();
+      }
     })();
   </script>
   <script src="<?= url('/assets/js/admin_table_paginator.js') ?>"></script>

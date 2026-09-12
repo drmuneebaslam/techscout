@@ -199,8 +199,8 @@
                 </div>
               </td>
 
-              <td style="font-size: 0.78rem; color: #64748b;">
-                <?= date('M j, Y', strtotime($u['created_at'])) ?>
+              <td style="font-size: 0.78rem; color: #94a3b8;">
+                <?= \App\Core\DateHelper::render($u['created_at'], 'M j, Y', 'date') ?>
               </td>
 
               <td>

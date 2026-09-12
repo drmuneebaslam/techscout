@@ -237,10 +237,9 @@ require __DIR__ . '/../layouts/admin_header.php';
                   <?php endif; ?>
                 </td>
 
-                <!-- 5. TIMESTAMP -->
-                <td style="font-size: 0.78rem; color: #64748b; font-family: var(--admin-font-mono); white-space: nowrap;">
-                  <div style="color: #f8fafc; font-weight: 600;"><?= date('H:i:s', strtotime($log['created_at'])) ?></div>
-                  <div style="font-size: 0.7rem; color: #94a3b8;"><?= date('M j, Y', strtotime($log['created_at'])) ?></div>
+                <!-- 5. TIMESTAMP (AUTO LOCALIZED) -->
+                <td style="font-size: 0.78rem; font-family: var(--admin-font-mono); white-space: nowrap;">
+                  <?= \App\Core\DateHelper::renderTwoLines($log['created_at']) ?>
                 </td>
 
                 <!-- 6. ACTIONS -->
@@ -487,7 +486,20 @@ function openFullErrorInspector(btn) {
 
     document.getElementById('modalErrorMessage').innerText = log.message || 'Exception occurred';
     document.getElementById('modalFileLocation').innerText = log.file ? `📄 ${log.file.split(/[\\\\/]/).pop()}:${log.line}` : 'Source Location Unknown';
-    document.getElementById('modalLoggedTime').innerText = `🕒 ${log.created_at || 'Just now'}`;
+    
+    let localizedModalTime = log.created_at || 'Just now';
+    if (log.created_at) {
+      try {
+        const d = new Date(log.created_at.replace(' ', 'T') + '+05:00');
+        if (!isNaN(d.getTime())) {
+          const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+          localizedModalTime = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' • ' +
+                               d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) +
+                               ' (' + userTz + ')';
+        }
+      } catch(e) {}
+    }
+    document.getElementById('modalLoggedTime').innerText = `🕒 ${localizedModalTime}`;
 
     // 2. Tab 1: Trace
     document.getElementById('modalErrorTrace').innerText = log.stack_trace || 'No execution call stack trace captured for this event.';

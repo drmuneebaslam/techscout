@@ -123,3 +123,9 @@ if (!function_exists('content_url')) {
     }
 }
 
+if (!function_exists('render_time')) {
+    function render_time($time, string $format = 'M j, Y H:i:s', string $formatType = 'full', string $extraClass = ''): string {
+        return \App\Core\DateHelper::render($time, $format, $formatType, $extraClass);
+    }
+}
+

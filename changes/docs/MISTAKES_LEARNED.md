@@ -257,6 +257,25 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-22: Bypassing Timezone Localization Engine with Raw PHP `date()` and Missing Client-Side `<time>` DOM Synchronization
+* **Root Cause:**
+  - Administrative views and table templates used raw PHP `date('H:i:s', strtotime(...))` and `date('M j, Y', strtotime(...))` instead of the centralized `DateHelper` localization engine.
+  - MySQL stores `DATETIME` records in Pakistan Standard Time (`Asia/Karachi`, UTC+5) and `index.php` initializes `date_default_timezone_set('Asia/Karachi')`. Calling raw `date()` directly evaluated under the server's default timezone, displaying Pakistan Standard Time to every user worldwide.
+  - Browser timezone detection (`Intl.DateTimeFormat().resolvedOptions().timeZone`) only set a cookie on initial load, leaving static HTML rendered in PKT until page refresh, with no client-side DOM synchronization for `<time>` elements.
+  - Using hardcoded inline colors (e.g. `style="color: #f8fafc"`) in timestamp markup rather than semantic CSS variables, violating Rule 3 (Dual Theme Preservation).
+* **Consequences:**
+  - Global visitors saw mismatched times for error logs, audit forensics, payouts, newsletter queues, and content moderation.
+  - First-time visitors without an established cookie saw server default timestamps with no real-time client correction.
+  - Light mode theme displayed illegible white text if inline styles bypassed theme CSS variables.
+* **Mandatory Rule:**
+  - Always render database timestamps using `\App\Core\DateHelper::render($time, $format, $formatType)` or `\App\Core\DateHelper::renderTwoLines($time)`.
+  - Always output semantic `<time class="ts-time" datetime="YYYY-MM-DDTHH:mm:ss+05:00" data-format-type="...">` wrappers without hardcoded inline tag colors. Use CSS classes (`.ts-time-part`, `.ts-date-part`, `.ts-tz-abbr`) defined with CSS custom properties (`var(--admin-text-primary)`).
+  - Implement dual-layer timezone localization:
+    1. **Server-side:** `DateHelper::timezone()` detects `$_COOKIE['user_timezone']` or user profile and adjusts timestamps using `DateTime` and `DateTimeZone`.
+    2. **Client-side:** `window.localizeAllTimestamps()` runs on DOM load and PJAX transitions, querying `Intl.DateTimeFormat().resolvedOptions().timeZone` to synchronize `<time class="ts-time">` elements and persist the `user_timezone` cookie.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -280,6 +299,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 19. [ ] **Debounced Theme Toggling & Single Event Listener Enforcement**: Does `window.toggleTheme()` contain a debounce re-entrancy guard, avoiding double-invocation from combined inline and programmatic event listeners?
 20. [ ] **Branded Outbound /go/{slug} Gateway Routing**: Are all external tool, custom GPT, and directory destination links routed via `/go/{slug}` instead of exposing direct third-party URLs?
 21. [ ] **Early Script Declarations & Robust Global Helpers**: Are interactive UI handlers declared early before markup, dynamic JSON safely defaulted, and theme sync helpers universally available?
+22. [ ] **Universal Timezone Auto-Detection & Dual-Layer Localization**: Are all timestamps rendered with `DateHelper::render()` or `DateHelper::renderTwoLines()` using ISO-8601 `<time class="ts-time">` markup, backed by `Intl.DateTimeFormat` client synchronization and cookie persistence without hardcoded inline styles?
+
 
 
 

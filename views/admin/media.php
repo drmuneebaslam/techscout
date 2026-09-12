@@ -141,7 +141,7 @@
             
             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-bottom: 0.6rem;">
               <span><?= $sizeFormatted ?></span>
-              <span><?= date('M j, Y', strtotime($item['created_at'])) ?></span>
+              <span><?= \App\Core\DateHelper::render($item['created_at'], 'M j, Y', 'date') ?></span>
             </div>
 
             <?php if (!empty($item['alt_text'])): ?>

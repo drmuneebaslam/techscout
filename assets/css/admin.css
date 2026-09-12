@@ -1936,3 +1936,40 @@ body.theme-light .audit-inspector-footer {
   margin-bottom: 0.25rem;
 }
 
+/* ==========================================================================
+   TIMEZONE AUTO-DETECTION & DYNAMIC LOCALIZER COMPONENTS
+   Supports dual theme, tabular alignment, and mono typography
+   ========================================================================== */
+.ts-time {
+  display: inline-block;
+  font-family: var(--admin-font-mono, monospace);
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.ts-time-two-lines {
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1.25;
+  vertical-align: middle;
+}
+
+.ts-time-part {
+  color: var(--admin-text-primary, #f8fafc);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.ts-date-part {
+  font-size: 0.7rem;
+  color: var(--admin-text-secondary, #94a3b8);
+  margin-top: 2px;
+}
+
+.ts-tz-abbr {
+  font-size: 0.65rem;
+  color: var(--admin-text-muted, #64748b);
+  font-weight: 600;
+}
+

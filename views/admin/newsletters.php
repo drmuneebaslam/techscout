@@ -205,8 +205,8 @@
                       <?= strtoupper(htmlspecialchars($sub['status'])) ?>
                     </span>
                   </td>
-                  <td style="font-size: 0.78rem; color: #94a3b8; font-family: var(--admin-font-mono);">
-                    <?= date('M j, Y H:i', strtotime($sub['created_at'])) ?>
+                  <td style="font-size: 0.78rem; font-family: var(--admin-font-mono);">
+                    <?= \App\Core\DateHelper::render($sub['created_at'], 'M j, Y H:i') ?>
                   </td>
                   <td style="text-align: right;">
                     <div style="display: inline-flex; gap: 0.4rem;">
@@ -463,12 +463,12 @@
 
                   <td>
                     <div style="font-size: 0.78rem; color: #cbd5e1; font-family: var(--admin-font-mono);">
-                      <div><strong>Dispatched:</strong> <?= date('M j, H:i:s', strtotime($log['dispatched_at'])) ?></div>
+                      <div><strong>Dispatched:</strong> <?= \App\Core\DateHelper::render($log['dispatched_at'], 'M j, H:i:s') ?></div>
                       <?php if (!empty($log['opened_at'])): ?>
-                        <div style="color: #38bdf8;"><strong>Opened:</strong> <?= date('M j, H:i:s', strtotime($log['opened_at'])) ?></div>
+                        <div style="color: #38bdf8;"><strong>Opened:</strong> <?= \App\Core\DateHelper::render($log['opened_at'], 'M j, H:i:s') ?></div>
                       <?php endif; ?>
                       <?php if (!empty($log['clicked_at'])): ?>
-                        <div style="color: #c084fc;"><strong>Clicked:</strong> <?= date('M j, H:i:s', strtotime($log['clicked_at'])) ?></div>
+                        <div style="color: #c084fc;"><strong>Clicked:</strong> <?= \App\Core\DateHelper::render($log['clicked_at'], 'M j, H:i:s') ?></div>
                       <?php endif; ?>
                     </div>
                   </td>
@@ -883,7 +883,7 @@
                     <?= strtoupper(htmlspecialchars($iss['status'])) ?>
                   </span>
                 </td>
-                <td style="font-size: 0.78rem; color: #64748b;"><?= !empty($iss['sent_at']) ? date('M j, Y H:i', strtotime($iss['sent_at'])) : ($iss['scheduled_at'] ? 'Sched: ' . date('M j, H:i', strtotime($iss['scheduled_at'])) : 'Draft') ?></td>
+                <td style="font-size: 0.78rem; font-family: var(--admin-font-mono);"><?= !empty($iss['sent_at']) ? \App\Core\DateHelper::render($iss['sent_at'], 'M j, Y H:i') : ($iss['scheduled_at'] ? 'Sched: ' . \App\Core\DateHelper::render($iss['scheduled_at'], 'M j, H:i') : 'Draft') ?></td>
                 <td>
                   <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
                     <button type="button" onclick="startLiveDispatch(<?= (int)$iss['id'] ?>, '<?= htmlspecialchars(addslashes($iss['title'])) ?>')" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.55rem; background: #10b981; border-color: #10b981; font-weight: 700;" title="Dispatch live to subscribers">
@@ -977,7 +977,7 @@
             <tr>
               <td style="font-weight: 700; color: #f8fafc;"><?= htmlspecialchars($si['title']) ?></td>
               <td><span class="ts-badge ts-badge-cyan">All Active Subscribers (<?= number_format($stats['active']) ?>)</span></td>
-              <td style="font-family: var(--admin-font-mono); color: #38bdf8;"><?= date('M j, Y H:i:s', strtotime($si['scheduled_at'])) ?></td>
+              <td style="font-family: var(--admin-font-mono); color: #38bdf8;"><?= \App\Core\DateHelper::render($si['scheduled_at'], 'M j, Y H:i:s') ?></td>
               <td><span class="ts-badge ts-badge-green">QUEUED</span></td>
               <td>
                 <button type="button" onclick='loadIssueIntoComposer(<?= json_encode($si) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem;">Edit Schedule</button>

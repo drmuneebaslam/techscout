@@ -289,10 +289,9 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
               ];
             ?>
             <tr>
-              <!-- 1. TIMESTAMP -->
-              <td style="font-family: var(--admin-font-mono); font-size: 0.78rem; color: #94a3b8; white-space: nowrap;">
-                <div style="font-weight: 700; color: #f8fafc;"><?= date('H:i:s', strtotime($log['created_at'])) ?></div>
-                <div style="font-size: 0.7rem; color: #64748b;"><?= date('M j, Y', strtotime($log['created_at'])) ?></div>
+              <!-- 1. TIMESTAMP (AUTO LOCALIZED) -->
+              <td style="font-family: var(--admin-font-mono); font-size: 0.78rem; white-space: nowrap;">
+                <?= \App\Core\DateHelper::renderTwoLines($log['created_at']) ?>
               </td>
 
               <!-- 2. ACTOR / USER -->
@@ -562,7 +561,20 @@ function openAuditForensicInspector(btn) {
 
     // Header
     document.getElementById('auditModalActionBadge').innerText = log.action || 'MUTATION';
-    document.getElementById('auditModalTimestamp').innerText = `🕒 ${log.created_at || ''}`;
+    
+    let localizedAuditTime = log.created_at || '';
+    if (log.created_at) {
+      try {
+        const d = new Date(log.created_at.replace(' ', 'T') + '+05:00');
+        if (!isNaN(d.getTime())) {
+          const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+          localizedAuditTime = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' • ' +
+                               d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) +
+                               ' (' + userTz + ')';
+        }
+      } catch(e) {}
+    }
+    document.getElementById('auditModalTimestamp').innerText = `🕒 ${localizedAuditTime}`;
     document.getElementById('auditModalTitle').innerText = `${log.display_name} performed "${log.action}" on ${log.entity_name}`;
 
     // Actor

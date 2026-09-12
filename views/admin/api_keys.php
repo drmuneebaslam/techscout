@@ -81,7 +81,7 @@
                 </span>
               </td>
               <td style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #94a3b8;">
-                <?= date('Y-m-d', strtotime($k['created_at'])) ?>
+                <?= \App\Core\DateHelper::render($k['created_at'], 'Y-m-d', 'date') ?>
               </td>
               <td>
                 <form action="<?= url('/admin/api-keys/revoke/' . $k['id']) ?>" method="POST" onsubmit="return confirm('Revoke and delete this API key? Any applications using it will be blocked.');">

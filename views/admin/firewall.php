@@ -137,7 +137,7 @@
                   <span style="font-weight: 700; color: #ef4444; font-family: monospace;"><?= number_format($r['hits_count'] ?? 0) ?></span>
                 </td>
                 <td style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #94a3b8;">
-                  <?= date('Y-m-d H:i', strtotime($r['created_at'])) ?>
+                  <?= \App\Core\DateHelper::render($r['created_at'], 'Y-m-d H:i', 'short') ?>
                 </td>
                 <td style="text-align: right;">
                   <form action="<?= url('/admin/firewall/rules/delete/' . $r['id']) ?>" method="POST" onsubmit="return confirm('Remove this firewall rule?');" style="display: inline;">
