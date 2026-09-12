@@ -159,7 +159,7 @@
                 <div style="display: flex; gap: 0.5rem;">
                   <a href="<?= url('/gpts/' . $rel['slug']) ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="flex: 1;">View Blueprint</a>
                   <?php if (!empty($rel['openai_url'])): ?>
-                    <a href="<?= htmlspecialchars($rel['openai_url']) ?>" target="_blank" class="ts-btn ts-btn-accent ts-btn-sm"><i data-lucide="external-link" style="width: 14px;"></i></a>
+                    <a href="<?= url('/go/' . $rel['slug']) ?>" target="_blank" class="ts-btn ts-btn-accent ts-btn-sm"><i data-lucide="external-link" style="width: 14px;"></i></a>
                   <?php endif; ?>
                 </div>
               </div>

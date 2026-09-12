@@ -314,7 +314,7 @@
               View Blueprint &amp; Prompts
             </a>
             <?php if (!empty($gpt['openai_url'])): ?>
-              <a href="<?= htmlspecialchars($gpt['openai_url']) ?>" target="_blank" class="ts-btn ts-btn-primary ts-btn-sm" title="Launch in ChatGPT">
+              <a href="<?= url('/go/' . $gpt['slug']) ?>" target="_blank" class="ts-btn ts-btn-primary ts-btn-sm" title="Launch in ChatGPT">
                 <i data-lucide="bot" style="width: 14px;"></i> Launch ↗
               </a>
             <?php endif; ?>

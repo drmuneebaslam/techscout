@@ -231,6 +231,17 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-20: Direct Outbound Links Bypassing Referral / Affiliate Tracking Gateway
+* **Root Cause:**
+  - Directly embedding external third-party URLs (`$tool['website_url']`, `$gpt['openai_url']`, `$tool['affiliate_url']`) into `<a href="...">` on detail pages or card feeds instead of routing through the dedicated `/go/{slug}` tracking gateway.
+* **Consequences:**
+  - Outbound traffic leaves the site without analytics telemetry logging (`Analytics::logEvent('click_outbound')`), affiliate attribution parameters are lost, and users are exposed to unmasked third-party domains.
+* **Mandatory Rule:**
+  - All external outbound links for tools, custom GPTs, and directory items must be routed through `url('/go/' . $slug)` (with optional `?type=docs`, `?type=repo`, `?type=discord` for sub-resources).
+  - The gateway at `DirectoryController::affiliateRedirect` handles telemetry, affiliate resolution, and safe 302 redirects.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -252,6 +263,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 17. [ ] **Semantic Dual-Theme Modals & CSS Variables**: Are modal dialogs and inspectors styled using semantic classes and CSS variables without hardcoded tag colors or unwanted generic class overrides?
 18. [ ] **Comprehensive Role Auth & Dual-Mode Form Controls**: Is `Auth::requireRole` implemented and are base form controls explicitly themed with dark `:root` and light tokens to prevent user-agent white background leaks?
 19. [ ] **Debounced Theme Toggling & Single Event Listener Enforcement**: Does `window.toggleTheme()` contain a debounce re-entrancy guard, avoiding double-invocation from combined inline and programmatic event listeners?
+20. [ ] **Branded Outbound /go/{slug} Gateway Routing**: Are all external tool, custom GPT, and directory destination links routed via `/go/{slug}` instead of exposing direct third-party URLs?
+
 
 
 

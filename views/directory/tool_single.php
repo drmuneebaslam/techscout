@@ -21,8 +21,8 @@
   $useCases = $parseJsonArray($tool['use_cases'] ?? '');
   $screenshots = $parseJsonArray($tool['screenshots_gallery'] ?? '');
 
-  $officialWebsite = !empty($tool['website_url']) ? $tool['website_url'] : url('/go/' . $tool['slug']);
-  $affiliateLink = !empty($tool['affiliate_url']) ? $tool['affiliate_url'] : $officialWebsite;
+  $officialWebsite = url('/go/' . $tool['slug']);
+  $affiliateLink = url('/go/' . $tool['slug']);
   $ratingAvg = (float)($tool['rating_avg'] ?? $tool['tool_rating'] ?? 4.85);
   $ratingEase = (float)($tool['rating_ease_of_use'] ?? 4.80);
   $ratingValue = (float)($tool['rating_value_for_money'] ?? 4.70);
@@ -523,8 +523,8 @@
         <tr style="border-bottom: 1px solid var(--ts-border-main);">
           <td class="tool-table-cell-header">Official Website</td>
           <td class="tool-table-cell-value">
-            <a href="<?= htmlspecialchars($officialWebsite) ?>" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
-              <?= htmlspecialchars($officialWebsite) ?> ↗
+            <a href="<?= url('/go/' . $tool['slug']) ?>" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
+              <?= htmlspecialchars(parse_url($tool['website_url'] ?? '', PHP_URL_HOST) ?: ($tool['title'] . ' Official Site')) ?> ↗
             </a>
           </td>
         </tr>
@@ -532,8 +532,8 @@
           <tr style="border-bottom: 1px solid var(--ts-border-main);">
             <td class="tool-table-cell-header">API Documentation</td>
             <td class="tool-table-cell-value">
-              <a href="<?= htmlspecialchars($tool['docs_url']) ?>" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">
-                <?= htmlspecialchars($tool['docs_url']) ?> ↗
+              <a href="<?= url('/go/' . $tool['slug'] . '?type=docs') ?>" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">
+                View Official Documentation ↗
               </a>
             </td>
           </tr>
@@ -542,8 +542,8 @@
           <tr style="border-bottom: 1px solid var(--ts-border-main);">
             <td class="tool-table-cell-header">GitHub Repository</td>
             <td class="tool-table-cell-value">
-              <a href="<?= htmlspecialchars($tool['open_source_repo']) ?>" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">
-                <?= htmlspecialchars($tool['open_source_repo']) ?> ↗
+              <a href="<?= url('/go/' . $tool['slug'] . '?type=repo') ?>" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none;">
+                <?= htmlspecialchars(basename($tool['open_source_repo']) ?: 'GitHub Repository') ?> ↗
               </a>
             </td>
           </tr>
@@ -552,7 +552,7 @@
           <tr style="border-bottom: 1px solid var(--ts-border-main);">
             <td class="tool-table-cell-header">Discord Community</td>
             <td class="tool-table-cell-value">
-              <a href="<?= htmlspecialchars($tool['discord_url']) ?>" target="_blank" rel="noopener noreferrer" style="color: #818cf8; text-decoration: none;">
+              <a href="<?= url('/go/' . $tool['slug'] . '?type=discord') ?>" target="_blank" rel="noopener noreferrer" style="color: #818cf8; text-decoration: none;">
                 Join Discord Server ↗
               </a>
             </td>

@@ -350,8 +350,8 @@ https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5" style="width: 100%
                   </a>
                 </div>
                 <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.15rem;">
-                  <a href="<?= htmlspecialchars($t['website_url'] ?? '') ?>" target="_blank" style="color: #38bdf8; text-decoration: none;">
-                    <?= htmlspecialchars(parse_url($t['website_url'] ?? '', PHP_URL_HOST) ?: $t['website_url'] ?? '') ?>
+                  <a href="<?= url('/go/' . $t['slug']) ?>" target="_blank" style="color: #38bdf8; text-decoration: none;">
+                    <?= htmlspecialchars(parse_url($t['website_url'] ?? '', PHP_URL_HOST) ?: ($t['website_url'] ?? '')) ?> ↗
                   </a>
                 </div>
               </div>

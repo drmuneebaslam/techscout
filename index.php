@@ -166,6 +166,7 @@ $router->get('/category/{slug}', [BlogController::class, 'category']);
 $router->get('/go/gpt/{slug}', [DirectoryController::class, 'affiliateRedirect']);
 $router->get('/go/tool/{slug}', [DirectoryController::class, 'affiliateRedirect']);
 $router->get('/go/{slug}', [DirectoryController::class, 'affiliateRedirect']);
+$router->get('/go', [DirectoryController::class, 'affiliateRedirect']);
 
 // ----------------------------------------------------------------------------
 // 4. GLOBAL SEARCH & TOPIC EXPLORER

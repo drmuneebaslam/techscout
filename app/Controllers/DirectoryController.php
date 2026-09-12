@@ -541,24 +541,92 @@ class DirectoryController {
         Response::redirect('/jobs/' . $slug);
     }
 
-    // Affiliate & Outbound Link Redirect Gateway
+    // Universal Affiliate & Outbound Link Redirect Gateway (/go/{slug})
     public function affiliateRedirect(Request $request, array $params): void {
-        $slug = $params['slug'] ?? '';
-        $content = Content::findBySlug($slug);
+        $slug = trim((string)($params['slug'] ?? ''));
 
+        // Support direct outbound redirect via parameter: /go?url=https%3A%2F%2F...
+        $directUrl = trim((string)$request->query('url', ''));
+        if (!empty($directUrl) && (str_starts_with($directUrl, 'http://') || str_starts_with($directUrl, 'https://'))) {
+            Response::redirect($directUrl, 302);
+            return;
+        }
+
+        if (empty($slug)) {
+            Response::redirect('/tools');
+            return;
+        }
+
+        $type = trim((string)$request->query('type', ''));
+
+        $content = Content::findBySlug($slug);
         if ($content) {
-            Analytics::logEvent('click_outbound', (int)$content['id']);
-            
+            try {
+                Analytics::logEvent('click_outbound', (int)$content['id']);
+            } catch (\Throwable $e) {}
+
+            // Handle type-specific deep external redirects (docs, source repo, discord community)
+            if ($type === 'docs' && !empty($content['docs_url'])) {
+                Response::redirect($content['docs_url'], 302);
+                return;
+            }
+            if (($type === 'repo' || $type === 'github') && !empty($content['open_source_repo'])) {
+                Response::redirect($content['open_source_repo'], 302);
+                return;
+            }
+            if ($type === 'discord' && !empty($content['discord_url'])) {
+                Response::redirect($content['discord_url'], 302);
+                return;
+            }
+
             if ($content['content_type'] === 'gpt_listing') {
                 $target = !empty($content['openai_url']) ? $content['openai_url'] : 'https://chatgpt.com/g/';
                 Response::redirect($target, 302);
                 return;
             }
 
-            $target = !empty($content['affiliate_url']) ? $content['affiliate_url'] : (!empty($content['website_url']) ? $content['website_url'] : url('/'));
+            $target = !empty($content['affiliate_url']) ? $content['affiliate_url'] : (!empty($content['website_url']) ? $content['website_url'] : url('/tools/' . $slug));
             Response::redirect($target, 302);
             return;
         }
+
+        // Direct table fallback for AI Tools if not in unified contents view
+        try {
+            $tool = Database::fetch("SELECT * FROM ai_tools WHERE slug = ?", [$slug]);
+            if ($tool) {
+                if ($type === 'docs' && !empty($tool['docs_url'])) {
+                    Response::redirect($tool['docs_url'], 302);
+                    return;
+                }
+                if (($type === 'repo' || $type === 'github') && !empty($tool['open_source_repo'])) {
+                    Response::redirect($tool['open_source_repo'], 302);
+                    return;
+                }
+                if ($type === 'discord' && !empty($tool['discord_url'])) {
+                    Response::redirect($tool['discord_url'], 302);
+                    return;
+                }
+                $target = !empty($tool['affiliate_url']) ? $tool['affiliate_url'] : (!empty($tool['website_url']) ? $tool['website_url'] : url('/tools'));
+                Response::redirect($target, 302);
+                return;
+            }
+
+            // Direct table fallback for GPT Listings
+            $gpt = Database::fetch("SELECT * FROM gpt_listings WHERE slug = ?", [$slug]);
+            if ($gpt) {
+                $target = !empty($gpt['openai_url']) ? $gpt['openai_url'] : 'https://chatgpt.com/g/';
+                Response::redirect($target, 302);
+                return;
+            }
+
+            // Direct table fallback for Jobs
+            $job = Database::fetch("SELECT * FROM jobs WHERE slug = ? AND is_active = 1", [$slug]);
+            if ($job && !empty($job['apply_url'])) {
+                Response::redirect($job['apply_url'], 302);
+                return;
+            }
+        } catch (\Throwable $e) {}
+
         Response::redirect('/tools');
     }
 }

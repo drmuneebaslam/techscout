@@ -101,7 +101,7 @@
           <td><span class="ts-badge ts-badge-cyan"><?= htmlspecialchars($g['model_base']) ?></span></td>
           <td><strong style="color: #94a3b8; font-size: 0.85rem;"><?= htmlspecialchars($g['creator_handle']) ?></strong></td>
           <td>
-            <a href="<?= htmlspecialchars($g['openai_url']) ?>" target="_blank" style="color: #38bdf8; font-size: 0.85rem;">Launch GPT ↗</a>
+            <a href="<?= url('/go/' . $g['slug']) ?>" target="_blank" style="color: #38bdf8; font-size: 0.85rem;">Launch GPT ↗</a>
           </td>
           <td>
             <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
