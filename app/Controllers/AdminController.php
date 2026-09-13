@@ -461,11 +461,23 @@ class AdminController {
     // 4. PROMPT BLUEPRINTS CRUD
     // ------------------------------------------------------------------------
     public function prompts(Request $request): void {
-        $prompts = Database::query("SELECT c.*, p.prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
+        // Ensure prompt_type column exists safely without throwing if already present
+        Database::executeSilent("ALTER TABLE `prompts` ADD COLUMN `prompt_type` ENUM('text', 'image') NOT NULL DEFAULT 'text'");
+
+        $prompts = Database::querySilent("SELECT c.*, p.prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
                                    FROM contents c 
                                    JOIN prompts p ON c.id = p.content_id 
                                    LEFT JOIN categories cat ON c.category_id = cat.id 
                                    ORDER BY c.created_at DESC");
+        
+        if (empty($prompts)) {
+            // Graceful fallback query if column creation was delayed
+            $prompts = Database::query("SELECT c.*, 'text' as prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
+                                       FROM contents c 
+                                       JOIN prompts p ON c.id = p.content_id 
+                                       LEFT JOIN categories cat ON c.category_id = cat.id 
+                                       ORDER BY c.created_at DESC");
+        }
         
         $categories = Database::query("SELECT * FROM categories ORDER BY name ASC");
 
@@ -4592,16 +4604,16 @@ class AdminController {
 
             $dbReferences = [];
             try {
-                $artImages = Database::query("SELECT featured_image FROM articles WHERE featured_image IS NOT NULL");
-                foreach ($artImages as $ai) if (!empty($ai['featured_image'])) $dbReferences[] = basename($ai['featured_image']);
+                $artImages = Database::querySilent("SELECT featured_image_url FROM contents WHERE featured_image_url IS NOT NULL");
+                foreach ($artImages as $ai) if (!empty($ai['featured_image_url'])) $dbReferences[] = basename($ai['featured_image_url']);
 
-                $promptThumbs = Database::query("SELECT thumbnail FROM prompts WHERE thumbnail IS NOT NULL");
+                $promptThumbs = Database::querySilent("SELECT thumbnail FROM prompts WHERE thumbnail IS NOT NULL");
                 foreach ($promptThumbs as $pt) if (!empty($pt['thumbnail'])) $dbReferences[] = basename($pt['thumbnail']);
 
-                $galImages = Database::query("SELECT image_url FROM prompt_images");
+                $galImages = Database::querySilent("SELECT image_url FROM prompt_images");
                 foreach ($galImages as $gi) if (!empty($gi['image_url'])) $dbReferences[] = basename($gi['image_url']);
 
-                $mediaFiles = Database::query("SELECT file_path FROM media_files");
+                $mediaFiles = Database::querySilent("SELECT file_path FROM media_files");
                 foreach ($mediaFiles as $mf) if (!empty($mf['file_path'])) $dbReferences[] = basename($mf['file_path']);
             } catch (\Throwable $e) {}
 

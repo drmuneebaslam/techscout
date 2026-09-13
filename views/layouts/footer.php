@@ -154,14 +154,7 @@
   <script src="<?= url('/assets/js/main.js') ?>"></script>
   <script src="<?= url('/assets/js/content-engine.js') ?>"></script>
 
-  <!-- PWA Offline Service Worker Registration [TS-UI-05] -->
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('<?= url('/sw.js') ?>').catch(() => {});
-    });
-  }
-  </script>
+
 
   <!-- Dynamic Direct / Popunder Ad Trigger -->
   <?php 

@@ -2,10 +2,6 @@
 
 <?php
 $isImageEngine = (($prompt['prompt_type'] ?? '') === 'image');
-$modelsStr = is_string($prompt['target_models'] ?? '') ? $prompt['target_models'] : json_encode($prompt['target_models'] ?? []);
-if (!$isImageEngine && (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || in_array($prompt['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion']))) {
-    $isImageEngine = true;
-}
 
 $allImages = [];
 // Strictly attach image gallery only if this is an image generation prompt

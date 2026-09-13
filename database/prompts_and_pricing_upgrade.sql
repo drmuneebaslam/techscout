@@ -1,22 +1,11 @@
 -- ============================================================================
 -- TechScout Database Upgrade: Prompt Library Segregation & Pricing Settings
--- Non-destructive upgrade script
+-- InfinityFree & Shared-Hosting Safe Script (No information_schema, No PREPARE stmt)
 -- ============================================================================
 
--- 1. Safely add prompt_type column to prompts table if it doesn't already exist
-SET @col_exists = 0;
-SELECT COUNT(*) INTO @col_exists 
-FROM information_schema.COLUMNS 
-WHERE TABLE_SCHEMA = DATABASE() 
-  AND TABLE_NAME = 'prompts' 
-  AND COLUMN_NAME = 'prompt_type';
-
-SET @ddl = IF(@col_exists = 0, 
-    'ALTER TABLE `prompts` ADD COLUMN `prompt_type` ENUM(\'text\', \'image\') NOT NULL DEFAULT \'text\' AFTER `content_id`', 
-    'SELECT "prompt_type already exists"');
-PREPARE stmt FROM @ddl;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
+-- 1. Add prompt_type column to prompts table
+-- (Note: If column already exists, this statement may return 'Duplicate column name', which is completely normal)
+ALTER TABLE `prompts` ADD COLUMN `prompt_type` ENUM('text', 'image') NOT NULL DEFAULT 'text';
 
 -- 2. Identify and classify AI image generation prompts based on categories and target models
 UPDATE `prompts` p
@@ -29,7 +18,8 @@ WHERE cat.slug IN ('ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-d
    OR p.target_models LIKE '%Flux%'
    OR p.target_models LIKE '%Stable Diffusion%'
    OR p.target_models LIKE '%Leonardo%'
-   OR p.target_models LIKE '%Ideogram%';
+   OR p.target_models LIKE '%Ideogram%'
+   OR p.content_id IN (30, 31, 32, 33, 34, 35, 36, 37);
 
 -- 3. Strict Image Isolation: Text prompts will have NO image attached. Only image prompts may have images attached.
 UPDATE `contents` c

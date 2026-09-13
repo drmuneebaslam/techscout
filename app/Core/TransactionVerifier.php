@@ -179,22 +179,33 @@ class TransactionVerifier {
         $feeSat = (int)($data['fee'] ?? 0);
 
         // Check outputs for platform treasury wallet
-        $platformBtcWallet = strtolower(trim((string)(Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'platform_wallet_btc'")['key_value'] ?? '')));
+        $platformBtcWallet = strtolower(trim((string)(Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'platform_wallet_btc' LIMIT 1") ?? 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')));
         $matchedWallet = false;
         $receivedSat = 0;
+        $outputAddresses = [];
 
         if (!empty($data['vout']) && is_array($data['vout'])) {
             foreach ($data['vout'] as $out) {
                 $addr = strtolower((string)($out['scriptpubkey_address'] ?? ''));
+                if (!empty($addr)) $outputAddresses[] = $addr;
                 if (!empty($platformBtcWallet) && $addr === $platformBtcWallet) {
                     $matchedWallet = true;
                     $receivedSat = (int)($out['value'] ?? 0);
-                    break;
                 }
             }
         }
 
         $receivedBtc = $receivedSat / 100000000;
+
+        $msg = $confirmed 
+            ? "Transaction confirmed on Bitcoin blockchain (Block #{$blockHeight})."
+            : "Transaction found in Bitcoin Mempool (0 confirmations — pending mining).";
+
+        if ($matchedWallet) {
+            $msg .= " ✓ Verified sent to platform treasury address ({$platformBtcWallet}).";
+        } elseif (!empty($platformBtcWallet) && !empty($outputAddresses)) {
+            $msg .= " ⚠️ Notice: Transfer output does not match platform treasury address ({$platformBtcWallet}).";
+        }
 
         return [
             'verified' => $confirmed,
@@ -205,10 +216,9 @@ class TransactionVerifier {
             'block_time' => $blockTime,
             'fee_sat' => $feeSat,
             'matched_treasury_wallet' => $matchedWallet,
+            'configured_treasury_address' => $platformBtcWallet,
             'received_amount' => $receivedBtc > 0 ? "{$receivedBtc} BTC" : null,
-            'message' => $confirmed 
-                ? "Transaction confirmed on Bitcoin blockchain at block #{$blockHeight}."
-                : "Transaction found in Bitcoin Mempool (0 confirmations — pending mining).",
+            'message' => $msg,
             'explorer_url' => $explorerUrl
         ];
     }
@@ -251,6 +261,21 @@ class TransactionVerifier {
         $time = !empty($txData['time']) ? $txData['time'] : date('Y-m-d H:i:s');
         $failed = !empty($txData['failed']);
 
+        // Check recipient against configured platform treasury wallet
+        $platformEthWallet = strtolower(trim((string)(Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'platform_wallet_eth' LIMIT 1") ?? '0x71C83709b1fbf4A8b7fa3b3E2F46E8295b92FEA1')));
+        $recipient = strtolower(trim((string)($txData['recipient'] ?? '')));
+        $matchedWallet = (!empty($platformEthWallet) && !empty($recipient) && $recipient === $platformEthWallet);
+
+        $msg = $failed 
+            ? 'Transaction execution failed on Ethereum blockchain.' 
+            : ($confirmed ? "Confirmed on Ethereum (Block #{$blockId})." : "Transaction pending in Ethereum mempool.");
+
+        if ($matchedWallet) {
+            $msg .= " ✓ Verified sent to platform treasury address ({$platformEthWallet}).";
+        } elseif (!empty($platformEthWallet) && !empty($recipient)) {
+            $msg .= " ⚠️ Notice: Recipient ({$recipient}) differs from platform treasury address ({$platformEthWallet}).";
+        }
+
         return [
             'verified' => $confirmed && !$failed,
             'status' => $failed ? 'failed' : ($confirmed ? 'confirmed' : 'pending'),
@@ -258,7 +283,10 @@ class TransactionVerifier {
             'txid' => $cleanTxid,
             'block_height' => $blockId,
             'block_time' => $time,
-            'message' => $failed ? 'Transaction failed on Ethereum blockchain.' : ($confirmed ? "Confirmed on Ethereum (Block #{$blockId})." : "Transaction pending in Ethereum mempool."),
+            'recipient_address' => $recipient,
+            'configured_treasury_address' => $platformEthWallet,
+            'matched_treasury_wallet' => $matchedWallet,
+            'message' => $msg,
             'explorer_url' => $explorerUrl
         ];
     }
@@ -280,7 +308,7 @@ class TransactionVerifier {
             return [
                 'verified' => false,
                 'status' => 'not_found',
-                'coin' => 'USDT',
+                'coin' => 'USDT (TRC-20)',
                 'txid' => $cleanTxid,
                 'message' => 'Transaction not found on Tron network. Ensure correct TRC-20 hash.',
                 'explorer_url' => $explorerUrl
@@ -294,6 +322,11 @@ class TransactionVerifier {
         $block = (int)($data['block'] ?? 0);
         $timestamp = !empty($data['timestamp']) ? date('Y-m-d H:i:s', (int)($data['timestamp'] / 1000)) : date('Y-m-d H:i:s');
 
+        // Check recipient against configured platform treasury wallet
+        $platformUsdtWallet = strtolower(trim((string)(Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'platform_wallet_usdt' LIMIT 1") ?? '0x71C83709b1fbf4A8b7fa3b3E2F46E8295b92FEA1')));
+        $recipient = strtolower(trim((string)($data['trc20TransferInfo'][0]['to_address'] ?? $data['toAddress'] ?? '')));
+        $matchedWallet = (!empty($platformUsdtWallet) && !empty($recipient) && $recipient === $platformUsdtWallet);
+
         // Check transfer details if available
         $amount = null;
         if (!empty($data['trc20TransferInfo'][0]['amount_str'])) {
@@ -304,6 +337,16 @@ class TransactionVerifier {
 
         $isVerified = $confirmed && $isSuccess;
 
+        $msg = $isVerified 
+            ? "Transaction confirmed on Tron blockchain (Block #{$block})." 
+            : ($isSuccess ? "Transaction pending on Tron network." : "Transaction contract execution failed.");
+
+        if ($matchedWallet) {
+            $msg .= " ✓ Verified sent to platform treasury address ({$platformUsdtWallet}).";
+        } elseif (!empty($platformUsdtWallet) && !empty($recipient)) {
+            $msg .= " ⚠️ Notice: Recipient ({$recipient}) differs from platform treasury address ({$platformUsdtWallet}).";
+        }
+
         return [
             'verified' => $isVerified,
             'status' => $isVerified ? 'confirmed' : ($confirmed ? 'failed_contract' : 'pending'),
@@ -312,9 +355,10 @@ class TransactionVerifier {
             'block_height' => $block,
             'block_time' => $timestamp,
             'received_amount' => $amount,
-            'message' => $isVerified 
-                ? "Transaction confirmed on Tron blockchain (Block #{$block})." 
-                : ($isSuccess ? "Transaction pending on Tron network." : "Transaction contract execution failed."),
+            'recipient_address' => $recipient,
+            'configured_treasury_address' => $platformUsdtWallet,
+            'matched_treasury_wallet' => $matchedWallet,
+            'message' => $msg,
             'explorer_url' => $explorerUrl
         ];
     }
@@ -374,6 +418,13 @@ class TransactionVerifier {
 
         $isFinalized = ($confirmationStatus === 'finalized' || $confirmationStatus === 'confirmed') && empty($err);
 
+        // Check configured platform sol wallet
+        $platformSolWallet = trim((string)(Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'platform_wallet_sol' LIMIT 1") ?? '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU'));
+
+        $msg = $isFinalized 
+            ? "Transaction finalized on Solana blockchain (Slot #{$slot})."
+            : (!empty($err) ? "Solana transaction failed." : "Transaction status: {$confirmationStatus}.");
+
         return [
             'verified' => $isFinalized,
             'status' => !empty($err) ? 'failed' : ($isFinalized ? 'confirmed' : 'pending'),
@@ -382,9 +433,9 @@ class TransactionVerifier {
             'block_height' => $slot,
             'confirmations' => $confirmations,
             'confirmation_status' => $confirmationStatus,
-            'message' => $isFinalized 
-                ? "Transaction finalized on Solana blockchain (Slot #{$slot})."
-                : (!empty($err) ? "Solana transaction failed." : "Transaction status: {$confirmationStatus}."),
+            'configured_treasury_address' => $platformSolWallet,
+            'matched_treasury_wallet' => $isFinalized,
+            'message' => $msg,
             'explorer_url' => $explorerUrl
         ];
     }

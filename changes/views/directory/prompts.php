@@ -167,21 +167,16 @@
     <?php if (!empty($prompts)): ?>
       <?php foreach ($prompts as $p): ?>
         <?php
+          // Strict separation: Images are exclusively for image generation prompts in the image gallery tab
           $isImagePrompt = (($p['prompt_type'] ?? '') === 'image');
-          if (!$isImagePrompt) {
-              $modelsStr = is_string($p['target_models'] ?? '') ? $p['target_models'] : json_encode($p['target_models'] ?? []);
-              if (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || in_array($p['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion'])) {
-                  $isImagePrompt = true;
-              }
-          }
           $promptText = $p['prompt_template'] ?? '';
-          // Only image generation prompts may have an image attached
-          $imageUrl = $isImagePrompt ? image_url($p['featured_image_url'] ?? '') : '';
+          $imageUrl = ($isImagePrompt && ($activeTab ?? '') === 'image') ? image_url($p['featured_image_url'] ?? '') : '';
+          $shouldRenderImage = ($isImagePrompt && ($activeTab ?? '') === 'image' && !empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/');
         ?>
         <div class="ts-card" style="display: flex; flex-direction: column; overflow: hidden; padding: 0; border: 1px solid var(--ts-border-main); border-radius: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
           
-          <?php if ($isImagePrompt && !empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/'): ?>
-            <!-- Card Thumbnail: Strictly for AI Image Generation Prompts -->
+          <?php if ($shouldRenderImage): ?>
+            <!-- Card Thumbnail: Strictly for AI Image Generation Prompts in the Images Gallery -->
             <a href="<?= url('/prompts/' . $p['slug']) ?>" style="position: relative; height: 190px; overflow: hidden; background: var(--ts-bg-surface-elevated); display: block; text-decoration: none;">
               <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= htmlspecialchars($p['title']) ?>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
               <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%); display: flex; align-items: flex-end; padding: 0.75rem;">
@@ -190,8 +185,8 @@
                 </span>
               </div>
             </a>
-          <?php elseif (!$isImagePrompt): ?>
-            <!-- Sleek Code & Terminal Header: Pure Text / System Prompts (No Image Attached) -->
+          <?php else: ?>
+            <!-- Sleek Code & Terminal Header: Pure Text / System Prompts (Strictly No Image Attached) -->
             <div style="background: linear-gradient(135deg, rgba(6,182,212,0.06) 0%, rgba(99,102,241,0.06) 100%); border-bottom: 1px solid var(--ts-border-main); padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.4rem;">
                 <i data-lucide="terminal" style="width: 15px; height: 15px; color: #38bdf8;"></i>

@@ -273,20 +273,20 @@ $rateSource = $liveRatesData['source'] ?? 'CoinGecko API';
 </div>
 
 <script>
-// Dynamic live pricing calculation variables
-const cryptoRates = {
+// Dynamic live pricing calculation variables (Safe global singleton)
+var cryptoRates = window.cryptoRates = window.cryptoRates || {
   BTC: <?= $initBtc ?>,
   ETH: <?= $initEth ?>,
   SOL: <?= $initSol ?>,
   USDT: <?= $initUsdt ?>
 };
 
-let currentDurationDays = 30;
-let currentAmountUsd = <?= $tier30Price ?>;
+var currentDurationDays = window.currentDurationDays || 30;
+var currentAmountUsd = window.currentAmountUsd || <?= $tier30Price ?>;
 
 function selectDurationTier(days, price) {
-  currentDurationDays = days;
-  currentAmountUsd = price;
+  window.currentDurationDays = currentDurationDays = days;
+  window.currentAmountUsd = currentAmountUsd = price;
 
   const selDays = document.getElementById('selected_duration_tier');
   if (selDays) selDays.value = days;
@@ -315,11 +315,13 @@ function selectDurationTier(days, price) {
   const labelElem = document.getElementById('display_duration_label');
   if (labelElem) labelElem.innerText = '(' + days + ' Days Active Placement)';
 
+  const rates = window.cryptoRates || cryptoRates;
+
   // Calculate Exact Crypto Equivalents using Live Rates
-  const usdtVal = (price / cryptoRates.USDT).toFixed(2);
-  const btcVal = (price / cryptoRates.BTC).toFixed(6);
-  const ethVal = (price / cryptoRates.ETH).toFixed(4);
-  const solVal = (price / cryptoRates.SOL).toFixed(3);
+  const usdtVal = (price / rates.USDT).toFixed(2);
+  const btcVal = (price / rates.BTC).toFixed(6);
+  const ethVal = (price / rates.ETH).toFixed(4);
+  const solVal = (price / rates.SOL).toFixed(3);
 
   // Update Required Pills
   const pillUsdt = document.getElementById('req_usdt');
@@ -352,27 +354,29 @@ function openDynamicCryptoQr(coin) {
   let address = '';
   let amountStr = '';
   let deeplink = '';
+  const rates = window.cryptoRates || cryptoRates;
+  const amtUsd = window.currentAmountUsd || currentAmountUsd;
 
   if (coin === 'BTC') {
     address = document.getElementById('addr_btc')?.value || '';
-    const btcAmount = (currentAmountUsd / cryptoRates.BTC).toFixed(6);
-    amountStr = btcAmount + ' BTC ($' + currentAmountUsd + ' USD)';
+    const btcAmount = (amtUsd / rates.BTC).toFixed(6);
+    amountStr = btcAmount + ' BTC ($' + amtUsd + ' USD)';
     deeplink = 'bitcoin:' + address + '?amount=' + btcAmount + '&label=TechScout+Sponsorship';
   } else if (coin === 'ETH') {
     address = document.getElementById('addr_eth')?.value || '';
-    const ethAmount = (currentAmountUsd / cryptoRates.ETH).toFixed(4);
-    amountStr = ethAmount + ' ETH ($' + currentAmountUsd + ' USD)';
+    const ethAmount = (amtUsd / rates.ETH).toFixed(4);
+    amountStr = ethAmount + ' ETH ($' + amtUsd + ' USD)';
     deeplink = 'ethereum:' + address + '?value=' + ethAmount + '&label=TechScout+Sponsorship';
   } else if (coin === 'SOL') {
     address = document.getElementById('addr_sol')?.value || '';
-    const solAmount = (currentAmountUsd / cryptoRates.SOL).toFixed(3);
-    amountStr = solAmount + ' SOL ($' + currentAmountUsd + ' USD)';
+    const solAmount = (amtUsd / rates.SOL).toFixed(3);
+    amountStr = solAmount + ' SOL ($' + amtUsd + ' USD)';
     deeplink = 'solana:' + address + '?amount=' + solAmount + '&label=TechScout+Sponsorship';
   } else {
     // USDT
     address = document.getElementById('addr_usdt')?.value || '';
-    const usdtAmount = (currentAmountUsd / cryptoRates.USDT).toFixed(2);
-    amountStr = usdtAmount + ' USDT ($' + currentAmountUsd + ' USD)';
+    const usdtAmount = (amtUsd / rates.USDT).toFixed(2);
+    amountStr = usdtAmount + ' USDT ($' + amtUsd + ' USD)';
     deeplink = address;
   }
 
@@ -402,10 +406,13 @@ function copyCryptoText(id, btn) {
 
 function copyExactAmount(coin, btn) {
   let amt = '';
-  if (coin === 'BTC') amt = (currentAmountUsd / cryptoRates.BTC).toFixed(6);
-  else if (coin === 'ETH') amt = (currentAmountUsd / cryptoRates.ETH).toFixed(4);
-  else if (coin === 'SOL') amt = (currentAmountUsd / cryptoRates.SOL).toFixed(3);
-  else amt = (currentAmountUsd / cryptoRates.USDT).toFixed(2);
+  const rates = window.cryptoRates || cryptoRates;
+  const amtUsd = window.currentAmountUsd || currentAmountUsd;
+
+  if (coin === 'BTC') amt = (amtUsd / rates.BTC).toFixed(6);
+  else if (coin === 'ETH') amt = (amtUsd / rates.ETH).toFixed(4);
+  else if (coin === 'SOL') amt = (amtUsd / rates.SOL).toFixed(3);
+  else amt = (amtUsd / rates.USDT).toFixed(2);
 
   navigator.clipboard.writeText(amt).then(() => {
     const origHtml = btn.innerHTML;
@@ -422,18 +429,19 @@ async function fetchLiveCryptoRates() {
     if (!res.ok) return;
     const json = await res.json();
     if (json && json.success && json.rates) {
-      if (json.rates.BTC && json.rates.BTC.price) cryptoRates.BTC = json.rates.BTC.price;
-      if (json.rates.ETH && json.rates.ETH.price) cryptoRates.ETH = json.rates.ETH.price;
-      if (json.rates.SOL && json.rates.SOL.price) cryptoRates.SOL = json.rates.SOL.price;
-      if (json.rates.USDT && json.rates.USDT.price) cryptoRates.USDT = json.rates.USDT.price;
+      const rates = window.cryptoRates || cryptoRates;
+      if (json.rates.BTC && json.rates.BTC.price) rates.BTC = json.rates.BTC.price;
+      if (json.rates.ETH && json.rates.ETH.price) rates.ETH = json.rates.ETH.price;
+      if (json.rates.SOL && json.rates.SOL.price) rates.SOL = json.rates.SOL.price;
+      if (json.rates.USDT && json.rates.USDT.price) rates.USDT = json.rates.USDT.price;
 
       const txt = document.getElementById('spot_rates_text');
       if (txt) {
-        txt.innerHTML = 'Live Rates (' + (json.source || 'Live') + '): 1 BTC ≈ $' + Math.round(cryptoRates.BTC).toLocaleString() + ' &bull; 1 ETH ≈ $' + Math.round(cryptoRates.ETH).toLocaleString() + ' &bull; 1 SOL ≈ $' + Math.round(cryptoRates.SOL);
+        txt.innerHTML = 'Live Rates (' + (json.source || 'Live') + '): 1 BTC ≈ $' + Math.round(rates.BTC).toLocaleString() + ' &bull; 1 ETH ≈ $' + Math.round(rates.ETH).toLocaleString() + ' &bull; 1 SOL ≈ $' + Math.round(rates.SOL);
       }
 
       // Re-calculate with fresh rates
-      selectDurationTier(currentDurationDays, currentAmountUsd);
+      selectDurationTier(window.currentDurationDays || 30, window.currentAmountUsd || <?= $tier30Price ?>);
     }
   } catch (e) {}
 }
@@ -448,8 +456,7 @@ async function verifyUserTxidLive() {
   const btn = document.getElementById('btnVerifyTxidUser');
 
   if (!txidInput || !txidInput.value.trim()) {
-    alert('Please enter or paste your transaction hash (TXID) first.');
-    txidInput?.focus();
+    alert('Please enter your crypto transaction hash (TXID) first.');
     return;
   }
 
@@ -457,25 +464,25 @@ async function verifyUserTxidLive() {
   const coin = coinSelect ? coinSelect.value : 'USDT';
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="ts-spinner-sm"></span> Verifying...';
+  btn.innerHTML = '<i data-lucide="loader" class="ts-spin" style="width:12px;height:12px;"></i> Querying Node...';
+  if (window.lucide) lucide.createIcons();
 
   resultBox.style.display = 'block';
-  resultBox.style.background = 'rgba(56,189,248,0.08)';
+  resultBox.style.background = 'rgba(56,189,248,0.1)';
   resultBox.style.border = '1px solid rgba(56,189,248,0.3)';
   msgElem.style.color = '#38bdf8';
-  msgElem.textContent = 'Interrogating ' + coin + ' blockchain explorers in real-time...';
+  msgElem.textContent = 'Connecting to ' + coin + ' blockchain network and verifying hash on-chain...';
   linkElem.style.display = 'none';
 
   try {
-    const params = new URLSearchParams({
-      coin: coin,
-      txid: txid,
-      amount_usd: currentAmountUsd
-    });
     const res = await fetch('<?= url('/api/v1/payments/verify-txid') ?>', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
+      body: new URLSearchParams({
+        coin: coin,
+        txid: txid,
+        amount_usd: window.currentAmountUsd || currentAmountUsd
+      })
     });
     const json = await res.json();
 
@@ -485,10 +492,17 @@ async function verifyUserTxidLive() {
     if (json && json.data) {
       const d = json.data;
       if (d.verified) {
-        resultBox.style.background = 'rgba(16,185,129,0.12)';
-        resultBox.style.border = '1px solid rgba(16,185,129,0.4)';
-        msgElem.style.color = '#10b981';
-        msgElem.textContent = '✓ ' + (d.message || 'Transaction confirmed on blockchain!');
+        if (d.matched_treasury_wallet) {
+          resultBox.style.background = 'rgba(16,185,129,0.12)';
+          resultBox.style.border = '1px solid rgba(16,185,129,0.4)';
+          msgElem.style.color = '#10b981';
+          msgElem.textContent = '✓ ' + (d.message || 'Transaction confirmed on blockchain & verified sent to official platform treasury address!');
+        } else {
+          resultBox.style.background = 'rgba(245,158,11,0.12)';
+          resultBox.style.border = '1px solid rgba(245,158,11,0.4)';
+          msgElem.style.color = '#f59e0b';
+          msgElem.textContent = '⚠️ ' + (d.message || 'Transaction confirmed on blockchain, but recipient differs from platform treasury address.');
+        }
       } else if (d.status === 'pending_mempool' || d.status === 'pending') {
         resultBox.style.background = 'rgba(245,158,11,0.12)';
         resultBox.style.border = '1px solid rgba(245,158,11,0.4)';
@@ -519,9 +533,12 @@ async function verifyUserTxidLive() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  fetchLiveCryptoRates();
-  // Poll rates every 60 seconds
-  setInterval(fetchLiveCryptoRates, 60000);
-});
+if (!window.cryptoRatesPollingActive) {
+  window.cryptoRatesPollingActive = true;
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchLiveCryptoRates();
+    // Poll rates every 60 seconds
+    setInterval(fetchLiveCryptoRates, 60000);
+  });
+}
 </script>

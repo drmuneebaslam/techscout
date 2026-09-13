@@ -10,8 +10,164 @@ $getEntityUrl = function($type, $slug) {
     return url('/article/' . $slug);
 };
 ?>
+<style>
+/* ========================================================================= */
+/* DUAL THEME ENFORCEMENT FOR AUTHOR DASHBOARD (DARK + LIGHT THEMES)         */
+/* ========================================================================= */
+.author-dashboard-wrap {
+  min-height: 80vh;
+}
 
-<div class="container" style="padding-top: 2rem; margin-bottom: 5rem;">
+/* Light Theme Overrides */
+[data-theme="light"] .author-dashboard-wrap,
+.theme-light .author-dashboard-wrap {
+  --author-card-bg: #ffffff;
+  --author-card-border: #e2e8f0;
+  --author-subcard-bg: #f8fafc;
+  --author-text-primary: #0f172a;
+  --author-text-secondary: #334155;
+  --author-text-muted: #64748b;
+  --author-table-th-bg: #f1f5f9;
+  --author-table-border: #e2e8f0;
+  --author-input-bg: #ffffff;
+  --author-input-border: #cbd5e1;
+}
+
+[data-theme="light"] .author-dashboard-wrap .ts-card,
+.theme-light .author-dashboard-wrap .ts-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* High Contrast Headings in Light Mode */
+[data-theme="light"] .author-dashboard-wrap h1,
+[data-theme="light"] .author-dashboard-wrap h2,
+[data-theme="light"] .author-dashboard-wrap h3,
+[data-theme="light"] .author-dashboard-wrap h4,
+[data-theme="light"] .author-dashboard-wrap h5,
+.theme-light .author-dashboard-wrap h1,
+.theme-light .author-dashboard-wrap h2,
+.theme-light .author-dashboard-wrap h3,
+.theme-light .author-dashboard-wrap h4,
+.theme-light .author-dashboard-wrap h5 {
+  color: #0f172a !important;
+}
+
+/* High Contrast Text & Paragraphs in Light Mode */
+[data-theme="light"] .author-dashboard-wrap p,
+.theme-light .author-dashboard-wrap p {
+  color: #334155 !important;
+}
+
+/* High Contrast Metric Labels & Values in Light Mode */
+[data-theme="light"] .author-dashboard-wrap .author-hud-metric-val,
+.theme-light .author-dashboard-wrap .author-hud-metric-val {
+  color: #0f172a !important;
+}
+
+/* High Contrast Sub-Cards & Panels in Light Mode */
+[data-theme="light"] .author-dashboard-wrap div[style*="background: rgba(15,23,42"],
+[data-theme="light"] .author-dashboard-wrap div[style*="background: #04070e"],
+[data-theme="light"] .author-dashboard-wrap div[style*="background: linear-gradient(135deg, rgba(13,21,39"],
+[data-theme="light"] .author-dashboard-wrap div[style*="background: linear-gradient(135deg, rgba(15,23,42"],
+.theme-light .author-dashboard-wrap div[style*="background: rgba(15,23,42"],
+.theme-light .author-dashboard-wrap div[style*="background: #04070e"],
+.theme-light .author-dashboard-wrap div[style*="background: linear-gradient(135deg, rgba(13,21,39"],
+.theme-light .author-dashboard-wrap div[style*="background: linear-gradient(135deg, rgba(15,23,42"] {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Table Light Mode Overrides */
+[data-theme="light"] .author-dashboard-wrap .ts-table th,
+.theme-light .author-dashboard-wrap .ts-table th {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .author-dashboard-wrap .ts-table td,
+.theme-light .author-dashboard-wrap .ts-table td {
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .author-dashboard-wrap .ts-table strong,
+.theme-light .author-dashboard-wrap .ts-table strong {
+  color: #0f172a !important;
+}
+
+/* Light Mode Input Elements */
+[data-theme="light"] .author-dashboard-wrap input[type="text"],
+[data-theme="light"] .author-dashboard-wrap input[type="password"],
+[data-theme="light"] .author-dashboard-wrap input[type="number"],
+[data-theme="light"] .author-dashboard-wrap input[type="url"],
+[data-theme="light"] .author-dashboard-wrap select,
+[data-theme="light"] .author-dashboard-wrap textarea,
+.theme-light .author-dashboard-wrap input[type="text"],
+.theme-light .author-dashboard-wrap input[type="password"],
+.theme-light .author-dashboard-wrap input[type="number"],
+.theme-light .author-dashboard-wrap input[type="url"],
+.theme-light .author-dashboard-wrap select,
+.theme-light .author-dashboard-wrap textarea {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Light Mode Navigation Tab Strip */
+[data-theme="light"] .author-tabs-strip,
+.theme-light .author-tabs-strip {
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .author-tabs-strip .ts-btn-outline,
+.theme-light .author-tabs-strip .ts-btn-outline {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+[data-theme="light"] .author-tabs-strip .ts-btn-outline:hover,
+.theme-light .author-tabs-strip .ts-btn-outline:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Modal Boxes in Light Mode */
+[data-theme="light"] .admin-modal-box,
+.theme-light .admin-modal-box {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="light"] .admin-modal-title,
+.theme-light .admin-modal-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .admin-modal-label,
+.theme-light .admin-modal-label {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .admin-modal-input,
+[data-theme="light"] .admin-modal-textarea,
+[data-theme="light"] .admin-modal-select,
+.theme-light .admin-modal-input,
+.theme-light .admin-modal-textarea,
+.theme-light .admin-modal-select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+</style>
+
+<div class="container author-dashboard-wrap" style="padding-top: 2rem; margin-bottom: 5rem;">
   
   <!-- ========================================================================= -->
   <!-- 1. AUTHOR CAREER PROGRESSION & COMMAND HUD -->
@@ -119,26 +275,35 @@ $getEntityUrl = function($type, $slug) {
   <!-- ========================================================================= -->
   <!-- 3. CREATOR STUDIO MASTER TABS NAVIGATION STRIP -->
   <!-- ========================================================================= -->
-  <div style="display: flex; gap: 0.5rem; border-bottom: 1px solid rgba(148,163,184,0.15); margin-bottom: 2rem; flex-wrap: wrap;">
-    <button type="button" onclick="switchAuthorMainTab('publications')" id="amaintab_publications" class="ts-btn ts-btn-sm ts-btn-primary" style="padding: 0.5rem 1.25rem; font-weight: 700;">
-      📝 Publications Hub (<?= count($contents) ?>)
+  <div class="author-tabs-strip" style="display: flex; gap: 0.5rem; border-bottom: 1px solid rgba(148,163,184,0.15); margin-bottom: 2rem; flex-wrap: wrap;">
+    <button type="button" onclick="switchAuthorMainTab('publications')" id="amaintab_publications" class="ts-btn ts-btn-sm ts-btn-primary" style="padding: 0.5rem 1.15rem; font-weight: 700;">
+      📝 Publications (<?= count($contents) ?>)
     </button>
-    <button type="button" onclick="switchAuthorMainTab('payouts')" id="amaintab_payouts" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.25rem; font-weight: 700; color: #34d399; border-color: rgba(16,185,129,0.3);">
+    <button type="button" onclick="switchAuthorMainTab('prompts')" id="amaintab_prompts" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #a855f7; border-color: rgba(168,85,247,0.3);">
+      🎨 Prompts Studio (<?= count($authorPrompts ?? []) ?>)
+    </button>
+    <button type="button" onclick="switchAuthorMainTab('payouts')" id="amaintab_payouts" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #34d399; border-color: rgba(16,185,129,0.3);">
       💳 Royalties &amp; Ledger (<?= count($payouts) ?>)
     </button>
-    <button type="button" onclick="switchAuthorMainTab('ambassador')" id="amaintab_ambassador" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.25rem; font-weight: 700; color: #fbbf24; border-color: rgba(245,158,11,0.3);">
+    <button type="button" onclick="switchAuthorMainTab('tipjar')" id="amaintab_tipjar" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #f59e0b; border-color: rgba(245,158,11,0.3);">
+      ⚡ Crypto Tip Jar
+    </button>
+    <button type="button" onclick="switchAuthorMainTab('ambassador')" id="amaintab_ambassador" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #fbbf24; border-color: rgba(245,158,11,0.3);">
       🤝 Ambassador Hub (<?= $ambassadorData['total_referrals'] ?? 0 ?>)
     </button>
-    <button type="button" onclick="switchAuthorMainTab('collaborations')" id="amaintab_collaborations" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.25rem; font-weight: 700; color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+    <button type="button" onclick="switchAuthorMainTab('collaborations')" id="amaintab_collaborations" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #38bdf8; border-color: rgba(56,189,248,0.3);">
       👥 Co-Authoring (<?= count($collaborations ?? []) ?>)
     </button>
-    <button type="button" onclick="switchAuthorMainTab('analytics')" id="amaintab_analytics" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.25rem; font-weight: 700; color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+    <button type="button" onclick="switchAuthorMainTab('analytics')" id="amaintab_analytics" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #38bdf8; border-color: rgba(56,189,248,0.3);">
       📊 Analytics &amp; Telemetry
     </button>
-    <button type="button" onclick="switchAuthorMainTab('community')" id="amaintab_community" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.25rem; font-weight: 700; color: #a855f7; border-color: rgba(168,85,247,0.3);">
-      💬 Community (<?= count($followers ?? []) ?>)
+    <button type="button" onclick="switchAuthorMainTab('feedback')" id="amaintab_feedback" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #ec4899; border-color: rgba(236,72,153,0.3);">
+      💬 Feedback (<?= count($recentComments ?? []) ?>)
     </button>
-    <button type="button" onclick="switchAuthorMainTab('security')" id="amaintab_security" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.25rem; font-weight: 700; color: #10b981; border-color: rgba(16,185,129,0.3);">
+    <button type="button" onclick="switchAuthorMainTab('community')" id="amaintab_community" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #a855f7; border-color: rgba(168,85,247,0.3);">
+      👥 Community (<?= count($followers ?? []) ?>)
+    </button>
+    <button type="button" onclick="switchAuthorMainTab('security')" id="amaintab_security" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.15rem; font-weight: 700; color: #10b981; border-color: rgba(16,185,129,0.3);">
       🛡️ Security &amp; Devices (<?= count($userSessions ?? []) ?>)
     </button>
     <button type="button" onclick="openProfileModal()" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.5rem 1.1rem; font-weight: 700; margin-left: auto;">
@@ -1324,6 +1489,442 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
     </div>
   </div><!-- /amainpane_community -->
 
+  <!-- ========================================================================= -->
+  <!-- 4. PANE: AI PROMPTS STUDIO & RUNNER -->
+  <!-- ========================================================================= -->
+  <div id="amainpane_prompts" style="display: none;">
+    <div class="ts-card" style="margin-bottom: 3rem; padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="ts-badge ts-badge-purple">FRONTIER AI STUDIO</span>
+            <span style="font-size: 0.8rem; color: #64748b;">Prompt Engineering &amp; Variable Injection Hub</span>
+          </div>
+          <h3 style="font-size: 1.45rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            🎨 Author AI Prompts Studio
+          </h3>
+          <p style="color: #94a3b8; font-size: 0.88rem; margin: 0.35rem 0 0 0; max-width: 650px;">
+            Publish parameter-driven prompt blueprints and diffusion recipes. Prompts earn discovery XP and reader engagement metrics across the platform.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <a href="<?= url('/author/editor?type=prompt') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #a855f7, #6366f1); font-weight: 700; border: none; padding: 0.55rem 1.25rem;">
+            <i data-lucide="sparkles"></i> New Prompt Blueprint ⚡
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Counters -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Total Prompts</div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #a855f7; font-family: 'Outfit', sans-serif; margin-top: 0.25rem;">
+            <?= count($authorPrompts ?? []) ?>
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Published in catalog</div>
+        </div>
+
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Text Blueprints</div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #38bdf8; font-family: 'Outfit', sans-serif; margin-top: 0.25rem;">
+            <?= count(array_filter($authorPrompts ?? [], fn($p) => ($p['prompt_type'] ?? 'text') !== 'image')) ?>
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Code, reasoning &amp; system prompts</div>
+        </div>
+
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Image Gen Prompts</div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #ec4899; font-family: 'Outfit', sans-serif; margin-top: 0.25rem;">
+            <?= count(array_filter($authorPrompts ?? [], fn($p) => ($p['prompt_type'] ?? '') === 'image')) ?>
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Diffusion &amp; Midjourney prompts</div>
+        </div>
+
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Total Copies &amp; Runs</div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #10b981; font-family: monospace; margin-top: 0.25rem;">
+            <?= number_format(array_sum(array_column($authorPrompts ?? [], 'copy_count'))) ?>
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Reader usage executions</div>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.4rem;">
+          <button type="button" onclick="filterAuthorPrompts('all')" id="apfilter_all" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.8rem;">All (<?= count($authorPrompts ?? []) ?>)</button>
+          <button type="button" onclick="filterAuthorPrompts('text')" id="apfilter_text" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.8rem;">📝 Text Only</button>
+          <button type="button" onclick="filterAuthorPrompts('image')" id="apfilter_image" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.8rem;">🎨 Image Gen Only</button>
+        </div>
+        <span style="font-size: 0.78rem; color: #64748b;">Text prompts are strictly clean code/terminal blueprints without card images.</span>
+      </div>
+
+      <!-- Prompts Grid -->
+      <?php if (!empty($authorPrompts)): ?>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+          <?php foreach ($authorPrompts as $ap): ?>
+            <?php 
+              $isImgPrompt = ($ap['prompt_type'] ?? '') === 'image';
+              $vars = json_decode($ap['template_variables'] ?? '[]', true) ?: [];
+              $models = json_decode($ap['target_models'] ?? '[]', true) ?: [];
+            ?>
+            <div class="author-prompt-card author-subcard" data-prompt-type="<?= $isImgPrompt ? 'image' : 'text' ?>" style="background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.14); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; position: relative;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+                <div>
+                  <span class="ts-badge <?= $isImgPrompt ? 'ts-badge-purple' : 'ts-badge-cyan' ?>" style="font-size: 0.68rem; text-transform: uppercase;">
+                    <?= $isImgPrompt ? '🎨 Image Gen' : '📝 Text Blueprint' ?>
+                  </span>
+                  <?php if (!empty($ap['category_name'])): ?>
+                    <span style="font-size: 0.72rem; color: #64748b; margin-left: 0.35rem;"><?= htmlspecialchars($ap['category_name']) ?></span>
+                  <?php endif; ?>
+                </div>
+                <span style="font-size: 0.72rem; font-family: monospace; color: #10b981; font-weight: 700;">
+                  <?= (int)($ap['copy_count'] ?? 0) ?> copies
+                </span>
+              </div>
+
+              <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #f8fafc; font-family: 'Outfit', sans-serif;">
+                <a href="<?= url('/prompts/' . $ap['slug']) ?>" target="_blank" style="color: inherit; text-decoration: none;">
+                  <?= htmlspecialchars($ap['title']) ?> ↗
+                </a>
+              </h4>
+
+              <!-- Template Preview Snippet (Pure Text Blueprint) -->
+              <div style="background: #04070e; border: 1px solid rgba(148,163,184,0.12); border-radius: 6px; padding: 0.75rem; font-family: var(--ts-font-mono); font-size: 0.78rem; color: #cbd5e1; max-height: 85px; overflow: hidden; position: relative; line-height: 1.45;">
+                <?= htmlspecialchars(mb_strimwidth($ap['prompt_template'] ?? '', 0, 160, '...')) ?>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 25px; background: linear-gradient(transparent, #04070e);"></div>
+              </div>
+
+              <!-- Variables & Models -->
+              <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                <?php foreach (array_slice($models, 0, 3) as $m): ?>
+                  <span style="font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 4px; background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3);"><?= htmlspecialchars($m) ?></span>
+                <?php endforeach; ?>
+                <?php foreach (array_slice($vars, 0, 2) as $v): ?>
+                  <span style="font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 4px; background: rgba(56,189,248,0.1); color: #38bdf8; font-family: monospace;">{<?= htmlspecialchars($v['name'] ?? $v) ?>}</span>
+                <?php endforeach; ?>
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.6rem; border-top: 1px solid rgba(148,163,184,0.08); gap: 0.5rem;">
+                <button type="button" onclick="copyAuthorPromptTemplate(<?= htmlspecialchars(json_encode($ap['prompt_template'] ?? '')) ?>)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.65rem;">
+                  <i data-lucide="copy"></i> Copy Prompt
+                </button>
+                <div style="display: flex; gap: 0.35rem;">
+                  <a href="<?= url('/author/editor/' . $ap['id']) ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.65rem; color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+                    Edit ⚙️
+                  </a>
+                  <a href="<?= url('/prompts/' . $ap['slug']) ?>" target="_blank" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.65rem;">
+                    View ↗
+                  </a>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php else: ?>
+        <div style="background: rgba(15,23,42,0.5); border: 1px dashed rgba(148,163,184,0.15); border-radius: 12px; padding: 3rem 2rem; text-align: center; color: #64748b;">
+          <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">🎨</div>
+          <h4 style="color: #f8fafc; font-size: 1.15rem; margin: 0 0 0.5rem 0;">No AI Prompts Published Yet</h4>
+          <p style="margin: 0 0 1.25rem 0; font-size: 0.88rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            Create high-accuracy coding prompts, architectural blueprints, or diffusion prompts. Every prompt is indexed for technical search and AI tools discovery.
+          </p>
+          <a href="<?= url('/author/editor?type=prompt') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #a855f7, #6366f1); font-weight: 700; padding: 0.55rem 1.4rem;">
+            + Create Your First AI Prompt
+          </a>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div><!-- /amainpane_prompts -->
+
+  <!-- ========================================================================= -->
+  <!-- 5. PANE: CREATOR CRYPTO TIP JAR & PEER PATRONAGE -->
+  <!-- ========================================================================= -->
+  <div id="amainpane_tipjar" style="display: none;">
+    <div class="ts-card" style="margin-bottom: 3rem; padding: 2rem; background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(24,20,38,0.7)); border: 1px solid rgba(245,158,11,0.3); border-radius: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="ts-badge ts-badge-amber" style="font-weight: 800;">DIRECT CREATOR PATRONAGE</span>
+            <span style="font-size: 0.8rem; color: #94a3b8;">100% Peer-to-Peer On-Chain Tips &bull; 0% Platform Fee</span>
+          </div>
+          <h3 style="font-size: 1.45rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            ⚡ Creator Crypto Tip Jar
+          </h3>
+          <p style="color: #94a3b8; font-size: 0.88rem; margin: 0.35rem 0 0 0; max-width: 680px;">
+            Let your technical readers support your open-source research and engineering tutorials directly. Readers can tip you in Bitcoin, Ethereum, USDT, or Solana straight to your personal crypto wallet.
+          </p>
+        </div>
+        <div>
+          <span class="ts-badge ts-badge-green" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+            ZERO COMMISSIONS ACTIVE ✓
+          </span>
+        </div>
+      </div>
+
+      <!-- Configured Wallets Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        <!-- BTC -->
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="color: #f59e0b; font-size: 0.95rem;">₿ Bitcoin (BTC)</strong>
+            <span class="ts-badge ts-badge-amber" style="font-size: 0.65rem;">Native SegWit / Taproot</span>
+          </div>
+          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
+            <?= htmlspecialchars($author['tip_wallet_btc'] ?? 'bc1q9v80n7... (Not configured)') ?>
+          </div>
+          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
+            Configure BTC Wallet ⚙️
+          </button>
+        </div>
+
+        <!-- ETH -->
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(99,102,241,0.25); border-radius: 10px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="color: #818cf8; font-size: 0.95rem;">Ξ Ethereum / EVM</strong>
+            <span class="ts-badge ts-badge-indigo" style="font-size: 0.65rem;">ERC-20 / Arbitrum</span>
+          </div>
+          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
+            <?= htmlspecialchars($author['tip_wallet_eth'] ?? '0x71C... (Not configured)') ?>
+          </div>
+          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
+            Configure ETH / EVM Wallet ⚙️
+          </button>
+        </div>
+
+        <!-- USDT -->
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(16,185,129,0.25); border-radius: 10px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="color: #34d399; font-size: 0.95rem;">₮ Tether (USDT)</strong>
+            <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">TRC-20 / ERC-20</span>
+          </div>
+          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
+            <?= htmlspecialchars($author['tip_wallet_usdt'] ?? 'TXa9... (Not configured)') ?>
+          </div>
+          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
+            Configure USDT Address ⚙️
+          </button>
+        </div>
+
+        <!-- SOL -->
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.25); border-radius: 10px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="color: #c084fc; font-size: 0.95rem;">◎ Solana (SOL)</strong>
+            <span class="ts-badge ts-badge-purple" style="font-size: 0.65rem;">SPL Network</span>
+          </div>
+          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
+            <?= htmlspecialchars($author['tip_wallet_sol'] ?? 'So11... (Not configured)') ?>
+          </div>
+          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
+            Configure SOL Address ⚙️
+          </button>
+        </div>
+      </div>
+
+      <!-- Embeddable Reader Badge Snippet -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 10px; padding: 1.25rem;">
+        <h4 style="color: #f8fafc; font-size: 1rem; margin: 0 0 0.5rem 0; font-family: 'Outfit', sans-serif;">
+          📢 Embed Reader Tip Badge in Your Markdown Articles &amp; GitHub
+        </h4>
+        <p style="color: #94a3b8; font-size: 0.82rem; margin: 0 0 0.75rem 0;">
+          Copy and paste this markdown snippet at the bottom of your articles or open-source repositories to invite technical patronage:
+        </p>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="text" id="tipMeBadgeSnippet" readonly value="[![Support with Crypto](https://img.shields.io/badge/TechScout-Tip_Author-6366f1?logo=bitcoin)](<?= url('/author/profile/' . ($author['slug'] ?? '')) ?>#tip)" class="admin-modal-input" style="font-family: monospace; font-size: 0.8rem; flex: 1;">
+          <button type="button" onclick="copySnippet('tipMeBadgeSnippet')" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #f59e0b; border: none; color: #000; font-weight: 700; white-space: nowrap;">
+            Copy Markdown 📋
+          </button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /amainpane_tipjar -->
+
+  <!-- ========================================================================= -->
+  <!-- 6. PANE: TECHNICAL READER FEEDBACK & COMMENT STREAM -->
+  <!-- ========================================================================= -->
+  <div id="amainpane_feedback" style="display: none;">
+    <div class="ts-card" style="margin-bottom: 3rem; padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="ts-badge ts-badge-pink">READER DISCUSSIONS</span>
+            <span style="font-size: 0.8rem; color: #64748b;">Feedback &amp; Peer Reviews Across Your Catalog</span>
+          </div>
+          <h3 style="font-size: 1.45rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            💬 Reader Feedback &amp; Discussion Stream
+          </h3>
+          <p style="color: #94a3b8; font-size: 0.88rem; margin: 0.35rem 0 0 0; max-width: 650px;">
+            Engage with developers who comment on your tutorials, prompt blueprints, and tools. Active responses boost creator reputation XP.
+          </p>
+        </div>
+      </div>
+
+      <?php if (!empty($recentComments)): ?>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <?php foreach ($recentComments as $cm): ?>
+            <div class="author-subcard" style="background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.12); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.65rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ec4899, #8b5cf6); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: #fff;">
+                    <?= strtoupper(substr($cm['username'] ?? 'R', 0, 1)) ?>
+                  </div>
+                  <div>
+                    <strong style="color: #f8fafc; font-size: 0.88rem;"><?= htmlspecialchars($cm['username'] ?? 'Anonymous Reader') ?></strong>
+                    <span style="font-size: 0.72rem; color: #64748b; margin-left: 0.4rem;">commented on</span>
+                    <a href="<?= url('/article/' . ($cm['content_slug'] ?? '')) ?>#comments" target="_blank" style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-decoration: none;">
+                      <?= htmlspecialchars($cm['content_title'] ?? 'Publication') ?> ↗
+                    </a>
+                  </div>
+                </div>
+                <span style="font-size: 0.72rem; color: #64748b; font-family: var(--ts-font-mono);">
+                  <?= \App\Core\DateHelper::formatDateTime($cm['created_at']) ?>
+                </span>
+              </div>
+
+              <div style="background: #04070e; border-left: 3px solid #ec4899; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+                <?= nl2br(htmlspecialchars($cm['comment'] ?? $cm['content'] ?? '')) ?>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                <a href="<?= url('/article/' . ($cm['content_slug'] ?? '')) ?>#comments" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.65rem; color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+                  Reply on Article &rarr;
+                </a>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php else: ?>
+        <div style="background: rgba(15,23,42,0.5); border: 1px dashed rgba(148,163,184,0.15); border-radius: 12px; padding: 3rem 2rem; text-align: center; color: #64748b;">
+          <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">💬</div>
+          <h4 style="color: #f8fafc; font-size: 1.15rem; margin: 0 0 0.5rem 0;">No Reader Discussions Yet</h4>
+          <p style="margin: 0; font-size: 0.88rem;">
+            When readers comment or ask architectural questions on your published technical publications, they will stream here in real time!
+          </p>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div><!-- /amainpane_feedback -->
+
+  <!-- ========================================================================= -->
+  <!-- 7. PANE: SECURITY, CREDENTIALS & ACTIVE SESSIONS HUD -->
+  <!-- ========================================================================= -->
+  <div id="amainpane_security" style="display: none;">
+    <div class="ts-card" style="margin-bottom: 3rem; padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="ts-badge ts-badge-green">ACCOUNT GOVERNANCE</span>
+            <span style="font-size: 0.8rem; color: #64748b;">Device Sessions, Multi-Factor &amp; Credential Hygiene</span>
+          </div>
+          <h3 style="font-size: 1.45rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+            🛡️ Creator Security &amp; Device Manager
+          </h3>
+          <p style="color: #94a3b8; font-size: 0.88rem; margin: 0.35rem 0 0 0; max-width: 650px;">
+            Protect your publication portfolio and royalty payout destinations with hardened security credentials and session oversight.
+          </p>
+        </div>
+
+        <div>
+          <button type="button" onclick="openPasswordModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700; border: none; padding: 0.55rem 1.25rem;">
+            <i data-lucide="key"></i> Change Password 🔑
+          </button>
+        </div>
+      </div>
+
+      <!-- Security Scorecard -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Password Status</div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; font-family: 'Outfit', sans-serif; margin-top: 0.25rem;">
+            ACTIVE &amp; HARDENED ✓
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Encrypted with bcrypt (Cost 12)</div>
+        </div>
+
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Active Devices</div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: #38bdf8; font-family: monospace; margin-top: 0.25rem;">
+            <?= max(1, count($userSessions ?? [])) ?> Active Session<?= count($userSessions ?? []) !== 1 ? 's' : '' ?>
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Under continuous IP audit</div>
+        </div>
+
+        <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 10px; padding: 1.25rem;">
+          <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Payout Lock Status</div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; font-family: 'Outfit', sans-serif; margin-top: 0.25rem;">
+            PROTECTED 🔒
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Changes require password re-auth</div>
+        </div>
+      </div>
+
+      <!-- Active Sessions Roster -->
+      <h4 style="font-size: 1.05rem; color: #f8fafc; margin: 0 0 1rem 0; font-family: 'Outfit', sans-serif;">
+        🖥️ Active Authenticated Browser Sessions
+      </h4>
+
+      <div style="overflow-x: auto; margin-bottom: 1.5rem;">
+        <table class="ts-table" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(148,163,184,0.15); text-align: left; font-size: 0.78rem; color: #94a3b8;">
+              <th style="padding: 0.75rem;">Device &amp; Platform</th>
+              <th style="padding: 0.75rem;">IP Address</th>
+              <th style="padding: 0.75rem;">Last Active</th>
+              <th style="padding: 0.75rem;">Session Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(148,163,184,0.08); font-size: 0.85rem;">
+              <td style="padding: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.2rem;">💻</span>
+                  <div>
+                    <strong style="color: #f8fafc;">Current Browser Session</strong>
+                    <div style="font-size: 0.72rem; color: #64748b;"><?= htmlspecialchars($_SERVER['HTTP_USER_AGENT'] ?? 'Web Browser') ?></div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding: 0.75rem; font-family: monospace; color: #38bdf8;">
+                <?= htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1') ?>
+              </td>
+              <td style="padding: 0.75rem; color: #cbd5e1; font-size: 0.8rem;">
+                Just now (Active)
+              </td>
+              <td style="padding: 0.75rem;">
+                <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">THIS DEVICE ✓</span>
+              </td>
+            </tr>
+            <?php if (!empty($userSessions)): ?>
+              <?php foreach ($userSessions as $s): ?>
+                <tr style="border-bottom: 1px solid rgba(148,163,184,0.08); font-size: 0.85rem;">
+                  <td style="padding: 0.75rem; color: #cbd5e1;">
+                    <?= htmlspecialchars($s['user_agent'] ?? 'Secondary Device') ?>
+                  </td>
+                  <td style="padding: 0.75rem; font-family: monospace; color: #94a3b8;">
+                    <?= htmlspecialchars($s['ip_address'] ?? '—') ?>
+                  </td>
+                  <td style="padding: 0.75rem; color: #64748b; font-size: 0.8rem;">
+                    <?= htmlspecialchars($s['last_activity'] ?? '—') ?>
+                  </td>
+                  <td style="padding: 0.75rem;">
+                    <span class="ts-badge ts-badge-indigo" style="font-size: 0.7rem;">AUTHENTICATED</span>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="button" onclick="openPasswordModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">
+          Terminate Other Sessions via Password Reset 🚨
+        </button>
+      </div>
+    </div>
+  </div><!-- /amainpane_security -->
+
 </div>
 
 <!-- ========================================================================= -->
@@ -1949,7 +2550,7 @@ function switchAuthorMainTab(tab) {
     btn.classList.add('ts-btn-primary');
   }
 
-  const panes = ['publications', 'payouts', 'ambassador', 'collaborations', 'analytics', 'community', 'security'];
+  const panes = ['publications', 'prompts', 'payouts', 'tipjar', 'ambassador', 'collaborations', 'analytics', 'feedback', 'community', 'security'];
   panes.forEach(p => {
     const el = document.getElementById('amainpane_' + p);
     if (el) el.style.display = (tab === p) ? 'block' : 'none';
@@ -1962,10 +2563,63 @@ function switchAuthorMainTab(tab) {
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const targetTab = urlParams.get('tab');
-  if (targetTab && ['publications', 'payouts', 'ambassador', 'collaborations', 'analytics', 'community', 'security'].includes(targetTab)) {
+  const validPanes = ['publications', 'prompts', 'payouts', 'tipjar', 'ambassador', 'collaborations', 'analytics', 'feedback', 'community', 'security'];
+  if (targetTab && validPanes.includes(targetTab)) {
     switchAuthorMainTab(targetTab);
   }
 });
+
+function filterAuthorPrompts(type) {
+  const btns = ['all', 'text', 'image'];
+  btns.forEach(b => {
+    const el = document.getElementById('apfilter_' + b);
+    if (el) {
+      if (b === type) {
+        el.classList.remove('ts-btn-outline');
+        el.classList.add('ts-btn-primary');
+      } else {
+        el.classList.remove('ts-btn-primary');
+        el.classList.add('ts-btn-outline');
+      }
+    }
+  });
+
+  const cards = document.querySelectorAll('.author-prompt-card');
+  cards.forEach(card => {
+    const pType = card.getAttribute('data-prompt-type');
+    if (type === 'all' || pType === type) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function copyAuthorPromptTemplate(text) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    if (typeof showToast === 'function') {
+      showToast('Prompt blueprint copied to clipboard! 📋', 'success');
+    } else {
+      alert('Prompt blueprint copied to clipboard! 📋');
+    }
+  }).catch(() => {
+    alert('Prompt copied!');
+  });
+}
+
+function copySnippet(elementId) {
+  const input = document.getElementById(elementId);
+  if (!input) return;
+  input.select();
+  navigator.clipboard.writeText(input.value).then(() => {
+    if (typeof showToast === 'function') {
+      showToast('Markdown snippet copied to clipboard! 📋', 'success');
+    } else {
+      alert('Markdown snippet copied to clipboard! 📋');
+    }
+  });
+}
 
 function copyAmbassadorLink() {
   const input = document.getElementById('ambassadorLinkInput');

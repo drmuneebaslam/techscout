@@ -14,23 +14,14 @@ if (isset($_SERVER['REQUEST_URI'])) {
             exit;
         }
     } elseif (str_ends_with($cleanUri, 'manifest.json')) {
-        $manifestPath = __DIR__ . '/manifest.json';
-        if (file_exists($manifestPath)) {
-            header('Content-Type: application/manifest+json; charset=utf-8');
-            header('Access-Control-Allow-Origin: *');
-            header('Cache-Control: public, max-age=86400');
-            readfile($manifestPath);
-            exit;
-        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo '{}';
+        exit;
     } elseif (str_ends_with($cleanUri, 'sw.js')) {
-        $swPath = __DIR__ . '/sw.js';
-        if (file_exists($swPath)) {
-            header('Content-Type: application/javascript; charset=utf-8');
-            header('Service-Worker-Allowed: /');
-            header('Cache-Control: no-cache, no-store, must-revalidate');
-            readfile($swPath);
-            exit;
-        }
+        header('Content-Type: application/javascript; charset=utf-8');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        echo 'self.addEventListener("install", function() { self.skipWaiting(); }); self.addEventListener("activate", function() { self.registration.unregister(); });';
+        exit;
     }
 }
 
@@ -769,16 +760,26 @@ try {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $isAdmin = \App\Core\Auth::isAdmin();
     $isAdminPath = str_starts_with($path, '/admin') || str_starts_with($path, '/login') || str_starts_with($path, '/logout') || str_starts_with($path, '/assets') || str_starts_with($path, '/auth');
-    $hasBypass = \App\Core\Session::get('maintenance_bypass') || $request->query('bypass') === 'techscout_ops';
+    
+    // Simulate guest view test or preview
+    if ($request->query('simulate_guest') === '1') {
+        \App\Core\Session::remove('maintenance_bypass');
+        $hasBypass = false;
+        $isAdmin = false;
+    } else {
+        $hasBypass = \App\Core\Session::get('maintenance_bypass') || ($request->query('bypass') === 'techscout_ops');
+    }
     
     // Check Client IP against Maintenance Allowed IPs whitelist [TS-INF-09]
-    $clientIp = Request::ip();
-    $ipRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_allowed_ips'");
-    $allowedIps = array_filter(array_map('trim', explode(',', (string)($ipRow['key_value'] ?? ''))));
-    foreach ($allowedIps as $ip) {
-        if ($ip === $clientIp || $ip === '*' || (str_contains($ip, '/') && \App\Core\Firewall::ipInRange($clientIp, $ip))) {
-            $hasBypass = true;
-            break;
+    if (!$hasBypass) {
+        $clientIp = Request::ip();
+        $ipRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_allowed_ips'");
+        $allowedIps = array_filter(array_map('trim', explode(',', (string)($ipRow['key_value'] ?? ''))));
+        foreach ($allowedIps as $ip) {
+            if ($ip === $clientIp || $ip === '*' || (str_contains($ip, '/') && \App\Core\Firewall::ipInRange($clientIp, $ip))) {
+                $hasBypass = true;
+                break;
+            }
         }
     }
 
@@ -787,7 +788,7 @@ try {
         $hasBypass = true;
     }
 
-    $isPreview503 = ($request->query('preview_503') === '1');
+    $isPreview503 = ($request->query('preview_503') === '1' || $request->query('test_maint') === '1');
 
     if (($isFullMaint && !$isAdmin && !$isAdminPath && !$hasBypass) || $isPreview503) {
         http_response_code(503);

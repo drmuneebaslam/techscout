@@ -170,6 +170,35 @@ class AuthorStudioController {
         $payoutFeeSettings = FinancialLedger::getPayoutFeeSettings();
         $allowedPayoutMethods = FinancialLedger::getAllowedPayoutMethods();
 
+        // Prompts Studio Data
+        $authorPrompts = Database::querySilent(
+            "SELECT c.*, COALESCE(p.prompt_type, 'text') as prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
+             FROM contents c 
+             JOIN prompts p ON c.id = p.content_id 
+             LEFT JOIN categories cat ON c.category_id = cat.id 
+             WHERE c.author_id = ? 
+             ORDER BY c.created_at DESC", 
+            [$authorId]
+        ) ?: [];
+
+        // Reader Feedback & Comments Data
+        $recentComments = Database::querySilent(
+            "SELECT cm.*, c.title as content_title, c.slug as content_slug, u.username, u.avatar_url 
+             FROM comments cm 
+             JOIN contents c ON cm.content_id = c.id 
+             LEFT JOIN users u ON cm.user_id = u.id 
+             WHERE c.author_id = ? 
+             ORDER BY cm.created_at DESC 
+             LIMIT 25", 
+            [$authorId]
+        ) ?: [];
+
+        // Active Device Sessions
+        $userSessions = Database::querySilent(
+            "SELECT * FROM user_sessions WHERE user_id = ? ORDER BY last_activity DESC LIMIT 10", 
+            [$user['id']]
+        ) ?: [];
+
         Response::view('author/dashboard', [
             'title' => 'Creator Studio & Intelligence Dashboard | TechScout',
             'user' => $user,
@@ -200,7 +229,10 @@ class AuthorStudioController {
             'ambassadorData' => $ambassadorData,
             'collaborations' => $collaborations,
             'changesRequiredItems' => $changesRequiredItems,
-            'monetization' => $monetization
+            'monetization' => $monetization,
+            'authorPrompts' => $authorPrompts,
+            'recentComments' => $recentComments,
+            'userSessions' => $userSessions
         ]);
     }
 

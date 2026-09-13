@@ -138,8 +138,6 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
   
-  <!-- Progressive Web App Manifest & Meta [TS-UI-05] -->
-  <link rel="manifest" href="<?= url('/manifest.json') ?>">
   <meta name="theme-color" content="#0284c7">
   <link rel="apple-touch-icon" href="<?= url('/favicon.ico') ?>">
   
@@ -204,9 +202,10 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
           <i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: #f59e0b;"></i>
           <span><strong>MAINTENANCE MODE ACTIVE:</strong> Public visitors receive HTTP 503. You are bypassing this as Administrator.</span>
         </span>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
           <a href="<?= url('/admin/settings?tab=general') ?>" class="ts-btn ts-btn-xs ts-btn-outline" style="border-color: currentColor;">⚙️ Settings</a>
-          <a href="<?= url('/?preview_503=1') ?>" target="_blank" class="ts-btn ts-btn-xs ts-btn-primary">Preview 503 Page ↗</a>
+          <a href="<?= url('/?preview_503=1') ?>" target="_blank" class="ts-btn ts-btn-xs ts-btn-primary">👁️ Preview 503 Screen ↗</a>
+          <a href="<?= url('/?simulate_guest=1') ?>" class="ts-btn ts-btn-xs ts-btn-outline" style="background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.5); color: #fca5a5;">🔒 Test As Visitor (Lockout)</a>
         </div>
       </div>
     </div>

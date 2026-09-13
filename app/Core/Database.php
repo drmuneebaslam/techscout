@@ -1525,6 +1525,17 @@ class Database {
                     }
                 }
             } catch (Throwable $e) {}
+
+            // 31. Prompts Prompt Type & Clean Text Prompts Migration (InfinityFree-Safe)
+            try {
+                $hasCol = $pdo->query("SHOW COLUMNS FROM `prompts` LIKE 'prompt_type'")->fetchAll();
+                if (empty($hasCol)) {
+                    $pdo->exec("ALTER TABLE `prompts` ADD COLUMN `prompt_type` ENUM('text', 'image') NOT NULL DEFAULT 'text'");
+                    $pdo->exec("UPDATE `prompts` SET `prompt_type` = 'image' WHERE `content_id` IN (30, 31, 32, 33, 34, 35, 36, 37)");
+                }
+                // Ensure all text prompts strictly have NO image attached in contents
+                $pdo->exec("UPDATE `contents` c JOIN `prompts` p ON c.id = p.content_id SET c.featured_image_url = NULL WHERE p.prompt_type = 'text'");
+            } catch (Throwable $e) {}
         } catch (Throwable $e) {
             // Ignore minor migration conflicts
         }
@@ -1542,6 +1553,29 @@ class Database {
         }
     }
 
+    public static function queryScalar(string $sql, array $params = []): mixed {
+        try {
+            $stmt = self::getConnection()->prepare($sql);
+            $stmt->execute($params);
+            $val = $stmt->fetchColumn();
+            return ($val !== false) ? $val : null;
+        } catch (Throwable $e) {
+            return null;
+        }
+    }
+
+    public static function querySilent(string $sql, array $params = []): array {
+        try {
+            $conn = self::getConnection();
+            if (!$conn) return [];
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll();
+        } catch (Throwable $e) {
+            return [];
+        }
+    }
+
     public static function fetch(string $sql, array $params = []): ?array {
         try {
             $stmt = self::getConnection()->prepare($sql);
@@ -1550,6 +1584,19 @@ class Database {
             return $res ? $res : null;
         } catch (Throwable $e) {
             self::renderDetailedError($e, Config::get('db_host'), Config::get('db_port'), Config::get('db_name'), Config::get('db_user'), $sql, $params);
+            return null;
+        }
+    }
+
+    public static function fetchSilent(string $sql, array $params = []): ?array {
+        try {
+            $conn = self::getConnection();
+            if (!$conn) return null;
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+            $res = $stmt->fetch();
+            return $res ? $res : null;
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -1585,22 +1632,6 @@ class Database {
             }
             error_log("Database::executeSilent: " . $msg);
             return false;
-        }
-    }
-
-    /**
-     * Fetches single row silently without triggering renderDetailedError on failure.
-     */
-    public static function fetchSilent(string $sql, array $params = []): ?array {
-        try {
-            $conn = self::getConnection();
-            if (!$conn) return null;
-            $stmt = $conn->prepare($sql);
-            $stmt->execute($params);
-            $res = $stmt->fetch();
-            return $res ? $res : null;
-        } catch (Throwable $e) {
-            return null;
         }
     }
 

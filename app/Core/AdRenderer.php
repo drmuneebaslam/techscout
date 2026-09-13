@@ -110,7 +110,7 @@ HTML;
 
     private static function renderBadge(string $url, string $alt): string {
         if (!empty($url) && $url !== 'https://funwithcoding.free.nf/') {
-            return '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($alt) . '" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(148,163,184,0.2); flex-shrink: 0;">';
+            return '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($alt) . '" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(148,163,184,0.2); flex-shrink: 0;" onerror="this.onerror=null;this.style.display=\'none\';">';
         }
         return '<div style="width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #0284c7, #6366f1); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">⚡</div>';
     }
