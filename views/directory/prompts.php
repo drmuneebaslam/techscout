@@ -44,6 +44,12 @@
       <a href="<?= url('/prompts/images') ?>" class="ts-btn ts-btn-sm ts-btn-outline" style="border-radius: 24px; padding: 0.45rem 1.25rem; font-weight: 700; text-decoration: none; border-color: #ec4899; color: #ec4899;">
         🎨 AI Image Prompts Gallery ↗
       </a>
+      <a href="<?= url('/prompts/images/categories') ?>" class="ts-btn ts-btn-sm ts-btn-ghost" style="border-radius: 24px; padding: 0.45rem 1.25rem; font-weight: 700; text-decoration: none; color: #f43f5e;">
+        🖼️ Image Categories &amp; Counts
+      </a>
+      <a href="<?= url('/prompts/categories') ?>" class="ts-btn ts-btn-sm ts-btn-ghost" style="border-radius: 24px; padding: 0.45rem 1.25rem; font-weight: 600; text-decoration: none;">
+        📁 All Categories Hub
+      </a>
       <a href="<?= url('/prompts?tab=all') ?>" class="ts-btn ts-btn-sm <?= ($activeTab ?? '') === 'all' ? 'ts-btn-primary' : 'ts-btn-ghost' ?>" style="border-radius: 24px; padding: 0.45rem 1.25rem; font-weight: 600; text-decoration: none;">
         🌟 All Blueprints
       </a>

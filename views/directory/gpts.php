@@ -7,6 +7,14 @@
     <p style="color: var(--ts-text-secondary); max-width: 640px; margin: 0 auto;">
       Curated specialized agents, system designers, and code architects engineered for maximum builder throughput.
     </p>
+    <div style="display: inline-flex; gap: 0.5rem; margin-top: 1.25rem;">
+      <a href="<?= url('/gpts') ?>" class="ts-btn ts-btn-sm ts-btn-primary" style="border-radius: 20px; padding: 0.45rem 1.2rem; text-decoration: none;">
+        🤖 All Custom GPTs
+      </a>
+      <a href="<?= url('/gpts/categories') ?>" class="ts-btn ts-btn-sm ts-btn-outline" style="border-radius: 20px; padding: 0.45rem 1.2rem; text-decoration: none;">
+        📁 Browse Agent Categories &amp; Counts ↗
+      </a>
+    </div>
 
     <?php if (!empty($currentCategory)): ?>
       <div style="display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); padding: 0.35rem 0.9rem; border-radius: 9999px; margin-top: 1rem;">

@@ -7,6 +7,14 @@
     <p style="color: var(--ts-text-secondary); max-width: 640px; margin: 0 auto;">
       Discover, benchmark, and compare modern developer tools, generative AI models, and SaaS applications.
     </p>
+    <div style="display: inline-flex; gap: 0.5rem; margin-top: 1.25rem;">
+      <a href="<?= url('/tools') ?>" class="ts-btn ts-btn-sm ts-btn-primary" style="border-radius: 20px; padding: 0.45rem 1.2rem; text-decoration: none;">
+        ⚡ All Tools Directory
+      </a>
+      <a href="<?= url('/tools/categories') ?>" class="ts-btn ts-btn-sm ts-btn-outline" style="border-radius: 20px; padding: 0.45rem 1.2rem; text-decoration: none;">
+        📁 Browse Tool Categories &amp; Counts ↗
+      </a>
+    </div>
   </div>
 
   <!-- Interactive Filter & Sorting Command HUD -->

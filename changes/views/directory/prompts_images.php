@@ -39,12 +39,18 @@
     </p>
 
     <!-- Sub-Directory Navigation Switcher -->
-    <div style="display: inline-flex; background: var(--ts-bg-surface-elevated); padding: 0.35rem; border-radius: 30px; border: 1px solid var(--ts-border-main); margin-top: 1.5rem; gap: 0.35rem;">
+    <div style="display: inline-flex; background: var(--ts-bg-surface-elevated); padding: 0.35rem; border-radius: 30px; border: 1px solid var(--ts-border-main); margin-top: 1.5rem; gap: 0.35rem; flex-wrap: wrap; justify-content: center;">
       <a href="<?= url('/prompts') ?>" class="ts-btn ts-btn-sm ts-btn-ghost" style="border-radius: 24px; padding: 0.45rem 1.2rem; font-weight: 600; text-decoration: none;">
         ⚡ LLM &amp; System Prompts
       </a>
       <a href="<?= url('/prompts/images') ?>" class="ts-btn ts-btn-sm ts-btn-primary" style="border-radius: 24px; padding: 0.45rem 1.2rem; font-weight: 700; text-decoration: none; background: linear-gradient(135deg, #ec4899, #8b5cf6); box-shadow: 0 4px 15px rgba(236,72,153,0.35);">
         🎨 AI Image Prompts Gallery
+      </a>
+      <a href="<?= url('/prompts/images/categories') ?>" class="ts-btn ts-btn-sm ts-btn-ghost" style="border-radius: 24px; padding: 0.45rem 1.2rem; font-weight: 700; text-decoration: none; color: #ec4899;">
+        📁 Image Categories &amp; Counts
+      </a>
+      <a href="<?= url('/prompts/categories') ?>" class="ts-btn ts-btn-sm ts-btn-ghost" style="border-radius: 24px; padding: 0.45rem 1.2rem; font-weight: 600; text-decoration: none;">
+        📚 All Prompt Taxonomies
       </a>
     </div>
   </div>
@@ -75,6 +81,12 @@
        class="ts-badge <?= ($activeCat === 'stable-diffusion') ? 'ts-badge-pink' : 'ts-badge-cyan' ?>" 
        style="padding: 0.45rem 1rem; font-size: 0.85rem; text-decoration: none; border-radius: 20px; font-weight: 700;">
       🌊 Stable Diffusion XL
+    </a>
+    <a href="<?= url('/prompts/images/categories') ?>" 
+       class="ts-badge ts-badge-gold" 
+       style="padding: 0.45rem 1.1rem; font-size: 0.85rem; text-decoration: none; border-radius: 20px; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+      <i data-lucide="folder" style="width: 14px; height: 14px;"></i>
+      <span>All Image Categories (with counts) ↗</span>
     </a>
   </div>
 

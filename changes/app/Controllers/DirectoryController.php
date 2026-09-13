@@ -266,6 +266,137 @@ class DirectoryController {
         ]);
     }
 
+    // Dedicated AI Image Prompt Categories Index
+    public function imagePromptCategories(Request $request): void {
+        $adDirectUrl = 'https://omg10.com/4/11737440';
+        try {
+            $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url' OR key_name = 'ad_popunder_url'");
+            if (!empty($adRow['key_value'])) {
+                $adDirectUrl = $adRow['key_value'];
+            }
+        } catch (\Throwable $e) {}
+
+        // Fetch image categories with live prompt counts and telemetry
+        $categories = Database::query("
+            SELECT c.*, 
+                   pcat.name as parent_name, pcat.slug as parent_slug,
+                   COALESCE(SUM(CASE WHEN cnt.content_type = 'prompt' THEN 1 ELSE 0 END), 0) as prompt_count,
+                   COALESCE(SUM(p.copy_count), 0) as total_copies,
+                   COALESCE(SUM(cnt.view_count), 0) as total_views,
+                   (SELECT cnt2.featured_image_url 
+                    FROM contents cnt2 
+                    WHERE cnt2.category_id = c.id AND cnt2.content_type = 'prompt' AND cnt2.status = 'published' AND cnt2.featured_image_url IS NOT NULL 
+                    LIMIT 1) as sample_image
+            FROM categories c
+            LEFT JOIN categories pcat ON c.parent_id = pcat.id
+            LEFT JOIN contents cnt ON c.id = cnt.category_id AND cnt.status = 'published'
+            LEFT JOIN prompts p ON cnt.id = p.content_id
+            WHERE c.parent_id = 30 OR c.id = 30 OR c.slug IN ('flux', 'midjourney', 'dall-e', 'stable-diffusion', 'ai-image-prompts', 'photorealism', '3d-renders', 'cyberpunk', 'anime', 'architecture', 'fantasy', 'cinematic', 'vector')
+            GROUP BY c.id
+            ORDER BY prompt_count DESC, c.sort_order ASC
+        ");
+
+        $totalImagePrompts = array_sum(array_column($categories, 'prompt_count'));
+        $totalCopies = array_sum(array_column($categories, 'total_copies'));
+
+        Response::view('directory/prompt_image_categories', [
+            'title' => 'AI Image Generation Prompt Categories & Diffusion Engines | TechScout',
+            'categories' => $categories,
+            'totalImagePrompts' => $totalImagePrompts,
+            'totalCopies' => $totalCopies,
+            'adDirectUrl' => $adDirectUrl
+        ]);
+    }
+
+    // Dedicated Prompt Categories Hub (Image & System Prompts)
+    public function promptCategories(Request $request): void {
+        $adDirectUrl = 'https://omg10.com/4/11737440';
+        try {
+            $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url' OR key_name = 'ad_popunder_url'");
+            if (!empty($adRow['key_value'])) {
+                $adDirectUrl = $adRow['key_value'];
+            }
+        } catch (\Throwable $e) {}
+
+        $categories = Database::query("
+            SELECT c.*, 
+                   pcat.name as parent_name, pcat.slug as parent_slug,
+                   COALESCE(SUM(CASE WHEN cnt.content_type = 'prompt' THEN 1 ELSE 0 END), 0) as prompt_count,
+                   COALESCE(SUM(p.copy_count), 0) as total_copies,
+                   COALESCE(SUM(cnt.view_count), 0) as total_views,
+                   (SELECT cnt2.featured_image_url 
+                    FROM contents cnt2 
+                    WHERE cnt2.category_id = c.id AND cnt2.content_type = 'prompt' AND cnt2.status = 'published' AND cnt2.featured_image_url IS NOT NULL 
+                    LIMIT 1) as sample_image
+            FROM categories c
+            LEFT JOIN categories pcat ON c.parent_id = pcat.id
+            LEFT JOIN contents cnt ON c.id = cnt.category_id AND cnt.status = 'published'
+            LEFT JOIN prompts p ON cnt.id = p.content_id
+            WHERE c.applicable_to IN ('prompt', 'all') OR c.parent_id = 30
+            GROUP BY c.id
+            ORDER BY prompt_count DESC, c.sort_order ASC
+        ");
+
+        $imageCats = [];
+        $textCats = [];
+        foreach ($categories as $cat) {
+            if ($cat['parent_id'] == 30 || in_array($cat['slug'], ['flux', 'midjourney', 'dall-e', 'stable-diffusion', 'ai-image-prompts', 'photorealism', '3d-renders', 'cyberpunk', 'anime', 'architecture', 'fantasy', 'cinematic', 'vector'])) {
+                $imageCats[] = $cat;
+            } else {
+                $textCats[] = $cat;
+            }
+        }
+
+        Response::view('directory/prompt_categories', [
+            'title' => 'Prompt Blueprint Categories & System Architecture Hub | TechScout',
+            'imageCategories' => $imageCats,
+            'textCategories' => $textCats,
+            'adDirectUrl' => $adDirectUrl
+        ]);
+    }
+
+    // AI Tools Categories Hub
+    public function toolCategories(Request $request): void {
+        $categories = Database::query("
+            SELECT c.*, 
+                   pcat.name as parent_name,
+                   COALESCE(SUM(CASE WHEN cnt.content_type = 'ai_tool' THEN 1 ELSE 0 END), 0) as tool_count,
+                   COALESCE(SUM(cnt.view_count), 0) as total_views
+            FROM categories c
+            LEFT JOIN categories pcat ON c.parent_id = pcat.id
+            LEFT JOIN contents cnt ON c.id = cnt.category_id AND cnt.status = 'published'
+            WHERE c.applicable_to IN ('ai_tool', 'all')
+            GROUP BY c.id
+            ORDER BY tool_count DESC, c.sort_order ASC
+        ");
+
+        Response::view('directory/tool_categories', [
+            'title' => 'AI Tools Categories & Software Directory | TechScout',
+            'categories' => $categories
+        ]);
+    }
+
+    // Custom GPTs Categories Hub
+    public function gptCategories(Request $request): void {
+        $categories = Database::query("
+            SELECT c.*, 
+                   pcat.name as parent_name,
+                   COALESCE(SUM(CASE WHEN cnt.content_type = 'gpt_listing' THEN 1 ELSE 0 END), 0) as gpt_count,
+                   COALESCE(SUM(cnt.view_count), 0) as total_views
+            FROM categories c
+            LEFT JOIN categories pcat ON c.parent_id = pcat.id
+            LEFT JOIN contents cnt ON c.id = cnt.category_id AND cnt.status = 'published'
+            WHERE c.applicable_to IN ('gpt_listing', 'all')
+            GROUP BY c.id
+            ORDER BY gpt_count DESC, c.sort_order ASC
+        ");
+
+        Response::view('directory/gpt_categories', [
+            'title' => 'Custom GPTs Categories & Autonomous Agent Personas | TechScout',
+            'categories' => $categories
+        ]);
+    }
+
     // Custom GPTs Hub
     public function gpts(Request $request, array $params = []): void {
         $category = $params['slug'] ?? $request->query('category');

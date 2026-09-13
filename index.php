@@ -179,10 +179,13 @@ $router->get('/topics', [TopicController::class, 'index']);
 $router->get('/categories', [TopicController::class, 'index']);
 $router->get('/topic/{slug}', [TopicController::class, 'show']);
 
+$router->get('/tools/categories', [DirectoryController::class, 'toolCategories']);
 $router->get('/tools', [DirectoryController::class, 'tools']);
 $router->get('/tools/category/{slug}', [DirectoryController::class, 'tools']);
 $router->get('/tools/{slug}', [DirectoryController::class, 'toolSingle']);
 
+$router->get('/prompts/images/categories', [DirectoryController::class, 'imagePromptCategories']);
+$router->get('/prompts/categories', [DirectoryController::class, 'promptCategories']);
 $router->get('/prompts', [DirectoryController::class, 'prompts']);
 $router->get('/prompts/images', [DirectoryController::class, 'imagePrompts']);
 $router->get('/prompts/images/{category}', [DirectoryController::class, 'imagePrompts']);
@@ -190,6 +193,7 @@ $router->get('/prompts/image-prompts', [DirectoryController::class, 'imagePrompt
 $router->get('/prompts/category/{slug}', [DirectoryController::class, 'prompts']);
 $router->get('/prompts/{slug}', [DirectoryController::class, 'promptSingle']);
 
+$router->get('/gpts/categories', [DirectoryController::class, 'gptCategories']);
 $router->get('/gpts', [DirectoryController::class, 'gpts']);
 $router->get('/gpts/category/{slug}', [DirectoryController::class, 'gpts']);
 $router->get('/gpts/{slug}', [DirectoryController::class, 'gptSingle']);
