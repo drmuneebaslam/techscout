@@ -481,10 +481,18 @@ class AdminController {
         
         $categories = Database::query("SELECT * FROM categories ORDER BY name ASC");
 
+        $kpiStats = [
+            'total' => count($prompts),
+            'text_count' => count(array_filter($prompts, fn($p) => ($p['prompt_type'] ?? 'text') === 'text')),
+            'image_count' => count(array_filter($prompts, fn($p) => ($p['prompt_type'] ?? '') === 'image')),
+            'total_copies' => array_sum(array_column($prompts, 'copy_count'))
+        ];
+
         Response::view('admin/crud/prompts', [
-            'title' => 'Prompt Blueprints (Full CRUD) | Admin Hub',
+            'title' => 'Prompt Blueprints (Enterprise CRUD) | Admin Hub',
             'prompts' => $prompts,
-            'categories' => $categories
+            'categories' => $categories,
+            'kpiStats' => $kpiStats
         ]);
     }
 
@@ -493,6 +501,7 @@ class AdminController {
         $title = trim((string)$request->post('title', ''));
         $categoryId = (int)$request->post('category_id');
         $summary = trim((string)$request->post('summary', ''));
+        $bodyHtml = trim((string)$request->post('body_html', ''));
         $template = trim((string)$request->post('prompt_template', ''));
         $variablesJson = trim((string)$request->post('template_variables', '[]'));
         $targetModelsJson = trim((string)$request->post('target_models', '["ChatGPT", "Claude"]'));
@@ -501,6 +510,28 @@ class AdminController {
         if (!in_array($promptType, ['text', 'image'], true)) {
             $promptType = 'text';
         }
+
+        $customBadge = trim((string)$request->post('custom_badge', ''));
+        $isFeatured = $request->post('is_featured') ? 1 : 0;
+        $isTrending = $request->post('is_trending') ? 1 : 0;
+        $qualityScore = (float)$request->post('quality_score', 95.0);
+        $status = (string)$request->post('status', 'published');
+        if (!in_array($status, ['published', 'draft', 'in_review'], true)) {
+            $status = 'published';
+        }
+
+        // Hyperparameters & Metadata JSON stored in internal_notes
+        $meta = [
+            'temperature' => (float)$request->post('param_temperature', 0.7),
+            'top_p' => (float)$request->post('param_top_p', 0.95),
+            'max_tokens' => (int)$request->post('param_max_tokens', 4096),
+            'negative_prompt' => trim((string)$request->post('param_negative_prompt', '')),
+            'aspect_ratio' => (string)$request->post('param_aspect_ratio', '16:9'),
+            'rating' => (float)$request->post('param_rating', 4.9),
+            'difficulty' => (string)$request->post('param_difficulty', 'Intermediate'),
+            'author_handle' => (string)$request->post('param_author_handle', '@techscout')
+        ];
+        $internalNotes = json_encode($meta, JSON_UNESCAPED_SLASHES);
 
         $authorId = (int)(Auth::user()['author_id'] ?? 1);
         $slug = Sanitizer::slug($title);
@@ -533,18 +564,18 @@ class AdminController {
         }
 
         if ($id) {
-            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, featured_image_url = ?, status = 'published', updated_at = NOW() WHERE id = ?", [
-                $title, $slug, $categoryId, $summary, $imageUrl, $id
+            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, body_html = ?, featured_image_url = ?, custom_badge = ?, is_featured = ?, is_trending = ?, quality_score = ?, status = ?, internal_notes = ?, updated_at = NOW() WHERE id = ?", [
+                $title, $slug, $categoryId, $summary, $bodyHtml, $imageUrl, $customBadge, $isFeatured, $isTrending, $qualityScore, $status, $internalNotes, $id
             ]);
             Database::execute("UPDATE prompts SET prompt_type = ?, prompt_template = ?, template_variables = ?, target_models = ?, sample_output = ? WHERE content_id = ?", [
                 $promptType, $template, $variablesJson, $targetModelsJson, $sampleOutput, $id
             ]);
             AuditLog::log('admin.prompt_update', 'prompt', (int)$id, ['title' => $title, 'prompt_type' => $promptType]);
-            Session::flash('success', "Prompt '{$title}' updated successfully.");
+            Session::flash('success', "Prompt blueprint '{$title}' updated successfully.");
         } else {
             $uuid = bin2hex(random_bytes(16));
-            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, featured_image_url, status, quality_score, published_at) VALUES (?, 'prompt', ?, ?, ?, ?, ?, ?, 'published', 95.0, NOW())", [
-                $uuid, $authorId, $categoryId, $title, $slug, $summary, $imageUrl
+            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, body_html, featured_image_url, custom_badge, is_featured, is_trending, quality_score, status, internal_notes, published_at) VALUES (?, 'prompt', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", [
+                $uuid, $authorId, $categoryId, $title, $slug, $summary, $bodyHtml, $imageUrl, $customBadge, $isFeatured, $isTrending, $qualityScore, $status, $internalNotes
             ]);
             $newId = (int)Database::lastInsertId();
             Database::execute("INSERT INTO prompts (content_id, prompt_type, prompt_template, template_variables, target_models, sample_output) VALUES (?, ?, ?, ?, ?, ?)", [
@@ -571,7 +602,7 @@ class AdminController {
     // 5. CUSTOM GPTS & AI AGENTS CRUD
     // ------------------------------------------------------------------------
     public function gpts(Request $request): void {
-        $gpts = Database::query("SELECT c.*, gpt.openai_url, gpt.model_base, gpt.creator_handle, cat.name as category_name 
+        $gpts = Database::query("SELECT c.*, gpt.openai_url, gpt.model_base, gpt.prompt_starters, gpt.creator_handle, gpt.use_case, cat.name as category_name 
                                 FROM contents c 
                                 JOIN gpt_listings gpt ON c.id = gpt.content_id 
                                 LEFT JOIN categories cat ON c.category_id = cat.id 
@@ -579,10 +610,18 @@ class AdminController {
 
         $categories = Database::query("SELECT * FROM categories ORDER BY name ASC");
 
+        $kpiStats = [
+            'total' => count($gpts),
+            'verified_count' => count(array_filter($gpts, fn($g) => !empty($g['custom_badge']) || str_contains(strtolower($g['custom_badge'] ?? ''), 'verified'))),
+            'actions_count' => count(array_filter($gpts, fn($g) => str_contains($g['internal_notes'] ?? '', 'actions'))),
+            'total_launches' => array_sum(array_column($gpts, 'view_count'))
+        ];
+
         Response::view('admin/crud/gpts', [
-            'title' => 'Custom GPTs & Agents (Full CRUD) | Admin Hub',
+            'title' => 'Custom GPTs & Autonomous Agents (Enterprise CRUD) | Admin Hub',
             'gpts' => $gpts,
-            'categories' => $categories
+            'categories' => $categories,
+            'kpiStats' => $kpiStats
         ]);
     }
 
@@ -591,34 +630,95 @@ class AdminController {
         $title = mb_substr(trim((string)$request->post('title', '')), 0, 100);
         $categoryId = (int)$request->post('category_id');
         $summary = mb_substr(trim((string)$request->post('summary', '')), 0, 300);
+        $bodyHtml = trim((string)$request->post('body_html', ''));
         $openaiUrl = trim((string)$request->post('openai_url', ''));
         $modelBase = (string)$request->post('model_base', 'GPT-4o');
         $creatorHandle = (string)$request->post('creator_handle', '@techscout');
+        $useCase = trim((string)$request->post('use_case', ''));
+
+        // Parse prompt starters
+        $startersRaw = $request->post('prompt_starters');
+        $startersList = [];
+        if (is_array($startersRaw)) {
+            $startersList = array_values(array_filter(array_map('trim', $startersRaw)));
+        } elseif (!empty($startersRaw)) {
+            $decoded = json_decode((string)$startersRaw, true);
+            if (is_array($decoded)) {
+                $startersList = $decoded;
+            } else {
+                $startersList = array_values(array_filter(explode("\n", (string)$startersRaw)));
+            }
+        }
+        $startersJson = json_encode($startersList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        $customBadge = trim((string)$request->post('custom_badge', ''));
+        $isFeatured = $request->post('is_featured') ? 1 : 0;
+        $isTrending = $request->post('is_trending') ? 1 : 0;
+        $qualityScore = (float)$request->post('quality_score', 95.0);
+        $status = (string)$request->post('status', 'published');
+        if (!in_array($status, ['published', 'draft', 'in_review'], true)) {
+            $status = 'published';
+        }
+
+        // Capabilities & Tool Metadata stored in internal_notes JSON
+        $capabilities = $request->post('capabilities');
+        if (!is_array($capabilities)) $capabilities = ['web_browsing', 'code_interpreter'];
+
+        $meta = [
+            'capabilities' => array_values($capabilities),
+            'actions_count' => (int)$request->post('actions_count', 0),
+            'actions_list' => trim((string)$request->post('actions_list', '')),
+            'access_level' => (string)$request->post('access_level', 'free'),
+            'rating' => (float)$request->post('rating', 4.8),
+            'creator_website' => trim((string)$request->post('creator_website', '')),
+            'target_audience' => trim((string)$request->post('target_audience', ''))
+        ];
+        $internalNotes = json_encode($meta, JSON_UNESCAPED_SLASHES);
+
         $authorId = (int)(Auth::user()['author_id'] ?? 1);
         $slug = Sanitizer::slug($title);
 
-        $imageUrl = image_url(trim((string)$request->post('featured_image_url', '')));
+        $imageUrl = null;
+        if ($id) {
+            $existing = Database::fetch("SELECT featured_image_url FROM contents WHERE id = ?", [$id]);
+            $imageUrl = $existing['featured_image_url'] ?? null;
+        }
+
+        // Handle avatar upload
+        if (!empty($_FILES['image_file']['tmp_name']) && is_uploaded_file($_FILES['image_file']['tmp_name'])) {
+            $uploadDir = dirname(__DIR__, 2) . '/storage/uploads/gpts';
+            if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+            $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'gif'])) {
+                $filename = 'gpt_avatar_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                if (move_uploaded_file($_FILES['image_file']['tmp_name'], $uploadDir . '/' . $filename)) {
+                    $imageUrl = '/storage/uploads/gpts/' . $filename;
+                }
+            }
+        } elseif (!empty($request->post('featured_image_url'))) {
+            $imageUrl = image_url(trim((string)$request->post('featured_image_url')));
+        }
 
         if ($id) {
-            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, featured_image_url = ?, status = 'published', updated_at = NOW() WHERE id = ?", [
-                $title, $slug, $categoryId, $summary, $imageUrl, $id
+            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, body_html = ?, featured_image_url = ?, custom_badge = ?, is_featured = ?, is_trending = ?, quality_score = ?, status = ?, internal_notes = ?, updated_at = NOW() WHERE id = ?", [
+                $title, $slug, $categoryId, $summary, $bodyHtml, $imageUrl, $customBadge, $isFeatured, $isTrending, $qualityScore, $status, $internalNotes, $id
             ]);
-            Database::execute("UPDATE gpt_listings SET openai_url = ?, model_base = ?, creator_handle = ? WHERE content_id = ?", [
-                $openaiUrl, $modelBase, $creatorHandle, $id
+            Database::execute("UPDATE gpt_listings SET openai_url = ?, model_base = ?, prompt_starters = ?, creator_handle = ?, use_case = ? WHERE content_id = ?", [
+                $openaiUrl, $modelBase, $startersJson, $creatorHandle, $useCase, $id
             ]);
             AuditLog::log('admin.gpt_update', 'gpt', (int)$id, ['title' => $title]);
-            Session::flash('success', "GPT '{$title}' updated successfully.");
+            Session::flash('success', "GPT Agent '{$title}' updated successfully.");
         } else {
             $uuid = bin2hex(random_bytes(16));
-            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, featured_image_url, status, quality_score, published_at) VALUES (?, 'gpt_listing', ?, ?, ?, ?, ?, ?, 'published', 95.0, NOW())", [
-                $uuid, $authorId, $categoryId, $title, $slug, $summary, $imageUrl
+            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, body_html, featured_image_url, custom_badge, is_featured, is_trending, quality_score, status, internal_notes, published_at) VALUES (?, 'gpt_listing', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", [
+                $uuid, $authorId, $categoryId, $title, $slug, $summary, $bodyHtml, $imageUrl, $customBadge, $isFeatured, $isTrending, $qualityScore, $status, $internalNotes
             ]);
             $newId = (int)Database::lastInsertId();
-            Database::execute("INSERT INTO gpt_listings (content_id, openai_url, model_base, creator_handle) VALUES (?, ?, ?, ?)", [
-                $newId, $openaiUrl, $modelBase, $creatorHandle
+            Database::execute("INSERT INTO gpt_listings (content_id, openai_url, model_base, prompt_starters, creator_handle, use_case) VALUES (?, ?, ?, ?, ?, ?)", [
+                $newId, $openaiUrl, $modelBase, $startersJson, $creatorHandle, $useCase
             ]);
             AuditLog::log('admin.gpt_create', 'gpt', $newId, ['title' => $title]);
-            Session::flash('success', "Custom GPT published to directory.");
+            Session::flash('success', "Custom GPT Agent published to directory.");
         }
         $targetGptId = $id ? (int)$id : $newId;
         \App\Core\TagHelper::syncTags($targetGptId, $request->post('tags', ''));

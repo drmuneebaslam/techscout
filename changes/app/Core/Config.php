@@ -33,18 +33,6 @@ class Config {
         }
 
         $base = rtrim(self::get('app_url', 'https://funwithcoding.free.nf'), '/');
-        
-        $parsed = parse_url($base);
-        $basePath = trim($parsed['path'] ?? '', '/');
-        if ($basePath !== '') {
-            $prefix = '/' . $basePath;
-            if (str_starts_with($path, $prefix . '/')) {
-                $path = substr($path, strlen($prefix));
-            } elseif ($path === $prefix) {
-                $path = '';
-            }
-        }
-
         $cleanPath = ltrim($path, '/');
         return $cleanPath ? "{$base}/{$cleanPath}" : $base . '/';
     }
