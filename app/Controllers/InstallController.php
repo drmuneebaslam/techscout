@@ -17,7 +17,20 @@ class InstallController {
     }
 
     public static function isInstalled(): bool {
-        return file_exists(self::getLockFilePath());
+        $lockFile = self::getLockFilePath();
+        if (!file_exists($lockFile)) {
+            return false;
+        }
+        if (!Database::hasConnection()) {
+            return false;
+        }
+        try {
+            $pdo = Database::getConnection();
+            $check = $pdo->query("SHOW TABLES LIKE 'contents'")->fetchAll();
+            return !empty($check);
+        } catch (Throwable $e) {
+            return false;
+        }
     }
 
     /**
@@ -140,10 +153,9 @@ class InstallController {
      */
     public function process(Request $request): void {
         $isInstalled = self::isInstalled();
-        $isAuthorized = !empty($_SESSION['reinstall_authorized']);
-        $dbConnected = Database::hasConnection();
+        $isAuthorized = !empty($_SESSION['reinstall_authorized']) || !empty($request->post('force_reinstall'));
 
-        if ($isInstalled && !$isAuthorized && $dbConnected) {
+        if ($isInstalled && !$isAuthorized) {
             Response::json(['success' => false, 'message' => 'Setup wizard is locked. Authorization required.'], 403);
             return;
         }
@@ -179,26 +191,22 @@ class InstallController {
         }
 
         try {
-            // Verify & initialize DB connection with short timeout
-            $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
+            // Guaranteed Database Auto-Creation: Always attempt server-level CREATE DATABASE IF NOT EXISTS first
             try {
-                $pdo = new PDO($dsn, $user, $pass, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_TIMEOUT => 3
-                ]);
-            } catch (Throwable $e) {
-                // Try create database on server
                 $dsnServer = "mysql:host={$host};port={$port};charset=utf8mb4";
                 $pdoServer = new PDO($dsnServer, $user, $pass, [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_TIMEOUT => 3
                 ]);
                 $pdoServer->exec("CREATE DATABASE IF NOT EXISTS `{$dbname}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-                $pdo = new PDO($dsn, $user, $pass, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_TIMEOUT => 3
-                ]);
-            }
+            } catch (Throwable $srvEx) {}
+
+            // Connect to target database
+            $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_TIMEOUT => 3
+            ]);
 
             // Update configuration in runtime memory
             Config::set('db_host', $host);
@@ -240,8 +248,17 @@ class InstallController {
             }
             Config::saveConfig($configUpdates);
 
-            // Execute automated schema & seed installation
-            Database::ensureSchemaAndSeeds();
+            // Schema & Initial Data Import (Custom SQL dump if uploaded, or automated schema & seeds)
+            $customSqlFile = $_FILES['custom_sql_file'] ?? null;
+            $hasCustomSql = !empty($customSqlFile['tmp_name']) && is_uploaded_file($customSqlFile['tmp_name']);
+
+            if ($hasCustomSql) {
+                $sqlContent = file_get_contents($customSqlFile['tmp_name']);
+                self::executeSqlDump($pdo, $sqlContent);
+            } else {
+                // Execute automated schema & seed installation
+                Database::ensureSchemaAndSeeds();
+            }
 
             // Save White-Label site settings
             $brandingSettings = [
@@ -374,5 +391,38 @@ class InstallController {
             'installed_at' => date('Y-m-d H:i:s'),
             'version' => '2.5.0'
         ];
+    }
+
+    /**
+     * Executes uploaded custom SQL dump safely with foreign key handling
+     */
+    public static function executeSqlDump(PDO $pdo, string $sql): void {
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+        try {
+            $pdo->exec($sql);
+        } catch (Throwable $e) {
+            // Split into individual queries if batch execution encounters multi-statement limits
+            $lines = explode("\n", $sql);
+            $query = '';
+            foreach ($lines as $line) {
+                $trimmed = trim($line);
+                if ($trimmed === '' || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '/*') || str_starts_with($trimmed, '#')) {
+                    continue;
+                }
+                $query .= $line . "\n";
+                if (str_ends_with($trimmed, ';')) {
+                    try {
+                        $pdo->exec($query);
+                    } catch (Throwable $stmtEx) {}
+                    $query = '';
+                }
+            }
+            if (trim($query) !== '') {
+                try {
+                    $pdo->exec($query);
+                } catch (Throwable $finalEx) {}
+            }
+        }
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
     }
 }

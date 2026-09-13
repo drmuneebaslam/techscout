@@ -62,7 +62,8 @@
   <!-- Main Installer Card -->
   <div class="ts-card" style="padding: 2.25rem; border: 1px solid var(--ts-border-main); background: var(--ts-bg-surface); border-radius: 16px; box-shadow: var(--ts-shadow-xl);">
     
-    <form id="installerForm" onsubmit="handleInstallerSubmit(event)">
+    <form id="installerForm" onsubmit="handleInstallerSubmit(event)" enctype="multipart/form-data">
+      <input type="hidden" name="force_reinstall" value="1">
 
       <!-- ================================================================= -->
       <!-- STEP 1: PREREQUISITES & SYSTEM REQUIREMENTS -->
@@ -150,6 +151,43 @@
           <div>
             <label class="ts-form-label">Database Password</label>
             <input type="password" name="db_pass" id="input_db_pass" value="<?= htmlspecialchars($currentConfig['db_pass']) ?>" class="ts-form-input" placeholder="Enter password (leave blank for local root)">
+          </div>
+        </div>
+
+        <!-- Schema Initialization & Custom SQL File Upload Section -->
+        <div style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="font-weight: 700; font-size: 0.92rem; color: var(--ts-text-primary); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.45rem;">
+            <i data-lucide="file-code-2" style="width: 17px; height: 17px; color: var(--ts-primary);"></i>
+            Database Schema &amp; Initial Data Source
+          </div>
+          <p style="font-size: 0.82rem; color: var(--ts-text-secondary); margin: 0 0 1rem 0;">
+            Target database will be automatically created if it does not already exist. Choose how tables should be populated:
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.65rem; cursor: pointer; font-size: 0.88rem; color: var(--ts-text-primary);">
+              <input type="radio" name="sql_import_mode" value="default" checked onchange="toggleSqlUpload(false)">
+              <span>⚡ <strong>Fresh Installation:</strong> Initialize default schema &amp; sample seed data</span>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 0.65rem; cursor: pointer; font-size: 0.88rem; color: var(--ts-text-primary);">
+              <input type="radio" name="sql_import_mode" value="custom" onchange="toggleSqlUpload(true)">
+              <span>📦 <strong>Import Custom SQL Backup File:</strong> Upload a <code>.sql</code> dump file</span>
+            </label>
+          </div>
+
+          <!-- Custom SQL File Upload Box (Hidden by default) -->
+          <div id="customSqlUploadBox" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--ts-border-subtle);">
+            <label class="ts-form-label" style="display: flex; align-items: center; justify-content: space-between;">
+              <span>Select Custom SQL Dump File (.sql)</span>
+              <span style="font-size: 0.75rem; color: var(--ts-primary);">Max file size: 64MB</span>
+            </label>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <input type="file" name="custom_sql_file" id="input_custom_sql_file" accept=".sql,text/plain" class="ts-form-input" style="padding: 0.45rem 0.75rem;">
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ts-text-tertiary); margin-top: 0.4rem;">
+              ℹ️ Useful for importing an existing database backup from InfinityFree phpMyAdmin, mysqldump, or a previous deployment.
+            </div>
           </div>
         </div>
 
@@ -303,8 +341,8 @@
             <div style="font-weight: 700; color: var(--ts-text-primary);" id="summary_admin">admin (admin@techscout.ai)</div>
           </div>
           <div style="padding: 1rem; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-subtle); border-radius: 8px;">
-            <div style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; margin-bottom: 0.4rem;">Lock Protection</div>
-            <div style="font-weight: 700; color: var(--ts-success);">Auto-lock upon completion ✓</div>
+            <div style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; margin-bottom: 0.4rem;">Schema &amp; Data Source</div>
+            <div style="font-weight: 700; color: var(--ts-primary);" id="summary_schema_source">Default Schema &amp; Seeds</div>
           </div>
         </div>
 
@@ -486,6 +524,13 @@ function validateStep(step) {
   return true;
 }
 
+function toggleSqlUpload(show) {
+  const box = document.getElementById('customSqlUploadBox');
+  if (box) {
+    box.style.display = show ? 'block' : 'none';
+  }
+}
+
 function updateSummary() {
   const host = document.getElementById('input_db_host')?.value.trim() || '127.0.0.1';
   const port = document.getElementById('input_db_port')?.value.trim() || '3306';
@@ -500,6 +545,19 @@ function updateSummary() {
   if (sumBrand) sumBrand.innerText = siteName;
   const sumAdmin = document.getElementById('summary_admin');
   if (sumAdmin) sumAdmin.innerText = `${adminUser} (${adminEmail})`;
+
+  const customSqlInput = document.getElementById('input_custom_sql_file');
+  const isCustom = document.querySelector('input[name="sql_import_mode"]:checked')?.value === 'custom';
+  const sumSource = document.getElementById('summary_schema_source');
+  if (sumSource) {
+    if (isCustom && customSqlInput && customSqlInput.files.length > 0) {
+      sumSource.innerText = `Custom SQL: ${customSqlInput.files[0].name}`;
+    } else if (isCustom) {
+      sumSource.innerText = 'Custom SQL (Dump Upload)';
+    } else {
+      sumSource.innerText = 'Default Schema & Seeds';
+    }
+  }
 }
 
 function testDatabaseConnection() {

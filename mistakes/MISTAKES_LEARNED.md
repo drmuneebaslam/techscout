@@ -385,8 +385,20 @@ This document serves as the permanent registry of architectural and implementati
 * **Mandatory Rule**:
   - Always enforce `PDO::ATTR_TIMEOUT => 2` or `3` across all PDO connections to prevent script hanging.
   - In `Config.php`, intelligently detect local development environments and bridge remote InfinityFree credentials to local MySQL fallback (`127.0.0.1`).
-  - In `index.php` and `InstallController.php`, if `!Database::hasConnection()`, bypass the installation lock and route immediately to the Database Recovery & Setup Wizard so developers can update credentials with 1 click.
-  - In admin listings, always project specific table columns, omitting `body_html` and heavy columns from list queries, and aggregate platform stats into a single consolidated query with in-memory caching.
+### 🔴 MISTAKE-33: False Installation Lockout on First-Run FTP Restorations & Missing Custom SQL Uploader
+* **Root Cause**:
+  1. When downloading a full repository backup from an existing production server, `storage/installed.lock` is included in the archive.
+  2. In the setup wizard, `InstallController::isInstalled()` checked solely for the presence of `storage/installed.lock`. When the user configured a new local database, `Database::hasConnection()` was established, but the wizard was locked because `isInstalled()` returned `true` without checking whether database tables actually existed.
+  3. Attempting to submit the wizard in Step 5 threw `403 Forbidden: Setup wizard is locked. Authorization required.`, preventing setup completion.
+  4. The installer only supported executing a hardcoded `database/schema.sql` and `seeds.sql`, lacking support for importing custom `.sql` database dumps exported from phpMyAdmin or prior backups.
+* **Consequences**:
+  - Developers restoring FTP archives could not complete the setup wizard on fresh environments without manually deleting `storage/installed.lock`.
+  - Database could not be populated with custom user backups through the UI installer.
+* **Mandatory Rule**:
+  - `InstallController::isInstalled()` must verify not just `storage/installed.lock`, but whether the database is actually populated (e.g., table `contents` exists). If tables do not exist, the platform must be considered uninstalled.
+  - `InstallController::process()` must allow installation when `!$isInstalled` OR `!empty($request->post('force_reinstall'))` from the installer form.
+  - Automatically create target databases using server-level connection (`CREATE DATABASE IF NOT EXISTS \`{$dbname}\``) so setup never fails due to missing databases on fresh setups.
+  - Provide an option in the setup wizard to upload a custom `.sql` dump file with foreign key checks temporarily disabled (`SET FOREIGN_KEY_CHECKS = 0`) to allow seamless restoration of custom databases.
 
 ---
 
@@ -424,6 +436,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 30. [ ] **Unlimited Recursive Taxonomy Nesting & Anti-Cycle Guards (MISTAKE-30)**: Does category CRUD support arbitrary hierarchical depth with cycle prevention and parent pre-selection?
 31. [ ] **Atomic Tip Verification & Schema Synchronization (MISTAKE-31)**: Are tip statuses synced with schema constraints (`'completed'`, `'refunded'`) and balanced atomically with ledger and notification updates?
 32. [ ] **Zero-Crash Remote DB Lockout & Admin Query Optimization (MISTAKE-32)**: Are timeouts enforced, remote credentials bridged locally, setup wizard unlocked when disconnected, and listing queries stripped of `body_html`?
+33. [ ] **Auto-DB Creation, Unlocked First-Run FTP Restores & Custom SQL Support (MISTAKE-33)**: Does the installer verify actual table population instead of blindly relying on `installed.lock`, auto-create the database, allow custom `.sql` dump uploads, and bypass false locks on first-time setup?
+
 
 
 

@@ -130,15 +130,22 @@ if ($dbHasConnection) {
 }
 Config::set('app_url', $baseUrl);
 
-// First-Run Web Installer & Database Recovery Auto-Detector
-$lockPath = __DIR__ . '/storage/installed.lock';
-$reqUri = $_SERVER['REQUEST_URI'] ?? '/';
-$isStaticAsset = str_starts_with($reqUri, '/assets/') 
-    || str_contains($reqUri, 'favicon.ico')
-    || str_contains($reqUri, 'robots.txt');
-$isInstallRoute = str_contains($reqUri, '/install');
+// Check if core database tables actually exist
+$isDbPopulated = false;
+if ($dbHasConnection) {
+    try {
+        $pdo = \App\Core\Database::getConnection();
+        $check = $pdo->query("SHOW TABLES LIKE 'contents'")->fetchAll();
+        $isDbPopulated = !empty($check);
+    } catch (\Throwable $e) {
+        $isDbPopulated = false;
+    }
+}
 
-if ((!file_exists($lockPath) || !$dbHasConnection) && !$isStaticAsset && !$isInstallRoute) {
+// Platform is only truly installed if lock exists, database is connected, AND core tables exist
+$isFullyInstalled = file_exists($lockPath) && $dbHasConnection && $isDbPopulated;
+
+if (!$isFullyInstalled && !$isStaticAsset && !$isInstallRoute) {
     $redirectUrl = $baseUrl . '/install' . (!$dbHasConnection ? '?recovery=1' : '');
     header('Location: ' . $redirectUrl);
     exit;

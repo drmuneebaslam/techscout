@@ -165,12 +165,38 @@
 
   <div class="container">
 
-    <!-- Request #5 (Current Active) -->
+    <!-- Request #6 (Current Active) -->
+    <div class="req-card" id="req-6">
+      <div class="req-meta">
+        <div class="req-id">
+          <span>⚡ Prompt #6: Fix Setup Wizard Lockout on Process Step, Auto DB Creation &amp; Custom SQL File Upload</span>
+          <span class="req-badge">ACTIVE EXECUTION</span>
+        </div>
+        <div>
+          <button class="copy-btn" onclick="copyPromptText('req-text-6', this)">📋 Copy Full Prompt</button>
+        </div>
+      </div>
+      <div class="req-content" id="req-text-6">Installation Error: Setup wizard is locked. Authorization required.
+
+at lastt step but it is 1st time run and no db is there will be auto created 
+and a custom sql file can be uploaded
+please</div>
+
+      <div class="breakdown-title">📌 Architectural Action Plan &amp; Breakdown:</div>
+      <ul class="breakdown-list">
+        <li><strong>Unlock Setup Wizard Execution:</strong> Fix <code>InstallController::process()</code> so that when the database is not initialized (no <code>contents</code> table), or when running from a downloaded FTP backup with a stale <code>installed.lock</code>, it never halts with <em>"Setup wizard is locked. Authorization required."</em></li>
+        <li><strong>Guaranteed Database Auto-Creation:</strong> Ensure MySQL connection logic connects to the MySQL server directly and executes <code>CREATE DATABASE IF NOT EXISTS `dbname`</code> whenever the database does not exist.</li>
+        <li><strong>Custom SQL File Upload &amp; Importer:</strong> Add an interactive custom <code>.sql</code> file uploader in the Setup Wizard. If an SQL dump (e.g. from phpMyAdmin or InfinityFree backup) is uploaded, execute it directly into the database; otherwise, fall back to default schema and seeds.</li>
+        <li><strong>Fresh Lock Generation &amp; Auto-Login:</strong> Update <code>installed.lock</code> with current installation metadata and write configuration to <code>Config.php</code>.</li>
+      </ul>
+    </div>
+
+    <!-- Request #5 -->
     <div class="req-card" id="req-5">
       <div class="req-meta">
         <div class="req-id">
-          <span>⚡ Prompt #5: Admin Panel Speed Optimisation, Zero-Crash Installer & Whitelabelling Config Engine</span>
-          <span class="req-badge">ACTIVE EXECUTION</span>
+          <span>⚡ Prompt #5: Admin Panel Speed Optimisation, Zero-Crash Installer &amp; Whitelabelling Config Engine</span>
+          <span class="req-badge" style="background: rgba(16,185,129,0.15); color: #34d399; border-color: rgba(16,185,129,0.3);">COMPLETED</span>
         </div>
         <div>
           <button class="copy-btn" onclick="copyPromptText('req-text-5', this)">📋 Copy Full Prompt</button>
