@@ -26,12 +26,15 @@ class InstallController {
     public function index(Request $request): void {
         $isInstalled = self::isInstalled();
         $isAuthorized = !empty($_SESSION['reinstall_authorized']);
+        $dbConnected = Database::hasConnection();
+        $isRecovery = !$dbConnected || !empty($_GET['recovery']);
 
-        // If platform is already installed and not authorized by an authenticated SuperAdmin
-        if ($isInstalled && !$isAuthorized) {
+        // If platform is already installed, database is reachable, and re-install is not authorized
+        if ($isInstalled && !$isAuthorized && $dbConnected && !$isRecovery) {
             Response::view('install/locked', [
                 'title' => 'Platform Already Installed & Protected | TechScout',
-                'lockData' => self::getLockData()
+                'lockData' => self::getLockData(),
+                'dbConnected' => true
             ]);
             return;
         }
@@ -40,34 +43,42 @@ class InstallController {
         $requirements = self::checkRequirements();
         $allPassed = !in_array(false, array_column($requirements, 'passed'), true);
 
-        // Current Config defaults
+        // Current Config defaults (Smart Local Detection for downloaded backups)
+        $isLocal = Config::isLocalEnvironment();
+        $rawDbHost = Config::$settings['db_host'] ?? '127.0.0.1';
+        $isRemoteHost = str_contains($rawDbHost, 'infinityfree.com') 
+            || str_contains($rawDbHost, 'epizy.com') 
+            || str_contains($rawDbHost, 'byethost');
+
         $currentConfig = [
-            'db_host' => Config::get('db_host', '127.0.0.1'),
+            'db_host' => ($isLocal && $isRemoteHost) ? '127.0.0.1' : Config::get('db_host', '127.0.0.1'),
             'db_port' => Config::get('db_port', '3306'),
-            'db_name' => Config::get('db_name', 'techscout_db'),
-            'db_user' => Config::get('db_user', 'root'),
-            'db_pass' => Config::get('db_pass', ''),
-            'app_url' => Config::get('app_url', 'http://localhost/techscout.n'),
+            'db_name' => ($isLocal && $isRemoteHost) ? 'techscout_db' : Config::get('db_name', 'techscout_db'),
+            'db_user' => ($isLocal && $isRemoteHost) ? 'root' : Config::get('db_user', 'root'),
+            'db_pass' => ($isLocal && $isRemoteHost) ? '' : Config::get('db_pass', ''),
+            'app_url' => Config::get('app_url', Config::detectBaseUrl()),
         ];
 
         // Fetch existing white-label branding if available in site_settings
         $existingBranding = [
-            'site_name' => 'TechScout',
-            'site_tagline' => 'Enterprise AI Directory & Engineering Ecosystem',
-            'primary_color' => '#38bdf8',
-            'support_email' => 'support@techscout.ai',
-            'site_copyright' => '© ' . date('Y') . ' TechScout Inc. All rights reserved.',
-            'default_theme' => 'dark'
+            'site_name' => Config::get('app_name', 'TechScout'),
+            'site_tagline' => Config::get('app_tagline', 'Enterprise AI Directory & Engineering Ecosystem'),
+            'primary_color' => Config::get('primary_color', '#38bdf8'),
+            'support_email' => Config::get('support_email', 'support@techscout.ai'),
+            'site_copyright' => Config::get('site_copyright', '© ' . date('Y') . ' TechScout Inc. All rights reserved.'),
+            'default_theme' => Config::get('default_theme', 'dark')
         ];
 
-        try {
-            $settingsRows = Database::query("SELECT key_name, key_value FROM site_settings WHERE key_name IN ('site_name', 'site_tagline', 'primary_color', 'support_email', 'site_copyright', 'default_theme')");
-            foreach ($settingsRows as $sr) {
-                if (!empty($sr['key_value'])) {
-                    $existingBranding[$sr['key_name']] = $sr['key_value'];
+        if ($dbConnected) {
+            try {
+                $settingsRows = Database::query("SELECT key_name, key_value FROM site_settings WHERE key_name IN ('site_name', 'site_tagline', 'primary_color', 'support_email', 'site_copyright', 'default_theme')");
+                foreach ($settingsRows as $sr) {
+                    if (!empty($sr['key_value'])) {
+                        $existingBranding[$sr['key_name']] = $sr['key_value'];
+                    }
                 }
-            }
-        } catch (Throwable $e) {}
+            } catch (Throwable $e) {}
+        }
 
         Response::view('install/index', [
             'title' => 'Comprehensive Web Setup Wizard & White-Label Installer',
@@ -75,7 +86,9 @@ class InstallController {
             'allPassed' => $allPassed,
             'currentConfig' => $currentConfig,
             'branding' => $existingBranding,
-            'isReinstall' => $isInstalled && $isAuthorized
+            'isReinstall' => $isInstalled && $isAuthorized,
+            'isRecovery' => $isRecovery,
+            'dbConnected' => $dbConnected
         ]);
     }
 
@@ -128,8 +141,9 @@ class InstallController {
     public function process(Request $request): void {
         $isInstalled = self::isInstalled();
         $isAuthorized = !empty($_SESSION['reinstall_authorized']);
+        $dbConnected = Database::hasConnection();
 
-        if ($isInstalled && !$isAuthorized) {
+        if ($isInstalled && !$isAuthorized && $dbConnected) {
             Response::json(['success' => false, 'message' => 'Setup wizard is locked. Authorization required.'], 403);
             return;
         }
@@ -165,18 +179,25 @@ class InstallController {
         }
 
         try {
-            // Verify & initialize DB connection
+            // Verify & initialize DB connection with short timeout
             $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
             try {
                 $pdo = new PDO($dsn, $user, $pass, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 3
                 ]);
             } catch (Throwable $e) {
-                // Try create database
+                // Try create database on server
                 $dsnServer = "mysql:host={$host};port={$port};charset=utf8mb4";
-                $pdoServer = new PDO($dsnServer, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                $pdoServer = new PDO($dsnServer, $user, $pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 3
+                ]);
                 $pdoServer->exec("CREATE DATABASE IF NOT EXISTS `{$dbname}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-                $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                $pdo = new PDO($dsn, $user, $pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 3
+                ]);
             }
 
             // Update configuration in runtime memory
@@ -185,6 +206,39 @@ class InstallController {
             Config::set('db_name', $dbname);
             Config::set('db_user', $user);
             Config::set('db_pass', $pass);
+            Config::set('app_name', $siteName);
+            Config::set('app_tagline', $siteTagline);
+            Config::set('primary_color', $primaryColor);
+            Config::set('support_email', $supportEmail);
+            Config::set('site_copyright', $siteCopyright);
+            Config::set('default_theme', $defaultTheme);
+
+            // Persist updated credentials into Config.php file
+            $isLocal = Config::isLocalEnvironment();
+            $configUpdates = [
+                'app_name' => $siteName,
+                'app_tagline' => $siteTagline,
+                'primary_color' => $primaryColor,
+                'support_email' => $supportEmail,
+                'site_copyright' => $siteCopyright,
+                'default_theme' => in_array($defaultTheme, ['dark', 'light'], true) ? $defaultTheme : 'dark',
+            ];
+            if ($isLocal) {
+                $configUpdates['local_db_host'] = $host;
+                $configUpdates['local_db_port'] = $port;
+                $configUpdates['local_db_name'] = $dbname;
+                $configUpdates['local_db_user'] = $user;
+                $configUpdates['local_db_pass'] = $pass;
+                $configUpdates['local_app_url'] = Config::detectBaseUrl();
+            } else {
+                $configUpdates['db_host'] = $host;
+                $configUpdates['db_port'] = $port;
+                $configUpdates['db_name'] = $dbname;
+                $configUpdates['db_user'] = $user;
+                $configUpdates['db_pass'] = $pass;
+                $configUpdates['app_url'] = Config::detectBaseUrl();
+            }
+            Config::saveConfig($configUpdates);
 
             // Execute automated schema & seed installation
             Database::ensureSchemaAndSeeds();

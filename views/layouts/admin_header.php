@@ -5,12 +5,18 @@ use App\Core\Database;
 $currentUser = Auth::user();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 $adminSiteSettings = [];
-try {
-    $rows = Database::query("SELECT key_name, key_value FROM site_settings WHERE key_name = 'enable_bg_grid_lines'");
-    foreach ($rows as $r) {
-        $adminSiteSettings[$r['key_name']] = $r['key_value'];
+if (!isset($GLOBALS['__admin_site_settings_cache'])) {
+    try {
+        $rows = Database::query("SELECT key_name, key_value FROM site_settings WHERE key_name = 'enable_bg_grid_lines'");
+        $GLOBALS['__admin_site_settings_cache'] = [];
+        foreach ($rows as $r) {
+            $GLOBALS['__admin_site_settings_cache'][$r['key_name']] = $r['key_value'];
+        }
+    } catch (\Throwable $e) {
+        $GLOBALS['__admin_site_settings_cache'] = [];
     }
-} catch (\Throwable $e) {}
+}
+$adminSiteSettings = $GLOBALS['__admin_site_settings_cache'];
 
 // Determine Active Admin Theme: URL param (?theme=) > Cookie (ts_theme) > Default dark
 $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light') 
@@ -156,8 +162,8 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- CSS Framework & Cyber-HUD Admin Style -->
-  <link rel="stylesheet" href="<?= url('assets/css/style.css?v=' . time()) ?>">
-  <link rel="stylesheet" href="<?= url('assets/css/admin.css?v=' . time()) ?>">
+  <link rel="stylesheet" href="<?= url('assets/css/style.css?v=2.5.0') ?>">
+  <link rel="stylesheet" href="<?= url('assets/css/admin.css?v=2.5.0') ?>">
 
   <!-- PJAX SPA Navigation Styles -->
   <style>

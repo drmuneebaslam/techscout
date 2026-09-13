@@ -46,6 +46,13 @@
         <i data-lucide="log-in"></i> Administrator Login
       </a>
     </div>
+
+    <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--ts-border-subtle); font-size: 0.82rem; color: var(--ts-text-tertiary);">
+      Running from an FTP download or migrated to a new local server?
+      <a href="<?= url('/install?recovery=1') ?>" style="color: var(--ts-primary); font-weight: 600; text-decoration: underline; margin-left: 0.35rem;">
+        Reconfigure Database Connection / Recovery Wizard &rarr;
+      </a>
+    </div>
   </div>
 </div>
 

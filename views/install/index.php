@@ -18,6 +18,23 @@
     </p>
   </div>
 
+  <!-- Recovery Mode Banner -->
+  <?php if (!empty($isRecovery) || empty($dbConnected)): ?>
+    <div style="background: rgba(245,158,11,0.09); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 1rem;">
+      <div style="background: rgba(245,158,11,0.2); color: #f59e0b; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="database" style="width: 20px; height: 20px;"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-weight: 700; color: #f59e0b; font-size: 1rem; margin-bottom: 0.25rem;">
+          Database Connection Recovery Mode
+        </div>
+        <p style="color: var(--ts-text-secondary); font-size: 0.88rem; margin: 0; line-height: 1.5;">
+          The configured database server could not be reached (common when downloaded from FTP backups because remote MySQL connections are prohibited by hosting firewalls). Local MySQL parameters have been populated below. You can test and save them directly.
+        </p>
+      </div>
+    </div>
+  <?php endif; ?>
+
   <!-- Multi-Step Progress Tracker -->
   <div class="installer-step-tracker" style="display: flex; justify-content: space-between; position: relative; margin-bottom: 2.5rem;">
     <div class="step-indicator active" id="step_indicator_1" onclick="goToStep(1)">
@@ -99,6 +116,16 @@
           <p style="color: var(--ts-text-secondary); font-size: 0.85rem; margin: 0;">Specify MySQL / MariaDB connection parameters and verify connectivity in real-time.</p>
         </div>
 
+        <!-- Quick DB Presets -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <button type="button" onclick="setDbPreset('local')" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.78rem;">
+            💻 Localhost MySQL Defaults (127.0.0.1 / root)
+          </button>
+          <button type="button" onclick="setDbPreset('infinityfree')" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.78rem;">
+            ☁️ InfinityFree Production Hosted Credentials
+          </button>
+        </div>
+
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
           <div>
             <label class="ts-form-label">Database Host / Server IP</label>
@@ -149,6 +176,19 @@
         <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--ts-border-subtle); padding-bottom: 1rem;">
           <h2 style="font-size: 1.35rem; color: var(--ts-text-primary); margin: 0 0 0.35rem 0;">3. White-Label Branding &amp; Platform Identity</h2>
           <p style="color: var(--ts-text-secondary); font-size: 0.85rem; margin: 0;">Customize platform brand name, tagline, corporate color scheme, and support contact.</p>
+        </div>
+
+        <!-- Branding Presets -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <button type="button" onclick="setBrandingPreset('techscout')" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.78rem;">
+            🚀 TechScout Default (#38bdf8)
+          </button>
+          <button type="button" onclick="setBrandingPreset('cyberscout')" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.78rem;">
+            ⚡ CyberScout Pro (#10b981)
+          </button>
+          <button type="button" onclick="setBrandingPreset('aipulse')" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.78rem;">
+            💜 AI Pulse Studio (#8b5cf6)
+          </button>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
@@ -560,6 +600,44 @@ function handleInstallerSubmit(e) {
       errBox.innerText = 'Network failure during installation. Please check server logs.';
     }
   });
+}
+
+function setDbPreset(type) {
+  if (type === 'local') {
+    document.getElementById('input_db_host').value = '127.0.0.1';
+    document.getElementById('input_db_port').value = '3306';
+    document.getElementById('input_db_name').value = 'techscout_db';
+    document.getElementById('input_db_user').value = 'root';
+    document.getElementById('input_db_pass').value = '';
+  } else if (type === 'infinityfree') {
+    document.getElementById('input_db_host').value = 'sql306.infinityfree.com';
+    document.getElementById('input_db_port').value = '3306';
+    document.getElementById('input_db_name').value = 'if0_40102772_techscoutmainafterallchanges';
+    document.getElementById('input_db_user').value = 'if0_40102772';
+    document.getElementById('input_db_pass').value = 'Fp9QFWfj5fm';
+  }
+}
+
+function setBrandingPreset(type) {
+  if (type === 'techscout') {
+    document.getElementById('input_site_name').value = 'TechScout';
+    document.getElementById('input_site_tagline').value = 'Enterprise AI Directory & Engineering Ecosystem';
+    document.getElementById('input_primary_color').value = '#38bdf8';
+    document.getElementById('input_color_picker').value = '#38bdf8';
+    document.getElementById('input_support_email').value = 'support@techscout.ai';
+  } else if (type === 'cyberscout') {
+    document.getElementById('input_site_name').value = 'CyberScout Pro';
+    document.getElementById('input_site_tagline').value = 'Next-Gen Cybersecurity & AI Developer Hub';
+    document.getElementById('input_primary_color').value = '#10b981';
+    document.getElementById('input_color_picker').value = '#10b981';
+    document.getElementById('input_support_email').value = 'contact@cyberscout.pro';
+  } else if (type === 'aipulse') {
+    document.getElementById('input_site_name').value = 'AI Pulse Studio';
+    document.getElementById('input_site_tagline').value = 'Curated Intelligence & Autonomous AI Workflows';
+    document.getElementById('input_primary_color').value = '#8b5cf6';
+    document.getElementById('input_color_picker').value = '#8b5cf6';
+    document.getElementById('input_support_email').value = 'hello@aipulse.studio';
+  }
 }
 </script>
 

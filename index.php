@@ -90,41 +90,47 @@ $scriptDir = trim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''))
 $detectedBaseUrl = $protocol . '://' . $host . ($scriptDir ? '/' . $scriptDir : '');
 
 $baseUrl = $detectedBaseUrl;
-try {
-    $cmsDomain = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'domain_app_url' LIMIT 1");
-    $cmsUrl = !empty($cmsDomain['key_value']) ? rtrim(trim((string)$cmsDomain['key_value']), '/') : '';
-    $cmsHost = $cmsUrl ? parse_url($cmsUrl, PHP_URL_HOST) : '';
-    $cmsPath = $cmsUrl ? trim(parse_url($cmsUrl, PHP_URL_PATH) ?? '', '/') : '';
-    $detectedPath = trim($scriptDir, '/');
 
-    // Only trust the database setting if host matches AND path matches current deployment.
-    // If site was moved from a subfolder (e.g. /tech) to root, auto-heal database setting to root.
-    if ($cmsUrl && $cmsHost && (
-        strcasecmp($cmsHost, $host) === 0 ||
-        (in_array($host, ['localhost', '127.0.0.1', '::1'], true) && in_array($cmsHost, ['localhost', '127.0.0.1', '::1'], true))
-    ) && ($cmsPath === $detectedPath || empty($detectedPath))) {
-        // If detectedPath is empty (site is at root) and cmsPath has /tech, heal to detectedBaseUrl
-        if (empty($detectedPath) && !empty($cmsPath) && ($cmsPath === 'tech' || str_ends_with($cmsUrl, '/tech'))) {
+// Safe Database Connectivity Verification
+$dbHasConnection = \App\Core\Database::hasConnection();
+
+if ($dbHasConnection) {
+    try {
+        $cmsDomain = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'domain_app_url' LIMIT 1");
+        $cmsUrl = !empty($cmsDomain['key_value']) ? rtrim(trim((string)$cmsDomain['key_value']), '/') : '';
+        $cmsHost = $cmsUrl ? parse_url($cmsUrl, PHP_URL_HOST) : '';
+        $cmsPath = $cmsUrl ? trim(parse_url($cmsUrl, PHP_URL_PATH) ?? '', '/') : '';
+        $detectedPath = trim($scriptDir, '/');
+
+        // Only trust the database setting if host matches AND path matches current deployment.
+        // If site was moved from a subfolder (e.g. /tech) to root, auto-heal database setting to root.
+        if ($cmsUrl && $cmsHost && (
+            strcasecmp($cmsHost, $host) === 0 ||
+            (in_array($host, ['localhost', '127.0.0.1', '::1'], true) && in_array($cmsHost, ['localhost', '127.0.0.1', '::1'], true))
+        ) && ($cmsPath === $detectedPath || empty($detectedPath))) {
+            // If detectedPath is empty (site is at root) and cmsPath has /tech, heal to detectedBaseUrl
+            if (empty($detectedPath) && !empty($cmsPath) && ($cmsPath === 'tech' || str_ends_with($cmsUrl, '/tech'))) {
+                $baseUrl = $detectedBaseUrl;
+                \App\Core\Database::execute("UPDATE site_settings SET key_value = ? WHERE key_name = 'domain_app_url'", [$detectedBaseUrl]);
+                try {
+                    \App\Core\Database::execute("UPDATE notifications SET action_url = REPLACE(action_url, '/tech/', '/') WHERE action_url LIKE '%/tech/%'");
+                    \App\Core\Database::execute("UPDATE notifications SET action_url = REPLACE(action_url, 'funwithcoding.free.nf/tech', 'funwithcoding.free.nf') WHERE action_url LIKE '%funwithcoding.free.nf/tech%'");
+                } catch (\Throwable $ne) {}
+            } else {
+                $baseUrl = $cmsUrl;
+            }
+        } else {
+            // Auto-heal setting in database to match current environment seamlessly
             $baseUrl = $detectedBaseUrl;
             \App\Core\Database::execute("UPDATE site_settings SET key_value = ? WHERE key_name = 'domain_app_url'", [$detectedBaseUrl]);
-            try {
-                \App\Core\Database::execute("UPDATE notifications SET action_url = REPLACE(action_url, '/tech/', '/') WHERE action_url LIKE '%/tech/%'");
-                \App\Core\Database::execute("UPDATE notifications SET action_url = REPLACE(action_url, 'funwithcoding.free.nf/tech', 'funwithcoding.free.nf') WHERE action_url LIKE '%funwithcoding.free.nf/tech%'");
-            } catch (\Throwable $ne) {}
-        } else {
-            $baseUrl = $cmsUrl;
         }
-    } else {
-        // Auto-heal setting in database to match current environment seamlessly
+    } catch (\Throwable $e) {
         $baseUrl = $detectedBaseUrl;
-        \App\Core\Database::execute("UPDATE site_settings SET key_value = ? WHERE key_name = 'domain_app_url'", [$detectedBaseUrl]);
     }
-} catch (\Throwable $e) {
-    $baseUrl = $detectedBaseUrl;
 }
 Config::set('app_url', $baseUrl);
 
-// First-Run Web Installer Auto-Detector & Router
+// First-Run Web Installer & Database Recovery Auto-Detector
 $lockPath = __DIR__ . '/storage/installed.lock';
 $reqUri = $_SERVER['REQUEST_URI'] ?? '/';
 $isStaticAsset = str_starts_with($reqUri, '/assets/') 
@@ -132,8 +138,9 @@ $isStaticAsset = str_starts_with($reqUri, '/assets/')
     || str_contains($reqUri, 'robots.txt');
 $isInstallRoute = str_contains($reqUri, '/install');
 
-if (!file_exists($lockPath) && !$isStaticAsset && !$isInstallRoute) {
-    header('Location: ' . $baseUrl . '/install');
+if ((!file_exists($lockPath) || !$dbHasConnection) && !$isStaticAsset && !$isInstallRoute) {
+    $redirectUrl = $baseUrl . '/install' . (!$dbHasConnection ? '?recovery=1' : '');
+    header('Location: ' . $redirectUrl);
     exit;
 }
 

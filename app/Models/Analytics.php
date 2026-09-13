@@ -43,24 +43,47 @@ class Analytics {
         );
     }
 
-    public static function getPlatformStats(): array {
-        $totalUsers = Database::fetch("SELECT COUNT(*) as count FROM users")['count'] ?? 0;
-        $totalArticles = Database::fetch("SELECT COUNT(*) as count FROM contents WHERE content_type = 'article' AND status = 'published'")['count'] ?? 0;
-        $totalTools = Database::fetch("SELECT COUNT(*) as count FROM contents WHERE content_type = 'ai_tool' AND status = 'published'")['count'] ?? 0;
-        $totalPrompts = Database::fetch("SELECT COUNT(*) as count FROM contents WHERE content_type = 'prompt' AND status = 'published'")['count'] ?? 0;
-        $totalViews = Database::fetch("SELECT SUM(view_count) as total FROM contents")['total'] ?? 0;
-        $pendingReviews = Database::fetch("SELECT COUNT(*) as count FROM contents WHERE status = 'in_review'")['count'] ?? 0;
-        $flaggedReports = Database::fetch("SELECT COUNT(*) as count FROM reports WHERE status = 'pending'")['count'] ?? 0;
+    private static ?array $cachedPlatformStats = null;
+    private static int $platformStatsCachedAt = 0;
 
-        return [
-            'total_users' => (int)$totalUsers,
-            'total_articles' => (int)$totalArticles,
-            'total_tools' => (int)$totalTools,
-            'total_prompts' => (int)$totalPrompts,
-            'total_views' => (int)$totalViews,
-            'pending_reviews' => (int)$pendingReviews,
-            'flagged_reports' => (int)$flaggedReports
+    public static function getPlatformStats(bool $forceRefresh = false): array {
+        $now = time();
+        if (!$forceRefresh && self::$cachedPlatformStats !== null && ($now - self::$platformStatsCachedAt < 60)) {
+            return self::$cachedPlatformStats;
+        }
+
+        // Consolidated query: computes counts for articles, tools, prompts, gpts, pending reviews and total views in ONE pass
+        $contentAgg = Database::fetch("
+            SELECT 
+                SUM(CASE WHEN content_type = 'article' AND status = 'published' THEN 1 ELSE 0 END) as total_articles,
+                SUM(CASE WHEN content_type = 'ai_tool' AND status = 'published' THEN 1 ELSE 0 END) as total_tools,
+                SUM(CASE WHEN content_type = 'prompt' AND status = 'published' THEN 1 ELSE 0 END) as total_prompts,
+                SUM(CASE WHEN content_type = 'gpt_listing' AND status = 'published' THEN 1 ELSE 0 END) as total_gpts,
+                SUM(CASE WHEN status = 'in_review' THEN 1 ELSE 0 END) as pending_reviews,
+                COALESCE(SUM(view_count), 0) as total_views
+            FROM contents
+        ") ?: [];
+
+        $totalUsers = (int)(Database::fetch("SELECT COUNT(*) as count FROM users")['count'] ?? 0);
+
+        $flaggedReports = 0;
+        try {
+            $flaggedReports = (int)(Database::fetch("SELECT COUNT(*) as count FROM entity_reports WHERE status = 'pending'")['count'] ?? 0);
+        } catch (\Throwable $e) {}
+
+        self::$cachedPlatformStats = [
+            'total_users' => $totalUsers,
+            'total_articles' => (int)($contentAgg['total_articles'] ?? 0),
+            'total_tools' => (int)($contentAgg['total_tools'] ?? 0),
+            'total_prompts' => (int)($contentAgg['total_prompts'] ?? 0),
+            'total_gpts' => (int)($contentAgg['total_gpts'] ?? 0),
+            'total_views' => (int)($contentAgg['total_views'] ?? 0),
+            'pending_reviews' => (int)($contentAgg['pending_reviews'] ?? 0),
+            'flagged_reports' => $flaggedReports
         ];
+        self::$platformStatsCachedAt = $now;
+
+        return self::$cachedPlatformStats;
     }
 
     /**

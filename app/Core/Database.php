@@ -8,6 +8,59 @@ use Throwable;
 class Database {
     private static ?PDO $instance = null;
     private static bool $initialized = false;
+    public static bool $connectionFailed = false;
+    public static ?string $connectionError = null;
+
+    /**
+     * Non-blocking check to verify if database is currently connectable.
+     */
+    public static function hasConnection(): bool {
+        if (self::$instance !== null) {
+            return true;
+        }
+        if (self::$connectionFailed) {
+            return false;
+        }
+
+        $host = Config::get('db_host', '127.0.0.1');
+        $port = Config::get('db_port', '3306');
+        $dbname = Config::get('db_name', 'techscout_db');
+        $user = Config::get('db_user', 'root');
+        $pass = Config::get('db_pass', '');
+
+        try {
+            $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_TIMEOUT => 2
+            ]);
+            self::$instance = $pdo;
+            self::$connectionFailed = false;
+            self::$connectionError = null;
+            return true;
+        } catch (Throwable $e) {
+            // Attempt server-level connect if DB needs creation
+            try {
+                $dsnServer = "mysql:host={$host};port={$port};charset=utf8mb4";
+                $pdoServer = new PDO($dsnServer, $user, $pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 2
+                ]);
+                $pdoServer->exec("CREATE DATABASE IF NOT EXISTS `{$dbname}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                self::$instance = new PDO($dsn, $user, $pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_TIMEOUT => 2
+                ]);
+                self::$connectionFailed = false;
+                self::$connectionError = null;
+                return true;
+            } catch (Throwable $srvEx) {
+                self::$connectionFailed = true;
+                self::$connectionError = $e->getMessage();
+                return false;
+            }
+        }
+    }
 
     public static function getConnection(): PDO {
         if (self::$instance === null) {
@@ -23,27 +76,30 @@ class Database {
             }
 
             try {
-                // First connect to target DB directly
+                // First connect to target DB directly with short 2s timeout
                 $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
                 try {
                     self::$instance = new PDO($dsn, $user, $pass, [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                        PDO::ATTR_EMULATE_PREPARES => false
+                        PDO::ATTR_EMULATE_PREPARES => false,
+                        PDO::ATTR_TIMEOUT => 2
                     ]);
                 } catch (Throwable $dbEx) {
                     // If target DB doesn't exist and on localhost/server with root privileges, attempt CREATE DATABASE
                     $dsnServer = "mysql:host={$host};port={$port};charset=utf8mb4";
                     $pdoServer = new PDO($dsnServer, $user, $pass, [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        PDO::ATTR_TIMEOUT => 2
                     ]);
                     $pdoServer->exec("CREATE DATABASE IF NOT EXISTS `{$dbname}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
                     self::$instance = new PDO($dsn, $user, $pass, [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                        PDO::ATTR_EMULATE_PREPARES => false
+                        PDO::ATTR_EMULATE_PREPARES => false,
+                        PDO::ATTR_TIMEOUT => 2
                     ]);
                 }
 
@@ -58,6 +114,13 @@ class Database {
                     self::$initialized = true;
                 }
             } catch (Throwable $e) {
+                self::$connectionFailed = true;
+                self::$connectionError = $e->getMessage();
+
+                $uri = $_SERVER['REQUEST_URI'] ?? '';
+                if (str_contains($uri, '/install')) {
+                    throw $e;
+                }
                 self::renderDetailedError($e, $host, $port, $dbname, $user);
             }
         }
@@ -93,7 +156,7 @@ class Database {
         }
     }
 
-    private static function ensureSchemaAndSeeds(): void {
+    public static function ensureSchemaAndSeeds(): void {
         $pdo = self::$instance;
         $check = $pdo->query("SHOW TABLES LIKE 'contents'")->fetchAll();
         if (empty($check)) {
@@ -1855,9 +1918,14 @@ class Database {
             <div class="code-block" style="max-height: 220px; font-size: 0.75rem; color: #94a3b8;"><?= htmlspecialchars($trace) ?></div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid rgba(148,163,184,0.12); flex-wrap: wrap; gap: 1rem;">
-              <a href="?db_action=repair" class="btn btn-primary">
-                ⚡ Auto-Repair & Reinitialize Schema (Fixes Foreign Keys)
-              </a>
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <a href="<?= Config::url('/install?recovery=1') ?>" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1); box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);">
+                  🛠️ Configure Database / Run Setup Wizard
+                </a>
+                <a href="?db_action=repair" class="btn btn-primary">
+                  ⚡ Auto-Repair & Reinitialize Schema
+                </a>
+              </div>
               <button onclick="location.reload()" class="btn btn-outline">
                 🔄 Retry Query
               </button>

@@ -22,15 +22,17 @@ class AdminController {
     // ------------------------------------------------------------------------
     public function dashboard(Request $request): void {
         $stats = Analytics::getPlatformStats();
+        $totalGpts = $stats['total_gpts'] ?? 0;
 
-        // Additional counts
-        $totalGpts = (int)(Database::fetch("SELECT COUNT(*) as c FROM contents WHERE content_type = 'gpt_listing' AND status = 'published'")['c'] ?? 0);
+        // Combine author payout aggregate into single query
+        $payoutAgg = Database::fetch("SELECT COUNT(*) as c, COALESCE(SUM(amount_usd), 0.0) as s FROM author_payouts WHERE status = 'pending'") ?: [];
+        $pendingPayoutsCount = (int)($payoutAgg['c'] ?? 0);
+        $pendingPayoutsSum = (float)($payoutAgg['s'] ?? 0.0);
+
         $pendingAppsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM author_applications WHERE status = 'pending'")['c'] ?? 0);
-        $pendingPayoutsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM author_payouts WHERE status = 'pending'")['c'] ?? 0);
-        $pendingPayoutsSum = (float)(Database::fetch("SELECT SUM(amount_usd) as s FROM author_payouts WHERE status = 'pending'")['s'] ?? 0.0);
         $unresolvedErrorsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM system_error_logs WHERE resolved = 0")['c'] ?? 0);
         $activeSubscribersCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM newsletter_subscriptions WHERE status = 'active'")['c'] ?? 0);
-        $flaggedReportsCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM entity_reports WHERE status = 'pending'")['c'] ?? 0);
+        $flaggedReportsCount = $stats['flagged_reports'] ?? 0;
 
         $stats['total_gpts'] = $totalGpts;
         $stats['pending_applications'] = $pendingAppsCount;
@@ -133,7 +135,7 @@ class AdminController {
     // 2. ARTICLES CRUD
     // ------------------------------------------------------------------------
     public function articles(Request $request): void {
-        $articles = Database::query("SELECT c.*, art.reading_time_mins, art.difficulty_level, cat.name as category_name, a.display_name as author_name 
+        $articles = Database::query("SELECT c.id, c.uuid, c.category_id, c.author_id, c.title, c.slug, c.summary, c.featured_image_url, c.status, c.is_featured, c.is_trending, c.is_pinned, c.custom_badge, c.badge_bg, c.badge_color, c.internal_notes, c.editorial_notes, c.quality_score, c.view_count, c.reaction_count, c.comment_count, c.created_at, art.reading_time_mins, art.difficulty_level, cat.name as category_name, a.display_name as author_name 
                                     FROM contents c 
                                     LEFT JOIN articles art ON c.id = art.content_id 
                                     LEFT JOIN categories cat ON c.category_id = cat.id 
@@ -303,7 +305,7 @@ class AdminController {
     // 3. AI TOOLS & SOFTWARE CRUD (11 Enterprise Field Modules)
     // ------------------------------------------------------------------------
     public function tools(Request $request): void {
-        $tools = Database::query("SELECT c.*, tool.*, cat.name as category_name 
+        $tools = Database::query("SELECT c.id, c.uuid, c.category_id, c.author_id, c.title, c.slug, c.summary, c.featured_image_url, c.internal_notes, c.status, c.is_featured, c.is_trending, c.quality_score, c.view_count, c.created_at, tool.*, cat.name as category_name 
                                  FROM contents c 
                                  JOIN ai_tools tool ON c.id = tool.content_id 
                                  LEFT JOIN categories cat ON c.category_id = cat.id 
@@ -479,10 +481,7 @@ class AdminController {
     // 4. PROMPT BLUEPRINTS CRUD
     // ------------------------------------------------------------------------
     public function prompts(Request $request): void {
-        // Ensure prompt_type column exists safely without throwing if already present
-        Database::executeSilent("ALTER TABLE `prompts` ADD COLUMN `prompt_type` ENUM('text', 'image') NOT NULL DEFAULT 'text'");
-
-        $prompts = Database::querySilent("SELECT c.*, p.prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
+        $prompts = Database::querySilent("SELECT c.id, c.uuid, c.category_id, c.author_id, c.title, c.slug, c.summary, c.featured_image_url, c.internal_notes, c.status, c.is_featured, c.is_trending, c.custom_badge, c.badge_bg, c.badge_color, c.quality_score, c.view_count, c.created_at, p.prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
                                    FROM contents c 
                                    JOIN prompts p ON c.id = p.content_id 
                                    LEFT JOIN categories cat ON c.category_id = cat.id 
@@ -490,7 +489,7 @@ class AdminController {
         
         if (empty($prompts)) {
             // Graceful fallback query if column creation was delayed
-            $prompts = Database::query("SELECT c.*, 'text' as prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
+            $prompts = Database::query("SELECT c.id, c.uuid, c.category_id, c.author_id, c.title, c.slug, c.summary, c.featured_image_url, c.internal_notes, c.status, c.is_featured, c.is_trending, c.custom_badge, c.badge_bg, c.badge_color, c.quality_score, c.view_count, c.created_at, 'text' as prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
                                        FROM contents c 
                                        JOIN prompts p ON c.id = p.content_id 
                                        LEFT JOIN categories cat ON c.category_id = cat.id 
@@ -638,7 +637,7 @@ class AdminController {
     // 5. CUSTOM GPTS & AI AGENTS CRUD
     // ------------------------------------------------------------------------
     public function gpts(Request $request): void {
-        $gpts = Database::query("SELECT c.*, gpt.openai_url, gpt.model_base, gpt.prompt_starters, gpt.creator_handle, gpt.use_case, cat.name as category_name 
+        $gpts = Database::query("SELECT c.id, c.uuid, c.category_id, c.author_id, c.title, c.slug, c.summary, c.featured_image_url, c.internal_notes, c.status, c.is_featured, c.is_trending, c.custom_badge, c.badge_bg, c.badge_color, c.quality_score, c.view_count, c.created_at, gpt.openai_url, gpt.model_base, gpt.prompt_starters, gpt.creator_handle, gpt.use_case, cat.name as category_name 
                                 FROM contents c 
                                 JOIN gpt_listings gpt ON c.id = gpt.content_id 
                                 LEFT JOIN categories cat ON c.category_id = cat.id 

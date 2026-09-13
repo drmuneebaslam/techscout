@@ -373,6 +373,21 @@ This document serves as the permanent registry of architectural and implementati
   - Always synchronize tip status values strictly with the database schema (`'completed'` for verified/paid, `'refunded'` for rejected).
   - Tipping approvals must run with dual-schema compatibility (`amount_usd` vs `gross_amount`, `net_amount_usd` vs `net_author_amount`), atomically crediting `author_tip_balances`, recording a credit entry in `financial_ledger`, generating an in-app notification, and logging to `audit_logs`.
 
+### 🔴 MISTAKE-32: Unreachable Remote DB Host Lockout & Admin Listing Query Bloat
+* **Root Cause**: 
+  1. When backups are downloaded from hosted production (e.g. InfinityFree) and launched locally, remote database hosts (`sql306.infinityfree.com`) block incoming connections via hosting firewalls. Without connection timeouts (`PDO::ATTR_TIMEOUT`), PDO hangs for 30–60 seconds, triggering PHP execution timeouts and emitting a blank screen before routing.
+  2. The presence of `storage/installed.lock` in downloaded FTP backups previously locked the setup wizard, preventing developers from configuring local credentials.
+  3. Admin panel listing queries used `SELECT c.*`, pulling megabytes of `body_html` into memory for table views that only display title, status, and metadata, while multiple independent `SELECT COUNT(*)` queries caused excessive database round-trips.
+* **Consequences**:
+  - Downloaded backups crashed on first local launch with a fatal blank screen.
+  - Setup wizard was inaccessible due to stale `installed.lock` files from production.
+  - Admin panel navigation was sluggish due to redundant queries and massive payload sizes.
+* **Mandatory Rule**:
+  - Always enforce `PDO::ATTR_TIMEOUT => 2` or `3` across all PDO connections to prevent script hanging.
+  - In `Config.php`, intelligently detect local development environments and bridge remote InfinityFree credentials to local MySQL fallback (`127.0.0.1`).
+  - In `index.php` and `InstallController.php`, if `!Database::hasConnection()`, bypass the installation lock and route immediately to the Database Recovery & Setup Wizard so developers can update credentials with 1 click.
+  - In admin listings, always project specific table columns, omitting `body_html` and heavy columns from list queries, and aggregate platform stats into a single consolidated query with in-memory caching.
+
 ---
 
 ## 2. Response Audit Protocol
@@ -408,6 +423,7 @@ At the conclusion of any code generation, the agent must cross-check every modif
 29. [ ] **Universal Media Showcase on Single Detail Pages (MISTAKE-29)**: Are all associated media items rendered whenever available, rather than being gated by entity subtype?
 30. [ ] **Unlimited Recursive Taxonomy Nesting & Anti-Cycle Guards (MISTAKE-30)**: Does category CRUD support arbitrary hierarchical depth with cycle prevention and parent pre-selection?
 31. [ ] **Atomic Tip Verification & Schema Synchronization (MISTAKE-31)**: Are tip statuses synced with schema constraints (`'completed'`, `'refunded'`) and balanced atomically with ledger and notification updates?
+32. [ ] **Zero-Crash Remote DB Lockout & Admin Query Optimization (MISTAKE-32)**: Are timeouts enforced, remote credentials bridged locally, setup wizard unlocked when disconnected, and listing queries stripped of `body_html`?
 
 
 

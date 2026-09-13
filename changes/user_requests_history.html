@@ -165,7 +165,32 @@
 
   <div class="container">
 
-    <!-- Request #4 (Current) -->
+    <!-- Request #5 (Current Active) -->
+    <div class="req-card" id="req-5">
+      <div class="req-meta">
+        <div class="req-id">
+          <span>⚡ Prompt #5: Admin Panel Speed Optimisation, Zero-Crash Installer & Whitelabelling Config Engine</span>
+          <span class="req-badge">ACTIVE EXECUTION</span>
+        </div>
+        <div>
+          <button class="copy-btn" onclick="copyPromptText('req-text-5', this)">📋 Copy Full Prompt</button>
+        </div>
+      </div>
+      <div class="req-content" id="req-text-5">1st of all admin panel speed optimisation 
+secondly when i download a backup from ftp and then try to run it for first time no installer opens just a blank screen with the following error
+and also config should be so for whitelabelling and installation working
+it is just because of the db creds of infinityfree as it not allows remote connection</div>
+
+      <div class="breakdown-title">🎯 Key Architectural Deliverables & Scope</div>
+      <ul class="breakdown-list">
+        <li><strong>Admin Panel Speed Optimization:</strong> Streamline slow database queries, implement lightweight caching / aggregation for dashboard telemetry, eliminate redundant synchronous external network lookups, and index key analytical foreign keys.</li>
+        <li><strong>Zero-Crash Auto-Installer & DB Fallback:</strong> When downloading a backup from InfinityFree FTP with remote credentials (`sql306.infinityfree.com`) that block external/local connections, catch connection timeouts/failures gracefully instead of showing a blank screen/500 error; auto-detect unreachability and instantly launch the web installer/setup wizard (`/install`) with a helpful pre-flight diagnostic screen.</li>
+        <li><strong>Dynamic Whitelabelling Config Engine:</strong> Enable comprehensive platform branding, app name, taglines, logo, footer text, contact email, and environment switching between localhost vs hosted production via `Config.php` and dynamic site settings.</li>
+        <li><strong>Mistakes Learning & Rules Verification:</strong> Document newly learned root causes (`MISTAKE-32`) and cross-verify all modifications.</li>
+      </ul>
+    </div>
+
+    <!-- Request #4 -->
     <div class="req-card" id="req-4">
       <div class="req-meta">
         <div class="req-id">
