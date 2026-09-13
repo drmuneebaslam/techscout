@@ -279,6 +279,7 @@ $router->get('/author/analytics', [AuthorStudioController::class, 'analytics'], 
 $router->get('/author/analytics/content/{id}', [AuthorStudioController::class, 'contentAnalytics'], ['author']);
 $router->get('/author/rewards', [AuthorStudioController::class, 'rewards'], ['author']);
 $router->post('/author/profile/update', [AuthorStudioController::class, 'updateProfile'], ['author']);
+$router->post('/author/tip-wallets/save', [AuthorStudioController::class, 'saveTipWallets'], ['author']);
 $router->post('/author/payouts/request', [AuthorStudioController::class, 'requestPayout'], ['author']);
 $router->post('/author/payout-methods/save', [AuthorStudioController::class, 'savePayoutMethod'], ['author']);
 $router->post('/author/payout-methods/delete/{id}', [AuthorStudioController::class, 'deletePayoutMethod'], ['author']);

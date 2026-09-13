@@ -419,6 +419,24 @@
           </div>
         </div>
 
+        <!-- Additional Custom Named Links Repeater -->
+        <div style="background: var(--admin-card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div>
+              <strong style="color: var(--admin-text-primary, #f8fafc); font-size: 0.92rem; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="link-2" style="width: 16px; height: 16px; color: #38bdf8;"></i> Additional Custom Named Links
+              </strong>
+              <span style="font-size: 0.75rem; color: var(--admin-text-secondary, #94a3b8);">External links such as GitHub Repo, Hugging Face Model, Civitai, Author Portfolio, etc.</span>
+            </div>
+            <button type="button" onclick="addPromptCustomLinkRow()" class="ts-btn ts-btn-sm ts-btn-outline" style="border-color: rgba(56,189,248,0.4); color: #38bdf8; font-size: 0.78rem;">
+              + Add Custom Link
+            </button>
+          </div>
+          <div id="promptCustomLinksContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
         <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
           <button type="button" onclick="switchPromptTab('prompt-tab-architecture')" class="ts-btn ts-btn-outline">
             ← Back: Variables
@@ -1043,6 +1061,7 @@ function openNewPromptModal() {
   document.getElementById('prompt_max_tokens').value = '4096';
   document.getElementById('prompt_quality_score').value = '96.5';
   document.getElementById('prompt_status').value = 'published';
+  renderPromptCustomLinks([]);
 
   switchPromptTab('prompt-tab-identity');
   document.getElementById('promptFormModal').style.display = 'flex';
@@ -1099,10 +1118,35 @@ function editPrompt(p) {
     if (notes.author_handle !== undefined) document.getElementById('prompt_author_handle').value = notes.author_handle;
     if (notes.negative_prompt !== undefined) document.getElementById('prompt_negative_prompt').value = notes.negative_prompt;
     if (notes.aspect_ratio !== undefined) document.getElementById('prompt_aspect_ratio').value = notes.aspect_ratio;
-  } catch(e) {}
+    renderPromptCustomLinks(notes.custom_links || []);
+  } catch(e) {
+    renderPromptCustomLinks([]);
+  }
 
   switchPromptTab('prompt-tab-identity');
   document.getElementById('promptFormModal').style.display = 'flex';
+}
+
+function renderPromptCustomLinks(links) {
+  const container = document.getElementById('promptCustomLinksContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  if (Array.isArray(links) && links.length > 0) {
+    links.forEach(l => addPromptCustomLinkRow(l.name || '', l.url || ''));
+  }
+}
+
+function addPromptCustomLinkRow(name = '', url = '') {
+  const container = document.getElementById('promptCustomLinksContainer');
+  if (!container) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr 36px; gap: 0.6rem; align-items: center;';
+  row.innerHTML = `
+    <input type="text" name="custom_link_names[]" value="${escapeHtml(name)}" placeholder="Link Label (e.g. GitHub, Civitai)" style="background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.2)); padding: 0.55rem 0.75rem; border-radius: 6px; color: #38bdf8; font-size: 0.85rem;">
+    <input type="url" name="custom_link_urls[]" value="${escapeHtml(url)}" placeholder="https://..." style="background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.2)); padding: 0.55rem 0.75rem; border-radius: 6px; color: var(--admin-text-primary, #f8fafc); font-size: 0.85rem;">
+    <button type="button" onclick="this.parentElement.remove()" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; border-radius: 6px; padding: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Link">✕</button>
+  `;
+  container.appendChild(row);
 }
 
 function closePromptModal() {

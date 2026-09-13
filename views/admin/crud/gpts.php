@@ -302,6 +302,24 @@
             <input type="url" name="creator_website" id="gpt_creator_website" placeholder="https://github.com/... or personal site" style="width: 100%; background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding: 0.75rem 1rem; border-radius: 6px; color: var(--admin-text-primary, #f8fafc);">
           </div>
         </div>
+
+        <!-- Additional Custom Named Links Repeater -->
+        <div style="background: var(--admin-card-bg-subtle, rgba(255,255,255,0.03)); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 1.25rem; margin-top: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div>
+              <h4 style="margin: 0; color: #c084fc; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="link-2" style="width: 16px; height: 16px;"></i> Additional Custom Named Links
+              </h4>
+              <span style="font-size: 0.75rem; color: var(--admin-text-secondary, #94a3b8);">Custom links such as GitHub Repo, Technical Whitepaper, Discord Guild, Live Demo Sandbox, etc.</span>
+            </div>
+            <button type="button" onclick="addGptCustomLinkRow()" class="ts-btn ts-btn-sm ts-btn-outline" style="border-color: rgba(168,85,247,0.4); color: #c084fc; font-size: 0.78rem;">
+              + Add Custom Link
+            </button>
+          </div>
+          <div id="gptCustomLinksContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
       </div>
 
       <!-- TAB 5: ACCESS LEVEL & BENCHMARK -->
@@ -549,6 +567,7 @@ function openNewGptModal() {
     'Generate production Dockerfile multi-stage build optimized for caching',
     'Audit this API endpoint for N+1 query leaks and latency bottlenecks'
   ]);
+  renderGptCustomLinks([]);
 
   switchGptTab('gpt-tab-basic');
   document.getElementById('gptFormModal').style.display = 'flex';
@@ -602,6 +621,9 @@ function editGpt(g) {
   if (document.getElementById('gpt_target_audience')) document.getElementById('gpt_target_audience').value = meta.target_audience || '';
   if (document.getElementById('gpt_creator_website')) document.getElementById('gpt_creator_website').value = meta.creator_website || '';
 
+  // Custom Links
+  renderGptCustomLinks(meta.custom_links || []);
+
   // Parse starters
   let starters = [];
   try {
@@ -615,6 +637,28 @@ function editGpt(g) {
   document.getElementById('modalGptTitle').innerText = 'Edit GPT #' + g.id + ' — ' + (g.title || '');
   switchGptTab('gpt-tab-basic');
   document.getElementById('gptFormModal').style.display = 'flex';
+}
+
+function renderGptCustomLinks(links) {
+  const container = document.getElementById('gptCustomLinksContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  if (Array.isArray(links) && links.length > 0) {
+    links.forEach(l => addGptCustomLinkRow(l.name || '', l.url || ''));
+  }
+}
+
+function addGptCustomLinkRow(name = '', url = '') {
+  const container = document.getElementById('gptCustomLinksContainer');
+  if (!container) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr 36px; gap: 0.6rem; align-items: center;';
+  row.innerHTML = `
+    <input type="text" name="custom_link_names[]" value="${escapeHtml(name)}" placeholder="Link Label (e.g. GitHub Repo, Sandbox)" style="background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.2)); padding: 0.55rem 0.75rem; border-radius: 6px; color: #c084fc; font-size: 0.85rem;">
+    <input type="url" name="custom_link_urls[]" value="${escapeHtml(url)}" placeholder="https://..." style="background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.2)); padding: 0.55rem 0.75rem; border-radius: 6px; color: var(--admin-text-primary, #f8fafc); font-size: 0.85rem;">
+    <button type="button" onclick="this.parentElement.remove()" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; border-radius: 6px; padding: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Link">✕</button>
+  `;
+  container.appendChild(row);
 }
 
 function closeGptModal() {

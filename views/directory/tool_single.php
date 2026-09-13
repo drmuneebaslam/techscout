@@ -21,6 +21,13 @@
   $useCases = $parseJsonArray($tool['use_cases'] ?? '');
   $screenshots = $parseJsonArray($tool['screenshots_gallery'] ?? '');
 
+  // Extract custom links from internal_notes
+  $internalNotes = [];
+  try {
+    $internalNotes = json_decode($tool['internal_notes'] ?? '{}', true) ?: [];
+  } catch (\Throwable $e) {}
+  $customLinks = is_array($internalNotes['custom_links'] ?? null) ? $internalNotes['custom_links'] : [];
+
   $officialWebsite = url('/go/' . $tool['slug']);
   $affiliateLink = url('/go/' . $tool['slug']);
   $ratingAvg = (float)($tool['rating_avg'] ?? $tool['tool_rating'] ?? 4.85);
@@ -565,6 +572,20 @@
               <?= htmlspecialchars($tool['twitter_handle']) ?>
             </td>
           </tr>
+        <?php endif; ?>
+        <?php if (!empty($customLinks)): ?>
+          <?php foreach ($customLinks as $cLink): ?>
+            <?php if (!empty($cLink['name']) && !empty($cLink['url'])): ?>
+              <tr style="border-bottom: 1px solid var(--ts-border-main);">
+                <td class="tool-table-cell-header"><?= htmlspecialchars($cLink['name']) ?></td>
+                <td class="tool-table-cell-value">
+                  <a href="<?= htmlspecialchars($cLink['url']) ?>" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
+                    <?= htmlspecialchars(parse_url($cLink['url'], PHP_URL_HOST) ?: $cLink['name']) ?> ↗
+                  </a>
+                </td>
+              </tr>
+            <?php endif; ?>
+          <?php endforeach; ?>
         <?php endif; ?>
         <tr>
           <td class="tool-table-cell-header">License Type</td>

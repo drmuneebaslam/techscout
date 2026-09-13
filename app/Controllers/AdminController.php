@@ -389,9 +389,27 @@ class AdminController {
         $useCases = json_encode($parseList($request->post('use_cases', '')));
         $screenshotsGallery = json_encode($parseList($request->post('screenshots_gallery', '')));
 
+        // Parse Dynamic Additional Custom Links with custom names & URLs
+        $customLinkNames = $request->post('custom_link_names', []);
+        $customLinkUrls = $request->post('custom_link_urls', []);
+        $customLinks = [];
+        if (is_array($customLinkNames) && is_array($customLinkUrls)) {
+            for ($i = 0; $i < count($customLinkNames); $i++) {
+                $cName = trim((string)($customLinkNames[$i] ?? ''));
+                $cUrl = trim((string)($customLinkUrls[$i] ?? ''));
+                if (!empty($cUrl)) {
+                    $customLinks[] = [
+                        'name' => $cName ?: 'Custom Link',
+                        'url' => $cUrl
+                    ];
+                }
+            }
+        }
+        $internalNotes = json_encode(['custom_links' => $customLinks], JSON_UNESCAPED_SLASHES);
+
         if ($id) {
-            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, body_html = ?, featured_image_url = ?, status = 'published', updated_at = NOW() WHERE id = ?", [
-                $title, $slug, $categoryId, $summary, $bodyHtml, $imageUrl, $id
+            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, body_html = ?, featured_image_url = ?, internal_notes = ?, status = 'published', updated_at = NOW() WHERE id = ?", [
+                $title, $slug, $categoryId, $summary, $bodyHtml, $imageUrl, $internalNotes, $id
             ]);
             Database::execute("UPDATE ai_tools SET 
                 website_url = ?, docs_url = ?, discord_url = ?, twitter_handle = ?, open_source_repo = ?, license_type = ?,
@@ -417,8 +435,8 @@ class AdminController {
             Session::flash('success', "Tool '{$title}' updated successfully with all specifications.");
         } else {
             $uuid = bin2hex(random_bytes(16));
-            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, body_html, featured_image_url, status, quality_score, published_at) VALUES (?, 'ai_tool', ?, ?, ?, ?, ?, ?, ?, 'published', 95.0, NOW())", [
-                $uuid, $authorId, $categoryId, $title, $slug, $summary, $bodyHtml, $imageUrl
+            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, body_html, featured_image_url, internal_notes, status, quality_score, published_at) VALUES (?, 'ai_tool', ?, ?, ?, ?, ?, ?, ?, ?, 'published', 95.0, NOW())", [
+                $uuid, $authorId, $categoryId, $title, $slug, $summary, $bodyHtml, $imageUrl, $internalNotes
             ]);
             $newId = (int)Database::lastInsertId();
             Database::execute("INSERT INTO ai_tools (
@@ -531,6 +549,24 @@ class AdminController {
             'difficulty' => (string)$request->post('param_difficulty', 'Intermediate'),
             'author_handle' => (string)$request->post('param_author_handle', '@techscout')
         ];
+
+        // Parse Dynamic Additional Custom Links
+        $promptLinkNames = $request->post('custom_link_names', []);
+        $promptLinkUrls = $request->post('custom_link_urls', []);
+        $promptCustomLinks = [];
+        if (is_array($promptLinkNames) && is_array($promptLinkUrls)) {
+            for ($i = 0; $i < count($promptLinkNames); $i++) {
+                $pName = trim((string)($promptLinkNames[$i] ?? ''));
+                $pUrl = trim((string)($promptLinkUrls[$i] ?? ''));
+                if (!empty($pUrl)) {
+                    $promptCustomLinks[] = [
+                        'name' => $pName ?: 'Reference Link',
+                        'url' => $pUrl
+                    ];
+                }
+            }
+        }
+        $meta['custom_links'] = $promptCustomLinks;
         $internalNotes = json_encode($meta, JSON_UNESCAPED_SLASHES);
 
         $authorId = (int)(Auth::user()['author_id'] ?? 1);
@@ -673,6 +709,24 @@ class AdminController {
             'creator_website' => trim((string)$request->post('creator_website', '')),
             'target_audience' => trim((string)$request->post('target_audience', ''))
         ];
+
+        // Parse Dynamic Additional Custom Links
+        $gptLinkNames = $request->post('custom_link_names', []);
+        $gptLinkUrls = $request->post('custom_link_urls', []);
+        $gptCustomLinks = [];
+        if (is_array($gptLinkNames) && is_array($gptLinkUrls)) {
+            for ($i = 0; $i < count($gptLinkNames); $i++) {
+                $gName = trim((string)($gptLinkNames[$i] ?? ''));
+                $gUrl = trim((string)($gptLinkUrls[$i] ?? ''));
+                if (!empty($gUrl)) {
+                    $gptCustomLinks[] = [
+                        'name' => $gName ?: 'Custom Link',
+                        'url' => $gUrl
+                    ];
+                }
+            }
+        }
+        $meta['custom_links'] = $gptCustomLinks;
         $internalNotes = json_encode($meta, JSON_UNESCAPED_SLASHES);
 
         $authorId = (int)(Auth::user()['author_id'] ?? 1);

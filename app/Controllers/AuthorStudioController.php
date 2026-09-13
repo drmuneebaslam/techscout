@@ -31,6 +31,16 @@ class AuthorStudioController {
 
         $author = Database::fetch("SELECT a.*, u.username, u.email, u.role FROM authors a JOIN users u ON a.user_id = u.id WHERE a.id = ?", [$authorId]);
         
+        // Extract configured creator crypto tip jar wallets
+        $decodedSocials = [];
+        if (!empty($author['social_links'])) {
+            $decodedSocials = json_decode($author['social_links'], true) ?: [];
+        }
+        $author['tip_wallet_btc'] = $decodedSocials['tip_wallet_btc'] ?? null;
+        $author['tip_wallet_eth'] = $decodedSocials['tip_wallet_eth'] ?? null;
+        $author['tip_wallet_usdt'] = $decodedSocials['tip_wallet_usdt'] ?? null;
+        $author['tip_wallet_sol'] = $decodedSocials['tip_wallet_sol'] ?? null;
+        
         // Fetch all contents by author with categories and tags
         $contents = Database::query(
             "SELECT c.*, cat.name as category_name, cat.slug as category_slug 
@@ -199,6 +209,15 @@ class AuthorStudioController {
             [$user['id']]
         ) ?: [];
 
+        // Recent Author Tips & Peer Patronage (95% creator share / 5% platform fee)
+        $authorTips = [];
+        try {
+            $authorTips = Database::querySilent(
+                "SELECT * FROM author_tips WHERE author_id = ? ORDER BY created_at DESC LIMIT 30", 
+                [$authorId]
+            ) ?: [];
+        } catch (\Throwable $e) {}
+
         Response::view('author/dashboard', [
             'title' => 'Creator Studio & Intelligence Dashboard | TechScout',
             'user' => $user,
@@ -232,7 +251,8 @@ class AuthorStudioController {
             'monetization' => $monetization,
             'authorPrompts' => $authorPrompts,
             'recentComments' => $recentComments,
-            'userSessions' => $userSessions
+            'userSessions' => $userSessions,
+            'authorTips' => $authorTips
         ]);
     }
 
@@ -479,6 +499,12 @@ class AuthorStudioController {
         $taxIdOrSsn = trim((string)$request->post('tax_id_or_ssn', ''));
         $taxCountry = trim((string)$request->post('tax_country', ''));
 
+        // Creator Crypto Tip Jar & Patronage Payout Wallets (95% creator share / 5% platform fee)
+        $tipWalletBtc = trim((string)$request->post('tip_wallet_btc', ''));
+        $tipWalletEth = trim((string)$request->post('tip_wallet_eth', ''));
+        $tipWalletUsdt = trim((string)$request->post('tip_wallet_usdt', ''));
+        $tipWalletSol = trim((string)$request->post('tip_wallet_sol', ''));
+
         // Handle Avatar File Upload
         $avatarFile = $_FILES['avatar_file'] ?? null;
         if ($avatarFile && !empty($avatarFile['tmp_name']) && $avatarFile['error'] === UPLOAD_ERR_OK) {
@@ -551,7 +577,11 @@ class AuthorStudioController {
         $socialsData = [
             'items' => $dynamicSocialItems,
             'tax_id_or_ssn' => $taxIdOrSsn,
-            'tax_country' => $taxCountry
+            'tax_country' => $taxCountry,
+            'tip_wallet_btc' => $tipWalletBtc,
+            'tip_wallet_eth' => $tipWalletEth,
+            'tip_wallet_usdt' => $tipWalletUsdt,
+            'tip_wallet_sol' => $tipWalletSol
         ];
         foreach ($dynamicSocialItems as $item) {
             if (in_array($item['platform'], ['website', 'github', 'twitter', 'linkedin', 'discord'])) {
@@ -594,8 +624,63 @@ class AuthorStudioController {
             ]);
         } catch (\Throwable $e) {}
 
-        Session::flash('success', 'Creator public profile & developer channels saved successfully! 🌟');
+        Session::flash('success', 'Creator public profile, developer channels & crypto tip jar wallets saved successfully! 🌟');
         Response::redirect('/author/dashboard');
+    }
+
+    public function saveTipWallets(Request $request): void {
+        $user = Auth::user();
+        $authorId = $user['author_id'] ?? null;
+        if (!$authorId) {
+            $existing = Database::fetch("SELECT id FROM authors WHERE user_id = ?", [$user['id']]);
+            $authorId = $existing ? (int)$existing['id'] : null;
+        }
+        if (!$authorId) {
+            Response::json(['success' => false, 'error' => 'Author profile not found.'], 404);
+            return;
+        }
+
+        $btc = trim((string)$request->post('tip_wallet_btc', ''));
+        $eth = trim((string)$request->post('tip_wallet_eth', ''));
+        $usdt = trim((string)$request->post('tip_wallet_usdt', ''));
+        $sol = trim((string)$request->post('tip_wallet_sol', ''));
+
+        // Sanity validation
+        if ($btc && strlen($btc) < 20) {
+            Response::json(['success' => false, 'error' => 'Invalid Bitcoin address format. Please enter a valid Native SegWit (bc1q), Taproot (bc1p), or Legacy address.'], 422);
+            return;
+        }
+        if ($eth && (!str_starts_with(strtolower($eth), '0x') || strlen($eth) !== 42)) {
+            Response::json(['success' => false, 'error' => 'Ethereum / EVM address must start with 0x and be exactly 42 characters long.'], 422);
+            return;
+        }
+        if ($sol && (strlen($sol) < 32 || strlen($sol) > 44)) {
+            Response::json(['success' => false, 'error' => 'Solana address must be a valid SPL base58 public key (32-44 characters).'], 422);
+            return;
+        }
+
+        $author = Database::fetch("SELECT social_links FROM authors WHERE id = ?", [$authorId]);
+        $socials = json_decode($author['social_links'] ?? '{}', true) ?: [];
+        $socials['tip_wallet_btc'] = $btc;
+        $socials['tip_wallet_eth'] = $eth;
+        $socials['tip_wallet_usdt'] = $usdt;
+        $socials['tip_wallet_sol'] = $sol;
+
+        Database::execute(
+            "UPDATE authors SET social_links = ?, updated_at = NOW() WHERE id = ?",
+            [json_encode($socials, JSON_UNESCAPED_SLASHES), $authorId]
+        );
+
+        Response::json([
+            'success' => true,
+            'message' => 'Crypto payout addresses saved successfully! 95% of reader tips will be routed to these destination addresses.',
+            'wallets' => [
+                'btc' => $btc,
+                'eth' => $eth,
+                'usdt' => $usdt,
+                'sol' => $sol
+            ]
+        ]);
     }
 
     public function requestPayout(Request $request): void {

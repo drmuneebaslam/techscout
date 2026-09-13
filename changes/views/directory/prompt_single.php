@@ -191,6 +191,19 @@ try {
             </span>
           </div>
         <?php endif; ?>
+
+        <?php if (!empty($notes['custom_links']) && is_array($notes['custom_links'])): ?>
+          <div style="grid-column: 1 / -1; padding-top: 0.75rem; border-top: 1px solid var(--ts-border-subtle); display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700;">Additional Links:</span>
+            <?php foreach ($notes['custom_links'] as $cLink): ?>
+              <?php if (!empty($cLink['name']) && !empty($cLink['url'])): ?>
+                <a href="<?= htmlspecialchars($cLink['url']) ?>" target="_blank" rel="noopener noreferrer" class="ts-badge ts-badge-cyan" style="text-decoration: none; font-size: 0.78rem;">
+                  <i data-lucide="link-2" style="width: 11px; height: 11px; display: inline-block; vertical-align: -1px;"></i> <?= htmlspecialchars($cLink['name']) ?> ↗
+                </a>
+              <?php endif; ?>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
 

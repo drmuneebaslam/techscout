@@ -1,5 +1,15 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
+<?php
+  // Extract custom links and creator info from internal_notes
+  $internalNotes = [];
+  try {
+    $internalNotes = json_decode($gpt['internal_notes'] ?? '{}', true) ?: [];
+  } catch (\Throwable $e) {}
+  $gptCustomLinks = is_array($internalNotes['custom_links'] ?? null) ? $internalNotes['custom_links'] : [];
+  $creatorWebsite = $internalNotes['creator_website'] ?? '';
+?>
+
 <div class="container" style="padding-top: 2.5rem; margin-bottom: 5rem;">
   <div style="max-width: 960px; margin: 0 auto;">
 
@@ -72,6 +82,20 @@
               <a href="<?= url('/go/' . $gpt['slug']) ?>" target="_blank" class="ts-btn ts-btn-accent" style="padding: 0.65rem 1.5rem;">
                 <i data-lucide="external-link"></i> Launch in OpenAI ↗
               </a>
+            <?php endif; ?>
+            <?php if (!empty($creatorWebsite)): ?>
+              <a href="<?= htmlspecialchars($creatorWebsite) ?>" target="_blank" rel="noopener noreferrer" class="ts-btn ts-btn-outline" style="border-color: rgba(56,189,248,0.4); color: #38bdf8;">
+                <i data-lucide="globe"></i> Creator Portfolio ↗
+              </a>
+            <?php endif; ?>
+            <?php if (!empty($gptCustomLinks)): ?>
+              <?php foreach ($gptCustomLinks as $cLink): ?>
+                <?php if (!empty($cLink['name']) && !empty($cLink['url'])): ?>
+                  <a href="<?= htmlspecialchars($cLink['url']) ?>" target="_blank" rel="noopener noreferrer" class="ts-btn ts-btn-outline" style="border-color: rgba(168,85,247,0.4); color: #c084fc;">
+                    <i data-lucide="link-2"></i> <?= htmlspecialchars($cLink['name']) ?> ↗
+                  </a>
+                <?php endif; ?>
+              <?php endforeach; ?>
             <?php endif; ?>
             <button type="button" onclick="toggleBookmark(<?= (int)$gpt['id'] ?>)" id="content-bookmark-btn" class="ts-btn <?= !empty($isBookmarked) ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="<?= !empty($isBookmarked) ? 'background:#ec4899; border-color:#ec4899;' : 'color:#ec4899; border-color:rgba(236,72,153,0.3);' ?>">
               <i data-lucide="bookmark"></i>

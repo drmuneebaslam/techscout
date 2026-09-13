@@ -486,7 +486,7 @@ $tipWallets = [
 </div>
 
 <script>
-const tipWallets = <?= json_encode($tipWallets) ?>;
+const tipWallets = <?= json_encode($tipWallets ?? [], JSON_UNESCAPED_SLASHES) ?>;
 let activeTipCrypto = 'USDT';
 
 function switchAuthorTab(tab) {

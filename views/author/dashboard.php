@@ -1647,35 +1647,74 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
         <div>
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-amber" style="font-weight: 800;">DIRECT CREATOR PATRONAGE</span>
-            <span style="font-size: 0.8rem; color: #94a3b8;">100% Peer-to-Peer On-Chain Tips &bull; 0% Platform Fee</span>
+            <span style="font-size: 0.8rem; color: #94a3b8;">95% Direct Creator Payout &bull; 5% Platform Treasury &amp; Infrastructure Fee</span>
           </div>
           <h3 style="font-size: 1.45rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
-            ⚡ Creator Crypto Tip Jar
+            ⚡ Creator Crypto Tip Jar &amp; Peer Patronage
           </h3>
-          <p style="color: #94a3b8; font-size: 0.88rem; margin: 0.35rem 0 0 0; max-width: 680px;">
-            Let your technical readers support your open-source research and engineering tutorials directly. Readers can tip you in Bitcoin, Ethereum, USDT, or Solana straight to your personal crypto wallet.
+          <p style="color: #94a3b8; font-size: 0.88rem; margin: 0.35rem 0 0 0; max-width: 720px; line-height: 1.6;">
+            Let your technical readers support your open-source research and engineering tutorials directly. Readers tip in Bitcoin, Ethereum, USDT, or Solana. TechScout protocol reserves a 5% infrastructure contribution to cover gas subsidies and network validator relays, with 95% of gross tips routed directly to your personal crypto wallet.
           </p>
         </div>
-        <div>
-          <span class="ts-badge ts-badge-green" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-            ZERO COMMISSIONS ACTIVE ✓
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+          <span class="ts-badge ts-badge-green" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; font-weight: 800;">
+            95% CREATOR SHARE (5% PLATFORM FEE) ✓
           </span>
+          <button type="button" onclick="openCryptoWalletModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #f59e0b, #ec4899); border: none; font-weight: 700; color: #000; font-size: 0.8rem; padding: 0.4rem 0.85rem;">
+            ⚡ Quick-Configure All Wallets
+          </button>
+        </div>
+      </div>
+
+      <!-- Real-Time Protocol Fee Calculator Simulator -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(245,158,11,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="font-size: 1.5rem;">🧮</span>
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #f8fafc;">Live Distribution Simulator:</div>
+            <div style="font-size: 0.78rem; color: #94a3b8;">Simulate gross tip revenue payout breakdown</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="font-size: 0.85rem; color: #94a3b8;">Reader Tips:</span>
+            <input type="number" id="tipSimInput" value="50" min="1" step="5" oninput="updateTipSimulator(this.value)" style="width: 80px; background: #04070e; border: 1px solid rgba(245,158,11,0.4); border-radius: 6px; padding: 0.35rem 0.5rem; color: #f59e0b; font-weight: 800; font-family: monospace; text-align: center;">
+            <span style="font-size: 0.85rem; color: #94a3b8;">USD</span>
+          </div>
+          <div style="display: flex; gap: 0.75rem; font-size: 0.85rem;">
+            <span class="ts-badge ts-badge-green" id="tipSimNet" style="font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.65rem;">
+              You Receive (95%): $47.50
+            </span>
+            <span class="ts-badge ts-badge-amber" id="tipSimFee" style="font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.65rem;">
+              Platform Treasury (5%): $2.50
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- Configured Wallets Grid -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        
         <!-- BTC -->
         <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
             <strong style="color: #f59e0b; font-size: 0.95rem;">₿ Bitcoin (BTC)</strong>
-            <span class="ts-badge ts-badge-amber" style="font-size: 0.65rem;">Native SegWit / Taproot</span>
+            <span class="ts-badge <?= !empty($author['tip_wallet_btc']) ? 'ts-badge-green' : 'ts-badge-amber' ?>" style="font-size: 0.65rem;">
+              <?= !empty($author['tip_wallet_btc']) ? 'Active Payout ✓' : 'Native SegWit / Taproot' ?>
+            </span>
           </div>
-          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
-            <?= htmlspecialchars($author['tip_wallet_btc'] ?? 'bc1q9v80n7... (Not configured)') ?>
+          <div style="position: relative; margin-bottom: 0.65rem;">
+            <div style="font-family: monospace; font-size: 0.78rem; color: <?= !empty($author['tip_wallet_btc']) ? '#34d399' : '#94a3b8' ?>; word-break: break-all; background: #04070e; padding: 0.55rem 2rem 0.55rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245,158,11,0.2); min-height: 48px; display: flex; align-items: center;">
+              <?= htmlspecialchars($author['tip_wallet_btc'] ?? 'bc1q... (Not configured)') ?>
+            </div>
+            <?php if (!empty($author['tip_wallet_btc'])): ?>
+              <button type="button" onclick="navigator.clipboard.writeText('<?= htmlspecialchars(addslashes($author['tip_wallet_btc'])) ?>'); showToast('Bitcoin address copied!', 'success');" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #f59e0b; cursor: pointer; padding: 4px;" title="Copy Bitcoin Address">
+                📋
+              </button>
+            <?php endif; ?>
           </div>
-          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
-            Configure BTC Wallet ⚙️
+          <button type="button" onclick="openCryptoWalletModal('btc')" class="ts-btn <?= !empty($author['tip_wallet_btc']) ? 'ts-btn-primary' : 'ts-btn-outline' ?> ts-btn-sm" style="width: 100%; font-size: 0.75rem; padding: 0.35rem; <?= !empty($author['tip_wallet_btc']) ? 'background: #f59e0b; color: #000; font-weight: 700;' : 'color: #f59e0b; border-color: rgba(245,158,11,0.4); font-weight: 700;' ?>">
+            <?= !empty($author['tip_wallet_btc']) ? 'Edit BTC Wallet ⚙️' : 'Configure BTC Wallet ⚙️' ?>
           </button>
         </div>
 
@@ -1683,13 +1722,22 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
         <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(99,102,241,0.25); border-radius: 10px; padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
             <strong style="color: #818cf8; font-size: 0.95rem;">Ξ Ethereum / EVM</strong>
-            <span class="ts-badge ts-badge-indigo" style="font-size: 0.65rem;">ERC-20 / Arbitrum</span>
+            <span class="ts-badge <?= !empty($author['tip_wallet_eth']) ? 'ts-badge-green' : 'ts-badge-indigo' ?>" style="font-size: 0.65rem;">
+              <?= !empty($author['tip_wallet_eth']) ? 'Active Payout ✓' : 'ERC-20 / Arbitrum' ?>
+            </span>
           </div>
-          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
-            <?= htmlspecialchars($author['tip_wallet_eth'] ?? '0x71C... (Not configured)') ?>
+          <div style="position: relative; margin-bottom: 0.65rem;">
+            <div style="font-family: monospace; font-size: 0.78rem; color: <?= !empty($author['tip_wallet_eth']) ? '#34d399' : '#94a3b8' ?>; word-break: break-all; background: #04070e; padding: 0.55rem 2rem 0.55rem 0.65rem; border-radius: 6px; border: 1px solid rgba(99,102,241,0.2); min-height: 48px; display: flex; align-items: center;">
+              <?= htmlspecialchars($author['tip_wallet_eth'] ?? '0x71C... (Not configured)') ?>
+            </div>
+            <?php if (!empty($author['tip_wallet_eth'])): ?>
+              <button type="button" onclick="navigator.clipboard.writeText('<?= htmlspecialchars(addslashes($author['tip_wallet_eth'])) ?>'); showToast('Ethereum address copied!', 'success');" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #818cf8; cursor: pointer; padding: 4px;" title="Copy Ethereum Address">
+                📋
+              </button>
+            <?php endif; ?>
           </div>
-          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
-            Configure ETH / EVM Wallet ⚙️
+          <button type="button" onclick="openCryptoWalletModal('eth')" class="ts-btn <?= !empty($author['tip_wallet_eth']) ? 'ts-btn-primary' : 'ts-btn-outline' ?> ts-btn-sm" style="width: 100%; font-size: 0.75rem; padding: 0.35rem; <?= !empty($author['tip_wallet_eth']) ? 'background: #6366f1; color: #fff; font-weight: 700;' : 'color: #818cf8; border-color: rgba(99,102,241,0.4); font-weight: 700;' ?>">
+            <?= !empty($author['tip_wallet_eth']) ? 'Edit ETH / EVM Wallet ⚙️' : 'Configure ETH / EVM Wallet ⚙️' ?>
           </button>
         </div>
 
@@ -1697,13 +1745,22 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
         <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(16,185,129,0.25); border-radius: 10px; padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
             <strong style="color: #34d399; font-size: 0.95rem;">₮ Tether (USDT)</strong>
-            <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">TRC-20 / ERC-20</span>
+            <span class="ts-badge <?= !empty($author['tip_wallet_usdt']) ? 'ts-badge-green' : 'ts-badge-green' ?>" style="font-size: 0.65rem;">
+              <?= !empty($author['tip_wallet_usdt']) ? 'Active Payout ✓' : 'TRC-20 / ERC-20' ?>
+            </span>
           </div>
-          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
-            <?= htmlspecialchars($author['tip_wallet_usdt'] ?? 'TXa9... (Not configured)') ?>
+          <div style="position: relative; margin-bottom: 0.65rem;">
+            <div style="font-family: monospace; font-size: 0.78rem; color: <?= !empty($author['tip_wallet_usdt']) ? '#34d399' : '#94a3b8' ?>; word-break: break-all; background: #04070e; padding: 0.55rem 2rem 0.55rem 0.65rem; border-radius: 6px; border: 1px solid rgba(16,185,129,0.2); min-height: 48px; display: flex; align-items: center;">
+              <?= htmlspecialchars($author['tip_wallet_usdt'] ?? 'TXa9... (Not configured)') ?>
+            </div>
+            <?php if (!empty($author['tip_wallet_usdt'])): ?>
+              <button type="button" onclick="navigator.clipboard.writeText('<?= htmlspecialchars(addslashes($author['tip_wallet_usdt'])) ?>'); showToast('USDT address copied!', 'success');" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #34d399; cursor: pointer; padding: 4px;" title="Copy USDT Address">
+                📋
+              </button>
+            <?php endif; ?>
           </div>
-          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
-            Configure USDT Address ⚙️
+          <button type="button" onclick="openCryptoWalletModal('usdt')" class="ts-btn <?= !empty($author['tip_wallet_usdt']) ? 'ts-btn-primary' : 'ts-btn-outline' ?> ts-btn-sm" style="width: 100%; font-size: 0.75rem; padding: 0.35rem; <?= !empty($author['tip_wallet_usdt']) ? 'background: #10b981; color: #000; font-weight: 700;' : 'color: #34d399; border-color: rgba(16,185,129,0.4); font-weight: 700;' ?>">
+            <?= !empty($author['tip_wallet_usdt']) ? 'Edit USDT Address ⚙️' : 'Configure USDT Address ⚙️' ?>
           </button>
         </div>
 
@@ -1711,31 +1768,135 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
         <div class="author-subcard" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.25); border-radius: 10px; padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
             <strong style="color: #c084fc; font-size: 0.95rem;">◎ Solana (SOL)</strong>
-            <span class="ts-badge ts-badge-purple" style="font-size: 0.65rem;">SPL Network</span>
+            <span class="ts-badge <?= !empty($author['tip_wallet_sol']) ? 'ts-badge-green' : 'ts-badge-purple' ?>" style="font-size: 0.65rem;">
+              <?= !empty($author['tip_wallet_sol']) ? 'Active Payout ✓' : 'SPL Network' ?>
+            </span>
           </div>
-          <div style="font-family: monospace; font-size: 0.78rem; color: #cbd5e1; word-break: break-all; background: #04070e; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.65rem;">
-            <?= htmlspecialchars($author['tip_wallet_sol'] ?? 'So11... (Not configured)') ?>
+          <div style="position: relative; margin-bottom: 0.65rem;">
+            <div style="font-family: monospace; font-size: 0.78rem; color: <?= !empty($author['tip_wallet_sol']) ? '#34d399' : '#94a3b8' ?>; word-break: break-all; background: #04070e; padding: 0.55rem 2rem 0.55rem 0.65rem; border-radius: 6px; border: 1px solid rgba(168,85,247,0.2); min-height: 48px; display: flex; align-items: center;">
+              <?= htmlspecialchars($author['tip_wallet_sol'] ?? 'So11... (Not configured)') ?>
+            </div>
+            <?php if (!empty($author['tip_wallet_sol'])): ?>
+              <button type="button" onclick="navigator.clipboard.writeText('<?= htmlspecialchars(addslashes($author['tip_wallet_sol'])) ?>'); showToast('Solana address copied!', 'success');" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #c084fc; cursor: pointer; padding: 4px;" title="Copy Solana Address">
+                📋
+              </button>
+            <?php endif; ?>
           </div>
-          <button type="button" onclick="openProfileModal(); switchProfTab('socials');" class="ts-btn ts-btn-outline ts-btn-sm" style="width: 100%; font-size: 0.72rem; padding: 0.25rem;">
-            Configure SOL Address ⚙️
+          <button type="button" onclick="openCryptoWalletModal('sol')" class="ts-btn <?= !empty($author['tip_wallet_sol']) ? 'ts-btn-primary' : 'ts-btn-outline' ?> ts-btn-sm" style="width: 100%; font-size: 0.75rem; padding: 0.35rem; <?= !empty($author['tip_wallet_sol']) ? 'background: #a855f7; color: #fff; font-weight: 700;' : 'color: #c084fc; border-color: rgba(168,85,247,0.4); font-weight: 700;' ?>">
+            <?= !empty($author['tip_wallet_sol']) ? 'Edit SOL Address ⚙️' : 'Configure SOL Address ⚙️' ?>
           </button>
         </div>
       </div>
 
       <!-- Embeddable Reader Badge Snippet -->
-      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 10px; padding: 1.25rem;">
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 10px; padding: 1.25rem; margin-bottom: 2rem;">
         <h4 style="color: #f8fafc; font-size: 1rem; margin: 0 0 0.5rem 0; font-family: 'Outfit', sans-serif;">
           📢 Embed Reader Tip Badge in Your Markdown Articles &amp; GitHub
         </h4>
         <p style="color: #94a3b8; font-size: 0.82rem; margin: 0 0 0.75rem 0;">
-          Copy and paste this markdown snippet at the bottom of your articles or open-source repositories to invite technical patronage:
+          Copy and paste this markdown badge into your publications, tutorials, or open-source GitHub READMEs to invite reader patronage:
         </p>
         <div style="display: flex; gap: 0.5rem; align-items: center;">
-          <input type="text" id="tipMeBadgeSnippet" readonly value="[![Support with Crypto](https://img.shields.io/badge/TechScout-Tip_Author-6366f1?logo=bitcoin)](<?= url('/author/profile/' . ($author['slug'] ?? '')) ?>#tip)" class="admin-modal-input" style="font-family: monospace; font-size: 0.8rem; flex: 1;">
+          <input type="text" id="tipMeBadgeSnippet" readonly value="[![Support with Crypto](https://img.shields.io/badge/TechScout-Tip_Author-6366f1?logo=bitcoin)](<?= url('/author/' . ($author['slug'] ?? '')) ?>#tip)" class="admin-modal-input" style="font-family: monospace; font-size: 0.8rem; flex: 1;">
           <button type="button" onclick="copySnippet('tipMeBadgeSnippet')" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #f59e0b; border: none; color: #000; font-weight: 700; white-space: nowrap;">
             Copy Markdown 📋
           </button>
         </div>
+      </div>
+
+      <!-- Live Patronage & Tips Activity Ledger -->
+      <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); border-radius: 10px; padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h4 style="color: #f8fafc; font-size: 1.1rem; margin: 0 0 0.25rem 0; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="history" style="width: 18px; height: 18px; color: #f59e0b;"></i>
+              Recent Patronage &amp; Crypto Tips Ledger
+            </h4>
+            <span style="font-size: 0.78rem; color: #94a3b8;">Transparent on-chain tipping records: 95% net creator earnings &amp; 5% protocol treasury</span>
+          </div>
+          <span class="ts-badge" style="background: rgba(245,158,11,0.15); color: #f59e0b; font-weight: 700; font-family: monospace;">
+            <?= count($authorTips ?? []) ?> Records Logged
+          </span>
+        </div>
+
+        <?php if (!empty($authorTips)): ?>
+          <div class="admin-table-wrap">
+            <table class="admin-table" style="font-size: 0.82rem;">
+              <thead>
+                <tr>
+                  <th>Ref / Date</th>
+                  <th>Tipper / Donor</th>
+                  <th>Method &amp; TXID</th>
+                  <th style="text-align: right;">Gross Tip</th>
+                  <th style="text-align: right; color: #f59e0b;">Fee (5%)</th>
+                  <th style="text-align: right; color: #10b981;">Creator Net (95%)</th>
+                  <th style="text-align: center;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($authorTips as $tip): ?>
+                  <?php
+                    $gross = (float)($tip['amount_usd'] ?? $tip['gross_amount'] ?? 0);
+                    $fee = (float)($tip['platform_fee_usd'] ?? $tip['platform_fee'] ?? ($gross * 0.05));
+                    $net = (float)($tip['net_amount_usd'] ?? $tip['net_author_amount'] ?? ($gross * 0.95));
+                    $status = strtolower($tip['status'] ?? 'completed');
+                    $method = strtoupper(str_replace('crypto_', '', (string)($tip['payment_method'] ?? 'USDT')));
+                  ?>
+                  <tr>
+                    <td>
+                      <strong style="color: #f8fafc; font-family: monospace;"><?= htmlspecialchars($tip['reference_no'] ?? ('TIP-' . $tip['id'])) ?></strong>
+                      <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.15rem;">
+                        <?= \App\Core\DateHelper::render($tip['created_at'] ?? 'now', 'M j, Y • g:i A', 'datetime') ?>
+                      </div>
+                    </td>
+                    <td>
+                      <span style="color: #cbd5e1; font-weight: 600;"><?= htmlspecialchars($tip['tipper_name'] ?? $tip['sender_name'] ?? 'Anonymous Supporter') ?></span>
+                      <?php if (!empty($tip['message'])): ?>
+                        <div style="font-size: 0.72rem; color: #94a3b8; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= htmlspecialchars($tip['message']) ?>">
+                          <?= htmlspecialchars($tip['message']) ?>
+                        </div>
+                      <?php endif; ?>
+                    </td>
+                    <td>
+                      <span class="ts-badge ts-badge-indigo" style="font-size: 0.68rem; font-weight: 700;"><?= htmlspecialchars($method) ?></span>
+                      <?php if (!empty($tip['txid'])): ?>
+                        <div style="font-size: 0.7rem; font-family: monospace; color: #38bdf8; margin-top: 0.2rem; word-break: break-all;">
+                          TX: <?= htmlspecialchars(substr($tip['txid'], 0, 10)) ?>...<?= htmlspecialchars(substr($tip['txid'], -6)) ?>
+                        </div>
+                      <?php endif; ?>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: #f8fafc; font-family: monospace;">
+                      $<?= number_format($gross, 2) ?>
+                    </td>
+                    <td style="text-align: right; font-weight: 600; color: #f59e0b; font-family: monospace;">
+                      -$<?= number_format($fee, 2) ?>
+                    </td>
+                    <td style="text-align: right; font-weight: 800; color: #10b981; font-family: monospace; font-size: 0.9rem;">
+                      +$<?= number_format($net, 2) ?>
+                    </td>
+                    <td style="text-align: center;">
+                      <?php if ($status === 'completed' || $status === 'paid'): ?>
+                        <span class="ts-badge ts-badge-green" style="font-size: 0.68rem;">Dispatched ✓</span>
+                      <?php elseif ($status === 'pending'): ?>
+                        <span class="ts-badge ts-badge-amber" style="font-size: 0.68rem;">In Verification ⏳</span>
+                      <?php else: ?>
+                        <span class="ts-badge" style="font-size: 0.68rem; background: rgba(148,163,184,0.2);"><?= htmlspecialchars(ucfirst($status)) ?></span>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        <?php else: ?>
+          <div style="text-align: center; padding: 2rem 1rem; color: #94a3b8;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🪙</div>
+            <h5 style="color: #cbd5e1; font-size: 1rem; margin: 0 0 0.35rem 0;">No Crypto Tips Logged Yet</h5>
+            <p style="font-size: 0.82rem; margin: 0; max-width: 480px; margin: 0 auto;">
+              Your tipping jar is active! Once readers scan your wallet QR or send peer patronage, transactions appear here with 95% net creator earnings.
+            </p>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   </div><!-- /amainpane_tipjar -->
@@ -2132,12 +2293,15 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
     </div>
 
     <!-- Modal Sub-Tabs Strip -->
-    <div style="display: flex; gap: 0.5rem; background: rgba(15,23,42,0.8); padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); flex: 0 0 auto;">
+    <div style="display: flex; gap: 0.5rem; background: rgba(15,23,42,0.8); padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); flex: 0 0 auto; flex-wrap: wrap;">
       <button type="button" onclick="switchProfTab('identity')" id="ptab_identity" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.78rem; padding: 0.3rem 0.75rem;">
         👤 Public Identity
       </button>
       <button type="button" onclick="switchProfTab('socials')" id="ptab_socials" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.78rem; padding: 0.3rem 0.75rem;">
         🌐 Developer Socials
+      </button>
+      <button type="button" onclick="switchProfTab('crypto')" id="ptab_crypto" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.78rem; padding: 0.3rem 0.75rem; color: #f59e0b; border-color: rgba(245,158,11,0.4);">
+        ⚡ Crypto Tip Wallets (95% Payout)
       </button>
     </div>
 
@@ -2256,6 +2420,50 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
         </button>
       </div>
 
+      <!-- 3. CRYPTO TIP JAR & PATRONAGE WALLETS TAB (95% Creator Payout) -->
+      <div id="psec_crypto" style="display: none;">
+        <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.85rem; color: #f59e0b; font-weight: 700;">⚡ Creator Crypto Patronage &amp; Tipping Payout Addresses</div>
+          <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.2rem; line-height: 1.5;">
+            Configure your on-chain crypto wallets. Readers can tip you directly from articles, tutorials, or public profiles. <strong>95% of gross tips</strong> are dispatched to these addresses, with a 5% platform protocol contribution retained for network gas subsidies.
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+              <strong style="color: #f59e0b;">₿ Bitcoin (BTC) Payout Address</strong>
+              <span style="font-size: 0.72rem; color: #94a3b8;">Native SegWit (bc1q), Taproot (bc1p), or Legacy</span>
+            </label>
+            <input type="text" name="tip_wallet_btc" id="prof_tip_wallet_btc" value="<?= htmlspecialchars($author['tip_wallet_btc'] ?? '') ?>" placeholder="e.g. bc1q9v80n7..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+              <strong style="color: #818cf8;">Ξ Ethereum / EVM Address</strong>
+              <span style="font-size: 0.72rem; color: #94a3b8;">ERC-20 (Arbitrum, Base, Optimism, Polygon)</span>
+            </label>
+            <input type="text" name="tip_wallet_eth" id="prof_tip_wallet_eth" value="<?= htmlspecialchars($author['tip_wallet_eth'] ?? '') ?>" placeholder="e.g. 0x71C..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+              <strong style="color: #34d399;">₮ Tether (USDT) Address</strong>
+              <span style="font-size: 0.72rem; color: #94a3b8;">TRC-20 (Tron) or ERC-20</span>
+            </label>
+            <input type="text" name="tip_wallet_usdt" id="prof_tip_wallet_usdt" value="<?= htmlspecialchars($author['tip_wallet_usdt'] ?? '') ?>" placeholder="e.g. TXa9... or 0x..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+              <strong style="color: #c084fc;">◎ Solana (SOL) Address</strong>
+              <span style="font-size: 0.72rem; color: #94a3b8;">SPL Network (Phantom, Solflare, Backpack)</span>
+            </label>
+            <input type="text" name="tip_wallet_sol" id="prof_tip_wallet_sol" value="<?= htmlspecialchars($author['tip_wallet_sol'] ?? '') ?>" placeholder="e.g. So11..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+          </div>
+        </div>
+      </div>
+
       <!-- Payout & Banking Notice Card pointing to Royalties & Ledger tab -->
       <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 1rem; margin-top: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
         <div style="display: flex; gap: 0.75rem; align-items: center;">
@@ -2263,7 +2471,7 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
             <i data-lucide="wallet" style="width: 20px; height: 20px;"></i>
           </div>
           <div>
-            <div style="font-size: 0.86rem; font-weight: 700; color: #34d399;">Looking to link or update Payout Methods?</div>
+            <div style="font-size: 0.86rem; font-weight: 700; color: #34d399;">Looking to link or update Bank Payout Methods?</div>
             <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.15rem;">
               Bank accounts, PayPal, and crypto wallets are securely managed under the <strong>Royalties &amp; Ledger</strong> tab.
             </div>
@@ -2274,12 +2482,76 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
         </button>
       </div>
 
-
       <div class="admin-modal-footer" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(148,163,184,0.12);">
         <button type="button" onclick="closeProfileModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #38bdf8; border-color: #38bdf8; color: #000; font-weight: 700;">Save All Settings ✓</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: DEDICATED QUICK-CONFIG CRYPTO TIP WALLETS (95% CREATOR SHARE) -->
+<!-- ========================================================================= -->
+<div id="cryptoWalletModal" class="admin-modal-overlay" style="display: none;">
+  <div class="admin-modal-box modal-amber" style="max-width: 560px;">
+    <div class="admin-modal-header">
+      <h3 class="admin-modal-title" style="color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="wallet"></i> Configure Creator Crypto Tip Wallets
+      </h3>
+      <button type="button" onclick="closeCryptoWalletModal()" class="admin-modal-close">✕</button>
+    </div>
+    <div style="padding: 1.5rem;">
+      <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+        <div style="font-size: 0.85rem; color: #f59e0b; font-weight: 700;">Direct Patronage Routing • 95% Creator Share</div>
+        <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.2rem; line-height: 1.5;">
+          These destination addresses receive your 95% tip earnings. The 5% platform protocol fee covers gas subsidies and network validator relays.
+        </div>
+      </div>
+
+      <form id="quickCryptoWalletForm" onsubmit="saveCryptoWalletsAjax(event)">
+        <div style="margin-bottom: 1rem;">
+          <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+            <strong style="color: #f59e0b;">₿ Bitcoin (BTC) Payout Address</strong>
+            <span style="font-size: 0.72rem; color: #94a3b8;">SegWit / Taproot</span>
+          </label>
+          <input type="text" name="tip_wallet_btc" id="q_tip_wallet_btc" value="<?= htmlspecialchars($author['tip_wallet_btc'] ?? '') ?>" placeholder="bc1q..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+            <strong style="color: #818cf8;">Ξ Ethereum / EVM Address</strong>
+            <span style="font-size: 0.72rem; color: #94a3b8;">ERC-20 (Arbitrum, Base, Polygon)</span>
+          </label>
+          <input type="text" name="tip_wallet_eth" id="q_tip_wallet_eth" value="<?= htmlspecialchars($author['tip_wallet_eth'] ?? '') ?>" placeholder="0x..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+            <strong style="color: #34d399;">₮ Tether (USDT) Address</strong>
+            <span style="font-size: 0.72rem; color: #94a3b8;">TRC-20 / ERC-20</span>
+          </label>
+          <input type="text" name="tip_wallet_usdt" id="q_tip_wallet_usdt" value="<?= htmlspecialchars($author['tip_wallet_usdt'] ?? '') ?>" placeholder="TXa9... or 0x..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label class="admin-modal-label" style="display: flex; justify-content: space-between;">
+            <strong style="color: #c084fc;">◎ Solana (SOL) Address</strong>
+            <span style="font-size: 0.72rem; color: #94a3b8;">SPL Network</span>
+          </label>
+          <input type="text" name="tip_wallet_sol" id="q_tip_wallet_sol" value="<?= htmlspecialchars($author['tip_wallet_sol'] ?? '') ?>" placeholder="So11..." class="admin-modal-input" style="font-family: monospace; font-size: 0.85rem;">
+        </div>
+
+        <div id="quickWalletFeedback" style="display: none; margin-bottom: 1rem; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;"></div>
+
+        <div class="admin-modal-footer" style="padding-top: 1rem; border-top: 1px solid rgba(148,163,184,0.12);">
+          <button type="button" onclick="closeCryptoWalletModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+          <button type="submit" id="btnSaveCryptoWallets" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #f59e0b; border-color: #f59e0b; color: #000; font-weight: 700;">
+            Save Crypto Wallets ✓
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -2704,8 +2976,95 @@ function switchProfTab(tab) {
 
   const identitySec = document.getElementById('psec_identity');
   const socialsSec = document.getElementById('psec_socials');
+  const cryptoSec = document.getElementById('psec_crypto');
   if (identitySec) identitySec.style.display = (tab === 'identity') ? 'block' : 'none';
   if (socialsSec) socialsSec.style.display = (tab === 'socials') ? 'block' : 'none';
+  if (cryptoSec) cryptoSec.style.display = (tab === 'crypto') ? 'block' : 'none';
+}
+
+function openCryptoWalletModal(focusCoin) {
+  const modal = document.getElementById('cryptoWalletModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    if (focusCoin) {
+      const el = document.getElementById('q_tip_wallet_' + focusCoin);
+      if (el) setTimeout(() => el.focus(), 100);
+    }
+  }
+}
+
+function closeCryptoWalletModal() {
+  const modal = document.getElementById('cryptoWalletModal');
+  if (modal) modal.style.display = 'none';
+  const fb = document.getElementById('quickWalletFeedback');
+  if (fb) fb.style.display = 'none';
+}
+
+function updateTipSimulator(val) {
+  const amount = parseFloat(val) || 0;
+  const net = (amount * 0.95).toFixed(2);
+  const fee = (amount * 0.05).toFixed(2);
+  const netEl = document.getElementById('tipSimNet');
+  const feeEl = document.getElementById('tipSimFee');
+  if (netEl) netEl.innerText = 'You Receive (95%): $' + net;
+  if (feeEl) feeEl.innerText = 'Platform Treasury (5%): $' + fee;
+}
+
+async function saveCryptoWalletsAjax(e) {
+  e.preventDefault();
+  const form = document.getElementById('quickCryptoWalletForm');
+  const btn = document.getElementById('btnSaveCryptoWallets');
+  const fb = document.getElementById('quickWalletFeedback');
+  if (!form || !btn) return;
+
+  btn.disabled = true;
+  btn.innerText = 'Saving Wallets... ⏳';
+  if (fb) fb.style.display = 'none';
+
+  const formData = new FormData(form);
+
+  try {
+    const res = await fetch('<?= url("/author/tip-wallets/save") ?>', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    const data = await res.json();
+    if (data.success) {
+      if (fb) {
+        fb.style.display = 'block';
+        fb.style.background = 'rgba(16,185,129,0.15)';
+        fb.style.color = '#34d399';
+        fb.style.border = '1px solid rgba(16,185,129,0.3)';
+        fb.innerText = data.message || 'Saved successfully!';
+      }
+      showToast('Crypto tip jar payout wallets saved!', 'success');
+      setTimeout(() => {
+        window.location.href = window.location.pathname + '?tab=tipjar';
+      }, 750);
+    } else {
+      if (fb) {
+        fb.style.display = 'block';
+        fb.style.background = 'rgba(239,68,68,0.15)';
+        fb.style.color = '#f87171';
+        fb.style.border = '1px solid rgba(239,68,68,0.3)';
+        fb.innerText = data.error || 'Failed to save wallets.';
+      }
+    }
+  } catch (err) {
+    if (fb) {
+      fb.style.display = 'block';
+      fb.style.background = 'rgba(239,68,68,0.15)';
+      fb.style.color = '#f87171';
+      fb.style.border = '1px solid rgba(239,68,68,0.3)';
+      fb.innerText = 'Network connection error while saving.';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'Save Crypto Wallets ✓';
+  }
 }
 
 const AVAILABLE_SOCIAL_PLATFORMS = <?= json_encode(\App\Core\SocialHelper::getAvailablePlatforms(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;

@@ -134,6 +134,18 @@ class AuthorProfileController {
         $followerCount = max($authorFollowerCount, $dbFollowers);
         $followingCount = (int)(Database::fetch("SELECT COUNT(*) as c FROM author_followers WHERE user_id = ?", [(int)$author['user_id']])['c'] ?? 0);
 
+        // Extract author's configured crypto tip wallets (95% creator share / 5% platform fee)
+        $authorSocials = [];
+        if (!empty($author['social_links'])) {
+            $authorSocials = json_decode($author['social_links'], true) ?: [];
+        }
+        $tipWallets = [
+            'USDT' => $authorSocials['tip_wallet_usdt'] ?? '0x71C8A60e46b38cE1241F8308D649372F7505a76E',
+            'SOL' => $authorSocials['tip_wallet_sol'] ?? 'So11111111111111111111111111111111111111112',
+            'ETH' => $authorSocials['tip_wallet_eth'] ?? '0x71C8A60e46b38cE1241F8308D649372F7505a76E',
+            'BTC' => $authorSocials['tip_wallet_btc'] ?? 'bc1q9v80n73qg3cm94n59tcqv04q6vt6vg00508h7e'
+        ];
+
         Response::view('public/author_profile', [
             'title' => ($author['display_name'] ?? $author['username']) . ' — Author & Contributor Profile | TechScout',
             'author' => $author,
@@ -148,7 +160,8 @@ class AuthorProfileController {
             'followingCount' => $followingCount,
             'followers' => $followers,
             'following' => $following,
-            'isAdmin' => $isAdmin
+            'isAdmin' => $isAdmin,
+            'tipWallets' => $tipWallets
         ]);
     }
 }

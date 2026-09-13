@@ -188,6 +188,24 @@
           <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #f8fafc; margin-bottom: 0.4rem;">Software License Type</label>
           <input type="text" name="license_type" id="tool_license_type" placeholder="Proprietary, MIT, Apache-2.0, AGPL-3.0" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.75rem 1rem; border-radius: 6px; color: #f8fafc;">
         </div>
+
+        <!-- Additional Custom Named Links Repeater -->
+        <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 1.25rem; margin-top: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div>
+              <h4 style="margin: 0; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="link-2" style="width: 16px; height: 16px;"></i> Additional Custom Named Links
+              </h4>
+              <span style="font-size: 0.75rem; color: #94a3b8;">Add custom external links like Live Sandbox, Whitepaper, Figma System, Substack, etc.</span>
+            </div>
+            <button type="button" onclick="addToolCustomLinkRow()" class="ts-btn ts-btn-sm ts-btn-outline" style="border-color: rgba(56,189,248,0.4); color: #38bdf8; font-size: 0.78rem;">
+              + Add Custom Link
+            </button>
+          </div>
+          <div id="toolCustomLinksContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
       </div>
 
       <!-- TAB 4: FEATURES & PLATFORM ECOSYSTEM -->
@@ -436,6 +454,7 @@ function openNewToolModal() {
   
   // Uncheck platform checkboxes
   document.querySelectorAll('.plat-cb').forEach(cb => cb.checked = false);
+  renderToolCustomLinks([]);
   
   switchToolTab('tab-basic');
   document.getElementById('toolFormModal').style.display = 'flex';
@@ -525,10 +544,45 @@ function editTool(t) {
     cb.checked = platArr.includes(cb.value);
   });
 
+  // Parse internal_notes for custom links
+  let customLinks = [];
+  try {
+    const notes = typeof t.internal_notes === 'string' ? JSON.parse(t.internal_notes) : (t.internal_notes || {});
+    if (Array.isArray(notes.custom_links)) customLinks = notes.custom_links;
+  } catch(e) {}
+  renderToolCustomLinks(customLinks);
+
   document.getElementById('modalToolTitle').innerText = 'Edit AI Tool: ' + (t.title || '');
   switchToolTab('tab-basic');
   document.getElementById('toolFormModal').style.display = 'flex';
   if (window.lucide) lucide.createIcons();
+}
+
+function renderToolCustomLinks(links) {
+  const container = document.getElementById('toolCustomLinksContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  if (Array.isArray(links) && links.length > 0) {
+    links.forEach(l => addToolCustomLinkRow(l.name || '', l.url || ''));
+  }
+}
+
+function addToolCustomLinkRow(name = '', url = '') {
+  const container = document.getElementById('toolCustomLinksContainer');
+  if (!container) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display: grid; grid-template-columns: 1fr 2fr 36px; gap: 0.6rem; align-items: center;';
+  row.innerHTML = `
+    <input type="text" name="custom_link_names[]" value="${escapeHtml(name)}" placeholder="Link Label (e.g. Sandbox, Discord)" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.55rem 0.75rem; border-radius: 6px; color: #38bdf8; font-size: 0.85rem;">
+    <input type="url" name="custom_link_urls[]" value="${escapeHtml(url)}" placeholder="https://..." style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.55rem 0.75rem; border-radius: 6px; color: #f8fafc; font-size: 0.85rem;">
+    <button type="button" onclick="this.parentElement.remove()" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; border-radius: 6px; padding: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Link">✕</button>
+  `;
+  container.appendChild(row);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
