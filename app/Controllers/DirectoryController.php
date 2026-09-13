@@ -241,6 +241,27 @@ class DirectoryController {
             $galleryImages = Database::query("SELECT * FROM prompt_images WHERE prompt_id = ? ORDER BY sort_order ASC, id ASC", [(int)$prompt['id']]);
         } catch (\Throwable $e) {}
 
+        // Author crypto tip wallets & profile data for creator tip jar
+        $tipWallets = [
+            'USDT' => '0x71C8A60e46b38cE1241F8308D649372F7505a76E',
+            'SOL' => 'So11111111111111111111111111111111111111112',
+            'ETH' => '0x71C8A60e46b38cE1241F8308D649372F7505a76E',
+            'BTC' => 'bc1q9v80n73qg3cm94n59tcqv04q6vt6vg00508h7e'
+        ];
+        $authorData = null;
+        if (!empty($prompt['author_id'])) {
+            try {
+                $authorData = Database::fetch("SELECT * FROM authors WHERE id = ?", [(int)$prompt['author_id']]);
+                if (!empty($authorData['social_links'])) {
+                    $soc = json_decode($authorData['social_links'], true) ?: [];
+                    if (!empty($soc['tip_wallet_btc'])) $tipWallets['BTC'] = $soc['tip_wallet_btc'];
+                    if (!empty($soc['tip_wallet_eth'])) $tipWallets['ETH'] = $soc['tip_wallet_eth'];
+                    if (!empty($soc['tip_wallet_usdt'])) $tipWallets['USDT'] = $soc['tip_wallet_usdt'];
+                    if (!empty($soc['tip_wallet_sol'])) $tipWallets['SOL'] = $soc['tip_wallet_sol'];
+                }
+            } catch (\Throwable $e) {}
+        }
+
         $adDirectUrl = 'https://omg10.com/4/11737440';
         try {
             $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url' OR key_name = 'ad_popunder_url'");
@@ -261,6 +282,8 @@ class DirectoryController {
             'models' => $models,
             'isBookmarked' => $isBookmarked,
             'galleryImages' => $galleryImages,
+            'tipWallets' => $tipWallets,
+            'authorData' => $authorData,
             'adDirectUrl' => $adDirectUrl,
             'comments' => $comments
         ]);

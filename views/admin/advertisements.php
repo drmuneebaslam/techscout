@@ -480,36 +480,48 @@
       <tbody>
         <?php if (!empty($authorTips)): ?>
           <?php foreach ($authorTips as $tip): ?>
+            <?php
+              $grossVal = !empty($tip['gross_amount']) ? (float)$tip['gross_amount'] : (float)($tip['amount_usd'] ?? 0);
+              $feeVal = !empty($tip['platform_fee']) ? (float)$tip['platform_fee'] : (float)($tip['platform_fee_usd'] ?? round($grossVal * 0.05, 2));
+              $netVal = !empty($tip['net_author_amount']) ? (float)$tip['net_author_amount'] : (float)($tip['net_amount_usd'] ?? round($grossVal * 0.95, 2));
+              $currVal = !empty($tip['currency']) ? $tip['currency'] : (str_replace('crypto_', '', strtoupper($tip['payment_method'] ?? 'USDT')));
+              $isCompleted = ($tip['status'] === 'completed' || $tip['status'] === 'verified');
+              $isRejected = ($tip['status'] === 'refunded' || $tip['status'] === 'rejected');
+              $isPending = ($tip['status'] === 'pending');
+            ?>
             <tr>
               <td>
-                <strong style="color: var(--admin-text-primary);"><?= htmlspecialchars($tip['author_name'] ?? $tip['author_username']) ?></strong>
+                <strong style="color: var(--admin-text-primary);"><?= htmlspecialchars($tip['author_name'] ?? $tip['author_username'] ?? 'Author') ?></strong>
                 <?php if (!empty($tip['article_url'])): ?>
                   <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">
-                    <a href="<?= htmlspecialchars($tip['article_url']) ?>" target="_blank" style="color: #38bdf8; text-decoration: none;">View Source Post ↗</a>
+                    <a href="<?= htmlspecialchars($tip['article_url']) ?>" target="_blank" style="color: #38bdf8; text-decoration: none;">View Source Blueprint ↗</a>
                   </div>
+                <?php endif; ?>
+                <?php if (!empty($tip['tipper_name'])): ?>
+                  <div style="font-size: 0.72rem; color: var(--admin-text-muted);">From: <?= htmlspecialchars($tip['tipper_name']) ?></div>
                 <?php endif; ?>
               </td>
               <td style="font-family: var(--admin-font-mono); font-weight: 700; color: var(--admin-text-primary);">
-                $<?= number_format((float)$tip['gross_amount'], 2) ?> <?= htmlspecialchars($tip['currency']) ?>
+                $<?= number_format($grossVal, 2) ?> <span style="font-size: 0.75rem; color: #818cf8;"><?= htmlspecialchars($currVal) ?></span>
               </td>
               <td style="font-family: var(--admin-font-mono); color: #f59e0b;">
-                -$<?= number_format((float)$tip['platform_fee'], 2) ?>
+                -$<?= number_format($feeVal, 2) ?>
               </td>
               <td style="font-family: var(--admin-font-mono); font-weight: 800; color: #10b981;">
-                +$<?= number_format((float)$tip['net_author_amount'], 2) ?>
+                +$<?= number_format($netVal, 2) ?>
               </td>
               <td>
-                <code style="font-size: 0.72rem; color: #38bdf8; background: rgba(56,189,248,0.08); padding: 0.15rem 0.4rem; border-radius: 4px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; display: inline-block;">
-                  <?= htmlspecialchars($tip['txid'] ?? 'N/A') ?>
+                <code style="font-size: 0.72rem; color: #38bdf8; background: rgba(56,189,248,0.08); padding: 0.15rem 0.4rem; border-radius: 4px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; display: inline-block;" title="<?= htmlspecialchars($tip['txid'] ?? $tip['reference_no'] ?? 'N/A') ?>">
+                  <?= htmlspecialchars(substr($tip['txid'] ?? $tip['reference_no'] ?? 'N/A', 0, 16)) ?>...
                 </code>
               </td>
               <td>
-                <span class="admin-pill-badge <?= $tip['status'] === 'verified' ? 'badge-success' : ($tip['status'] === 'rejected' ? 'badge-danger' : 'badge-warning') ?>">
-                  <?= ucfirst(htmlspecialchars($tip['status'])) ?>
+                <span class="admin-pill-badge <?= $isCompleted ? 'badge-success' : ($isRejected ? 'badge-danger' : 'badge-warning') ?>">
+                  <?= $isCompleted ? 'Completed ✓' : ($isRejected ? 'Refunded / Rejected' : 'Pending Verification') ?>
                 </span>
               </td>
               <td style="text-align: right;">
-                <?php if ($tip['status'] === 'pending'): ?>
+                <?php if ($isPending): ?>
                   <div style="display: inline-flex; gap: 0.35rem;">
                     <form action="<?= url('/admin/advertisements/tips/verify/' . $tip['id']) ?>" method="POST" style="margin: 0;">
                       <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.3); font-size: 0.72rem;">Credit Author ✓</button>

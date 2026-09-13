@@ -343,6 +343,38 @@ This document serves as the permanent registry of architectural and implementati
 
 ---
 
+### 🔴 MISTAKE-29: Gating Multi-Image Media Displays by Strict Entity Subtype
+* **Root Cause**: In `views/directory/prompt_single.php`, visual render showcase and thumbnail gallery components were conditioned on `$isImageEngine = (($prompt['prompt_type'] ?? '') === 'image');`. Prompts categorized as text, code, or workflows that had screenshots or visual architecture diagrams in `featured_image_url` or `prompt_images` were completely blocked from rendering any media.
+* **Consequences**:
+  - Attached images and interface screenshots failed to display for users, giving the appearance of lost or broken media.
+  - Creators who uploaded diagrams or workflow captures could not preview or show their assets.
+* **Mandatory Rule**:
+  - Always evaluate gallery display based on the presence of media assets (`!empty($allImages)` or `featured_image_url != ''` or `prompt_images` count > 0) rather than restricting display to a specific classification or engine subtype.
+
+---
+
+### 🔴 MISTAKE-30: Shallow Flattening & Unhandled Recursion in Taxonomy/Category CRUD
+* **Root Cause**: Category CRUD forms restricted parent selection to `WHERE parent_id IS NULL`, preventing multi-level nesting beyond level 1. Furthermore, hierarchical rendering lacked recursion and cycle detection, causing deep subcategories to either disappear or disrupt layout hierarchy.
+* **Consequences**:
+  - Admins could not organize complex category trees (e.g. `Prompts > AI Image Prompts > Midjourney > Photorealism`).
+  - Circular parenting references caused database lookup deadlock or infinite recursion.
+* **Mandatory Rule**:
+  - Support arbitrary, unlimited category nesting with recursion safeguards (depth limits, visited IDs cycle detection, and self-parenting prevention).
+  - Provide dedicated sub-tabs by entity scope (`All`, `Articles`, `AI Tools`, `Custom GPTs`, `Prompt Blueprints`, `Challenges`) with hierarchical indentation (`↳`, level badges) and instant "+ Add Subcategory" action buttons.
+
+---
+
+### 🔴 MISTAKE-31: Dual-Schema Mismatch & Non-Atomic Tipping Verification
+* **Root Cause**: The `author_tips` table status ENUM is `('completed','pending','refunded')`. Admin verification methods attempting to set status to `'verified'` or `'rejected'` violated MySQL strict ENUM constraints, causing silent updates or database exceptions. In addition, tip balance crediting and ledger records were not synchronized atomically.
+* **Consequences**:
+  - Tip status updates silently failed or stored empty strings.
+  - Creator balances were desynchronized from the financial ledger and incoming tips queue.
+* **Mandatory Rule**:
+  - Always synchronize tip status values strictly with the database schema (`'completed'` for verified/paid, `'refunded'` for rejected).
+  - Tipping approvals must run with dual-schema compatibility (`amount_usd` vs `gross_amount`, `net_amount_usd` vs `net_author_amount`), atomically crediting `author_tip_balances`, recording a credit entry in `financial_ledger`, generating an in-app notification, and logging to `audit_logs`.
+
+---
+
 ## 2. Response Audit Protocol
 At the conclusion of any code generation, the agent must cross-check every modified file against:
 1. [ ] **No Runtime DDL**: Are there any `ALTER TABLE` or `CREATE TABLE` calls in application request paths?
@@ -373,6 +405,10 @@ At the conclusion of any code generation, the agent must cross-check every modif
 26. [ ] **Non-Swallowed Middleware Exceptions & Normalized Paths (MISTAKE-26)**: Are middleware paths parsed with `$request->getPath()` with instant preview support?
 27. [ ] **Service Worker Guaranteed Response Conversion (MISTAKE-27)**: Do all `.catch()` service worker branches return valid `Response` instances?
 28. [ ] **Direct PWA Asset Interception (MISTAKE-28)**: Are `manifest.json` and `sw.js` served directly with proper MIME types before framework routing?
+29. [ ] **Universal Media Showcase on Single Detail Pages (MISTAKE-29)**: Are all associated media items rendered whenever available, rather than being gated by entity subtype?
+30. [ ] **Unlimited Recursive Taxonomy Nesting & Anti-Cycle Guards (MISTAKE-30)**: Does category CRUD support arbitrary hierarchical depth with cycle prevention and parent pre-selection?
+31. [ ] **Atomic Tip Verification & Schema Synchronization (MISTAKE-31)**: Are tip statuses synced with schema constraints (`'completed'`, `'refunded'`) and balanced atomically with ledger and notification updates?
+
 
 
 

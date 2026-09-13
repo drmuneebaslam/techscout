@@ -936,27 +936,75 @@ class AdminController {
     // 7. CATEGORIES & TAXONOMIES CRUD
     // ------------------------------------------------------------------------
     public function categories(Request $request): void {
-        $categories = Database::query("SELECT c.*, p.name as parent_name, t.name as topic_name, COUNT(cnt.id) as total_items 
-                                      FROM categories c 
-                                      LEFT JOIN categories p ON c.parent_id = p.id 
-                                      LEFT JOIN topics t ON c.topic_id = t.id 
-                                      LEFT JOIN contents cnt ON c.id = cnt.category_id 
-                                      GROUP BY c.id 
-                                      ORDER BY c.sort_order ASC, c.name ASC");
+        $rawCategories = Database::query("
+            SELECT c.*, p.name as parent_name, t.name as topic_name, COUNT(cnt.id) as total_items 
+            FROM categories c 
+            LEFT JOIN categories p ON c.parent_id = p.id 
+            LEFT JOIN topics t ON c.topic_id = t.id 
+            LEFT JOIN contents cnt ON c.id = cnt.category_id 
+            GROUP BY c.id 
+            ORDER BY c.sort_order ASC, c.name ASC
+        ");
 
-        $parentCategories = Database::query("SELECT * FROM categories WHERE parent_id IS NULL ORDER BY name ASC");
+        // Build parent lookup and recursive tree for unlimited nesting
+        $catMap = [];
+        $childrenMap = [];
+        foreach ($rawCategories as $c) {
+            $catMap[$c['id']] = $c;
+            $pId = $c['parent_id'] ? (int)$c['parent_id'] : 0;
+            $childrenMap[$pId][] = (int)$c['id'];
+        }
+
+        // Recursive tree builder with anti-cycle and anti-deep recursion guards (MISTAKE-30)
+        $flattenedTree = [];
+        $buildTree = function($parentId, $depth, $ancestors) use (&$buildTree, &$flattenedTree, &$catMap, &$childrenMap) {
+            if ($depth > 10) return;
+            if (empty($childrenMap[$parentId])) return;
+
+            foreach ($childrenMap[$parentId] as $cId) {
+                if (in_array($cId, $ancestors, true)) continue;
+                $item = $catMap[$cId];
+                $item['depth'] = $depth;
+                $item['ancestors'] = $ancestors;
+                $item['breadcrumb'] = array_merge($ancestors, [$item['name']]);
+                $item['breadcrumb_text'] = implode(' › ', $item['breadcrumb']);
+                $item['has_children'] = !empty($childrenMap[$cId]);
+                $item['children_count'] = count($childrenMap[$cId] ?? []);
+                $flattenedTree[] = $item;
+
+                $buildTree($cId, $depth + 1, array_merge($ancestors, [$item['name']]));
+            }
+        };
+
+        // Start recursion from top-level roots
+        $buildTree(0, 0, []);
+
+        // Include any orphaned categories
+        $seenIds = array_column($flattenedTree, 'id');
+        foreach ($rawCategories as $c) {
+            if (!in_array($c['id'], $seenIds)) {
+                $c['depth'] = 0;
+                $c['breadcrumb_text'] = $c['name'];
+                $c['has_children'] = !empty($childrenMap[$c['id']]);
+                $c['children_count'] = count($childrenMap[$c['id']] ?? []);
+                $flattenedTree[] = $c;
+            }
+        }
+
         $topics = Database::query("SELECT * FROM topics ORDER BY sort_order ASC, name ASC");
+        $currentScope = trim((string)$request->query('scope', 'all'));
 
         Response::view('admin/crud/categories', [
-            'title' => 'Categories & Taxonomies (Full CRUD) | Admin Hub',
-            'categories' => $categories,
-            'parentCategories' => $parentCategories,
-            'topics' => $topics
+            'title' => 'Categories & Hierarchical Taxonomies CRUD | Admin Hub',
+            'categories' => $flattenedTree,
+            'allCategoriesList' => $rawCategories,
+            'topics' => $topics,
+            'currentScope' => $currentScope
         ]);
     }
 
     public function saveCategory(Request $request): void {
-        $id = $request->post('id');
+        $id = $request->post('id') ? (int)$request->post('id') : null;
         $name = trim((string)$request->post('name', ''));
         $slug = trim((string)$request->post('slug', ''));
         if ($slug === '') {
@@ -971,19 +1019,41 @@ class AdminController {
         $color = trim((string)$request->post('color_hex', '#6366f1'));
         $sortOrder = (int)$request->post('sort_order', 0);
 
+        // Anti-cycle and self-parenting guard (MISTAKE-30)
+        if ($id && $parentId) {
+            if ($id === $parentId) {
+                $parentId = null;
+            } else {
+                $checkId = $parentId;
+                $visited = [$id];
+                while ($checkId) {
+                    if (in_array($checkId, $visited, true)) {
+                        $parentId = null; // Cycle detected, reset to root
+                        break;
+                    }
+                    $visited[] = $checkId;
+                    $pRow = Database::fetch("SELECT parent_id FROM categories WHERE id = ?", [$checkId]);
+                    $checkId = $pRow && $pRow['parent_id'] ? (int)$pRow['parent_id'] : null;
+                }
+            }
+        }
+
         if ($id) {
             Database::execute("UPDATE categories SET name = ?, slug = ?, topic_id = ?, parent_id = ?, applicable_to = ?, is_featured_home = ?, description = ?, icon_name = ?, color_hex = ?, sort_order = ? WHERE id = ?", [
                 $name, $slug, $topicId, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder, $id
             ]);
+            \App\Core\AuditLog::log('admin.category_update', 'categories', $id, ['name' => $name, 'parent_id' => $parentId]);
             Session::flash('success', "Category '{$name}' updated.");
         } else {
             Database::execute("INSERT INTO categories (name, slug, topic_id, parent_id, applicable_to, is_featured_home, description, icon_name, color_hex, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
                 $name, $slug, $topicId, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder
             ]);
+            $newId = (int)Database::lastInsertId();
+            \App\Core\AuditLog::log('admin.category_create', 'categories', $newId, ['name' => $name, 'parent_id' => $parentId]);
             Session::flash('success', "Category '{$name}' created.");
         }
 
-        Response::redirect('/admin/categories');
+        Response::redirect('/admin/categories' . ($applicableTo !== 'all' ? '?scope=' . urlencode($applicableTo) : ''));
     }
 
     public function deleteCategory(Request $request, array $params): void {
@@ -2995,9 +3065,14 @@ class AdminController {
             return;
         }
 
+        $gross = !empty($tip['gross_amount']) ? (float)$tip['gross_amount'] : (float)($tip['amount_usd'] ?? 0);
+        $fee = !empty($tip['platform_fee']) ? (float)$tip['platform_fee'] : (float)($tip['platform_fee_usd'] ?? round($gross * 0.05, 2));
+        $net = !empty($tip['net_author_amount']) ? (float)$tip['net_author_amount'] : (float)($tip['net_amount_usd'] ?? round($gross * 0.95, 2));
+        $currency = !empty($tip['currency']) ? $tip['currency'] : (str_replace('crypto_', '', strtoupper($tip['payment_method'] ?? 'USDT')));
+
         // Credit author balance
-        $author = Database::fetch("SELECT user_id FROM authors WHERE id = ?", [(int)$tip['author_id']]);
-        if ($author) {
+        $author = Database::fetch("SELECT a.id, a.user_id, a.display_name FROM authors a WHERE a.id = ?", [(int)$tip['author_id']]);
+        if ($author && !empty($author['user_id'])) {
             $userId = (int)$author['user_id'];
             Database::execute(
                 "INSERT INTO author_tip_balances (user_id, total_earned, current_balance) 
@@ -3005,27 +3080,69 @@ class AdminController {
                  ON DUPLICATE KEY UPDATE 
                  total_earned = total_earned + ?, 
                  current_balance = current_balance + ?",
-                [$userId, $tip['net_author_amount'], $tip['net_author_amount'], $tip['net_author_amount'], $tip['net_author_amount']]
+                [$userId, $net, $net, $net, $net]
             );
+
+            // Record to financial_ledger for complete financial audit trail
+            $refNo = $tip['reference_no'] ?? ('TIP-CREDIT-' . $tipId . '-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 6)));
+            try {
+                Database::execute(
+                    "INSERT INTO financial_ledger (reference_no, author_id, user_id, entry_type, category, amount_usd, credits, balance_before, balance_after, status, performed_by_user_id, performed_by_role, reason, internal_notes, created_at)
+                     VALUES (?, ?, ?, 'credit', 'author_tip', ?, ?, 0, ?, 'completed', ?, 'admin', ?, ?, NOW())",
+                    [$refNo, (int)$tip['author_id'], $userId, $net, $net, $net, (int)\App\Core\Auth::id(), "Verified creator tip #{$tipId} ({$currency})", "Gross: \${$gross}, Fee: \${$fee}, Net: \${$net}"]
+                );
+            } catch (\Throwable $e) {}
 
             \App\Core\NotificationHelper::send(
                 $userId,
                 'payout',
-                "Creator Tip Verified & Credited (+${$tip['net_author_amount']} USD)",
-                "You received a confirmed tip of ${$tip['gross_amount']} ({$tip['currency']}). After the 5% platform fee, ${$tip['net_author_amount']} has been added to your withdrawable balance!",
+                "Creator Tip Verified & Credited (+${$net} USD)",
+                "You received a confirmed tip of \${$gross} ({$currency}). After the 5% platform fee, \${$net} has been added to your withdrawable balance!",
                 url('/author/dashboard')
             );
         }
 
-        Database::execute("UPDATE author_tips SET status = 'verified' WHERE id = ?", [$tipId]);
-        Session::flash('success', "Tip #{$tipId} verified and credited to creator balance.");
+        // Status strictly set to 'completed' per schema enum('completed','pending','refunded')
+        Database::execute("UPDATE author_tips SET status = 'completed' WHERE id = ?", [$tipId]);
+
+        // Audit log recording
+        \App\Core\AuditLog::log('admin.tip_verified', 'author_tips', $tipId, [
+            'gross' => $gross,
+            'fee' => $fee,
+            'net' => $net,
+            'currency' => $currency,
+            'verified_by' => \App\Core\Auth::id()
+        ]);
+
+        Session::flash('success', "Tip #{$tipId} verified: \${$net} credited to creator balance and logged to financial ledger.");
         Response::redirect('/admin/advertisements?tab=tips');
     }
 
     public function rejectAuthorTip(Request $request, array $params): void {
         $tipId = (int)($params['id'] ?? 0);
-        Database::execute("UPDATE author_tips SET status = 'rejected' WHERE id = ?", [$tipId]);
-        Session::flash('success', "Tip #{$tipId} marked as rejected.");
+        $tip = Database::fetch("SELECT * FROM author_tips WHERE id = ?", [$tipId]);
+        if ($tip) {
+            // Status enum('completed','pending','refunded')
+            Database::execute("UPDATE author_tips SET status = 'refunded' WHERE id = ?", [$tipId]);
+            
+            // Audit log recording
+            \App\Core\AuditLog::log('admin.tip_rejected', 'author_tips', $tipId, [
+                'rejected_by' => \App\Core\Auth::id()
+            ]);
+
+            // Notify author
+            $author = Database::fetch("SELECT a.user_id FROM authors a WHERE a.id = ?", [(int)$tip['author_id']]);
+            if ($author && !empty($author['user_id'])) {
+                \App\Core\NotificationHelper::send(
+                    (int)$author['user_id'],
+                    'tip',
+                    "Creator Tip #{$tipId} Unverified",
+                    "A submitted reader tip #{$tipId} could not be confirmed on-chain and was marked as unverified.",
+                    url('/author/dashboard')
+                );
+            }
+        }
+        Session::flash('success', "Tip #{$tipId} marked as rejected/unverified.");
         Response::redirect('/admin/advertisements?tab=tips');
     }
 
