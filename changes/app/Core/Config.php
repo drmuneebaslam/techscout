@@ -12,7 +12,7 @@ class Config {
         'db_user' => 'if0_40102772',
         'db_pass' => 'Fp9QFWfj5fm',
         'session_lifetime' => 86400 * 7,
-        'environment' => 'production' // 'development' or 'production'
+        'environment' => 'production'
     ];
 
     public static function get(string $key, $default = null) {
@@ -34,7 +34,6 @@ class Config {
 
         $base = rtrim(self::get('app_url', 'https://funwithcoding.free.nf'), '/');
         
-        // Strip duplicate subfolder prefix if already present in path
         $parsed = parse_url($base);
         $basePath = trim($parsed['path'] ?? '', '/');
         if ($basePath !== '') {

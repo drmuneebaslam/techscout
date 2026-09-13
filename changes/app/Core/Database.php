@@ -1536,6 +1536,102 @@ class Database {
                 // Ensure all text prompts strictly have NO image attached in contents
                 $pdo->exec("UPDATE `contents` c JOIN `prompts` p ON c.id = p.content_id SET c.featured_image_url = NULL WHERE p.prompt_type = 'text'");
             } catch (Throwable $e) {}
+
+            // 32. Ensure comment_reactions, author_tip_balances, author_payout_requests, and author_tips columns exist
+            try {
+                $hasCR = $pdo->query("SHOW TABLES LIKE 'comment_reactions'")->fetchAll();
+                if (empty($hasCR)) {
+                    $pdo->exec("CREATE TABLE IF NOT EXISTS `comment_reactions` (
+                      `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                      `comment_id` bigint(20) unsigned NOT NULL,
+                      `user_id` bigint(20) unsigned DEFAULT NULL,
+                      `ip_address` varchar(45) NOT NULL,
+                      `reaction_type` varchar(32) NOT NULL DEFAULT 'helpful',
+                      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+                      PRIMARY KEY (`id`),
+                      KEY `idx_cr_comment_user` (`comment_id`, `user_id`),
+                      KEY `idx_cr_comment_ip` (`comment_id`, `ip_address`),
+                      KEY `idx_cr_reaction` (`reaction_type`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                }
+
+                $hasATB = $pdo->query("SHOW TABLES LIKE 'author_tip_balances'")->fetchAll();
+                if (empty($hasATB)) {
+                    $pdo->exec("CREATE TABLE IF NOT EXISTS `author_tip_balances` (
+                      `user_id` INT PRIMARY KEY,
+                      `total_earned` DECIMAL(10,2) DEFAULT 0.00,
+                      `current_balance` DECIMAL(10,2) DEFAULT 0.00,
+                      `total_withdrawn` DECIMAL(10,2) DEFAULT 0.00,
+                      `preferred_payout_wallet` VARCHAR(120) NULL,
+                      `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                }
+
+                $hasAPR = $pdo->query("SHOW TABLES LIKE 'author_payout_requests'")->fetchAll();
+                if (empty($hasAPR)) {
+                    $pdo->exec("CREATE TABLE IF NOT EXISTS `author_payout_requests` (
+                      `id` INT AUTO_INCREMENT PRIMARY KEY,
+                      `user_id` INT NOT NULL,
+                      `amount` DECIMAL(10,2) NOT NULL,
+                      `crypto_network` VARCHAR(20) NOT NULL,
+                      `destination_wallet` VARCHAR(120) NOT NULL,
+                      `status` ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+                      `txid` VARCHAR(120) NULL,
+                      `admin_notes` TEXT NULL,
+                      `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                      INDEX `idx_apr_user` (`user_id`, `status`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                }
+
+                // Check author_tips columns safely
+                $tipCols = array_column($pdo->query("SHOW COLUMNS FROM `author_tips`")->fetchAll(PDO::FETCH_ASSOC), 'Field');
+                if (!in_array('sender_name', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `sender_name` VARCHAR(100) DEFAULT 'Anonymous Supporter'");
+                }
+                if (!in_array('gross_amount', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `gross_amount` DECIMAL(10,2) NULL");
+                }
+                if (!in_array('platform_fee', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `platform_fee` DECIMAL(10,2) NULL");
+                }
+                if (!in_array('net_author_amount', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `net_author_amount` DECIMAL(10,2) NULL");
+                }
+                if (!in_array('currency', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `currency` VARCHAR(10) DEFAULT 'USDT'");
+                }
+                if (!in_array('txid', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `txid` VARCHAR(120) NULL");
+                }
+                if (!in_array('article_url', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `article_url` VARCHAR(255) NULL");
+                }
+                if (!in_array('sender_wallet', $tipCols, true)) {
+                    $pdo->exec("ALTER TABLE `author_tips` ADD COLUMN `sender_wallet` VARCHAR(120) NULL");
+                }
+            } catch (Throwable $e) {}
+
+            // 33. Ensure analytics_events table exists safely
+            try {
+                $hasAE = $pdo->query("SHOW TABLES LIKE 'analytics_events'")->fetchAll();
+                if (empty($hasAE)) {
+                    $pdo->exec("CREATE TABLE IF NOT EXISTS `analytics_events` (
+                      `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                      `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+                      `event_type` varchar(50) NOT NULL,
+                      `content_id` bigint(20) unsigned DEFAULT NULL,
+                      `author_id` bigint(20) unsigned DEFAULT NULL,
+                      `user_id` bigint(20) unsigned DEFAULT NULL,
+                      `referrer_domain` varchar(150) DEFAULT NULL,
+                      `device_type` enum('desktop','mobile','tablet','bot') NOT NULL DEFAULT 'desktop',
+                      `duration_seconds` int(10) unsigned DEFAULT 0,
+                      `metadata_json` longtext DEFAULT NULL,
+                      PRIMARY KEY (`id`),
+                      KEY `idx_analytics_type_time` (`event_type`,`event_time`),
+                      KEY `idx_analytics_lookup` (`event_time`,`event_type`,`content_id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                }
+            } catch (Throwable $e) {}
         } catch (Throwable $e) {
             // Ignore minor migration conflicts
         }
@@ -1551,6 +1647,10 @@ class Database {
             self::renderDetailedError($e, Config::get('db_host'), Config::get('db_port'), Config::get('db_name'), Config::get('db_user'), $sql, $params);
             return [];
         }
+    }
+
+    public static function queryOne(string $sql, array $params = []): ?array {
+        return self::fetchSilent($sql, $params);
     }
 
     public static function queryScalar(string $sql, array $params = []): mixed {

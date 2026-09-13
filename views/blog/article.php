@@ -27,6 +27,14 @@ $tipWallets = [
     'USDT' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_usdt' LIMIT 1") ?: '0x71C8A1bB722956276f5789129486c9A199859187',
     'SOL' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_sol' LIMIT 1") ?: 'So11111111111111111111111111111111111111112',
 ];
+
+$userArticleReaction = null;
+if (\App\Core\Auth::check()) {
+    $userArticleReaction = \App\Core\Database::queryScalar(
+        "SELECT reaction_type FROM reactions WHERE user_id = ? AND content_id = ? LIMIT 1",
+        [(int)\App\Core\Auth::id(), (int)$article['id']]
+    );
+}
 ?>
 
 <!-- Schema.org JSON-LD Structured Data -->
@@ -252,11 +260,11 @@ $tipWallets = [
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin: 2.5rem 0 1.5rem 0; padding-top: 1.5rem; border-top: 1px solid var(--ts-border-main);">
       <div class="reaction-bar" style="margin: 0; display: flex; gap: 0.4rem; flex-wrap: wrap;">
         <span style="font-size: 0.9rem; font-weight: 600; color: var(--ts-text-primary); margin-right: 0.5rem; align-self: center;">React:</span>
-        <button class="reaction-btn" data-content-id="<?= $article['id'] ?>" data-reaction="like">🔥 Fire <span class="reaction-count"><?= $article['reaction_count'] ?></span></button>
-        <button class="reaction-btn" data-content-id="<?= $article['id'] ?>" data-reaction="rocket">🚀 Rocket</button>
-        <button class="reaction-btn" data-content-id="<?= $article['id'] ?>" data-reaction="insightful">💡 Insightful</button>
-        <button class="reaction-btn" data-content-id="<?= $article['id'] ?>" data-reaction="mind_blown">🤯 Mind Blown</button>
-        <button class="reaction-btn" data-content-id="<?= $article['id'] ?>" data-reaction="clap">👏 Clap</button>
+        <button class="reaction-btn <?= ($userArticleReaction === 'like') ? 'active' : '' ?>" data-content-id="<?= $article['id'] ?>" data-reaction="like">🔥 Fire <span class="reaction-count"><?= $article['reaction_count'] ?></span></button>
+        <button class="reaction-btn <?= ($userArticleReaction === 'rocket') ? 'active' : '' ?>" data-content-id="<?= $article['id'] ?>" data-reaction="rocket">🚀 Rocket</button>
+        <button class="reaction-btn <?= ($userArticleReaction === 'insightful') ? 'active' : '' ?>" data-content-id="<?= $article['id'] ?>" data-reaction="insightful">💡 Insightful</button>
+        <button class="reaction-btn <?= ($userArticleReaction === 'mind_blown') ? 'active' : '' ?>" data-content-id="<?= $article['id'] ?>" data-reaction="mind_blown">🤯 Mind Blown</button>
+        <button class="reaction-btn <?= ($userArticleReaction === 'clap') ? 'active' : '' ?>" data-content-id="<?= $article['id'] ?>" data-reaction="clap">👏 Clap</button>
         <button type="button" class="reaction-btn" onclick="toggleBookmark(<?= $article['id'] ?>)" id="article-bottom-bookmark-btn" style="<?= !empty($isBookmarked) ? 'border-color: #ec4899; color: #f472b6;' : '' ?>">
           <span><?= !empty($isBookmarked) ? '🔖 Saved' : '🔖 Bookmark' ?></span>
         </button>
@@ -792,6 +800,80 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.sendBeacon('<?= url('/api/v1/history/record') ?>', payload);
       }
     });
+  }
+
+  // [TS-AUT-70] Code Block Interactive Copy Buttons & Telemetry Tracking
+  const codeBlocks = document.querySelectorAll('.article-body-content pre');
+  codeBlocks.forEach((pre) => {
+    if (pre.querySelector('.ts-code-copy-btn')) return;
+    pre.style.position = 'relative';
+    const codeEl = pre.querySelector('code') || pre;
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'ts-code-copy-btn';
+    copyBtn.innerHTML = '📋 Copy';
+    copyBtn.setAttribute('title', 'Copy code snippet');
+    copyBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; font-size: 0.72rem; padding: 4px 10px; background: rgba(15,23,42,0.85); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); border-radius: 6px; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.2s ease; z-index: 10; font-family: var(--ts-font-mono, monospace);';
+
+    copyBtn.addEventListener('mouseenter', () => {
+      copyBtn.style.color = '#38bdf8';
+      copyBtn.style.borderColor = '#38bdf8';
+      copyBtn.style.boxShadow = '0 0 10px rgba(56,189,248,0.2)';
+    });
+    copyBtn.addEventListener('mouseleave', () => {
+      if (copyBtn.innerHTML !== '✅ Copied!') {
+        copyBtn.style.color = '#94a3b8';
+        copyBtn.style.borderColor = 'rgba(148,163,184,0.3)';
+        copyBtn.style.boxShadow = 'none';
+      }
+    });
+
+    copyBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const rawText = codeEl.innerText || codeEl.textContent || '';
+      try {
+        await navigator.clipboard.writeText(rawText);
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.style.color = '#34d399';
+        copyBtn.style.borderColor = '#34d399';
+        setTimeout(() => {
+          copyBtn.innerHTML = '📋 Copy';
+          copyBtn.style.color = '#94a3b8';
+          copyBtn.style.borderColor = 'rgba(148,163,184,0.3)';
+          copyBtn.style.boxShadow = 'none';
+        }, 2200);
+
+        // Send telemetry event to backend
+        const contentId = '<?= (int)$article['id'] ?>';
+        const langMatch = (codeEl.className || '').match(/language-([a-zA-Z0-9_-]+)/);
+        const lang = langMatch ? langMatch[1] : 'code';
+        fetch('<?= url('/api/v1/telemetry/code-copy') ?>', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content_id: contentId,
+            language: lang,
+            snippet_length: rawText.length,
+            code_preview: rawText.substring(0, 100)
+          })
+        }).catch(() => {});
+      } catch (err) {
+        console.warn('Clipboard write error:', err);
+      }
+    });
+
+    pre.appendChild(copyBtn);
+  });
+
+  // Auto-trigger Tip Modal if URL has #tip or ?tip=1
+  const tipParams = new URLSearchParams(window.location.search);
+  if (window.location.hash === '#tip' || tipParams.get('tip') === '1') {
+    setTimeout(() => {
+      if (typeof openAuthorTipModal === 'function') {
+        openAuthorTipModal();
+      }
+    }, 350);
   }
 });
 </script>

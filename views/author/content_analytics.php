@@ -134,6 +134,9 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
     <button type="button" onclick="switchAnalyticsTab('engagement')" id="atab_engagement" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.45rem 1.15rem; font-weight: 700; color: #f472b6; border-color: rgba(236,72,153,0.3);">
       🔥 Sentiment &amp; Reactions
     </button>
+    <button type="button" onclick="switchAnalyticsTab('dropoff')" id="atab_dropoff" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.45rem 1.15rem; font-weight: 700; color: #f59e0b; border-color: rgba(245,158,11,0.3);">
+      🔥 Drop-Off &amp; Scroll Heatmap [TS-AUT-70]
+    </button>
   </div>
 
   <!-- ========================================================================= -->
@@ -353,6 +356,145 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
         <div style="background: rgba(15,23,42,0.6); padding: 1rem; border-radius: 8px; border: 1px dashed rgba(148,163,184,0.15); font-size: 0.8rem; color: #94a3b8;">
           ⚡ Every reaction and discussion reply awards Creator Reputation XP toward partner royalty tiers.
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAB 4: [TS-AUT-70] DROP-OFF & SCROLL DEPTH HEATMAP -->
+  <!-- ========================================================================= -->
+  <div id="apane_dropoff" class="analytics-tab-pane" style="display: none;">
+    <!-- AI Disengagement Hotspot Banner -->
+    <div class="ts-card" style="padding: 1.5rem; margin-bottom: 1.75rem; background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(239,68,68,0.05)); border: 1px solid rgba(245,158,11,0.3); border-left: 4px solid #f59e0b; border-radius: 12px;">
+      <div style="display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+        <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(245,158,11,0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
+          ⚠️
+        </div>
+        <div style="flex: 1; min-width: 260px;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ts-text-primary); margin: 0;">
+              Primary Disengagement Hotspot: <span style="color: #f59e0b;"><?= htmlspecialchars($analytics['ai_recommendation']['hotspot_zone'] ?? 'Intro') ?> (<?= htmlspecialchars($analytics['ai_recommendation']['hotspot_range'] ?? '0-20%') ?>)</span>
+            </h3>
+            <span class="ts-badge" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); font-size: 0.72rem;">
+              ↓ <?= (int)($analytics['ai_recommendation']['dropoff_rate'] ?? 0) ?>% Drop-Off
+            </span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--ts-text-secondary); margin: 0; line-height: 1.55;">
+            🤖 <strong>Tactical AI Recommendation:</strong> <?= htmlspecialchars($analytics['ai_recommendation']['advice'] ?? 'Keep optimizing key sections.') ?>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Block Utility & Telemetry Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
+      <div class="ts-card" style="padding: 1.25rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); border-top: 3px solid #10b981; border-radius: 12px;">
+        <div style="font-size: 0.75rem; color: var(--ts-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">
+          📋 Total Code Copies
+        </div>
+        <div style="font-size: 1.75rem; font-weight: 800; color: #10b981; font-family: var(--ts-font-mono);">
+          <?= number_format($analytics['total_code_copies'] ?? 0) ?>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--ts-text-muted); margin-top: 0.25rem;">
+          Times snippets were copied to clipboard
+        </div>
+      </div>
+
+      <div class="ts-card" style="padding: 1.25rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); border-top: 3px solid #38bdf8; border-radius: 12px;">
+        <div style="font-size: 0.75rem; color: var(--ts-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">
+          ⚡ Code Copy Conversion
+        </div>
+        <div style="font-size: 1.75rem; font-weight: 800; color: #38bdf8; font-family: var(--ts-font-mono);">
+          <?= $analytics['code_copy_rate'] ?? 0 ?>%
+        </div>
+        <div style="font-size: 0.75rem; color: var(--ts-text-muted); margin-top: 0.25rem;">
+          <?= $analytics['code_copiers_count'] ?? 0 ?> unique developers took action
+        </div>
+      </div>
+
+      <div class="ts-card" style="padding: 1.25rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); border-top: 3px solid #6366f1; border-radius: 12px;">
+        <div style="font-size: 0.75rem; color: var(--ts-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">
+          💻 Top Copied Syntax
+        </div>
+        <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.4rem;">
+          <?php if (!empty($analytics['top_copied_languages'])): ?>
+            <?php foreach ($analytics['top_copied_languages'] as $lang => $lCount): ?>
+              <span class="ts-badge ts-badge-indigo" style="font-size: 0.72rem;">
+                <?= htmlspecialchars(strtoupper($lang)) ?> (<?= $lCount ?>)
+              </span>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <span style="font-size: 0.85rem; color: var(--ts-text-muted);">Standard Snippets</span>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <div class="ts-card" style="padding: 1.25rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); border-top: 3px solid #ec4899; border-radius: 12px;">
+        <div style="font-size: 0.75rem; color: var(--ts-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">
+          📜 Average Scroll Depth
+        </div>
+        <div style="font-size: 1.75rem; font-weight: 800; color: #ec4899; font-family: var(--ts-font-mono);">
+          <?= $analytics['avg_scroll'] ?? 0 ?>%
+        </div>
+        <div style="font-size: 0.75rem; color: var(--ts-text-muted); margin-top: 0.25rem;">
+          Across all reader sessions
+        </div>
+      </div>
+    </div>
+
+    <!-- 5-Zone Thermal Scroll Heatmap Visualizer -->
+    <div class="ts-card" style="padding: 1.75rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); border-radius: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 style="font-size: 1.15rem; color: var(--ts-text-primary); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 700;">
+            🔥 5-Zone Audience Retention &amp; Thermal Scroll Heatmap
+          </h3>
+          <p style="font-size: 0.8rem; color: var(--ts-text-muted); margin: 0.2rem 0 0 0;">
+            Shows exact reader survival rates and drop-off deltas through the full publication flow
+          </p>
+        </div>
+        <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem;">
+          Phase 5 Enterprise Telemetry
+        </span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <?php foreach (($analytics['heatmap_zones'] ?? []) as $hz): ?>
+          <div style="background: var(--ts-bg-surface-elevated, rgba(15,23,42,0.6)); border: 1px solid var(--ts-border-subtle); border-radius: 10px; padding: 1rem 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span class="ts-badge" style="background: <?= $hz['color'] ?>22; color: <?= $hz['color'] ?>; border: 1px solid <?= $hz['color'] ?>55; font-weight: 700; font-size: 0.75rem;">
+                  <?= $hz['range'] ?>
+                </span>
+                <strong style="color: var(--ts-text-primary); font-size: 0.95rem;">
+                  <?= htmlspecialchars($hz['name']) ?>
+                </strong>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--ts-text-muted);">
+                  Retention: <strong style="color: <?= $hz['color'] ?>; font-family: var(--ts-font-mono); font-size: 1rem;"><?= $hz['retained_pct'] ?>%</strong>
+                </span>
+                <?php if ($hz['dropoff_pct'] > 0): ?>
+                  <span class="ts-badge" style="background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); font-size: 0.7rem;">
+                    ↓ <?= $hz['dropoff_pct'] ?>% drop-off
+                  </span>
+                <?php else: ?>
+                  <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">100% stable</span>
+                <?php endif; ?>
+              </div>
+            </div>
+
+            <!-- Heatmap Gradient Bar -->
+            <div style="width: 100%; height: 10px; background: rgba(148,163,184,0.1); border-radius: 999px; overflow: hidden; margin-bottom: 0.45rem;">
+              <div style="width: <?= $hz['retained_pct'] ?>%; height: 100%; background: linear-gradient(90deg, <?= $hz['color'] ?>, <?= $hz['color'] ?>bb); border-radius: 999px; transition: width 0.6s ease;"></div>
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--ts-text-muted); line-height: 1.4;">
+              <?= htmlspecialchars($hz['description']) ?>
+            </div>
+          </div>
+        <?php endforeach; ?>
       </div>
     </div>
   </div>

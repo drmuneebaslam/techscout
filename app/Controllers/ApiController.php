@@ -235,11 +235,14 @@ class ApiController {
         ]);
     }
 
-    // TS-SOC-04: Multi-Emoji Reaction Bar (❤️, 🚀, 💡, 🔥, 👀)
+    // TS-SOC-04: Multi-Emoji Reaction Bar (❤️, 🚀, 💡, 🔥, 👀) with Idempotent Single Reaction Toggle & Switch
     public function reactCommentEmoji(Request $request, array $params): void {
         $commentId = (int)($params['id'] ?? 0);
         $emoji = trim((string)($request->json('emoji') ?? $request->post('emoji') ?? ''));
-        $validEmojis = ['heart', 'rocket', 'lightbulb', 'fire', 'eyes'];
+        $validEmojis = ['heart', 'rocket', 'lightbulb', 'idea', 'fire', 'eyes'];
+
+        // Normalize lightbulb / idea
+        if ($emoji === 'idea') $emoji = 'lightbulb';
 
         if (!in_array($emoji, $validEmojis, true)) {
             Response::json(['error' => 'Invalid emoji reaction.'], 400);
@@ -249,8 +252,8 @@ class ApiController {
         $userId = Auth::id() ? (int)Auth::id() : null;
         $ip = Request::ip();
 
-        // Stored in reactions_json on comments
-        $comment = Database::fetch("SELECT reactions_json, reaction_count FROM comments WHERE id = ?", [$commentId]);
+        // Check if comment exists
+        $comment = Database::fetch("SELECT id, reactions_json, reaction_count FROM comments WHERE id = ?", [$commentId]);
         if (!$comment) {
             Response::json(['error' => 'Comment not found.'], 404);
             return;
@@ -258,17 +261,67 @@ class ApiController {
 
         $reactions = !empty($comment['reactions_json']) ? json_decode($comment['reactions_json'], true) : [];
         if (!is_array($reactions)) $reactions = [];
-        $reactions[$emoji] = (int)($reactions[$emoji] ?? 0) + 1;
 
-        Database::execute(
-            "UPDATE comments SET reactions_json = ?, reaction_count = reaction_count + 1 WHERE id = ?",
+        // Check if this user/IP already has an active emoji reaction on this comment
+        $existing = null;
+        try {
+            if ($userId) {
+                $existing = Database::fetch("SELECT id, reaction_type FROM comment_reactions WHERE comment_id = ? AND user_id = ? AND reaction_type != 'helpful' LIMIT 1", [$commentId, $userId]);
+            } else {
+                $existing = Database::fetch("SELECT id, reaction_type FROM comment_reactions WHERE comment_id = ? AND user_id IS NULL AND ip_address = ? AND reaction_type != 'helpful' LIMIT 1", [$commentId, $ip]);
+            }
+        } catch (\Throwable $e) {}
+
+        $action = 'added';
+        $userReaction = $emoji;
+
+        if ($existing) {
+            $prevReaction = $existing['reaction_type'];
+            if ($prevReaction === 'idea') $prevReaction = 'lightbulb';
+
+            if ($prevReaction === $emoji) {
+                // User clicked the exact same emoji -> TOGGLE OFF (Undo)
+                Database::executeSilent("DELETE FROM comment_reactions WHERE id = ?", [$existing['id']]);
+                $reactions[$emoji] = max(0, (int)($reactions[$emoji] ?? 0) - 1);
+                if ($reactions[$emoji] === 0) unset($reactions[$emoji]);
+                Database::executeSilent("UPDATE comments SET reaction_count = GREATEST(0, reaction_count - 1) WHERE id = ?", [$commentId]);
+                $action = 'removed';
+                $userReaction = null;
+            } else {
+                // User switched reaction to a different emoji -> SWITCH
+                Database::executeSilent("UPDATE comment_reactions SET reaction_type = ? WHERE id = ?", [$emoji, $existing['id']]);
+                $reactions[$prevReaction] = max(0, (int)($reactions[$prevReaction] ?? 0) - 1);
+                if ($reactions[$prevReaction] === 0) unset($reactions[$prevReaction]);
+                $reactions[$emoji] = (int)($reactions[$emoji] ?? 0) + 1;
+                $action = 'switched';
+                $userReaction = $emoji;
+            }
+        } else {
+            // First time emoji reaction by this user/IP
+            Database::executeSilent(
+                "INSERT INTO comment_reactions (comment_id, user_id, ip_address, reaction_type) VALUES (?, ?, ?, ?)",
+                [$commentId, $userId, $ip, $emoji]
+            );
+            $reactions[$emoji] = (int)($reactions[$emoji] ?? 0) + 1;
+            Database::executeSilent("UPDATE comments SET reaction_count = reaction_count + 1 WHERE id = ?", [$commentId]);
+            $action = 'added';
+            $userReaction = $emoji;
+        }
+
+        // Save updated reactions_json
+        Database::executeSilent(
+            "UPDATE comments SET reactions_json = ? WHERE id = ?",
             [json_encode($reactions), $commentId]
         );
 
+        $totalCount = (int)(Database::queryScalar("SELECT reaction_count FROM comments WHERE id = ?", [$commentId]) ?? 0);
+
         Response::json([
             'success' => true,
+            'action' => $action,
+            'user_reaction' => $userReaction,
             'reactions' => $reactions,
-            'total_count' => (int)$comment['reaction_count'] + 1
+            'total_count' => $totalCount
         ]);
     }
 
@@ -297,22 +350,28 @@ class ApiController {
 
     // TS-CR-05: Creator Crypto Tip Jar Submission (Central Treasury, 5% fee)
     public function submitCreatorTip(Request $request): void {
-        $authorUsername = trim((string)$request->post('author_username', ''));
+        $authorUsername = trim((string)($request->post('author_username') ?? $request->post('author_name') ?? ''));
+        $authorIdParam = (int)$request->post('author_id', 0);
         $articleUrl = trim((string)$request->post('article_url', ''));
-        $grossAmount = (float)$request->post('amount', 10.00);
-        $currency = strtoupper(trim((string)$request->post('currency', 'USDT')));
+        $articleId = (int)$request->post('article_id', 0);
+        $grossAmount = (float)($request->post('amount') ?? $request->post('amount_usd') ?? 10.00);
+        $currency = strtoupper(trim((string)($request->post('currency') ?? $request->post('crypto_symbol') ?? 'USDT')));
         $txid = trim((string)$request->post('txid', ''));
-        $senderName = trim((string)$request->post('sender_name', 'Anonymous Supporter'));
+        $senderName = trim((string)($request->post('sender_name') ?? $request->post('tipper_name') ?? 'Anonymous Supporter'));
+        $senderWallet = trim((string)$request->post('sender_wallet', ''));
 
         if ($grossAmount <= 0 || empty($txid)) {
-            Response::json(['error' => 'Please provide a valid tip amount and payment TXID.'], 400);
+            Response::json(['error' => 'Please provide a valid tip amount ($1+) and payment TXID.'], 400);
             return;
         }
 
         // Find author ID
         $author = null;
-        if (!empty($authorUsername)) {
-            $author = Database::fetch("SELECT a.id, a.user_id FROM authors a JOIN users u ON a.user_id = u.id WHERE u.username = ? OR a.display_name = ?", [$authorUsername, $authorUsername]);
+        if ($authorIdParam > 0) {
+            $author = Database::fetch("SELECT a.id, a.user_id FROM authors a WHERE a.id = ?", [$authorIdParam]);
+        }
+        if (!$author && !empty($authorUsername)) {
+            $author = Database::fetch("SELECT a.id, a.user_id FROM authors a JOIN users u ON a.user_id = u.id WHERE u.username = ? OR a.display_name = ? OR a.slug = ?", [$authorUsername, $authorUsername, $authorUsername]);
         }
         $authorId = $author ? (int)$author['id'] : 1;
 
@@ -320,15 +379,50 @@ class ApiController {
         $platformFee = round($grossAmount * 0.05, 2);
         $netAuthor = round($grossAmount * 0.95, 2);
 
-        Database::execute(
-            "INSERT INTO author_tips (author_id, sender_name, article_url, gross_amount, platform_fee, net_author_amount, currency, txid, status) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')",
-            [$authorId, $senderName ?: 'Anonymous Supporter', $articleUrl, $grossAmount, $platformFee, $netAuthor, $currency, $txid]
-        );
+        $refNo = 'TIP-CRYPTO-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 8));
+        $userId = Auth::id() ? (int)Auth::id() : null;
+        $tipperName = $senderName ?: 'Anonymous Supporter';
+        $paymentMethod = 'crypto_' . strtolower($currency);
+        $message = "Currency: {$currency} | TXID: {$txid}" . ($articleUrl ? " | Target: {$articleUrl}" : "");
+
+        // Dynamically inspect existing author_tips columns to ensure complete schema compatibility
+        $tipCols = [];
+        try {
+            $tipCols = array_column(Database::querySilent("SHOW COLUMNS FROM author_tips"), 'Field');
+        } catch (\Throwable $e) {}
+
+        if (in_array('sender_name', $tipCols, true) && in_array('gross_amount', $tipCols, true)) {
+            // Extended/Enterprise schema
+            Database::execute(
+                "INSERT INTO author_tips (author_id, sender_name, sender_wallet, article_url, gross_amount, platform_fee, net_author_amount, currency, txid, status) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')",
+                [$authorId, $tipperName, $senderWallet ?: null, $articleUrl ?: null, $grossAmount, $platformFee, $netAuthor, $currency, $txid]
+            );
+        } else {
+            // Standard/Legacy schema with reference_no, tipper_name, amount_usd, etc.
+            Database::execute(
+                "INSERT INTO author_tips (reference_no, author_id, article_id, tipper_user_id, tipper_name, amount_usd, platform_fee_usd, net_amount_usd, message, is_anonymous, payment_method, status, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())",
+                [$refNo, $authorId, $articleId ?: null, $userId, $tipperName, $grossAmount, $platformFee, $netAuthor, $message, ($tipperName === 'Anonymous Supporter' ? 1 : 0), $paymentMethod]
+            );
+        }
+
+        // Notify author if user_id known
+        if ($author && !empty($author['user_id'])) {
+            try {
+                \App\Core\NotificationHelper::send(
+                    (int)$author['user_id'],
+                    'tip',
+                    "Crypto Tip Received: \${$grossAmount} ({$currency})",
+                    "A reader tipped you \${$grossAmount} USD in {$currency}. TXID: {$txid}. Pending platform verification.",
+                    url('/author/dashboard')
+                );
+            } catch (\Throwable $e) {}
+        }
 
         Response::json([
             'success' => true,
-            'message' => 'Thank you! Your tip has been submitted for platform confirmation and creator credit.'
+            'message' => 'Thank you! Your crypto tip has been submitted for platform verification and creator credit.'
         ]);
     }
 
@@ -1584,6 +1678,33 @@ class ApiController {
             'success' => true,
             'data' => $result
         ]);
+    }
+
+    /**
+     * [TS-AUT-70] Log Code Block Copy Telemetry Event
+     */
+    public function logCodeCopy(Request $request): void {
+        $contentId = (int)($request->json('content_id') ?? $request->post('content_id') ?? 0);
+        if (!$contentId) {
+            Response::json(['error' => 'Missing content_id'], 400);
+            return;
+        }
+
+        $lang = substr(strip_tags((string)($request->json('language') ?? $request->post('language') ?? 'code')), 0, 32);
+        $length = (int)($request->json('snippet_length') ?? $request->post('snippet_length') ?? 0);
+        $preview = substr(strip_tags((string)($request->json('code_preview') ?? $request->post('code_preview') ?? '')), 0, 120);
+
+        $item = Database::fetch("SELECT author_id FROM contents WHERE id = ?", [$contentId]);
+        $authorId = $item ? (int)$item['author_id'] : null;
+
+        Analytics::logEvent('code_copy', $contentId, $authorId, 0, [
+            'language' => $lang,
+            'snippet_length' => $length,
+            'code_preview' => $preview,
+            'ip' => Request::ip()
+        ]);
+
+        Response::json(['success' => true]);
     }
 }
 

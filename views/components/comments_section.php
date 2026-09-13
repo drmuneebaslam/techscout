@@ -13,29 +13,39 @@ $comments = (isset($comments) && is_array($comments)) ? $comments : [];
 $totalComments = count($comments);
 $currentUser = \App\Core\Auth::user();
 
-// Query current user / IP upvoted comments for toggle state tracking
+// Query current user / IP upvoted comments & reactions for toggle state tracking
 $userUpvotedCommentIds = [];
+$userCommentReactions = [];
 try {
     $currentUserId = \App\Core\Auth::id();
     $clientIp = \App\Core\Request::ip();
     if ($currentUserId) {
-        $rows = \App\Core\Database::query(
-            "SELECT comment_id FROM comment_reactions WHERE user_id = ?",
+        $rows = \App\Core\Database::querySilent(
+            "SELECT comment_id, reaction_type FROM comment_reactions WHERE user_id = ?",
             [$currentUserId]
         );
     } else {
-        $rows = \App\Core\Database::query(
-            "SELECT comment_id FROM comment_reactions WHERE user_id IS NULL AND ip_address = ?",
+        $rows = \App\Core\Database::querySilent(
+            "SELECT comment_id, reaction_type FROM comment_reactions WHERE user_id IS NULL AND ip_address = ?",
             [$clientIp]
         );
     }
-    $userUpvotedCommentIds = array_map('intval', array_column($rows, 'comment_id'));
+    foreach ($rows as $r) {
+        $cid = (int)$r['comment_id'];
+        $rtype = $r['reaction_type'] ?? 'helpful';
+        if ($rtype === 'helpful') {
+            $userUpvotedCommentIds[] = $cid;
+        } else {
+            $userCommentReactions[$cid] = $rtype;
+        }
+    }
 } catch (\Throwable $e) {
     $userUpvotedCommentIds = [];
+    $userCommentReactions = [];
 }
 
 if (!function_exists('renderRedditCommentNode')) {
-    function renderRedditCommentNode(array $c, int $contentId, int $contentAuthorId, ?array $currentUser, int $depth = 0, array $userUpvotedCommentIds = []): void {
+    function renderRedditCommentNode(array $c, int $contentId, int $contentAuthorId, ?array $currentUser, int $depth = 0, array $userUpvotedCommentIds = [], array $userCommentReactions = []): void {
         $isAuthorComment = ($contentAuthorId && (int)$c['user_id'] === $contentAuthorId);
         $upvotes = (int)($c['reaction_count'] ?? 0);
         $commentId = (int)$c['id'];
@@ -118,10 +128,18 @@ if (!function_exists('renderRedditCommentNode')) {
 
                 <!-- Live Multi-Emoji Reactions Pill Row [TS-SOC-04] -->
                 <div id="reactions-display-<?= $commentId ?>" style="display: flex; gap: 0.3rem; margin-top: 0.4rem; flex-wrap: wrap;">
+                  <?php 
+                    $userEmoji = $userCommentReactions[$commentId] ?? null;
+                    if ($userEmoji === 'idea') $userEmoji = 'lightbulb';
+                  ?>
                   <?php foreach ($emojiMap as $eKey => $eSymbol): ?>
-                    <?php $cnt = (int)($reactions[$eKey] ?? 0); if ($cnt > 0): ?>
-                      <span class="reaction-pill-badge" id="pill-<?= $commentId ?>-<?= $eKey ?>" style="font-size: 0.72rem; padding: 0.1rem 0.4rem; border-radius: 12px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); display: inline-flex; align-items: center; gap: 0.25rem;">
-                        <?= $eSymbol ?> <span class="cnt"><?= $cnt ?></span>
+                    <?php 
+                      $cnt = (int)($reactions[$eKey] ?? 0); 
+                      $isActive = ($userEmoji === $eKey);
+                    ?>
+                    <?php if ($cnt > 0): ?>
+                      <span class="reaction-pill-badge <?= $isActive ? 'active-emoji-pill' : '' ?>" id="pill-<?= $commentId ?>-<?= $eKey ?>" style="font-size: 0.72rem; padding: 0.12rem 0.45rem; border-radius: 12px; background: <?= $isActive ? 'rgba(99,102,241,0.22)' : 'var(--ts-bg-surface)' ?>; border: 1px solid <?= $isActive ? 'var(--ts-primary)' : 'var(--ts-border-subtle)' ?>; color: <?= $isActive ? '#ffffff' : 'inherit' ?>; display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; transition: all 0.15s ease;" onclick="sendEmojiReaction(<?= $commentId ?>, '<?= $eKey ?>')" title="<?= $isActive ? 'Click to remove reaction' : 'Click to react' ?>">
+                        <?= $eSymbol ?> <span class="cnt" style="font-weight: <?= $isActive ? '700' : '400' ?>;"><?= $cnt ?></span>
                       </span>
                     <?php endif; ?>
                   <?php endforeach; ?>
@@ -205,7 +223,7 @@ if (!function_exists('renderRedditCommentNode')) {
                 <?php if ($hasReplies): ?>
                   <div id="comment-collapsible-body-<?= $commentId ?>">
                     <?php foreach ($c['replies'] as $subReply): ?>
-                      <?php renderRedditCommentNode($subReply, $contentId, $contentAuthorId, $currentUser, $depth + 1, $userUpvotedCommentIds); ?>
+                      <?php renderRedditCommentNode($subReply, $contentId, $contentAuthorId, $currentUser, $depth + 1, $userUpvotedCommentIds, $userCommentReactions); ?>
                     <?php endforeach; ?>
                   </div>
                 <?php endif; ?>
@@ -296,7 +314,7 @@ if (!function_exists('renderRedditCommentNode')) {
     <?php if (!empty($comments)): ?>
       <?php foreach ($comments as $index => $c): ?>
         <div class="root-comment-wrapper" style="<?= $index >= 5 ? 'display:none;' : '' ?>">
-          <?php renderRedditCommentNode($c, $contentId, $contentAuthorId, $currentUser, 0, $userUpvotedCommentIds); ?>
+          <?php renderRedditCommentNode($c, $contentId, $contentAuthorId, $currentUser, 0, $userUpvotedCommentIds, $userCommentReactions); ?>
         </div>
       <?php endforeach; ?>
 
@@ -583,20 +601,37 @@ async function sendEmojiReaction(commentId, emojiKey) {
     const data = await res.json();
     if (data && data.success) {
       const reactions = data.reactions || {};
+      const userReaction = data.user_reaction || null;
       const container = document.getElementById('reactions-display-' + commentId);
       if (container) {
-        const emojiMap = { heart: '❤️', rocket: '🚀', idea: '💡', fire: '🔥', eyes: '👀' };
+        const emojiMap = { heart: '❤️', rocket: '🚀', lightbulb: '💡', fire: '🔥', eyes: '👀' };
         let html = '';
         for (const [k, sym] of Object.entries(emojiMap)) {
           const cnt = reactions[k] || 0;
           if (cnt > 0) {
-            html += `<span class="reaction-pill-badge" id="pill-${commentId}-${k}" style="font-size: 0.72rem; padding: 0.1rem 0.4rem; border-radius: 12px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); display: inline-flex; align-items: center; gap: 0.25rem;">${sym} <span class="cnt">${cnt}</span></span>`;
+            const isActive = (userReaction === k);
+            const activeBg = isActive ? 'rgba(99,102,241,0.22)' : 'var(--ts-bg-surface)';
+            const activeBorder = isActive ? 'var(--ts-primary)' : 'var(--ts-border-subtle)';
+            const activeColor = isActive ? '#ffffff' : 'inherit';
+            const activeWeight = isActive ? '700' : '400';
+            html += `<span class="reaction-pill-badge ${isActive ? 'active-emoji-pill' : ''}" id="pill-${commentId}-${k}" style="font-size: 0.72rem; padding: 0.12rem 0.45rem; border-radius: 12px; background: ${activeBg}; border: 1px solid ${activeBorder}; color: ${activeColor}; display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; transition: all 0.15s ease;" onclick="sendEmojiReaction(${commentId}, '${k}')" title="${isActive ? 'Click to remove reaction' : 'Click to react'}">${sym} <span class="cnt" style="font-weight: ${activeWeight};">${cnt}</span></span>`;
           }
         }
         container.innerHTML = html;
       }
-      toggleEmojiBar(commentId);
-      if (typeof showToast === 'function') showToast('Reaction updated!', 'info');
+      const bar = document.getElementById('emoji-bar-' + commentId);
+      if (bar) bar.style.display = 'none';
+      if (typeof showToast === 'function') {
+        if (data.action === 'removed') {
+          showToast('Reaction removed', 'info');
+        } else if (data.action === 'switched') {
+          showToast(`Switched reaction to ${emojiKey}! ⚡`, 'success');
+        } else {
+          showToast(`Reacted with ${emojiKey}! 🚀`, 'success');
+        }
+      }
+    } else if (data && data.error) {
+      if (typeof showToast === 'function') showToast(data.error, 'warning');
     }
   } catch (err) {
     console.error(err);

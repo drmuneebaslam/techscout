@@ -153,4 +153,52 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // 5. [TS-AUT-70] Global Code Snippet Copy Enhancer
+  document.querySelectorAll('pre code, .article-body-content pre').forEach(target => {
+    const pre = target.tagName === 'PRE' ? target : target.closest('pre');
+    if (!pre || pre.querySelector('.ts-code-copy-btn')) return;
+    pre.style.position = 'relative';
+    const codeEl = pre.querySelector('code') || pre;
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'ts-code-copy-btn';
+    copyBtn.innerHTML = '📋 Copy';
+    copyBtn.setAttribute('title', 'Copy code snippet');
+    copyBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; font-size: 0.72rem; padding: 4px 10px; background: rgba(15,23,42,0.85); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); border-radius: 6px; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.2s ease; z-index: 10; font-family: monospace;';
+
+    copyBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const rawText = codeEl.innerText || codeEl.textContent || '';
+      try {
+        await navigator.clipboard.writeText(rawText);
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.style.color = '#34d399';
+        copyBtn.style.borderColor = '#34d399';
+        setTimeout(() => {
+          copyBtn.innerHTML = '📋 Copy';
+          copyBtn.style.color = '#94a3b8';
+          copyBtn.style.borderColor = 'rgba(148,163,184,0.3)';
+        }, 2000);
+
+        const contentId = document.querySelector('[data-content-id]')?.getAttribute('data-content-id');
+        if (contentId) {
+          const langMatch = (codeEl.className || '').match(/language-([a-zA-Z0-9_-]+)/);
+          const lang = langMatch ? langMatch[1] : 'code';
+          fetch(`${baseUrl}/api/v1/telemetry/code-copy`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content_id: contentId,
+              language: lang,
+              snippet_length: rawText.length,
+              code_preview: rawText.substring(0, 100)
+            })
+          }).catch(() => {});
+        }
+      } catch (err) {}
+    });
+    pre.appendChild(copyBtn);
+  });
 });

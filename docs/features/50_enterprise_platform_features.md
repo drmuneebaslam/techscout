@@ -22,10 +22,24 @@
    - Dedicated "Subscribe to Author" button. Authors can trigger automated newsletter digests to their personal follower base upon publication.
 8. **Draft Shareable Review Links & Pre-Release Private Feedback**
    - Generate secret, password-protected or expiring preview URLs (`techscout.n/preview/x8k92?token=...`) for peer review before publishing.
-9. **Granular Article Analytics Dashboard (Scroll Depth, Heatmaps & Drop-off Rates)**
-   - Track reader engagement: Average reading velocity, code snippet copy rates, scroll depth percentages (25%, 50%, 75%, 100%), and referral source attribution.
-10. **Creator Canonical URL & Multi-Platform Cross-Posting Sync**
-    - Built-in `rel="canonical"` URL configuration for authors republishing from their personal Substack, Medium, or personal dev blog to preserve SEO authority.
+9. **[TS-AUT-70 & TS-AUT-55] Reader Engagement Drop-Off & 5-Zone Scroll Depth Heatmap Telemetry (Phase 4 & 5)**
+   - Telemetry visualizer highlighting exact reader survival rates, drop-off percentages, and average scroll depth across 5 distinct zones: `0–20%` (Hook & TL;DR), `21–40%` (Context & Problem Framing), `41–60%` (Architecture & Core Implementation), `61–80%` (Execution & Edge Cases), and `81–100%` (Conclusion & Takeaways).
+   - Dynamic **Disengagement Hotspot Detection** with tailored, actionable AI content recommendations indicating how creators can restructure sections experiencing reader fatigue.
+   - Real-time **Code Block Copy Rates & Utility Telemetry**: Tracks total snippet copies, conversion percentage of unique readers copying code, and breakdown of most copied programming languages (`Python`, `PHP`, `TypeScript`, `Bash`, etc.).
+10. **[TS-AUT-68] Automated Technical Broken Link & 404 Scanner (Phase 5)**
+    - Interactive foreground administrative audit console built directly into `cron.php` and `LinkScanner` model.
+    - Inspects all outbound hyperlinks, API endpoints, and GitHub repository links embedded in published article HTML and summaries.
+    - Live foreground execution with real-time percentage progress bar, execution log streaming, HTTP latency timings, and status code verification (`200 OK`, `301 Redirect`, `404 Not Found`, `500 Server Error`).
+    - Interactive Results Data Table with 1-click "Edit in Studio" direct deep links, status filter pills, and JSON audit report export for technical authors.
+11. **Creator Canonical URL & Multi-Platform Cross-Posting Sync**
+    - Built-in `rel="canonical"` URL configuration for authors republishing from their personal Substack, Medium, or dev blog to preserve SEO authority.
+12. **[TS-SOC-15] Anti-Spam Single Reaction Per User Toggle & Switch Engine**
+    - Enforces idempotent single-reaction-per-user/IP constraint across articles and comments.
+    - Clicking the same reaction cleanly revokes it (undo / decrement); clicking a different emoji switches the reaction without artificially inflating totals.
+    - Dual-theme active state styling (`.active-emoji-pill`, `.reaction-btn.active`) eliminating spam clicks while preserving rich community sentiment.
+13. **[TS-CR-05] Author Crypto Tip Jar & Direct Anchor Modal Auto-Open (`#tip`)**
+    - Multi-network cryptocurrency tip modal (BTC, ETH, USDT, SOL) featuring dynamic QR codes, platform treasury addresses, TXID verification forms, and transparent 95/5 creator revenue split.
+    - Direct URL anchor routing: Navigating to `author/profile/{slug}#tip` or `?tip=1` automatically opens the interactive tip modal on page load.
 
 ---
 

@@ -2,6 +2,14 @@
 require __DIR__ . '/../layouts/header.php'; 
 
 $isOwner = (\App\Core\Auth::id() && (int)\App\Core\Auth::id() === (int)($author['user_id'] ?? 0)) || \App\Core\Auth::isAdmin();
+
+// Platform treasury wallets for author tipping [TS-CR-05]
+$tipWallets = [
+    'BTC' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_btc' LIMIT 1") ?: 'bc1qtechscoutcrypto7482910482910btcxx',
+    'ETH' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_eth' LIMIT 1") ?: '0x71C8A1bB722956276f5789129486c9A199859187',
+    'USDT' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_usdt' LIMIT 1") ?: '0x71C8A1bB722956276f5789129486c9A199859187',
+    'SOL' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_sol' LIMIT 1") ?: 'So11111111111111111111111111111111111111112',
+];
 ?>
 
 <div class="container" style="padding-top: 3rem; margin-bottom: 5rem;">
@@ -34,7 +42,7 @@ $isOwner = (\App\Core\Auth::id() && (int)\App\Core\Auth::id() === (int)($author[
           <?= htmlspecialchars($author['headline'] ?? $author['bio'] ?? 'Systems architect, deep learning researcher, and open-source contributor.') ?>
         </p>
 
-        <!-- Follow Action, Follower Counts & Privacy Controls -->
+        <!-- Follow Action, Crypto Tip Trigger, Follower Counts & Privacy Controls -->
         <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
           <?php if (\App\Core\Auth::id() !== (int)$author['user_id']): ?>
             <button type="button" onclick="toggleAuthorFollow(<?= (int)$author['id'] ?>, this)" id="btn-follow-author" class="ts-btn <?= !empty($isFollowing) ? 'ts-btn-outline' : 'ts-btn-primary' ?> ts-btn-sm" style="<?= !empty($isFollowing) ? 'color: #38bdf8; border-color: #38bdf8;' : 'background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700;' ?>">
@@ -42,6 +50,12 @@ $isOwner = (\App\Core\Auth::id() && (int)\App\Core\Auth::id() === (int)($author[
               <span id="follow-author-label"><?= !empty($isFollowing) ? 'Following' : 'Follow Author' ?></span>
             </button>
           <?php endif; ?>
+
+          <!-- [TS-CR-05] Crypto Tip Author Button -->
+          <button type="button" onclick="openAuthorTipModal()" id="btn-tip-author" class="ts-btn ts-btn-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; font-weight: 700; box-shadow: 0 4px 15px rgba(245,158,11,0.35); display: inline-flex; align-items: center; gap: 0.4rem; border: none; padding: 0.35rem 0.85rem; border-radius: 8px; cursor: pointer;">
+            <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+            <span>Tip Author (Crypto)</span>
+          </button>
 
           <span class="ts-badge" style="background: rgba(56,189,248,0.12); color: #38bdf8; border-color: rgba(56,189,248,0.3); padding: 0.4rem 0.75rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Verified Creator Followers">
             <i data-lucide="users" style="width: 13px;"></i>
@@ -374,7 +388,107 @@ $isOwner = (\App\Core\Auth::id() && (int)\App\Core\Auth::id() === (int)($author[
   <?php endif; ?>
 </div>
 
+<!-- [TS-CR-05] Dual-Theme Author Crypto Tip Modal -->
+<div id="authorTipModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.85); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;" onclick="if(event.target===this) closeAuthorTipModal();">
+  <div class="ts-card author-tip-modal-card" style="width: 100%; max-width: 540px; padding: 2rem; background: var(--ts-card-bg); border: 1px solid var(--ts-border-main); box-shadow: 0 25px 60px rgba(0,0,0,0.6); border-radius: 16px; position: relative; max-height: 90vh; overflow-y: auto;">
+    <button type="button" onclick="closeAuthorTipModal()" style="position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; font-size: 1.5rem; color: var(--ts-text-tertiary); cursor: pointer; line-height: 1;">&times;</button>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+      <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(245,158,11,0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="zap" style="width: 24px; height: 24px;"></i>
+      </div>
+      <div>
+        <h3 style="font-size: 1.35rem; color: var(--ts-text-primary); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+          Support <?= htmlspecialchars($author['display_name'] ?? $author['username']) ?> with Crypto
+        </h3>
+        <p style="font-size: 0.8rem; color: var(--ts-text-tertiary); margin: 0.15rem 0 0 0;">Direct creator micro-sponsorship via verified platform treasury</p>
+      </div>
+    </div>
+
+    <!-- Revenue Share & Fee Guarantee Notice -->
+    <div style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: var(--ts-text-secondary); line-height: 1.5;">
+      ⚡ <strong>Creator Revenue Guarantee:</strong> <strong>95%</strong> of your contribution is credited directly to <strong><?= htmlspecialchars($author['display_name'] ?? $author['username']) ?></strong>'s verified creator balance. The platform retains 5% for protocol verification &amp; maintenance.
+    </div>
+
+    <!-- Network Selector Tabs -->
+    <div style="margin-bottom: 1.25rem;">
+      <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--ts-text-secondary); text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing: 0.05em;">Select Cryptocurrency Network</label>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;" id="tipCryptoTabs">
+        <button type="button" onclick="selectTipCrypto('USDT')" id="tab-crypto-USDT" class="crypto-net-btn active" style="padding: 0.6rem 0.3rem; border-radius: 8px; border: 1px solid var(--ts-primary); background: rgba(99,102,241,0.15); color: var(--ts-text-primary); cursor: pointer; font-weight: 700; font-size: 0.82rem; text-align: center;">
+          <div style="font-size: 1rem; margin-bottom: 0.1rem;">💵</div>
+          USDT
+        </button>
+        <button type="button" onclick="selectTipCrypto('SOL')" id="tab-crypto-SOL" class="crypto-net-btn" style="padding: 0.6rem 0.3rem; border-radius: 8px; border: 1px solid var(--ts-border-subtle); background: var(--ts-bg-surface); color: var(--ts-text-secondary); cursor: pointer; font-weight: 700; font-size: 0.82rem; text-align: center;">
+          <div style="font-size: 1rem; margin-bottom: 0.1rem;">⚡</div>
+          SOL
+        </button>
+        <button type="button" onclick="selectTipCrypto('ETH')" id="tab-crypto-ETH" class="crypto-net-btn" style="padding: 0.6rem 0.3rem; border-radius: 8px; border: 1px solid var(--ts-border-subtle); background: var(--ts-bg-surface); color: var(--ts-text-secondary); cursor: pointer; font-weight: 700; font-size: 0.82rem; text-align: center;">
+          <div style="font-size: 1rem; margin-bottom: 0.1rem;">💎</div>
+          ETH
+        </button>
+        <button type="button" onclick="selectTipCrypto('BTC')" id="tab-crypto-BTC" class="crypto-net-btn" style="padding: 0.6rem 0.3rem; border-radius: 8px; border: 1px solid var(--ts-border-subtle); background: var(--ts-bg-surface); color: var(--ts-text-secondary); cursor: pointer; font-weight: 700; font-size: 0.82rem; text-align: center;">
+          <div style="font-size: 1rem; margin-bottom: 0.1rem;">🪙</div>
+          BTC
+        </button>
+      </div>
+    </div>
+
+    <!-- Deposit Address Box & Dynamic QR Code -->
+    <div style="background: var(--ts-bg); border: 1px solid var(--ts-border-main); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; text-align: center;">
+      <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+        <div style="background: #ffffff; padding: 8px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+          <img id="tipQrCodeImg" src="" alt="Deposit QR Code" style="width: 140px; height: 140px; display: block;">
+        </div>
+      </div>
+      <div style="font-size: 0.75rem; color: var(--ts-text-tertiary); margin-bottom: 0.35rem;" id="tipNetworkLabel">Platform Treasury Address (USDT - ERC20/TRC20):</div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <input type="text" id="tipWalletAddressInput" readonly style="flex: 1; font-family: monospace; font-size: 0.78rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-subtle); border-radius: 6px; padding: 0.5rem 0.75rem; color: var(--ts-text-primary);" value="">
+        <button type="button" onclick="copyTipAddress()" class="ts-btn ts-btn-outline ts-btn-sm" style="white-space: nowrap; font-size: 0.78rem; padding: 0.5rem 0.75rem;">
+          📋 Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- Tip Verification Form -->
+    <form id="authorTipSubmissionForm" onsubmit="submitAuthorProfileTip(event)">
+      <input type="hidden" name="author_username" value="<?= htmlspecialchars($author['username']) ?>">
+      <input type="hidden" name="author_id" value="<?= (int)$author['id'] ?>">
+      <input type="hidden" name="currency" id="tipCurrencyField" value="USDT">
+      <input type="hidden" name="article_url" value="<?= htmlspecialchars(url('/author/profile/' . $author['slug'])) ?>">
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--ts-text-primary); margin-bottom: 0.35rem;">Contribution ($ USD)</label>
+          <input type="number" name="amount" id="tipAmountInput" min="1" step="1" value="15" style="width: 100%; background: var(--ts-bg); border: 1px solid var(--ts-border-main); padding: 0.6rem 0.75rem; border-radius: 6px; color: var(--ts-text-primary); font-size: 0.9rem;" required>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--ts-text-primary); margin-bottom: 0.35rem;">Your Name / Handle</label>
+          <input type="text" name="sender_name" placeholder="Anonymous Supporter" style="width: 100%; background: var(--ts-bg); border: 1px solid var(--ts-border-main); padding: 0.6rem 0.75rem; border-radius: 6px; color: var(--ts-text-primary); font-size: 0.9rem;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--ts-text-primary); margin-bottom: 0.35rem;">
+          Transaction Hash / TXID <span style="color: #ef4444;">*</span>
+        </label>
+        <input type="text" name="txid" id="tipTxidInput" placeholder="Paste 0x... or Solana/Bitcoin transaction signature" style="width: 100%; background: var(--ts-bg); border: 1px solid var(--ts-border-main); padding: 0.6rem 0.75rem; border-radius: 6px; color: var(--ts-text-primary); font-size: 0.85rem; font-family: monospace;" required>
+        <span style="font-size: 0.72rem; color: var(--ts-text-tertiary); margin-top: 0.25rem; display: block;">Used by platform nodes to confirm on-chain arrival and allocate 95% creator credit.</span>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; align-items: center;">
+        <button type="button" onclick="closeAuthorTipModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+        <button type="submit" id="tipSubmitBtn" class="ts-btn ts-btn-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; border: none; padding: 0.55rem 1.5rem; box-shadow: 0 4px 15px rgba(245,158,11,0.35);">
+          Verify &amp; Credit Author ⚡
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
+const tipWallets = <?= json_encode($tipWallets) ?>;
+let activeTipCrypto = 'USDT';
+
 function switchAuthorTab(tab) {
   document.querySelectorAll('.author-tab-content').forEach(c => c.style.display = 'none');
   document.querySelectorAll('[id^="tab-btn-"]').forEach(b => {
@@ -390,6 +504,106 @@ function switchAuthorTab(tab) {
     btn.classList.add('ts-btn-primary');
   }
 }
+
+function selectTipCrypto(symbol) {
+  activeTipCrypto = symbol;
+  const currField = document.getElementById('tipCurrencyField');
+  if (currField) currField.value = symbol;
+
+  document.querySelectorAll('.crypto-net-btn').forEach(btn => {
+    btn.style.borderColor = 'var(--ts-border-subtle)';
+    btn.style.background = 'var(--ts-bg-surface)';
+    btn.style.color = 'var(--ts-text-secondary)';
+  });
+  const activeBtn = document.getElementById('tab-crypto-' + symbol);
+  if (activeBtn) {
+    activeBtn.style.borderColor = 'var(--ts-primary)';
+    activeBtn.style.background = 'rgba(99,102,241,0.15)';
+    activeBtn.style.color = 'var(--ts-text-primary)';
+  }
+  const addr = tipWallets[symbol] || '';
+  const walletInput = document.getElementById('tipWalletAddressInput');
+  if (walletInput) walletInput.value = addr;
+  const label = document.getElementById('tipNetworkLabel');
+  if (label) label.innerText = `Platform Treasury Address (${symbol}):`;
+  const qr = document.getElementById('tipQrCodeImg');
+  if (qr && addr) {
+    qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(addr)}`;
+  }
+}
+
+function openAuthorTipModal() {
+  selectTipCrypto(activeTipCrypto);
+  const modal = document.getElementById('authorTipModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+}
+
+function closeAuthorTipModal() {
+  const modal = document.getElementById('authorTipModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function copyTipAddress() {
+  const input = document.getElementById('tipWalletAddressInput');
+  if (input) {
+    navigator.clipboard.writeText(input.value).then(() => {
+      if (typeof showToast === 'function') showToast('Wallet address copied to clipboard! 📋', 'success');
+      else alert('Wallet address copied to clipboard!');
+    });
+  }
+}
+
+async function submitAuthorProfileTip(e) {
+  e.preventDefault();
+  const btn = document.getElementById('tipSubmitBtn');
+  btn.disabled = true;
+  btn.innerText = 'Submitting for verification...';
+
+  const baseUrl = (typeof getTsApiBase === 'function') ? getTsApiBase() : '';
+  const form = document.getElementById('authorTipSubmissionForm');
+  const formData = new FormData(form);
+
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/tips/submit`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success) {
+      if (typeof showToast === 'function') {
+        showToast(data.message || 'Tip submitted! Creator credited upon confirmation.', 'success');
+      } else {
+        alert(data.message || 'Tip submitted successfully!');
+      }
+      closeAuthorTipModal();
+      form.reset();
+    } else {
+      if (typeof showToast === 'function') {
+        showToast(data.error || 'Failed to submit tip.', 'warning');
+      } else {
+        alert(data.error || 'Failed to submit tip.');
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    if (typeof showToast === 'function') showToast('Unable to submit tip. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'Verify & Credit Author ⚡';
+  }
+}
+
+// Auto-trigger modal if URL contains #tip or ?tip=1
+document.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash;
+  const urlParams = new URLSearchParams(window.location.search);
+  if (hash === '#tip' || urlParams.get('tip') === '1' || urlParams.get('action') === 'tip') {
+    setTimeout(openAuthorTipModal, 250);
+  }
+});
 </script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

@@ -210,6 +210,139 @@ class Analytics {
             LIMIT 15
         ", [$contentId]);
 
+        // 9. [TS-AUT-70 & TS-AUT-55] Reader Engagement Drop-Off & Scroll Depth Heatmap Telemetry
+        $effectiveReaders = max(1, $readerCount);
+        $zone1Count = (int)(Database::fetch("SELECT COUNT(*) as c FROM reading_history WHERE content_id = ? AND progress_percent >= 0", [$contentId])['c'] ?? 0);
+        $zone2Count = (int)(Database::fetch("SELECT COUNT(*) as c FROM reading_history WHERE content_id = ? AND progress_percent >= 21", [$contentId])['c'] ?? 0);
+        $zone3Count = (int)(Database::fetch("SELECT COUNT(*) as c FROM reading_history WHERE content_id = ? AND progress_percent >= 41", [$contentId])['c'] ?? 0);
+        $zone4Count = (int)(Database::fetch("SELECT COUNT(*) as c FROM reading_history WHERE content_id = ? AND progress_percent >= 61", [$contentId])['c'] ?? 0);
+        $zone5Count = (int)(Database::fetch("SELECT COUNT(*) as c FROM reading_history WHERE content_id = ? AND progress_percent >= 81", [$contentId])['c'] ?? 0);
+
+        // Normalize zone counts
+        $zone1Count = max($zone1Count, $zone2Count, $zone3Count, $zone4Count, $zone5Count, (int)min($totalViews, 1));
+        $effectiveReaders = max(1, $zone1Count);
+
+        $zone1Pct = 100;
+        $zone2Pct = round(($zone2Count / $effectiveReaders) * 100);
+        $zone3Pct = round(($zone3Count / $effectiveReaders) * 100);
+        $zone4Pct = round(($zone4Count / $effectiveReaders) * 100);
+        $zone5Pct = round(($zone5Count / $effectiveReaders) * 100);
+
+        $drop1to2 = max(0, $zone1Pct - $zone2Pct);
+        $drop2to3 = max(0, $zone2Pct - $zone3Pct);
+        $drop3to4 = max(0, $zone3Pct - $zone4Pct);
+        $drop4to5 = max(0, $zone4Pct - $zone5Pct);
+        $dropFinal = max(0, $zone5Pct - (int)$completionRate);
+
+        $heatmapZones = [
+            [
+                'id' => 'zone_0_20',
+                'name' => 'Hook & Executive Summary',
+                'range' => '0% – 20%',
+                'retained_pct' => $zone1Pct,
+                'dropoff_pct' => $drop1to2,
+                'color' => '#10b981',
+                'description' => 'Title, author byline, TL;DR overview and architectural diagram hook.'
+            ],
+            [
+                'id' => 'zone_21_40',
+                'name' => 'Context & Problem Framing',
+                'range' => '21% – 40%',
+                'retained_pct' => $zone2Pct,
+                'dropoff_pct' => $drop2to3,
+                'color' => '#06b6d4',
+                'description' => 'Background context, prerequisites, stack selection, and core hypothesis.'
+            ],
+            [
+                'id' => 'zone_41_60',
+                'name' => 'Architecture & Core Implementation',
+                'range' => '41% – 60%',
+                'retained_pct' => $zone3Pct,
+                'dropoff_pct' => $drop3to4,
+                'color' => '#6366f1',
+                'description' => 'In-depth code walkthroughs, data schema breakdown, and integration logic.'
+            ],
+            [
+                'id' => 'zone_61_80',
+                'name' => 'Execution & Edge Cases',
+                'range' => '61% – 80%',
+                'retained_pct' => $zone4Pct,
+                'dropoff_pct' => $drop4to5,
+                'color' => '#f59e0b',
+                'description' => 'Benchmarking, concurrency tests, error boundary handlers, and production gotchas.'
+            ],
+            [
+                'id' => 'zone_81_100',
+                'name' => 'Conclusion & Production Takeaways',
+                'range' => '81% – 100%',
+                'retained_pct' => $zone5Pct,
+                'dropoff_pct' => $dropFinal,
+                'color' => '#ec4899',
+                'description' => 'Key learnings, author crypto tip banner, related blueprints, and discussion prompt.'
+            ]
+        ];
+
+        // Find primary disengagement hotspot (maximum drop-off)
+        $maxDrop = -1;
+        $hotspotZone = $heatmapZones[0];
+        foreach ($heatmapZones as $z) {
+            if ($z['dropoff_pct'] > $maxDrop) {
+                $maxDrop = $z['dropoff_pct'];
+                $hotspotZone = $z;
+            }
+        }
+
+        // Actionable AI recommendation based on hotspot
+        $aiRecommendation = [
+            'hotspot_zone' => $hotspotZone['name'],
+            'hotspot_range' => $hotspotZone['range'],
+            'dropoff_rate' => $hotspotZone['dropoff_pct'],
+            'advice' => ''
+        ];
+
+        switch ($hotspotZone['id']) {
+            case 'zone_0_20':
+                $aiRecommendation['advice'] = "High early drop-off detected ({$hotspotZone['dropoff_pct']}%). Consider tightening your opening 2 paragraphs, adding a punchy visual architecture diagram, and leading with an immediate actionable code snippet before theory.";
+                break;
+            case 'zone_21_40':
+                $aiRecommendation['advice'] = "Drop-off spike at 21–40% ({$hotspotZone['dropoff_pct']}%). Readers are losing patience during background exposition. Shorten setup paragraphs and introduce code blocks earlier.";
+                break;
+            case 'zone_41_60':
+                $aiRecommendation['advice'] = "Mid-article technical fatigue detected ({$hotspotZone['dropoff_pct']}% drop). Monolithic code blocks may be overwhelming readers. Break code into smaller chunks (under 25 lines) and intersperse annotated callout boxes.";
+                break;
+            case 'zone_61_80':
+                $aiRecommendation['advice'] = "Drop-off during advanced deep-dive ({$hotspotZone['dropoff_pct']}%). Readers need clearer benchmark summaries or ready-to-run CLI commands to maintain momentum through advanced configuration.";
+                break;
+            default:
+                $aiRecommendation['advice'] = "Strong retention across the technical implementation! Your final drop-off is {$hotspotZone['dropoff_pct']}%. Boost end-of-article engagement by highlighting the author crypto tip shield and embedding a community discussion question.";
+                break;
+        }
+
+        // 10. Code Block Copy Rates & Telemetry
+        $codeCopyRow = Database::fetch("
+            SELECT COUNT(*) as total_copies, COUNT(DISTINCT user_id) as unique_copiers
+            FROM analytics_events
+            WHERE content_id = ? AND event_type = 'code_copy'
+        ", [$contentId]);
+        $totalCodeCopies = (int)($codeCopyRow['total_copies'] ?? 0);
+        $uniqueCopiers = (int)($codeCopyRow['unique_copiers'] ?? 0);
+        $codeCopyRate = round(($uniqueCopiers / $effectiveReaders) * 100, 1);
+
+        $codeEvents = Database::query("
+            SELECT metadata_json 
+            FROM analytics_events 
+            WHERE content_id = ? AND event_type = 'code_copy' 
+            ORDER BY id DESC LIMIT 50
+        ", [$contentId]);
+        $langCounts = [];
+        foreach ($codeEvents as $ce) {
+            $m = json_decode($ce['metadata_json'] ?? '{}', true);
+            $l = !empty($m['language']) ? strtolower($m['language']) : 'code';
+            $langCounts[$l] = ($langCounts[$l] ?? 0) + 1;
+        }
+        arsort($langCounts);
+        $topLangs = array_slice($langCounts, 0, 5, true);
+
         return [
             'content' => $content,
             'total_views' => $totalViews,
@@ -231,7 +364,14 @@ class Analytics {
             'devices' => $devices,
             'referrers' => $referrers,
             'scroll_funnel' => $scrollFunnel,
-            'recent_readers' => $recentReaders
+            'recent_readers' => $recentReaders,
+            'heatmap_zones' => $heatmapZones,
+            'hotspot_zone' => $hotspotZone,
+            'ai_recommendation' => $aiRecommendation,
+            'total_code_copies' => $totalCodeCopies,
+            'code_copiers_count' => $uniqueCopiers,
+            'code_copy_rate' => $codeCopyRate,
+            'top_copied_languages' => $topLangs
         ];
     }
 
