@@ -398,7 +398,15 @@ This document serves as the permanent registry of architectural and implementati
   - `InstallController::isInstalled()` must verify not just `storage/installed.lock`, but whether the database is actually populated (e.g., table `contents` exists). If tables do not exist, the platform must be considered uninstalled.
   - `InstallController::process()` must allow installation when `!$isInstalled` OR `!empty($request->post('force_reinstall'))` from the installer form.
   - Automatically create target databases using server-level connection (`CREATE DATABASE IF NOT EXISTS \`{$dbname}\``) so setup never fails due to missing databases on fresh setups.
-  - Provide an option in the setup wizard to upload a custom `.sql` dump file with foreign key checks temporarily disabled (`SET FOREIGN_KEY_CHECKS = 0`) to allow seamless restoration of custom databases.
+### 🔴 MISTAKE-34: Uninitialized Bootstrap Variable Access in Platform Entrypoint (`index.php`)
+* **Root Cause**:
+  - In `index.php`, code evaluating `$isFullyInstalled = file_exists($lockPath) && ...` was placed before `$lockPath = __DIR__ . '/storage/installed.lock'` was declared.
+  - When PHP error reporting is configured to display warnings or when run under strict error tracking, this triggers `PHP Warning: Undefined variable $lockPath in index.php on line 146`.
+* **Consequences**:
+  - Emits PHP warning notices on bootstrap that can break JSON API responses, corrupt HTTP headers, or display ugly warnings to end users on custom or local installations.
+* **Mandatory Rule**:
+  - In `index.php`, all bootstrap state variables (`$lockPath`, `$reqUri`, `$isStaticAsset`, `$isInstallRoute`, `$isDbPopulated`) must be strictly initialized and declared *before* any installation checks, conditions, or redirects are executed.
+  - Always run `php -r "error_reporting(E_ALL); require_once 'index.php';"` during verification to guarantee zero undefined variable notices, deprecation warnings, or fatal exceptions.
 
 ---
 
@@ -437,6 +445,8 @@ At the conclusion of any code generation, the agent must cross-check every modif
 31. [ ] **Atomic Tip Verification & Schema Synchronization (MISTAKE-31)**: Are tip statuses synced with schema constraints (`'completed'`, `'refunded'`) and balanced atomically with ledger and notification updates?
 32. [ ] **Zero-Crash Remote DB Lockout & Admin Query Optimization (MISTAKE-32)**: Are timeouts enforced, remote credentials bridged locally, setup wizard unlocked when disconnected, and listing queries stripped of `body_html`?
 33. [ ] **Auto-DB Creation, Unlocked First-Run FTP Restores & Custom SQL Support (MISTAKE-33)**: Does the installer verify actual table population instead of blindly relying on `installed.lock`, auto-create the database, allow custom `.sql` dump uploads, and bypass false locks on first-time setup?
+34. [ ] **Early Bootstrap Variable Initialization & Zero-Warning Cleanliness (MISTAKE-34)**: Are `$lockPath`, `$reqUri`, `$isStaticAsset`, and other router bootstrap variables declared strictly prior to usage to prevent PHP undefined variable warnings?
+
 
 
 

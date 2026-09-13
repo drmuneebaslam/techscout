@@ -165,12 +165,33 @@
 
   <div class="container">
 
-    <!-- Request #6 (Current Active) -->
+    <!-- Request #7 (Current Active) -->
+    <div class="req-card" id="req-7">
+      <div class="req-meta">
+        <div class="req-id">
+          <span>⚡ Prompt #7: Eliminate Undefined Variable $lockPath Warning in index.php</span>
+          <span class="req-badge">ACTIVE EXECUTION</span>
+        </div>
+        <div>
+          <button class="copy-btn" onclick="copyPromptText('req-text-7', this)">📋 Copy Full Prompt</button>
+        </div>
+      </div>
+      <div class="req-content" id="req-text-7">Warning: Undefined variable $lockPath in C:\xampp\htdocs\techscout_custom\index.php on line 146
+kindly there should be no errors like this</div>
+
+      <div class="breakdown-title">📌 Architectural Action Plan &amp; Breakdown:</div>
+      <ul class="breakdown-list">
+        <li><strong>Early Declaration &amp; Variable Scoping:</strong> Ensure <code>$lockPath</code>, <code>$reqUri</code>, <code>$isStaticAsset</code>, and <code>$isInstallRoute</code> are declared before any installation check or redirect evaluations in <code>index.php</code>.</li>
+        <li><strong>Strict Error Cleanliness:</strong> Enforce zero PHP notices, warnings, or uninitialized variable accesses across all execution lifecycles, ensuring seamless portability across local development and production environments.</li>
+      </ul>
+    </div>
+
+    <!-- Request #6 -->
     <div class="req-card" id="req-6">
       <div class="req-meta">
         <div class="req-id">
           <span>⚡ Prompt #6: Fix Setup Wizard Lockout on Process Step, Auto DB Creation &amp; Custom SQL File Upload</span>
-          <span class="req-badge">ACTIVE EXECUTION</span>
+          <span class="req-badge" style="background: rgba(16,185,129,0.15); color: #34d399; border-color: rgba(16,185,129,0.3);">COMPLETED</span>
         </div>
         <div>
           <button class="copy-btn" onclick="copyPromptText('req-text-6', this)">📋 Copy Full Prompt</button>

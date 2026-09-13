@@ -130,6 +130,14 @@ if ($dbHasConnection) {
 }
 Config::set('app_url', $baseUrl);
 
+// First-Run Web Installer & Database Recovery Auto-Detector
+$lockPath = __DIR__ . '/storage/installed.lock';
+$reqUri = $_SERVER['REQUEST_URI'] ?? '/';
+$isStaticAsset = str_starts_with($reqUri, '/assets/') 
+    || str_contains($reqUri, 'favicon.ico')
+    || str_contains($reqUri, 'robots.txt');
+$isInstallRoute = str_contains($reqUri, '/install');
+
 // Check if core database tables actually exist
 $isDbPopulated = false;
 if ($dbHasConnection) {
