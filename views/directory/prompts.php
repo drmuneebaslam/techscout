@@ -10,14 +10,14 @@
 
     <!-- Top Primary Mode Tabs -->
     <div style="display: inline-flex; background: var(--ts-bg-surface-elevated); padding: 0.35rem; border-radius: 30px; border: 1px solid var(--ts-border-main); margin-top: 1.75rem; gap: 0.35rem; flex-wrap: wrap; justify-content: center;">
-      <a href="<?= url('/prompts') ?>" class="ts-btn ts-btn-sm <?= empty($activeTab) || $activeTab === 'all' ? 'ts-btn-primary' : 'ts-btn-ghost' ?>" style="border-radius: 24px; padding: 0.5rem 1.25rem; font-weight: 600; text-decoration: none;">
-        🌟 All Prompts
-      </a>
-      <a href="<?= url('/prompts?tab=text') ?>" class="ts-btn ts-btn-sm <?= ($activeTab ?? '') === 'text' ? 'ts-btn-primary' : 'ts-btn-ghost' ?>" style="border-radius: 24px; padding: 0.5rem 1.25rem; font-weight: 600; text-decoration: none;">
+      <a href="<?= url('/prompts') ?>" class="ts-btn ts-btn-sm <?= ($activeTab ?? 'text') === 'text' ? 'ts-btn-primary' : 'ts-btn-ghost' ?>" style="border-radius: 24px; padding: 0.5rem 1.25rem; font-weight: 600; text-decoration: none;">
         ⚡ LLM &amp; System Prompts
       </a>
       <a href="<?= url('/prompts/images') ?>" class="ts-btn ts-btn-sm ts-btn-outline" style="border-radius: 24px; padding: 0.5rem 1.25rem; font-weight: 700; text-decoration: none; border-color: #ec4899; color: #ec4899;">
-        🎨 AI Image Prompts Sub-Directory ↗
+        🎨 AI Image Prompts Gallery ↗
+      </a>
+      <a href="<?= url('/prompts?tab=all') ?>" class="ts-btn ts-btn-sm <?= ($activeTab ?? '') === 'all' ? 'ts-btn-primary' : 'ts-btn-ghost' ?>" style="border-radius: 24px; padding: 0.5rem 1.25rem; font-weight: 600; text-decoration: none;">
+        🌟 All Prompts
       </a>
     </div>
 
@@ -167,26 +167,40 @@
     <?php if (!empty($prompts)): ?>
       <?php foreach ($prompts as $p): ?>
         <?php
-          $isImagePrompt = false;
-          $modelsStr = is_string($p['target_models'] ?? '') ? $p['target_models'] : json_encode($p['target_models'] ?? []);
-          if (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || in_array($p['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion'])) {
-              $isImagePrompt = true;
+          $isImagePrompt = (($p['prompt_type'] ?? '') === 'image');
+          if (!$isImagePrompt) {
+              $modelsStr = is_string($p['target_models'] ?? '') ? $p['target_models'] : json_encode($p['target_models'] ?? []);
+              if (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || in_array($p['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion'])) {
+                  $isImagePrompt = true;
+              }
           }
           $promptText = $p['prompt_template'] ?? '';
-          $imageUrl = image_url($p['featured_image_url'] ?? '');
+          // Only image generation prompts may have an image attached
+          $imageUrl = $isImagePrompt ? image_url($p['featured_image_url'] ?? '') : '';
         ?>
         <div class="ts-card" style="display: flex; flex-direction: column; overflow: hidden; padding: 0; border: 1px solid var(--ts-border-main); border-radius: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
           
-          <?php if (!empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/'): ?>
-            <!-- Card Thumbnail: Direct link to Prompt Blueprint View (No Lightbox) -->
+          <?php if ($isImagePrompt && !empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/'): ?>
+            <!-- Card Thumbnail: Strictly for AI Image Generation Prompts -->
             <a href="<?= url('/prompts/' . $p['slug']) ?>" style="position: relative; height: 190px; overflow: hidden; background: var(--ts-bg-surface-elevated); display: block; text-decoration: none;">
               <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= htmlspecialchars($p['title']) ?>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
               <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%); display: flex; align-items: flex-end; padding: 0.75rem;">
-                <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; backdrop-filter: blur(4px);">
-                  <i data-lucide="arrow-right" style="width: 12px; height: 12px; display: inline;"></i> View Blueprint &amp; Copy ↗
+                <span class="ts-badge ts-badge-pink" style="font-size: 0.72rem; backdrop-filter: blur(4px);">
+                  <i data-lucide="image" style="width: 12px; height: 12px; display: inline;"></i> Visual Image Blueprint ↗
                 </span>
               </div>
             </a>
+          <?php elseif (!$isImagePrompt): ?>
+            <!-- Sleek Code & Terminal Header: Pure Text / System Prompts (No Image Attached) -->
+            <div style="background: linear-gradient(135deg, rgba(6,182,212,0.06) 0%, rgba(99,102,241,0.06) 100%); border-bottom: 1px solid var(--ts-border-main); padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="terminal" style="width: 15px; height: 15px; color: #38bdf8;"></i>
+                <span style="font-family: var(--ts-font-mono); font-size: 0.75rem; color: var(--ts-text-muted); font-weight: 600;">PROMPT BLUEPRINT</span>
+              </div>
+              <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">
+                <?= htmlspecialchars($p['category_name'] ?? 'Prompt') ?>
+              </span>
+            </div>
           <?php endif; ?>
 
           <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1;">

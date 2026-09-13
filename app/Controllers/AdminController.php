@@ -461,7 +461,7 @@ class AdminController {
     // 4. PROMPT BLUEPRINTS CRUD
     // ------------------------------------------------------------------------
     public function prompts(Request $request): void {
-        $prompts = Database::query("SELECT c.*, p.prompt_template, p.template_variables, p.target_models, p.copy_count, cat.name as category_name 
+        $prompts = Database::query("SELECT c.*, p.prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output, cat.name as category_name 
                                    FROM contents c 
                                    JOIN prompts p ON c.id = p.content_id 
                                    LEFT JOIN categories cat ON c.category_id = cat.id 
@@ -484,28 +484,61 @@ class AdminController {
         $template = trim((string)$request->post('prompt_template', ''));
         $variablesJson = trim((string)$request->post('template_variables', '[]'));
         $targetModelsJson = trim((string)$request->post('target_models', '["ChatGPT", "Claude"]'));
+        $sampleOutput = trim((string)$request->post('sample_output', ''));
+        $promptType = (string)$request->post('prompt_type', 'text');
+        if (!in_array($promptType, ['text', 'image'], true)) {
+            $promptType = 'text';
+        }
+
         $authorId = (int)(Auth::user()['author_id'] ?? 1);
         $slug = Sanitizer::slug($title);
 
+        $imageUrl = null;
+        if ($promptType === 'image') {
+            // Retrieve existing image URL if updating
+            if ($id) {
+                $existing = Database::fetch("SELECT featured_image_url FROM contents WHERE id = ?", [$id]);
+                $imageUrl = $existing['featured_image_url'] ?? null;
+            }
+
+            // Handle direct image file upload
+            if (!empty($_FILES['image_file']['tmp_name']) && is_uploaded_file($_FILES['image_file']['tmp_name'])) {
+                $uploadDir = dirname(__DIR__, 2) . '/storage/uploads/prompts';
+                if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+                $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
+                if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'gif'])) {
+                    $filename = 'prompt_visual_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                    if (move_uploaded_file($_FILES['image_file']['tmp_name'], $uploadDir . '/' . $filename)) {
+                        $imageUrl = '/storage/uploads/prompts/' . $filename;
+                    }
+                }
+            } elseif (!empty($request->post('featured_image_url'))) {
+                $imageUrl = image_url(trim((string)$request->post('featured_image_url')));
+            }
+        } else {
+            // Text prompts strictly have no image attached
+            $imageUrl = null;
+        }
+
         if ($id) {
-            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, status = 'published', updated_at = NOW() WHERE id = ?", [
-                $title, $slug, $categoryId, $summary, $id
+            Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, featured_image_url = ?, status = 'published', updated_at = NOW() WHERE id = ?", [
+                $title, $slug, $categoryId, $summary, $imageUrl, $id
             ]);
-            Database::execute("UPDATE prompts SET prompt_template = ?, template_variables = ?, target_models = ? WHERE content_id = ?", [
-                $template, $variablesJson, $targetModelsJson, $id
+            Database::execute("UPDATE prompts SET prompt_type = ?, prompt_template = ?, template_variables = ?, target_models = ?, sample_output = ? WHERE content_id = ?", [
+                $promptType, $template, $variablesJson, $targetModelsJson, $sampleOutput, $id
             ]);
-            AuditLog::log('admin.prompt_update', 'prompt', (int)$id, ['title' => $title]);
+            AuditLog::log('admin.prompt_update', 'prompt', (int)$id, ['title' => $title, 'prompt_type' => $promptType]);
             Session::flash('success', "Prompt '{$title}' updated successfully.");
         } else {
             $uuid = bin2hex(random_bytes(16));
-            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, status, quality_score, published_at) VALUES (?, 'prompt', ?, ?, ?, ?, ?, 'published', 95.0, NOW())", [
-                $uuid, $authorId, $categoryId, $title, $slug, $summary
+            Database::execute("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, featured_image_url, status, quality_score, published_at) VALUES (?, 'prompt', ?, ?, ?, ?, ?, ?, 'published', 95.0, NOW())", [
+                $uuid, $authorId, $categoryId, $title, $slug, $summary, $imageUrl
             ]);
             $newId = (int)Database::lastInsertId();
-            Database::execute("INSERT INTO prompts (content_id, prompt_template, template_variables, target_models) VALUES (?, ?, ?, ?)", [
-                $newId, $template, $variablesJson, $targetModelsJson
+            Database::execute("INSERT INTO prompts (content_id, prompt_type, prompt_template, template_variables, target_models, sample_output) VALUES (?, ?, ?, ?, ?, ?)", [
+                $newId, $promptType, $template, $variablesJson, $targetModelsJson, $sampleOutput
             ]);
-            AuditLog::log('admin.prompt_create', 'prompt', $newId, ['title' => $title]);
+            AuditLog::log('admin.prompt_create', 'prompt', $newId, ['title' => $title, 'prompt_type' => $promptType]);
             Session::flash('success', "Prompt blueprint created successfully.");
         }
         $targetPromptId = $id ? (int)$id : $newId;
@@ -2869,6 +2902,61 @@ class AdminController {
         Database::execute("UPDATE sponsored_submissions SET status = 'rejected', updated_at = NOW() WHERE id = ?", [$id]);
         Session::flash('success', 'Sponsored submission marked as rejected.');
         Response::redirect('/admin/advertisements?tab=sponsored');
+    }
+
+    public function savePricingSettings(Request $request): void {
+        $provider = (string)$request->post('pricing_api_provider', 'coingecko');
+        $apiKey = trim((string)$request->post('pricing_api_key', ''));
+        $ttl = max(10, (int)$request->post('pricing_cache_ttl', 120));
+        $fbBtc = (float)$request->post('pricing_fallback_btc', 64250.0);
+        $fbEth = (float)$request->post('pricing_fallback_eth', 3450.0);
+        $fbSol = (float)$request->post('pricing_fallback_sol', 145.0);
+        $fbUsdt = (float)$request->post('pricing_fallback_usdt', 1.0);
+
+        $settings = [
+            'pricing_api_provider' => $provider,
+            'pricing_api_key' => $apiKey,
+            'pricing_cache_ttl' => (string)$ttl,
+            'pricing_fallback_btc' => (string)$fbBtc,
+            'pricing_fallback_eth' => (string)$fbEth,
+            'pricing_fallback_sol' => (string)$fbSol,
+            'pricing_fallback_usdt' => (string)$fbUsdt,
+        ];
+
+        foreach ($settings as $k => $v) {
+            Database::execute("INSERT INTO site_settings (key_name, key_value, updated_at) VALUES (?, ?, NOW()) ON DUPLICATE KEY UPDATE key_value = VALUES(key_value), updated_at = NOW()", [$k, $v]);
+        }
+
+        // Trigger immediate fresh rates fetch
+        \App\Core\PricingEngine::getRates(true);
+
+        Session::flash('success', 'Live pricing API configuration saved and rates refreshed.');
+        Response::redirect('/admin/advertisements?tab=pricing');
+    }
+
+    public function verifySubmissionTxidOnChain(Request $request): void {
+        $id = (int)$request->post('id');
+        $sub = Database::fetch("SELECT * FROM sponsored_submissions WHERE id = ?", [$id]);
+        if (!$sub) {
+            Response::json(['success' => false, 'message' => 'Sponsored submission not found.'], 404);
+            return;
+        }
+
+        $coin = strtoupper($sub['crypto_currency'] ?? 'USDT');
+        $txid = trim((string)($sub['crypto_txid'] ?? ''));
+        $res = \App\Core\TransactionVerifier::verify($coin, $txid, (float)$sub['pricing_amount_usd']);
+
+        Response::json([
+            'success' => true,
+            'submission' => [
+                'id' => $sub['id'],
+                'title' => $sub['title'],
+                'amount_usd' => $sub['pricing_amount_usd'],
+                'coin' => $coin,
+                'status' => $sub['status']
+            ],
+            'verification' => $res
+        ]);
     }
 
     public function adManager(Request $request): void {

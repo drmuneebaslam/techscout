@@ -9,6 +9,15 @@ $cryptoNotes = \App\Core\Database::fetch("SELECT key_value FROM site_settings WH
 $tier7Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_tier_7_price'")['key_value'] ?? 49);
 $tier30Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_tier_30_price'")['key_value'] ?? 149);
 $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_tier_90_price'")['key_value'] ?? 299);
+
+// Initial Server-Rendered Live Spot Rates
+$liveRatesData = \App\Core\PricingEngine::getRates(false);
+$initRates = $liveRatesData['rates'] ?? [];
+$initBtc = !empty($initRates['BTC']['price']) ? (float)$initRates['BTC']['price'] : 77000.0;
+$initEth = !empty($initRates['ETH']['price']) ? (float)$initRates['ETH']['price'] : 2500.0;
+$initSol = !empty($initRates['SOL']['price']) ? (float)$initRates['SOL']['price'] : 100.0;
+$initUsdt = !empty($initRates['USDT']['price']) ? (float)$initRates['USDT']['price'] : 1.0;
+$rateSource = $liveRatesData['source'] ?? 'CoinGecko API';
 ?>
 
 <div style="background: rgba(245,158,11,0.04); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 1.75rem; margin-bottom: 2rem;">
@@ -17,9 +26,10 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
       <span class="ts-badge ts-badge-gold" style="font-weight: 800;">OFFICIAL CRYPTO TREASURY</span>
       <span class="ts-badge ts-badge-cyan">DECENTRALIZED SETTLEMENT</span>
     </div>
-    <!-- TS-CR-10 CoinGecko Spot Exchange Rate Badge -->
-    <div id="coingecko-spot-rate-pill" style="font-size: 0.78rem; font-family: var(--ts-font-mono); color: #34d399; background: rgba(16,185,129,0.1); padding: 0.2rem 0.6rem; border-radius: 20px; border: 1px solid rgba(16,185,129,0.3);">
-      ⚡ Live Crypto Rates: 1 BTC ≈ $64,250 &bull; 1 ETH ≈ $3,450 &bull; 1 SOL ≈ $145
+    <!-- Live CoinGecko / Multi-Provider Spot Exchange Rate Badge -->
+    <div id="coingecko-spot-rate-pill" style="font-size: 0.78rem; font-family: var(--ts-font-mono); color: #34d399; background: rgba(16,185,129,0.1); padding: 0.25rem 0.75rem; border-radius: 20px; border: 1px solid rgba(16,185,129,0.3); display: flex; align-items: center; gap: 0.4rem;">
+      <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+      <span id="spot_rates_text">Live Rates: 1 BTC ≈ $<?= number_format($initBtc, 0) ?> &bull; 1 ETH ≈ $<?= number_format($initEth, 0) ?> &bull; 1 SOL ≈ $<?= number_format($initSol, 0) ?></span>
     </div>
   </div>
 
@@ -34,7 +44,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
   <input type="hidden" name="duration_tier" id="selected_duration_tier" value="30">
   <input type="hidden" name="pricing_amount_usd" id="selected_payment_amount_usd" value="<?= $tier30Price ?>">
 
-  <!-- TS-CR-11 Duration Tier Selector with Live Pricing & Discounts -->
+  <!-- Duration Tier Selector with Live Pricing & Discounts -->
   <div style="margin-bottom: 1.5rem; background: var(--ts-bg-surface-elevated); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--ts-border-main);">
     <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--ts-text-primary); margin-bottom: 0.65rem;">
       Select Sponsorship Duration Tier (Amounts &amp; QR Codes Update Automatically)
@@ -73,12 +83,12 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
       </div>
     </div>
     <div style="text-align: right;">
-      <div style="font-size: 0.75rem; color: var(--ts-text-secondary); margin-bottom: 0.25rem;">Exact Crypto Required:</div>
+      <div style="font-size: 0.75rem; color: var(--ts-text-secondary); margin-bottom: 0.25rem;">Exact Live Crypto Required:</div>
       <div id="crypto_required_pills" style="display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end;">
-        <span class="ts-badge ts-badge-green" id="req_usdt" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= $tier30Price ?> USDT</span>
-        <span class="ts-badge ts-badge-gold" id="req_btc" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= number_format($tier30Price / 64250, 5) ?> BTC</span>
-        <span class="ts-badge ts-badge-indigo" id="req_eth" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= number_format($tier30Price / 3450, 4) ?> ETH</span>
-        <span class="ts-badge ts-badge-cyan" id="req_sol" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= number_format($tier30Price / 145, 3) ?> SOL</span>
+        <span class="ts-badge ts-badge-green" id="req_usdt" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= number_format($tier30Price / $initUsdt, 2) ?> USDT</span>
+        <span class="ts-badge ts-badge-gold" id="req_btc" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= number_format($tier30Price / $initBtc, 6) ?> BTC</span>
+        <span class="ts-badge ts-badge-indigo" id="req_eth" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= number_format($tier30Price / $initEth, 4) ?> ETH</span>
+        <span class="ts-badge ts-badge-cyan" id="req_sol" style="font-family: var(--ts-font-mono); font-size: 0.78rem;"><?= number_format($tier30Price / $initSol, 3) ?> SOL</span>
       </div>
     </div>
   </div>
@@ -92,7 +102,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         <div style="flex: 1; min-width: 240px;">
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; font-weight: 800;">USDT (TRC-20 / ERC-20)</span>
-            <span id="usdt_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #10b981; font-weight: 700;"><?= $tier30Price ?> USDT</span>
+            <span id="usdt_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #10b981; font-weight: 700;"><?= number_format($tier30Price / $initUsdt, 2) ?> USDT</span>
           </div>
           <div style="font-family: var(--ts-font-mono); font-size: 0.85rem; color: var(--ts-text-primary); word-break: break-all; margin-top: 0.25rem;">
             <?= htmlspecialchars($cryptoUsdt) ?>
@@ -101,7 +111,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         </div>
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <button type="button" onclick="openDynamicCryptoQr('USDT')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; color: #38bdf8;">
-            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code (Amount Included)
+            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code
           </button>
           <button type="button" onclick="copyCryptoText('addr_usdt', this)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
             <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Address
@@ -119,7 +129,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         <div style="flex: 1; min-width: 240px;">
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span class="ts-badge ts-badge-gold" style="font-size: 0.68rem; font-weight: 800;">Bitcoin (BTC Native)</span>
-            <span id="btc_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #f59e0b; font-weight: 700;"><?= number_format($tier30Price / 64250, 5) ?> BTC</span>
+            <span id="btc_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #f59e0b; font-weight: 700;"><?= number_format($tier30Price / $initBtc, 6) ?> BTC</span>
           </div>
           <div style="font-family: var(--ts-font-mono); font-size: 0.85rem; color: var(--ts-text-primary); word-break: break-all; margin-top: 0.25rem;">
             <?= htmlspecialchars($cryptoBtc) ?>
@@ -128,7 +138,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         </div>
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <button type="button" onclick="openDynamicCryptoQr('BTC')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; color: #f59e0b;">
-            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code (BIP-21 Amount)
+            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code (BIP-21)
           </button>
           <button type="button" onclick="copyCryptoText('addr_btc', this)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
             <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Address
@@ -146,7 +156,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         <div style="flex: 1; min-width: 240px;">
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span class="ts-badge ts-badge-indigo" style="font-size: 0.68rem; font-weight: 800;">Ethereum (ETH / ERC-20)</span>
-            <span id="eth_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #818cf8; font-weight: 700;"><?= number_format($tier30Price / 3450, 4) ?> ETH</span>
+            <span id="eth_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #818cf8; font-weight: 700;"><?= number_format($tier30Price / $initEth, 4) ?> ETH</span>
           </div>
           <div style="font-family: var(--ts-font-mono); font-size: 0.85rem; color: var(--ts-text-primary); word-break: break-all; margin-top: 0.25rem;">
             <?= htmlspecialchars($cryptoEth) ?>
@@ -155,7 +165,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         </div>
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <button type="button" onclick="openDynamicCryptoQr('ETH')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; color: #818cf8;">
-            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code (EIP-681 Amount)
+            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code (EIP-681)
           </button>
           <button type="button" onclick="copyCryptoText('addr_eth', this)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
             <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Address
@@ -173,7 +183,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         <div style="flex: 1; min-width: 240px;">
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem; font-weight: 800;">Solana (SOL Native)</span>
-            <span id="sol_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #38bdf8; font-weight: 700;"><?= number_format($tier30Price / 145, 3) ?> SOL</span>
+            <span id="sol_amount_tag" style="font-size: 0.75rem; font-family: var(--ts-font-mono); color: #38bdf8; font-weight: 700;"><?= number_format($tier30Price / $initSol, 3) ?> SOL</span>
           </div>
           <div style="font-family: var(--ts-font-mono); font-size: 0.85rem; color: var(--ts-text-primary); word-break: break-all; margin-top: 0.25rem;">
             <?= htmlspecialchars($cryptoSol) ?>
@@ -182,7 +192,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
         </div>
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <button type="button" onclick="openDynamicCryptoQr('SOL')" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; color: #38bdf8;">
-            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code (Solana Pay Amount)
+            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i> QR Code (Solana Pay)
           </button>
           <button type="button" onclick="copyCryptoText('addr_sol', this)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
             <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Address
@@ -196,10 +206,10 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
 
   </div>
 
-  <!-- TXID & Payment Verification Fields -->
-  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+  <!-- TXID & Payment Verification Fields with Live Verifier -->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 0.75rem;">
     <div>
-      <label class="ts-form-label">Payment Coin Used</label>
+      <label class="ts-form-label">Payment Coin Used *</label>
       <select name="crypto_currency" id="crypto_currency_select" class="ts-form-input">
         <option value="USDT">USDT (Tether)</option>
         <option value="BTC">Bitcoin (BTC)</option>
@@ -209,8 +219,21 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
       </select>
     </div>
     <div>
-      <label class="ts-form-label">Transaction Hash / TXID * (Requires Mandatory Admin Review)</label>
-      <input type="text" name="crypto_txid" class="ts-form-input" placeholder="Paste on-chain transaction hash or transfer ID..." style="font-family: var(--ts-font-mono);" required>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+        <label class="ts-form-label" style="margin-bottom: 0;">Transaction Hash / TXID *</label>
+        <button type="button" id="btnVerifyTxidUser" onclick="verifyUserTxidLive()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.15rem 0.6rem; color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+          ⚡ Check TXID On-Chain
+        </button>
+      </div>
+      <input type="text" name="crypto_txid" id="input_crypto_txid" class="ts-form-input" placeholder="Paste on-chain transaction hash or transfer ID..." style="font-family: var(--ts-font-mono);" required>
+    </div>
+  </div>
+
+  <!-- Real-Time TXID Verification Diagnostic Box -->
+  <div id="userTxidVerifyResultBox" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.82rem; margin-top: 0.5rem; transition: all 0.2s ease;">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+      <span id="userTxidVerifyMsg" style="font-weight: 600;"></span>
+      <a id="userTxidExplorerLink" href="#" target="_blank" style="color: #38bdf8; text-decoration: underline; font-size: 0.75rem; display: none;">View Explorer ↗</a>
     </div>
   </div>
 </div>
@@ -227,7 +250,7 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
     <div style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 1.25rem;">
       <span style="font-size: 0.75rem; color: var(--ts-text-secondary); text-transform: uppercase; font-weight: 700;">Required Exact Transfer Amount</span>
       <div id="qr_modal_amount_headline" style="font-size: 1.35rem; font-weight: 800; color: #38bdf8; font-family: var(--ts-font-mono); margin-top: 0.15rem;">
-        149 USDT ($149.00 USD)
+        <?= $tier30Price ?> USDT ($<?= number_format($tier30Price, 2) ?> USD)
       </div>
     </div>
     
@@ -250,12 +273,12 @@ $tier90Price = (float)(\App\Core\Database::fetch("SELECT key_value FROM site_set
 </div>
 
 <script>
-// Live pricing calculation variables
+// Dynamic live pricing calculation variables
 const cryptoRates = {
-  BTC: 64250,
-  ETH: 3450,
-  SOL: 145,
-  USDT: 1
+  BTC: <?= $initBtc ?>,
+  ETH: <?= $initEth ?>,
+  SOL: <?= $initSol ?>,
+  USDT: <?= $initUsdt ?>
 };
 
 let currentDurationDays = 30;
@@ -265,8 +288,10 @@ function selectDurationTier(days, price) {
   currentDurationDays = days;
   currentAmountUsd = price;
 
-  document.getElementById('selected_duration_tier').value = days;
-  document.getElementById('selected_payment_amount_usd').value = price;
+  const selDays = document.getElementById('selected_duration_tier');
+  if (selDays) selDays.value = days;
+  const selUsd = document.getElementById('selected_payment_amount_usd');
+  if (selUsd) selUsd.value = price;
 
   // Update Tier Cards UI
   [7, 30, 90].forEach(d => {
@@ -290,9 +315,9 @@ function selectDurationTier(days, price) {
   const labelElem = document.getElementById('display_duration_label');
   if (labelElem) labelElem.innerText = '(' + days + ' Days Active Placement)';
 
-  // Calculate Crypto Equivalents
-  const usdtVal = price.toFixed(2);
-  const btcVal = (price / cryptoRates.BTC).toFixed(5);
+  // Calculate Exact Crypto Equivalents using Live Rates
+  const usdtVal = (price / cryptoRates.USDT).toFixed(2);
+  const btcVal = (price / cryptoRates.BTC).toFixed(6);
   const ethVal = (price / cryptoRates.ETH).toFixed(4);
   const solVal = (price / cryptoRates.SOL).toFixed(3);
 
@@ -330,7 +355,7 @@ function openDynamicCryptoQr(coin) {
 
   if (coin === 'BTC') {
     address = document.getElementById('addr_btc')?.value || '';
-    const btcAmount = (currentAmountUsd / cryptoRates.BTC).toFixed(5);
+    const btcAmount = (currentAmountUsd / cryptoRates.BTC).toFixed(6);
     amountStr = btcAmount + ' BTC ($' + currentAmountUsd + ' USD)';
     deeplink = 'bitcoin:' + address + '?amount=' + btcAmount + '&label=TechScout+Sponsorship';
   } else if (coin === 'ETH') {
@@ -346,7 +371,8 @@ function openDynamicCryptoQr(coin) {
   } else {
     // USDT
     address = document.getElementById('addr_usdt')?.value || '';
-    amountStr = currentAmountUsd.toFixed(2) + ' USDT ($' + currentAmountUsd + ' USD)';
+    const usdtAmount = (currentAmountUsd / cryptoRates.USDT).toFixed(2);
+    amountStr = usdtAmount + ' USDT ($' + currentAmountUsd + ' USD)';
     deeplink = address;
   }
 
@@ -376,10 +402,10 @@ function copyCryptoText(id, btn) {
 
 function copyExactAmount(coin, btn) {
   let amt = '';
-  if (coin === 'BTC') amt = (currentAmountUsd / cryptoRates.BTC).toFixed(5);
+  if (coin === 'BTC') amt = (currentAmountUsd / cryptoRates.BTC).toFixed(6);
   else if (coin === 'ETH') amt = (currentAmountUsd / cryptoRates.ETH).toFixed(4);
   else if (coin === 'SOL') amt = (currentAmountUsd / cryptoRates.SOL).toFixed(3);
-  else amt = currentAmountUsd.toFixed(2);
+  else amt = (currentAmountUsd / cryptoRates.USDT).toFixed(2);
 
   navigator.clipboard.writeText(amt).then(() => {
     const origHtml = btn.innerHTML;
@@ -389,11 +415,113 @@ function copyExactAmount(coin, btn) {
   });
 }
 
-function updateCryptoCalculation(duration) {
-  const dur = parseInt(duration, 10);
-  let price = <?= $tier30Price ?>;
-  if (dur === 7) price = <?= $tier7Price ?>;
-  else if (dur === 90) price = <?= $tier90Price ?>;
-  selectDurationTier(dur, price);
+// Fetch Live Real-Time Pricing via TechScout REST Pricing API
+async function fetchLiveCryptoRates() {
+  try {
+    const res = await fetch('<?= url('/api/v1/pricing/crypto-rates') ?>');
+    if (!res.ok) return;
+    const json = await res.json();
+    if (json && json.success && json.rates) {
+      if (json.rates.BTC && json.rates.BTC.price) cryptoRates.BTC = json.rates.BTC.price;
+      if (json.rates.ETH && json.rates.ETH.price) cryptoRates.ETH = json.rates.ETH.price;
+      if (json.rates.SOL && json.rates.SOL.price) cryptoRates.SOL = json.rates.SOL.price;
+      if (json.rates.USDT && json.rates.USDT.price) cryptoRates.USDT = json.rates.USDT.price;
+
+      const txt = document.getElementById('spot_rates_text');
+      if (txt) {
+        txt.innerHTML = 'Live Rates (' + (json.source || 'Live') + '): 1 BTC ≈ $' + Math.round(cryptoRates.BTC).toLocaleString() + ' &bull; 1 ETH ≈ $' + Math.round(cryptoRates.ETH).toLocaleString() + ' &bull; 1 SOL ≈ $' + Math.round(cryptoRates.SOL);
+      }
+
+      // Re-calculate with fresh rates
+      selectDurationTier(currentDurationDays, currentAmountUsd);
+    }
+  } catch (e) {}
 }
+
+// Live On-Chain Transaction Verifier for User Submission
+async function verifyUserTxidLive() {
+  const txidInput = document.getElementById('input_crypto_txid');
+  const coinSelect = document.getElementById('crypto_currency_select');
+  const resultBox = document.getElementById('userTxidVerifyResultBox');
+  const msgElem = document.getElementById('userTxidVerifyMsg');
+  const linkElem = document.getElementById('userTxidExplorerLink');
+  const btn = document.getElementById('btnVerifyTxidUser');
+
+  if (!txidInput || !txidInput.value.trim()) {
+    alert('Please enter or paste your transaction hash (TXID) first.');
+    txidInput?.focus();
+    return;
+  }
+
+  const txid = txidInput.value.trim();
+  const coin = coinSelect ? coinSelect.value : 'USDT';
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ts-spinner-sm"></span> Verifying...';
+
+  resultBox.style.display = 'block';
+  resultBox.style.background = 'rgba(56,189,248,0.08)';
+  resultBox.style.border = '1px solid rgba(56,189,248,0.3)';
+  msgElem.style.color = '#38bdf8';
+  msgElem.textContent = 'Interrogating ' + coin + ' blockchain explorers in real-time...';
+  linkElem.style.display = 'none';
+
+  try {
+    const params = new URLSearchParams({
+      coin: coin,
+      txid: txid,
+      amount_usd: currentAmountUsd
+    });
+    const res = await fetch('<?= url('/api/v1/payments/verify-txid') ?>', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    });
+    const json = await res.json();
+
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Check TXID On-Chain';
+
+    if (json && json.data) {
+      const d = json.data;
+      if (d.verified) {
+        resultBox.style.background = 'rgba(16,185,129,0.12)';
+        resultBox.style.border = '1px solid rgba(16,185,129,0.4)';
+        msgElem.style.color = '#10b981';
+        msgElem.textContent = '✓ ' + (d.message || 'Transaction confirmed on blockchain!');
+      } else if (d.status === 'pending_mempool' || d.status === 'pending') {
+        resultBox.style.background = 'rgba(245,158,11,0.12)';
+        resultBox.style.border = '1px solid rgba(245,158,11,0.4)';
+        msgElem.style.color = '#f59e0b';
+        msgElem.textContent = '⏳ ' + (d.message || 'Transaction broadcasted in mempool (pending block confirmation).');
+      } else {
+        resultBox.style.background = 'rgba(239,68,68,0.12)';
+        resultBox.style.border = '1px solid rgba(239,68,68,0.4)';
+        msgElem.style.color = '#ef4444';
+        msgElem.textContent = '⚠️ ' + (d.message || 'Transaction not yet found or invalid hash format.');
+      }
+
+      if (d.explorer_url && d.explorer_url !== '#') {
+        linkElem.href = d.explorer_url;
+        linkElem.style.display = 'inline';
+      }
+    } else {
+      msgElem.style.color = '#ef4444';
+      msgElem.textContent = json.message || 'Verification service unreachable.';
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Check TXID On-Chain';
+    resultBox.style.background = 'rgba(239,68,68,0.1)';
+    resultBox.style.border = '1px solid rgba(239,68,68,0.3)';
+    msgElem.style.color = '#ef4444';
+    msgElem.textContent = 'Network error while checking blockchain status.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetchLiveCryptoRates();
+  // Poll rates every 60 seconds
+  setInterval(fetchLiveCryptoRates, 60000);
+});
 </script>

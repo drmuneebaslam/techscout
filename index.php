@@ -401,6 +401,8 @@ $router->post('/admin/advertisements/save', [AdminController::class, 'saveAdvert
 $router->post('/admin/advertisements/delete/{id}', [AdminController::class, 'deleteAdvertisement'], ['admin']);
 $router->post('/admin/advertisements/toggle/{id}', [AdminController::class, 'toggleAdStatus'], ['admin']);
 $router->post('/admin/advertisements/settings', [AdminController::class, 'saveAdSettings'], ['admin']);
+$router->post('/admin/advertisements/pricing-settings', [AdminController::class, 'savePricingSettings'], ['admin']);
+$router->post('/admin/advertisements/verify-txid', [AdminController::class, 'verifySubmissionTxidOnChain'], ['admin']);
 $router->post('/admin/advertisements/upload-image', [AdminController::class, 'uploadAdImage'], ['admin']);
 $router->post('/admin/advertisements/tips/verify/{id}', [AdminController::class, 'verifyAuthorTip'], ['admin']);
 $router->post('/admin/advertisements/tips/reject/{id}', [AdminController::class, 'rejectAuthorTip'], ['admin']);
@@ -716,6 +718,15 @@ $router->post('/api/v1/newsletter/subscribe', [ApiController::class, 'subscribeN
 $router->post('/newsletter/subscribe', [ApiController::class, 'subscribeNewsletter']);
 $router->post('/admin/newsletters/dispatch-batch/{id}', [AdminController::class, 'dispatchNewsletterBatch'], ['admin']);
 $router->get('/admin/newsletters/dispatch-status/{id}', [AdminController::class, 'getNewsletterDispatchStatus'], ['admin']);
+
+// Live Pricing & Currency Exchange API Endpoints [TS-API-PRICING]
+$router->get('/api/v1/pricing/crypto-rates', [ApiController::class, 'getCryptoRates']);
+$router->post('/api/v1/pricing/crypto-rates/refresh', [ApiController::class, 'getCryptoRates']);
+$router->post('/api/v1/pricing/test', [ApiController::class, 'testPricingApi'], ['admin']);
+
+// Blockchain Payment Transaction Verification API [TS-API-PAYMENT-VERIFY]
+$router->get('/api/v1/payments/verify-txid', [ApiController::class, 'verifyPaymentTxid']);
+$router->post('/api/v1/payments/verify-txid', [ApiController::class, 'verifyPaymentTxid']);
 
 // Multi-session reading history & Re-read Engine
 $router->post('/api/v1/history/init-session', [ApiController::class, 'initReadingSession']);

@@ -238,12 +238,15 @@
                 <div style="font-weight: 800; color: #10b981; font-family: var(--admin-font-mono); font-size: 0.9rem;">
                   $<?= number_format((float)$sub['pricing_amount_usd'], 2) ?> USD (<?= htmlspecialchars($sub['crypto_currency']) ?>)
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem;">
-                  <code style="font-size: 0.72rem; color: #38bdf8; background: rgba(56,189,248,0.08); padding: 0.15rem 0.4rem; border-radius: 4px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<?= htmlspecialchars($sub['crypto_txid']) ?>">
+                <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem; flex-wrap: wrap;">
+                  <code style="font-size: 0.72rem; color: #38bdf8; background: rgba(56,189,248,0.08); padding: 0.15rem 0.4rem; border-radius: 4px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<?= htmlspecialchars($sub['crypto_txid']) ?>">
                     <?= htmlspecialchars($sub['crypto_txid']) ?>
                   </code>
+                  <button type="button" onclick="openOnChainInspector(<?= (int)$sub['id'] ?>, '<?= htmlspecialchars(addslashes($coin)) ?>', '<?= htmlspecialchars(addslashes($txid)) ?>', <?= (float)$sub['pricing_amount_usd'] ?>)" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.65rem; padding: 0.1rem 0.4rem; color: #38bdf8; border-color: rgba(56,189,248,0.3);" title="On-Chain Forensic Verification">
+                    ⚡ Verify On-Chain
+                  </button>
                   <a href="<?= htmlspecialchars($explorerUrl) ?>" target="_blank" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.65rem; padding: 0.1rem 0.35rem; color: #818cf8;" title="View on Blockchain Explorer">
-                    Verify ↗
+                    ↗
                   </a>
                 </div>
               </td>
@@ -379,10 +382,79 @@
         </div>
       </div>
 
-      <button type="submit" class="admin-btn admin-btn-primary" style="padding: 0.75rem 1.75rem; font-weight: 700;">
+      <button type="submit" class="admin-btn admin-btn-primary" style="padding: 0.75rem 1.75rem; font-weight: 700; margin-bottom: 2rem;">
         Save All Monetization &amp; Wallet Settings 🚀
       </button>
     </form>
+
+    <!-- 5. Real-Time Cryptocurrency Pricing APIs & Live Feeds -->
+    <div style="border-top: 1px solid var(--admin-border-main); padding-top: 2rem;">
+      <form action="<?= url('/admin/advertisements/pricing-settings') ?>" method="POST">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <h4 style="font-size: 1.05rem; color: var(--admin-text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="activity" style="width: 18px; color: #10b981;"></i> Real-Time Pricing APIs &amp; Live Currency Feeds [TS-API-PRICING]
+          </h4>
+          <button type="button" onclick="testLivePricingApi()" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.4); font-size: 0.78rem;">
+            <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i> Test &amp; Ping Pricing API Live ⚡
+          </button>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--admin-text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">
+          Power public treasury pricing calculators with live spot rates from CoinGecko or Binance. Includes failover redundancy and resilient caching.
+        </p>
+
+        <!-- Live Diagnostic Readout Card -->
+        <div id="pricingApiTestResult" style="display: none; margin-bottom: 1.25rem; padding: 1.15rem; border-radius: 8px; border: 1px solid rgba(56,189,248,0.3); background: rgba(56,189,248,0.06); font-size: 0.84rem;">
+          <div id="pricingApiTestMsg" style="color: var(--admin-text-primary); font-weight: 600;"></div>
+          <div id="pricingApiRatesGrid" style="display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap;"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem;">Primary Pricing Provider</label>
+            <select name="pricing_api_provider" class="admin-input">
+              <option value="coingecko" <?= ($platformSettings['pricing_api_provider'] ?? 'coingecko') === 'coingecko' ? 'selected' : '' ?>>CoinGecko Free API (Recommended)</option>
+              <option value="binance" <?= ($platformSettings['pricing_api_provider'] ?? '') === 'binance' ? 'selected' : '' ?>>Binance Public API</option>
+              <option value="static" <?= ($platformSettings['pricing_api_provider'] ?? '') === 'static' ? 'selected' : '' ?>>Static Baseline Rates Only</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem;">Optional Provider API Key</label>
+            <input type="text" name="pricing_api_key" value="<?= htmlspecialchars($platformSettings['pricing_api_key'] ?? '') ?>" placeholder="Optional CoinGecko Demo/Pro Key" class="admin-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem;">Cache TTL (Seconds)</label>
+            <input type="number" name="pricing_cache_ttl" value="<?= htmlspecialchars($platformSettings['pricing_cache_ttl'] ?? '120') ?>" min="10" max="86400" class="admin-input" required>
+          </div>
+        </div>
+
+        <!-- Baseline Fallback Prices -->
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.45rem; color: var(--admin-text-secondary);">
+          Baseline Fallback Spot Rates (USD) - Engaged automatically if network is offline or rate-limited
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+          <div>
+            <span style="font-size: 0.72rem; color: #f59e0b; font-weight: 700;">BTC USD</span>
+            <input type="number" step="0.01" name="pricing_fallback_btc" value="<?= htmlspecialchars($platformSettings['pricing_fallback_btc'] ?? '64250.00') ?>" class="admin-input">
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #818cf8; font-weight: 700;">ETH USD</span>
+            <input type="number" step="0.01" name="pricing_fallback_eth" value="<?= htmlspecialchars($platformSettings['pricing_fallback_eth'] ?? '3450.00') ?>" class="admin-input">
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 700;">SOL USD</span>
+            <input type="number" step="0.01" name="pricing_fallback_sol" value="<?= htmlspecialchars($platformSettings['pricing_fallback_sol'] ?? '145.00') ?>" class="admin-input">
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #10b981; font-weight: 700;">USDT USD</span>
+            <input type="number" step="0.001" name="pricing_fallback_usdt" value="<?= htmlspecialchars($platformSettings['pricing_fallback_usdt'] ?? '1.00') ?>" class="admin-input">
+          </div>
+        </div>
+
+        <button type="submit" class="admin-btn admin-btn-primary" style="padding: 0.65rem 1.5rem; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border: none;">
+          Save Live Pricing Configuration ⚡
+        </button>
+      </form>
+    </div>
   </div>
 
 <!-- TAB 4: CREATOR TIPS & PAYOUTS LEDGER -->
@@ -543,6 +615,75 @@
   </div>
 </div>
 
+<!-- On-Chain Forensic Inspector Modal -->
+<div id="onChainInspectorModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div class="admin-card" style="width: 100%; max-width: 640px; padding: 2rem; border-radius: 16px; border: 1px solid var(--admin-border-main); max-height: 90vh; overflow-y: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.2rem; color: var(--admin-text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+        ⚡ Forensic On-Chain Transaction Inspector
+      </h3>
+      <button type="button" onclick="closeOnChainInspector()" style="background: none; border: none; color: var(--admin-text-secondary); cursor: pointer; font-size: 1.25rem; line-height: 1;">&times;</button>
+    </div>
+
+    <!-- Meta Details Summary -->
+    <div style="background: var(--admin-bg-base); padding: 1rem; border-radius: 8px; border: 1px solid var(--admin-border-main); margin-bottom: 1.25rem; font-size: 0.85rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+        <span style="color: var(--admin-text-secondary);">Submission ID:</span>
+        <strong id="inspector_sub_id" style="color: var(--admin-text-primary);">-</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+        <span style="color: var(--admin-text-secondary);">Currency / Expected Amount:</span>
+        <strong style="color: #10b981; font-family: var(--admin-font-mono);"><span id="inspector_coin">-</span> &bull; <span id="inspector_amount">-</span></strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--admin-text-secondary);">Provided TXID:</span>
+        <code id="inspector_txid" style="font-size: 0.75rem; color: #38bdf8; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">-</code>
+      </div>
+    </div>
+
+    <!-- Verification Loading Spinner -->
+    <div id="inspector_loading" style="text-align: center; padding: 2rem 1rem;">
+      <div style="color: #38bdf8; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem;">Connecting to blockchain RPC &amp; mempool nodes...</div>
+      <div style="color: var(--admin-text-secondary); font-size: 0.8rem;">Querying decentralized ledger for confirmations, status, and payload timestamp.</div>
+    </div>
+
+    <!-- Verification Diagnostic Details -->
+    <div id="inspector_content" style="display: none;">
+      <div style="margin-bottom: 1.25rem; padding: 1rem; border-radius: 8px; border: 1px solid var(--admin-border-main); background: var(--admin-bg-base);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-secondary);">ON-CHAIN LEDGER STATUS:</span>
+          <span id="inspector_status_badge" class="admin-pill-badge badge-warning">CHECKING</span>
+        </div>
+        <div id="inspector_message" style="color: var(--admin-text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; line-height: 1.4;"></div>
+        <div>
+          <a id="inspector_explorer_link" href="#" target="_blank" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3); font-size: 0.75rem;">
+            Open in Official Blockchain Explorer ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Raw Ledger Node Response (collapsible) -->
+      <details style="margin-bottom: 1.5rem; font-size: 0.8rem; color: var(--admin-text-secondary);">
+        <summary style="cursor: pointer; padding: 0.35rem 0; user-select: none;">View Raw Decentralized Ledger Response (JSON)</summary>
+        <pre id="inspector_raw_data" style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: 6px; font-family: var(--admin-font-mono); font-size: 0.72rem; max-height: 140px; overflow-y: auto; color: #a5b4fc; white-space: pre-wrap; word-break: break-all;"></pre>
+      </details>
+
+      <!-- Action Decision Form Buttons -->
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; border-top: 1px solid var(--admin-border-main); padding-top: 1.25rem;">
+        <button type="button" onclick="closeOnChainInspector()" class="admin-btn admin-btn-outline">Close</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <form id="inspectorRejectForm" method="POST" action="" onsubmit="return confirm('Reject this sponsored submission and invalidate payment?');" style="margin: 0;">
+            <button type="submit" class="admin-btn admin-btn-outline" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">Reject Payment</button>
+          </form>
+          <form id="inspectorApproveForm" method="POST" action="" onsubmit="return confirm('Confirm and approve this placement now?');" style="margin: 0;">
+            <button type="submit" class="admin-btn admin-btn-primary" style="background: #10b981; border-color: #10b981;">Approve Placement ✓</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 function openNewAdModal() {
   document.getElementById('adminAdForm').reset();
@@ -620,6 +761,105 @@ function openProcessPayoutModal(id, amount, wallet) {
   document.getElementById('payout_modal_amount').innerText = '$' + amount + ' USD';
   document.getElementById('payout_modal_wallet').innerText = wallet;
   document.getElementById('processPayoutModal').style.display = 'flex';
+}
+
+// Forensic On-Chain Transaction Inspector
+async function openOnChainInspector(subId, coin, txid, amountUsd) {
+  const modal = document.getElementById('onChainInspectorModal');
+  modal.style.display = 'flex';
+  document.getElementById('inspector_sub_id').innerText = '#' + subId;
+  document.getElementById('inspector_coin').innerText = coin;
+  document.getElementById('inspector_amount').innerText = '$' + parseFloat(amountUsd).toFixed(2) + ' USD';
+  document.getElementById('inspector_txid').innerText = txid;
+  document.getElementById('inspector_txid').title = txid;
+
+  document.getElementById('inspectorApproveForm').action = '<?= url('/admin/advertisements/submissions/approve/') ?>' + subId;
+  document.getElementById('inspectorRejectForm').action = '<?= url('/admin/advertisements/submissions/reject/') ?>' + subId;
+
+  const loading = document.getElementById('inspector_loading');
+  const content = document.getElementById('inspector_content');
+  loading.style.display = 'block';
+  content.style.display = 'none';
+
+  try {
+    const formData = new FormData();
+    formData.append('id', subId);
+
+    const res = await fetch('<?= url('/admin/advertisements/verify-txid') ?>', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    loading.style.display = 'none';
+    content.style.display = 'block';
+
+    if (data.success && data.verification) {
+      const v = data.verification;
+      const badge = document.getElementById('inspector_status_badge');
+      if (v.status === 'confirmed') {
+        badge.className = 'admin-pill-badge badge-success';
+        badge.innerText = 'CONFIRMED ON-CHAIN (' + (v.confirmations || 1) + '+ confs)';
+      } else if (v.status === 'unconfirmed' || v.status === 'pending') {
+        badge.className = 'admin-pill-badge badge-warning';
+        badge.innerText = 'PENDING IN MEMPOOL (' + (v.confirmations || 0) + ' confs)';
+      } else if (v.status === 'not_found') {
+        badge.className = 'admin-pill-badge badge-danger';
+        badge.innerText = 'NOT FOUND ON-CHAIN';
+      } else {
+        badge.className = 'admin-pill-badge badge-info';
+        badge.innerText = (v.status || 'CHECKED').toUpperCase();
+      }
+
+      document.getElementById('inspector_message').innerText = v.message || 'Transaction details retrieved.';
+      document.getElementById('inspector_explorer_link').href = v.explorer_url || '#';
+      document.getElementById('inspector_raw_data').innerText = JSON.stringify(v.raw_data || v, null, 2);
+    } else {
+      document.getElementById('inspector_status_badge').className = 'admin-pill-badge badge-danger';
+      document.getElementById('inspector_status_badge').innerText = 'VERIFICATION FAILED';
+      document.getElementById('inspector_message').innerText = data.message || 'Verification service could not complete inspection.';
+    }
+  } catch (err) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    document.getElementById('inspector_status_badge').className = 'admin-pill-badge badge-danger';
+    document.getElementById('inspector_status_badge').innerText = 'NETWORK ERROR';
+    document.getElementById('inspector_message').innerText = err.message || 'Network communication error.';
+  }
+}
+
+function closeOnChainInspector() {
+  document.getElementById('onChainInspectorModal').style.display = 'none';
+}
+
+// Live Pricing Engine API Ping
+async function testLivePricingApi() {
+  const testBox = document.getElementById('pricingApiTestResult');
+  const msgEl = document.getElementById('pricingApiTestMsg');
+  const gridEl = document.getElementById('pricingApiRatesGrid');
+
+  testBox.style.display = 'block';
+  msgEl.innerText = 'Pinging configured cryptocurrency pricing API...';
+  gridEl.innerHTML = '';
+
+  try {
+    const res = await fetch('<?= url('/api/v1/pricing/test') ?>', { method: 'POST' });
+    const data = await res.json();
+    if (data.status === 'healthy' || data.success) {
+      msgEl.innerHTML = '✅ <strong style="color: #10b981;">API Connected Successfully!</strong> Provider: ' + (data.provider || 'CoinGecko') + ' &bull; Latency: ' + (data.latency_ms || 0) + 'ms';
+      if (data.rates) {
+        let pills = '';
+        for (const [coin, price] of Object.entries(data.rates)) {
+          pills += '<div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); padding: 0.35rem 0.75rem; border-radius: 6px; font-family: var(--admin-font-mono); font-size: 0.8rem; color: var(--admin-text-primary);"><strong style="color: #10b981;">' + coin + ':</strong> $' + Number(price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4}) + '</div>';
+        }
+        gridEl.innerHTML = pills;
+      }
+    } else {
+      msgEl.innerHTML = '⚠️ <strong style="color: #f59e0b;">' + (data.message || 'Provider warning') + '</strong>';
+    }
+  } catch (err) {
+    msgEl.innerHTML = '❌ <strong style="color: #ef4444;">Ping failed: ' + err.message + '</strong>';
+  }
 }
 </script>
 

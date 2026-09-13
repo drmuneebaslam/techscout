@@ -256,6 +256,12 @@ class AuthorStudioController {
         $summary = mb_substr(trim((string)$request->post('summary', '')), 0, 300);
         $bodyHtml = (string)$request->post('body_html', '');
         $featuredImage = image_url(trim((string)$request->post('featured_image_url', '')));
+        if ($type === 'prompt') {
+            $promptType = (string)$request->post('prompt_type', 'text');
+            if ($promptType !== 'image') {
+                $featuredImage = null; // Text prompts strictly have no image attached
+            }
+        }
         $action = (string)$request->post('action', 'draft'); // 'draft' or 'submit'
 
         if ($title === '') {
@@ -365,11 +371,13 @@ class AuthorStudioController {
                 $contentId, $readTime, $difficulty, $tocJson
             ]);
         } elseif ($type === 'prompt') {
+            $promptType = (string)$request->post('prompt_type', 'text');
+            if ($promptType !== 'image') $promptType = 'text';
             $promptTemplate = $request->post('prompt_template', strip_tags($bodyHtml));
             $variables = $request->post('template_variables') ? json_encode(explode(',', (string)$request->post('template_variables'))) : null;
             $models = json_encode(['ChatGPT', 'Claude', 'DeepSeek']);
-            Database::execute("INSERT INTO prompts (content_id, prompt_template, template_variables, target_models) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE prompt_template = VALUES(prompt_template), template_variables = VALUES(template_variables)", [
-                $contentId, $promptTemplate, $variables, $models
+            Database::execute("INSERT INTO prompts (content_id, prompt_type, prompt_template, template_variables, target_models) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE prompt_type = VALUES(prompt_type), prompt_template = VALUES(prompt_template), template_variables = VALUES(template_variables)", [
+                $contentId, $promptType, $promptTemplate, $variables, $models
             ]);
         } elseif ($type === 'gpt_listing') {
             $openaiUrl = trim((string)$request->post('openai_url', 'https://chatgpt.com/g/'));

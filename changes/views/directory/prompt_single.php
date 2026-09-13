@@ -1,22 +1,24 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
 <?php
-$featuredImage = !empty($prompt['featured_image_url']) ? image_url($prompt['featured_image_url']) : '';
-$hasGallery = !empty($galleryImages) || (!empty($featuredImage) && $featuredImage !== 'https://funwithcoding.free.nf/');
+$isImageEngine = (($prompt['prompt_type'] ?? '') === 'image');
+$modelsStr = is_string($prompt['target_models'] ?? '') ? $prompt['target_models'] : json_encode($prompt['target_models'] ?? []);
+if (!$isImageEngine && (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || in_array($prompt['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion']))) {
+    $isImageEngine = true;
+}
+
 $allImages = [];
-if (!empty($featuredImage) && $featuredImage !== 'https://funwithcoding.free.nf/') {
+// Strictly attach image gallery only if this is an image generation prompt
+$featuredImage = !empty($prompt['featured_image_url']) ? image_url($prompt['featured_image_url']) : '';
+if ($isImageEngine && !empty($featuredImage) && $featuredImage !== 'https://funwithcoding.free.nf/') {
     $allImages[] = ['image_url' => $featuredImage, 'caption' => 'Master Generation Sample'];
 }
-if (!empty($galleryImages)) {
+if ($isImageEngine && !empty($galleryImages)) {
     foreach ($galleryImages as $gi) {
         $allImages[] = ['image_url' => image_url($gi['image_url']), 'caption' => $gi['caption'] ?? 'Variation Sample'];
     }
 }
-$isImageEngine = false;
-$modelsStr = is_string($prompt['target_models'] ?? '') ? $prompt['target_models'] : json_encode($prompt['target_models'] ?? []);
-if (stripos($modelsStr, 'Midjourney') !== false || stripos($modelsStr, 'DALL-E') !== false || stripos($modelsStr, 'Flux') !== false || stripos($modelsStr, 'Stable Diffusion') !== false || in_array($prompt['category_slug'] ?? '', ['ai-image-prompts', 'midjourney', 'dall-e', 'flux', 'stable-diffusion'])) {
-    $isImageEngine = true;
-}
+$hasGallery = $isImageEngine && !empty($allImages);
 ?>
 
 <div class="container" style="padding-top: 2.5rem; margin-bottom: 5rem;">

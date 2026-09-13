@@ -1538,6 +1538,54 @@ class ApiController {
 
         Response::json(['status' => 'acknowledged', 'logged' => true]);
     }
+
+    /**
+     * Get Live Crypto Spot Exchange Rates [TS-API-PRICING]
+     */
+    public function getCryptoRates(Request $request): void {
+        $refresh = ($request->query('refresh') === '1');
+        $rates = \App\Core\PricingEngine::getRates($refresh);
+        Response::json([
+            'success' => true,
+            'source' => $rates['source'] ?? 'CoinGecko API',
+            'cached' => $rates['cached'] ?? false,
+            'updated_at' => $rates['updated_at'] ?? date('Y-m-d H:i:s'),
+            'rates' => $rates['rates']
+        ]);
+    }
+
+    /**
+     * Test Pricing API connection [TS-API-PRICING-TEST]
+     */
+    public function testPricingApi(Request $request): void {
+        $diag = \App\Core\PricingEngine::testApiConnection();
+        Response::json($diag);
+    }
+
+    /**
+     * Verify Blockchain Payment Transaction On-Chain [TS-API-PAYMENT-VERIFY]
+     */
+    public function verifyPaymentTxid(Request $request): void {
+        $coin = (string)($request->post('coin') ?? $request->query('coin') ?? 'USDT');
+        $txid = trim((string)($request->post('txid') ?? $request->query('txid') ?? ''));
+        $expectedAmount = (float)($request->post('amount_usd') ?? $request->query('amount_usd') ?? 0);
+
+        if (empty($txid)) {
+            Response::json([
+                'success' => false,
+                'verified' => false,
+                'message' => 'Please provide a transaction hash (TXID) to verify.'
+            ], 400);
+            return;
+        }
+
+        $result = \App\Core\TransactionVerifier::verify($coin, $txid, $expectedAmount);
+        Response::json([
+            'success' => true,
+            'data' => $result
+        ]);
+    }
 }
+
 
 

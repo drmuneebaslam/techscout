@@ -98,16 +98,17 @@ class DirectoryController {
 
         if ($tab === 'image' || $isImageCategory) {
             $activeTab = 'image';
-        } elseif ($tab === 'text') {
-            $activeTab = 'text';
-        } else {
+        } elseif ($tab === 'all') {
             $activeTab = 'all';
+        } else {
+            // Default to text / system / code prompts to strictly segregate from image generation prompts
+            $activeTab = 'text';
         }
 
         $filters = [
             'search' => $search,
             'model' => $model,
-            'prompt_kind' => ($activeTab === 'image') ? 'image' : (($activeTab === 'text') ? 'text' : 'all')
+            'prompt_kind' => ($activeTab === 'image') ? 'image' : (($activeTab === 'all') ? 'all' : 'text')
         ];
 
         $prompts = Content::getFeed('prompt', $category, $sort, 24, 0, $filters);

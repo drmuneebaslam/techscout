@@ -225,25 +225,48 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
 
       <!-- Prompt Spec Pane -->
       <div id="pane_prompt_spec" style="<?= $currentType === 'prompt' ? 'display: block;' : 'display: none;' ?> border-top: 1px solid rgba(148,163,184,0.1); padding-top: 1rem; margin-top: 0.5rem;">
+        <!-- Author Prompt Type Selector -->
+        <div style="margin-bottom: 0.85rem;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.35rem;">
+            Prompt Blueprint Kind
+          </label>
+          <div style="display: flex; gap: 1rem;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--ts-text-primary); cursor: pointer;">
+              <input type="radio" name="prompt_type" value="text" <?= empty($content['prompt_type']) || $content['prompt_type'] === 'text' ? 'checked' : '' ?> onchange="toggleAuthorPromptImage(this.value)">
+              <span>📝 Text / System / Code Prompt (No Image)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--ts-text-primary); cursor: pointer;">
+              <input type="radio" name="prompt_type" value="image" <?= (!empty($content['prompt_type']) && $content['prompt_type'] === 'image') ? 'checked' : '' ?> onchange="toggleAuthorPromptImage(this.value)">
+              <span>🎨 AI Image Generation Prompt (Midjourney / Flux / DALL-E)</span>
+            </label>
+          </div>
+        </div>
+
         <div style="margin-bottom: 0.75rem;">
           <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.3rem;">
             Dynamic Template Variables (Comma-separated, e.g. <code>LANGUAGE, FRAMEWORK, DATABASE_SCHEMA</code>)
           </label>
           <input type="text" name="template_variables" value="<?= htmlspecialchars(!empty($content['template_variables']) ? (is_array($content['template_variables']) ? implode(', ', $content['template_variables']) : $content['template_variables']) : 'QUERY, SCHEMA, BUFFER_POOL') ?>" placeholder="e.g. QUERY, SCHEMA, INDEX_KEYS" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.6rem 0.85rem; border-radius: 6px; color: #f8fafc; font-family: monospace;">
         </div>
-        <!-- Multi-Image Upload for Prompts [MISTAKE-23] -->
-        <div style="padding: 0.75rem; background: rgba(56,189,248,0.06); border: 1px dashed rgba(56,189,248,0.3); border-radius: 8px;">
-          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; color: #38bdf8; margin-bottom: 0.35rem;">
-            <span>📸 Prompt Visual Output Showcase & Gallery (Multiple Images Supported)</span>
+
+        <!-- Multi-Image Upload for Prompts: Strictly for Image Generation Prompts -->
+        <div id="author_prompt_image_box" style="<?= (!empty($content['prompt_type']) && $content['prompt_type'] === 'image') ? 'display: block;' : 'display: none;' ?> padding: 0.75rem; background: rgba(236,72,153,0.06); border: 1px dashed rgba(236,72,153,0.3); border-radius: 8px; margin-top: 0.5rem;">
+          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; color: #ec4899; margin-bottom: 0.35rem;">
+            <span>📸 Image Generation Output Showcase & Gallery (Image Prompts Only)</span>
             <span style="font-size: 0.72rem; color: #94a3b8;">Optional</span>
           </label>
           <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <label class="ts-btn ts-btn-outline ts-btn-sm" style="cursor: pointer; padding: 0.3rem 0.75rem; font-size: 0.75rem;">
-              <i data-lucide="images" style="width: 13px; height: 13px;"></i> Select Prompt Showcase Images
+            <label class="ts-btn ts-btn-outline ts-btn-sm" style="cursor: pointer; padding: 0.3rem 0.75rem; font-size: 0.75rem; border-color: rgba(236,72,153,0.4); color: #ec4899;">
+              <i data-lucide="images" style="width: 13px; height: 13px;"></i> Select Showcase Render Images
               <input type="file" name="prompt_images[]" multiple accept="image/*" style="display: none;" onchange="if(this.files.length){ document.getElementById('prompt_img_count').textContent = this.files.length + ' image(s) selected'; }">
             </label>
             <span id="prompt_img_count" style="font-size: 0.75rem; color: #94a3b8;">No images selected</span>
           </div>
+        </div>
+
+        <div id="author_prompt_text_notice" style="<?= empty($content['prompt_type']) || $content['prompt_type'] === 'text' ? 'display: flex;' : 'display: none;' ?> align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--ts-text-secondary); background: rgba(56,189,248,0.05); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid rgba(56,189,248,0.15); margin-top: 0.5rem;">
+          <i data-lucide="info" style="width: 13px; height: 13px; color: #38bdf8;"></i>
+          <span>Text prompts have no image attached and render pure code blueprint cards.</span>
         </div>
       </div>
 
@@ -1046,6 +1069,14 @@ function onContentTypeChanged(val) {
   document.getElementById('pane_prompt_spec').style.display = (val === 'prompt') ? 'block' : 'none';
   document.getElementById('pane_gpt_spec').style.display = (val === 'gpt_listing') ? 'block' : 'none';
   document.getElementById('pane_tool_spec').style.display = (val === 'ai_tool') ? 'block' : 'none';
+}
+
+function toggleAuthorPromptImage(val) {
+  const isImage = (val === 'image');
+  const imgBox = document.getElementById('author_prompt_image_box');
+  const txtNotice = document.getElementById('author_prompt_text_notice');
+  if (imgBox) imgBox.style.display = isImage ? 'block' : 'none';
+  if (txtNotice) txtNotice.style.display = isImage ? 'none' : 'flex';
 }
 
 async function openTemplatesModal() {
