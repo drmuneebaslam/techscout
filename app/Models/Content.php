@@ -6,15 +6,17 @@ use App\Core\Database;
 class Content {
     public static function getFeed(?string $type = null, ?string $category = null, string $sort = 'latest', int $limit = 12, int $offset = 0, array $filters = []): array {
         $sql = "SELECT c.*, 
-                       cat.name as category_name, cat.slug as category_slug, cat.color_hex as category_color,
+                       cat.name as category_name, cat.slug as category_slug, cat.color_hex as category_color, cat.parent_id,
+                       pcat.name as parent_category_name, pcat.slug as parent_category_slug,
                        a.display_name as author_name, a.slug as author_slug, a.avatar_url as author_avatar, a.verification_badge,
                        art.reading_time_mins, art.difficulty_level,
                        tool.pricing_model, tool.rating_avg as tool_rating, tool.website_url,
                        gpt.openai_url, gpt.model_base, gpt.prompt_starters,
-                       p.copy_count, p.template_variables, p.target_models,
+                       p.prompt_type, p.prompt_template, p.copy_count, p.template_variables, p.target_models,
                        camp.prize_pool, camp.end_date, camp.start_date, camp.campaign_type
                 FROM contents c
                 LEFT JOIN categories cat ON c.category_id = cat.id
+                LEFT JOIN categories pcat ON cat.parent_id = pcat.id
                 LEFT JOIN authors a ON c.author_id = a.id
                 LEFT JOIN articles art ON c.id = art.content_id
                 LEFT JOIN ai_tools tool ON c.id = tool.content_id
@@ -126,16 +128,18 @@ class Content {
 
     public static function findBySlug(string $slug): ?array {
         $sql = "SELECT c.*, 
-                       cat.name as category_name, cat.slug as category_slug, cat.color_hex as category_color, cat.topic_id,
+                       cat.name as category_name, cat.slug as category_slug, cat.color_hex as category_color, cat.topic_id, cat.parent_id,
+                       pcat.name as parent_category_name, pcat.slug as parent_category_slug, pcat.id as parent_category_id,
                        t.name as topic_name, t.slug as topic_slug, t.icon_name as topic_icon, t.color_hex as topic_color,
                        a.id as author_id, a.display_name as author_name, a.slug as author_slug, a.headline as author_headline, a.bio as author_bio, a.avatar_url as author_avatar, a.verification_badge, a.reputation_score, a.follower_count as author_followers,
                        art.reading_time_mins, art.difficulty_level, art.table_of_contents, art.citation_sources,
                        tool.*, tool.rating_avg as tool_rating, tool.rating_count as tool_reviews,
                        gpt.openai_url, gpt.model_base, gpt.prompt_starters,
-                       p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output,
+                       p.prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output,
                        camp.campaign_type, camp.start_date, camp.end_date, camp.prize_pool, camp.rules_markdown
                 FROM contents c
                 LEFT JOIN categories cat ON c.category_id = cat.id
+                LEFT JOIN categories pcat ON cat.parent_id = pcat.id
                 LEFT JOIN topics t ON cat.topic_id = t.id
                 LEFT JOIN authors a ON c.author_id = a.id
                 LEFT JOIN articles art ON c.id = art.content_id

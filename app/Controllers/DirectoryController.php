@@ -118,8 +118,16 @@ class DirectoryController {
 
         $categoryInfo = null;
         if ($category && $category !== 'all') {
-            $categoryInfo = Database::fetch("SELECT * FROM categories WHERE slug = ?", [$category]);
+            $categoryInfo = Database::fetch("SELECT c.*, p.name as parent_name, p.slug as parent_slug FROM categories c LEFT JOIN categories p ON c.parent_id = p.id WHERE c.slug = ?", [$category]);
         }
+
+        $adDirectUrl = 'https://omg10.com/4/11737440';
+        try {
+            $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url' OR key_name = 'ad_popunder_url'");
+            if (!empty($adRow['key_value'])) {
+                $adDirectUrl = $adRow['key_value'];
+            }
+        } catch (\Throwable $e) {}
 
         Response::view('directory/prompts', [
             'title' => ($categoryInfo ? $categoryInfo['name'] . ' — ' : '') . 'Engineering Prompt Library & Variable Injector | TechScout',
@@ -131,7 +139,8 @@ class DirectoryController {
             'currentSort' => $sort,
             'currentSearch' => $search,
             'currentModel' => $model,
-            'activeTab' => $activeTab
+            'activeTab' => $activeTab,
+            'adDirectUrl' => $adDirectUrl
         ]);
     }
 
@@ -152,14 +161,29 @@ class DirectoryController {
         $prompts = Content::getFeed('prompt', $category, $sort, 50, 0, $filters);
         $categories = Database::query("SELECT c.*, p.name as parent_name FROM categories c LEFT JOIN categories p ON c.parent_id = p.id WHERE c.applicable_to IN ('all', 'prompt') ORDER BY c.sort_order ASC, c.name ASC");
 
+        $categoryInfo = null;
+        if ($category && $category !== 'all') {
+            $categoryInfo = Database::fetch("SELECT c.*, p.name as parent_name, p.slug as parent_slug FROM categories c LEFT JOIN categories p ON c.parent_id = p.id WHERE c.slug = ?", [$category]);
+        }
+
+        $adDirectUrl = 'https://omg10.com/4/11737440';
+        try {
+            $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url' OR key_name = 'ad_popunder_url'");
+            if (!empty($adRow['key_value'])) {
+                $adDirectUrl = $adRow['key_value'];
+            }
+        } catch (\Throwable $e) {}
+
         Response::view('directory/prompts_images', [
             'title' => 'AI Image Prompts Sub-Directory & Visual Blueprints | TechScout',
             'prompts' => $prompts,
             'categories' => $categories,
             'currentCategory' => $category,
+            'categoryInfo' => $categoryInfo,
             'currentSort' => $sort,
             'currentSearch' => $search,
-            'currentModel' => $model
+            'currentModel' => $model,
+            'adDirectUrl' => $adDirectUrl
         ]);
     }
 
@@ -171,6 +195,17 @@ class DirectoryController {
             http_response_code(404);
             Response::view('errors/404', ['title' => 'Prompt Not Found']);
             return;
+        }
+
+        // Category hierarchy fallback
+        if (!empty($prompt['category_id']) && empty($prompt['parent_category_name'])) {
+            try {
+                $catRow = Database::fetch("SELECT c.*, p.name as parent_name, p.slug as parent_slug FROM categories c LEFT JOIN categories p ON c.parent_id = p.id WHERE c.id = ?", [(int)$prompt['category_id']]);
+                if (!empty($catRow['parent_name'])) {
+                    $prompt['parent_category_name'] = $catRow['parent_name'];
+                    $prompt['parent_category_slug'] = $catRow['parent_slug'];
+                }
+            } catch (\Throwable $e) {}
         }
 
         // Access Control: Non-approved content is strictly restricted
@@ -208,7 +243,7 @@ class DirectoryController {
 
         $adDirectUrl = 'https://omg10.com/4/11737440';
         try {
-            $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url'");
+            $adRow = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_direct_link_url' OR key_name = 'ad_popunder_url'");
             if (!empty($adRow['key_value'])) {
                 $adDirectUrl = $adRow['key_value'];
             }

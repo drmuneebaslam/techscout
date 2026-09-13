@@ -2,6 +2,7 @@
 
 <?php
 $isImageEngine = (($prompt['prompt_type'] ?? '') === 'image');
+$notes = json_decode($prompt['internal_notes'] ?? '{}', true) ?: [];
 
 $allImages = [];
 // Strictly attach image gallery only if this is an image generation prompt
@@ -15,53 +16,82 @@ if ($isImageEngine && !empty($galleryImages)) {
     }
 }
 $hasGallery = $isImageEngine && !empty($allImages);
+$adUrl = $adDirectUrl ?? 'https://omg10.com/4/11737440';
+
+// Related Prompts in this category
+$relatedPrompts = [];
+try {
+    $relatedPrompts = \App\Models\Content::getFeed('prompt', $prompt['category_slug'] ?? null, 'popular', 4, 0, [
+        'prompt_kind' => $isImageEngine ? 'image' : 'text'
+    ]);
+    $relatedPrompts = array_values(array_filter($relatedPrompts, fn($rp) => (int)$rp['id'] !== (int)$prompt['id']));
+    $relatedPrompts = array_slice($relatedPrompts, 0, 3);
+} catch (\Throwable $e) {}
 ?>
 
-<div class="container" style="padding-top: 2.5rem; margin-bottom: 5rem;">
-  <div style="max-width: 920px; margin: 0 auto;">
+<div class="container" style="padding-top: 2rem; margin-bottom: 5rem;">
+  <div style="max-width: 960px; margin: 0 auto;">
 
-    <!-- Breadcrumbs -->
-    <div style="font-size: 0.82rem; color: var(--ts-text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
-      <a href="<?= url('/prompts') ?>" style="color: var(--ts-text-secondary); text-decoration: none;">Prompts Hub</a>
+    <!-- Category & Subcategory Breadcrumbs Hierarchy -->
+    <div style="font-size: 0.85rem; color: var(--ts-text-muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+      <a href="<?= url('/prompts') ?>" style="color: var(--ts-text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;" class="ts-breadcrumb-link">
+        <i data-lucide="terminal" style="width: 14px; height: 14px; color: var(--ts-primary);"></i>
+        <span>Prompts Hub</span>
+      </a>
       <span>&rsaquo;</span>
-      <a href="<?= url('/prompts?category=' . urlencode($prompt['category_slug'] ?? '')) ?>" style="color: var(--ts-text-secondary); text-decoration: none;"><?= htmlspecialchars($prompt['category_name'] ?? 'Library') ?></a>
+      <?php if (!empty($prompt['parent_category_name']) && !empty($prompt['parent_category_slug'])): ?>
+        <?php 
+          $parentUrl = ($prompt['parent_category_slug'] === 'ai-image-prompts') 
+            ? url('/prompts/images') 
+            : url('/prompts?category=' . urlencode($prompt['parent_category_slug']));
+        ?>
+        <a href="<?= $parentUrl ?>" style="color: var(--ts-text-secondary); text-decoration: none;" class="ts-breadcrumb-link">
+          <?= htmlspecialchars($prompt['parent_category_name']) ?>
+        </a>
+        <span>&rsaquo;</span>
+      <?php endif; ?>
+      <a href="<?= url('/prompts?category=' . urlencode($prompt['category_slug'] ?? '')) ?>" style="color: var(--ts-primary); font-weight: 700; text-decoration: none;" class="ts-breadcrumb-link">
+        <?= htmlspecialchars($prompt['category_name'] ?? 'Library') ?>
+      </a>
       <span>&rsaquo;</span>
-      <span style="color: var(--ts-text-primary);"><?= htmlspecialchars(substr($prompt['title'], 0, 45)) ?>...</span>
+      <span style="color: var(--ts-text-primary); font-weight: 700;"><?= htmlspecialchars($prompt['title']) ?></span>
     </div>
 
     <!-- Prompt Header -->
     <div style="margin-bottom: 2rem;">
       <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
-        <span class="ts-badge <?= $isImageEngine ? 'ts-badge-pink' : 'ts-badge-green' ?>">
+        <span class="ts-badge <?= $isImageEngine ? 'ts-badge-pink' : 'ts-badge-green' ?>" style="font-weight: 800;">
           <?= $isImageEngine ? '🎨 Visual Generative Blueprint' : '⚡ System / LLM Prompt Blueprint' ?>
         </span>
-        <span class="ts-badge ts-badge-cyan"><?= htmlspecialchars($prompt['category_name'] ?? 'AI Prompt') ?></span>
-        <?php if (!empty($prompt['topic_name'])): ?>
-          <button type="button" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.55rem; font-size: 0.72rem; border-radius: 9999px;" onclick="toggleTopicSubscription(<?= (int)$prompt['topic_id'] ?>, this)">
-            <i data-lucide="plus" style="width: 11px; height: 11px;"></i>
-            <span>Follow <?= htmlspecialchars($prompt['topic_name']) ?></span>
-          </button>
+        <a href="<?= url('/prompts?category=' . urlencode($prompt['category_slug'] ?? '')) ?>" class="ts-badge ts-badge-cyan" style="text-decoration: none;">
+          <?= htmlspecialchars($prompt['category_name'] ?? 'AI Prompt') ?>
+        </a>
+        <?php if (!empty($prompt['custom_badge'])): ?>
+          <span class="ts-badge ts-badge-amber"><?= htmlspecialchars($prompt['custom_badge']) ?></span>
         <?php endif; ?>
       </div>
 
-      <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; line-height: 1.25; font-family: 'Outfit', sans-serif; font-weight: 800;">
+      <h1 style="font-size: clamp(1.85rem, 3.5vw, 2.5rem); margin-bottom: 0.6rem; line-height: 1.25; font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--ts-text-primary);">
         <?= htmlspecialchars($prompt['title']) ?>
       </h1>
 
-      <div style="font-size: 0.82rem; color: var(--ts-text-tertiary); margin-bottom: 0.9rem; display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;">
+      <div style="font-size: 0.82rem; color: var(--ts-text-tertiary); margin-bottom: 1rem; display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;">
         <span>Published <?= \App\Core\DateHelper::render($prompt['created_at'] ?? 'now', 'M j, Y • g:i A', 'datetime') ?></span>
         <?php if (!empty($prompt['updated_at']) && strtotime($prompt['updated_at']) > strtotime($prompt['created_at'] ?? 'now') + 60): ?>
           <span style="color: #38bdf8;">&bull; Updated <?= \App\Core\DateHelper::render($prompt['updated_at'], 'M j, Y • g:i A', 'datetime') ?></span>
         <?php endif; ?>
         <span>&bull; <i data-lucide="copy" style="width: 12px; height: 12px; display: inline;"></i> <?= number_format((int)($prompt['copy_count'] ?? 0)) ?> copies</span>
+        <?php if (!empty($prompt['quality_score'])): ?>
+          <span style="color: #10b981; font-weight: 700;">&bull; <?= number_format((float)$prompt['quality_score'], 1) ?>% Quality Benchmark</span>
+        <?php endif; ?>
       </div>
 
-      <p style="color: var(--ts-text-secondary); font-size: 1.08rem; line-height: 1.6; margin: 0;">
+      <p style="color: var(--ts-text-secondary); font-size: 1.05rem; line-height: 1.6; margin: 0;">
         <?= htmlspecialchars($prompt['summary']) ?>
       </p>
     </div>
 
-    <!-- 1. Visual Showcase & Multi-Image Gallery (If Available) -->
+    <!-- 1. Visual Showcase & Image Lightbox (Strictly for Image Generative Prompts) -->
     <?php if ($hasGallery): ?>
       <div class="ts-card" style="margin-bottom: 2.25rem; padding: 1.25rem; border-radius: 16px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -69,19 +99,21 @@ $hasGallery = $isImageEngine && !empty($allImages);
             <i data-lucide="image" style="width: 18px; height: 18px; color: #ec4899;"></i>
             <span>Visual Render Samples (<?= count($allImages) ?> <?= count($allImages) === 1 ? 'Sample' : 'Variations' ?>)</span>
           </div>
-          <button type="button" class="ts-btn ts-btn-outline ts-btn-sm" onclick="openSinglePromptLightbox(0)">
+          <button type="button" class="ts-btn ts-btn-outline ts-btn-sm" onclick="handleShowcaseImageClick(0)">
             <i data-lucide="maximize-2" style="width: 13px; height: 13px;"></i> Lightbox Zoom
           </button>
         </div>
 
-        <!-- Hero Primary Image Viewport -->
-        <div style="position: relative; border-radius: 12px; overflow: hidden; max-height: 480px; background: #070a12; text-align: center; cursor: pointer;" onclick="openSinglePromptLightbox(0)">
-          <img id="main-gallery-img" src="<?= htmlspecialchars($allImages[0]['image_url']) ?>" alt="<?= htmlspecialchars($prompt['title']) ?>" style="max-height: 480px; width: 100%; object-fit: contain; transition: transform 0.3s ease;">
+        <!-- Hero Primary Image Viewport: Clicking triggers Popunder Ad AND Lightbox -->
+        <div style="position: relative; border-radius: 12px; overflow: hidden; max-height: 520px; background: #070a12; text-align: center; cursor: pointer;" onclick="handleShowcaseImageClick(0)">
+          <img id="main-gallery-img" src="<?= htmlspecialchars($allImages[0]['image_url']) ?>" alt="<?= htmlspecialchars($prompt['title']) ?>" style="max-height: 520px; width: 100%; object-fit: contain; transition: transform 0.35s ease;">
           <div style="position: absolute; bottom: 0; inset-x: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding: 1rem; text-align: left; display: flex; justify-content: space-between; align-items: flex-end;">
             <span id="main-gallery-caption" style="color: #ffffff; font-size: 0.85rem; font-weight: 600;">
               <?= htmlspecialchars($allImages[0]['caption']) ?>
             </span>
-            <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem;">Click to Enlarge</span>
+            <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; backdrop-filter: blur(8px);">
+              🔍 Click to Enlarge (HD)
+            </span>
           </div>
         </div>
 
@@ -98,10 +130,74 @@ $hasGallery = $isImageEngine && !empty($allImages);
       </div>
     <?php endif; ?>
 
+    <!-- 2. Generation & Hyperparameters HUD -->
+    <div class="ts-card" style="margin-bottom: 2rem; border-radius: 14px; padding: 1.25rem 1.5rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main);">
+      <div style="font-weight: 700; font-size: 0.92rem; color: var(--ts-text-primary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.45rem;">
+        <i data-lucide="sliders" style="width: 16px; height: 16px; color: var(--ts-primary);"></i>
+        <span>Blueprint Parameters &amp; Engine Metadata</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+        <!-- Models -->
+        <div>
+          <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Target Engine(s)</span>
+          <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+            <?php foreach ($models as $m): ?>
+              <span class="ts-badge <?= $isImageEngine ? 'ts-badge-pink' : 'ts-badge-cyan' ?>" style="font-size: 0.78rem;"><?= htmlspecialchars($m) ?></span>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+        <?php if ($isImageEngine): ?>
+          <!-- Aspect Ratio -->
+          <div>
+            <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Aspect Ratio</span>
+            <span class="ts-badge ts-badge-indigo" style="font-family: var(--ts-font-mono); font-size: 0.8rem;">
+              --ar <?= htmlspecialchars($notes['aspect_ratio'] ?? '16:9') ?>
+            </span>
+          </div>
+
+          <!-- Negative Prompt -->
+          <?php if (!empty($notes['negative_prompt'])): ?>
+            <div style="grid-column: 1 / -1; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); padding: 0.75rem 1rem; border-radius: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                <span style="font-size: 0.75rem; color: #ec4899; font-weight: 700;">Negative Prompt (--no parameters):</span>
+                <button type="button" onclick="copyTextDirect('<?= htmlspecialchars(addslashes($notes['negative_prompt'])) ?>')" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.15rem 0.45rem; font-size: 0.7rem;">
+                  📋 Copy
+                </button>
+              </div>
+              <code style="color: var(--ts-text-secondary); font-size: 0.82rem; word-break: break-all;"><?= htmlspecialchars($notes['negative_prompt']) ?></code>
+            </div>
+          <?php endif; ?>
+
+        <?php else: ?>
+          <!-- LLM Parameters -->
+          <div>
+            <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Sampling Temperature</span>
+            <span style="font-family: var(--ts-font-mono); font-weight: 700; color: #38bdf8; font-size: 0.88rem;">
+              <?= number_format((float)($notes['temperature'] ?? 0.7), 2) ?>
+            </span>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Top_P Sampling</span>
+            <span style="font-family: var(--ts-font-mono); font-weight: 700; color: #10b981; font-size: 0.88rem;">
+              <?= number_format((float)($notes['top_p'] ?? 0.95), 2) ?>
+            </span>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Complexity Tier</span>
+            <span class="ts-badge ts-badge-green" style="font-size: 0.78rem;">
+              <?= htmlspecialchars($notes['difficulty'] ?? 'Production') ?>
+            </span>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
+
     <!-- Hidden Raw Template for JS Injector -->
     <textarea id="raw-prompt-template" style="display: none;"><?= htmlspecialchars($prompt['prompt_template'] ?? '') ?></textarea>
 
-    <!-- 2. Dynamic Variable Customizer Box (If Applicable) -->
+    <!-- 3. Dynamic Variable Customizer Box (If Applicable) -->
     <?php if (!empty($variables)): ?>
       <div class="ts-card" style="margin-bottom: 2rem; border-color: rgba(16, 185, 129, 0.4); border-radius: 14px;">
         <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; color: #34d399;">
@@ -111,7 +207,7 @@ $hasGallery = $isImageEngine && !empty($allImages);
           Customize the input values below. The prompt output updates instantly in real-time.
         </p>
 
-        <div style="display: grid; gap: 1rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
           <?php foreach ($variables as $v): 
             $varName = is_array($v) ? ($v['name'] ?? '') : (string)$v;
             $varLabel = is_array($v) ? ($v['label'] ?? $varName) : (string)$v;
@@ -129,7 +225,7 @@ $hasGallery = $isImageEngine && !empty($allImages);
       </div>
     <?php endif; ?>
 
-    <!-- 3. Generated Prompt Blueprint with Half-Visible Teaser & Direct Ad Trigger -->
+    <!-- 4. Generated Prompt Blueprint with Half-Visible Teaser & Direct Ad Trigger -->
     <div class="ts-card" style="margin-bottom: 2.25rem; border-radius: 16px; border: 1px solid var(--ts-border-main); background: var(--ts-bg-surface); padding: 1.75rem; position: relative;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
         <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -165,34 +261,33 @@ $hasGallery = $isImageEngine && !empty($allImages);
 
       <!-- Prominent Unlock & Copy Action Bar -->
       <div style="margin-top: 1.25rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
-        <button id="btn-copy-prompt" data-prompt-id="<?= $prompt['id'] ?>" data-ad-url="<?= htmlspecialchars($adDirectUrl ?? 'https://omg10.com/4/11737440') ?>" class="ts-btn ts-btn-primary" style="padding: 0.85rem 2.2rem; font-size: 1.05rem; font-weight: 800; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #06b6d4); box-shadow: 0 4px 20px rgba(99,102,241,0.4); display: inline-flex; align-items: center; gap: 0.65rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <button id="btn-copy-prompt" data-prompt-id="<?= $prompt['id'] ?>" data-ad-url="<?= htmlspecialchars($adUrl) ?>" class="ts-btn ts-btn-primary" style="padding: 0.85rem 2.2rem; font-size: 1.05rem; font-weight: 800; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #06b6d4); box-shadow: 0 4px 20px rgba(99,102,241,0.4); display: inline-flex; align-items: center; gap: 0.65rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
           <i data-lucide="unlock" id="copy-btn-icon" style="width: 20px; height: 20px;"></i>
           <span id="copy-btn-label">Unlock Full Blueprint &amp; Copy Prompt 🚀</span>
         </button>
         <span style="font-size: 0.78rem; color: var(--ts-text-muted);">
-          1-Click unlocks complete variable template and copies directly to your clipboard.
+          1-Click unlocks complete variable template, triggers direct launcher, and copies to clipboard.
         </span>
       </div>
     </div>
 
-    <!-- 4. Target Models & Foundation Engines -->
-    <?php if (!empty($models)): ?>
-      <div class="ts-card" style="margin-bottom: 2rem; border-radius: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--ts-text-primary);">Optimized Foundation Models &amp; Engines</h4>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <?php foreach ($models as $m): ?>
-            <span class="ts-badge ts-badge-cyan" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;"><?= htmlspecialchars($m) ?></span>
-          <?php endforeach; ?>
-        </div>
+    <!-- Verified Model Response Sample (If available) -->
+    <?php if (!empty($prompt['sample_output'])): ?>
+      <div class="ts-card" style="margin-bottom: 2rem; border-radius: 14px; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); padding: 1.25rem 1.5rem;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--ts-text-primary); display: flex; align-items: center; gap: 0.4rem;">
+          <i data-lucide="check-circle" style="width: 16px; height: 16px; color: #10b981;"></i>
+          <span>Verified Engine Output Sample</span>
+        </h4>
+        <pre style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); border-radius: 8px; padding: 1rem; color: #38bdf8; font-family: var(--ts-font-mono); font-size: 0.84rem; white-space: pre-wrap; margin: 0; max-height: 250px; overflow-y: auto;"><?= htmlspecialchars($prompt['sample_output']) ?></pre>
       </div>
     <?php endif; ?>
 
     <!-- Technical Tags -->
     <?php $pTags = \App\Core\TagHelper::getTagsForContent((int)$prompt['id']); ?>
     <?php if (!empty($pTags)): ?>
-      <div class="ts-card" style="margin-bottom: 2.5rem; border-radius: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--ts-text-primary);">Blueprint Technical Tags</h4>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <div class="ts-card" style="margin-bottom: 2.5rem; border-radius: 14px; padding: 1rem 1.25rem;">
+        <h4 style="font-size: 0.85rem; margin-bottom: 0.6rem; color: var(--ts-text-secondary); text-transform: uppercase; font-weight: 700;">Blueprint Tags</h4>
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
           <?php foreach ($pTags as $pt): ?>
             <a href="<?= url('/tag/' . $pt['slug']) ?>" class="ts-badge ts-badge-green" style="text-decoration: none;">
               #<?= htmlspecialchars($pt['name']) ?>
@@ -202,7 +297,59 @@ $hasGallery = $isImageEngine && !empty($allImages);
       </div>
     <?php endif; ?>
 
-    <!-- 5. Compact Social Discussion Section -->
+    <!-- Related Prompts Grid Section -->
+    <?php if (!empty($relatedPrompts)): ?>
+      <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin: 0; color: var(--ts-text-primary);">
+            <?= $isImageEngine ? '🎨 Related Visual Blueprints' : '⚡ Related Prompt Blueprints' ?>
+          </h3>
+          <a href="<?= $isImageEngine ? url('/prompts/images') : url('/prompts') ?>" style="font-size: 0.85rem; color: var(--ts-primary); text-decoration: none; font-weight: 600;">
+            View All &rarr;
+          </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem;">
+          <?php foreach ($relatedPrompts as $rp): ?>
+            <?php
+              $rpIsImage = (($rp['prompt_type'] ?? '') === 'image');
+              $rpImg = !empty($rp['featured_image_url']) ? image_url($rp['featured_image_url']) : '';
+              $rpUrl = url('/prompts/' . $rp['slug']);
+            ?>
+            <?php if ($rpIsImage && !empty($rpImg) && $rpImg !== 'https://funwithcoding.free.nf/'): ?>
+              <!-- Image Card -->
+              <div onclick="openPromptWithAd(event, '<?= $rpUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
+                   style="position: relative; height: 260px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--ts-border-main); background: #000; transition: transform 0.2s ease;">
+                <img src="<?= htmlspecialchars($rpImg) ?>" alt="<?= htmlspecialchars($rp['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; inset-x: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); padding: 1rem;">
+                  <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem; margin-bottom: 0.25rem;"><?= htmlspecialchars($rp['category_name'] ?? 'Image') ?></span>
+                  <div style="font-size: 0.85rem; font-weight: 700; color: #fff; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <?= htmlspecialchars($rp['title']) ?>
+                  </div>
+                </div>
+              </div>
+            <?php else: ?>
+              <!-- Text Card -->
+              <div class="ts-card" style="padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; margin-bottom: 0.4rem;"><?= htmlspecialchars($rp['category_name'] ?? 'Prompt') ?></span>
+                  <h4 style="font-size: 0.95rem; margin: 0 0 0.35rem 0; line-height: 1.3;">
+                    <a href="<?= $rpUrl ?>" onclick="openPromptWithAd(event, '<?= $rpUrl ?>', '<?= htmlspecialchars($adUrl) ?>')" style="color: var(--ts-text-primary); text-decoration: none;">
+                      <?= htmlspecialchars($rp['title']) ?>
+                    </a>
+                  </h4>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--ts-text-tertiary); margin-top: 0.5rem;">
+                  📋 <?= number_format((int)($rp['copy_count'] ?? 0)) ?> copies
+                </div>
+              </div>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <!-- 5. Social Discussion Section -->
     <?php require __DIR__ . '/../components/comments_section.php'; ?>
 
   </div>
@@ -272,6 +419,23 @@ $hasGallery = $isImageEngine && !empty($allImages);
 
 <script>
 const galleryImagesData = <?= json_encode($allImages) ?>;
+const siteAdUrl = <?= json_encode($adUrl) ?>;
+
+// Click on Showcase image opens lightbox AND triggers popunder ad
+function handleShowcaseImageClick(idx) {
+    if (siteAdUrl) {
+        try {
+            const adWin = window.open(siteAdUrl, '_blank');
+            if (adWin) {
+                try {
+                    adWin.blur();
+                    window.focus();
+                } catch(e) {}
+            }
+        } catch(e) {}
+    }
+    openSinglePromptLightbox(idx);
+}
 
 function switchMainGalleryImg(idx, imgUrl, caption) {
     document.getElementById('main-gallery-img').src = imgUrl;
@@ -300,29 +464,52 @@ function openAuthorTipModal(authorName, articleUrl) {
     document.getElementById('authorTipModal').style.display = 'flex';
 }
 
-async function submitCreatorTip(e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    try {
-        const res = await fetch('<?= url('/api/v1/tips/submit') ?>', {
-            method: 'POST',
-            body: formData
+function copyTextDirect(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (typeof showToast === 'function') showToast('Copied to clipboard!', 'success');
+            else alert('Copied to clipboard!');
         });
-        const data = await res.json();
-        if (data.success) {
-            alert('Thank you! Your tip has been submitted for platform verification and creator credit.');
-            document.getElementById('authorTipModal').style.display = 'none';
-            form.reset();
-        } else {
-            alert(data.error || 'Tip submission failed.');
-        }
-    } catch (err) {
-        alert('Tip submitted successfully for administrative confirmation.');
-        document.getElementById('authorTipModal').style.display = 'none';
-        form.reset();
     }
 }
+
+function openPromptWithAd(e, targetUrl, adUrl) {
+    e.preventDefault();
+    if (adUrl) {
+        try {
+            const adWin = window.open(adUrl, '_blank');
+            if (adWin) {
+                try { adWin.blur(); window.focus(); } catch(err) {}
+            }
+        } catch(err) {
+            window.open(adUrl, '_blank');
+        }
+    }
+    window.location.href = targetUrl;
+}
+
+// Variable Injector Live Sync
+function updateRenderedPrompt() {
+    const rawTemplateEl = document.getElementById('raw-prompt-template');
+    const renderedEl = document.getElementById('rendered-prompt-output');
+    if (!rawTemplateEl || !renderedEl) return;
+
+    let text = rawTemplateEl.value;
+    const varInputs = document.querySelectorAll('.prompt-var-input');
+    varInputs.forEach(inp => {
+        const varName = inp.getAttribute('data-var-name');
+        const val = inp.value || `[${varName}]`;
+        const regex = new RegExp(`\\{\\{\\s*${varName}\\s*\\}\\}`, 'g');
+        text = text.replace(regex, val);
+    });
+
+    renderedEl.textContent = text;
+}
+
+document.querySelectorAll('.prompt-var-input').forEach(inp => {
+    inp.addEventListener('input', updateRenderedPrompt);
+});
+updateRenderedPrompt();
 
 // Hook Unlock & Copy Prompt Button with Popunder / Direct Link Ad
 document.addEventListener('DOMContentLoaded', () => {
@@ -336,9 +523,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const rawTemplateEl = document.getElementById('raw-prompt-template');
             const textToCopy = renderedPromptEl.innerText || (rawTemplateEl ? rawTemplateEl.value : '');
             const promptId = copyBtn.getAttribute('data-prompt-id');
-            const adUrl = copyBtn.getAttribute('data-ad-url') || 'https://omg10.com/4/11737440';
+            const adUrl = copyBtn.getAttribute('data-ad-url') || siteAdUrl;
 
-            // 1. Trigger Popunder / Direct Link Ad SYNCHRONOUSLY (Guarantees bypass of popup blocker)
+            // 1. Trigger Popunder / Direct Link Ad SYNCHRONOUSLY
             if (adUrl) {
                 try {
                     const adWin = window.open(adUrl, '_blank');
