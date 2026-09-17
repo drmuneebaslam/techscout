@@ -697,18 +697,17 @@ window.tsModal = {
   }
 };
 
-// Global 1-Click Topic / Category Subscription Handler
-window.toggleTopicSubscription = async function(topicId, btn) {
+// Global 1-Click Category / Taxonomy Subscription Handler
+window.toggleCategorySubscription = window.toggleTopicSubscription = async function(catId, btn) {
   const baseUrl = getTsApiBase();
   try {
-    const res = await fetch(`${baseUrl}/api/v1/subscriptions/toggle`, {
+    const res = await fetch(`${baseUrl}/category/subscribe/${catId}`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: JSON.stringify({ type: 'topic', id: topicId })
+      }
     });
     const data = await res.json();
     if (data.error) {
@@ -724,12 +723,12 @@ window.toggleTopicSubscription = async function(topicId, btn) {
         btn.classList.remove('ts-btn-outline');
         btn.classList.add('ts-btn-primary');
         btn.innerHTML = `<i data-lucide="check" style="width:11px; height:11px; vertical-align:middle;"></i> <span>Following</span>`;
-        showToast('Topic added to your personalized stream! ⚡', 'success');
+        showToast('Category added to your personalized radar! 🚀', 'success');
       } else {
         btn.classList.remove('ts-btn-primary');
         btn.classList.add('ts-btn-outline');
-        btn.innerHTML = `<i data-lucide="plus" style="width:11px; height:11px; vertical-align:middle;"></i> <span>Follow Topic</span>`;
-        showToast('Topic unfollowed.', 'info');
+        btn.innerHTML = `<i data-lucide="plus" style="width:11px; height:11px; vertical-align:middle;"></i> <span>Follow</span>`;
+        showToast('Category unfollowed.', 'info');
       }
       if (typeof lucide !== 'undefined') lucide.createIcons();
     }

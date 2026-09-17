@@ -71,10 +71,10 @@ $featuredCats = array_slice($categories, 0, 7);
       </select>
     </div>
 
-    <!-- Topics Hub Button -->
-    <a href="<?= url('/topics') ?>" class="ts-badge" style="background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); color: #a5b4fc; text-decoration: none; padding: 0.4rem 0.9rem; font-size: 0.82rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;">
+    <!-- All Categories Hub Button -->
+    <a href="<?= url('/categories') ?>" class="ts-badge" style="background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); color: #a5b4fc; text-decoration: none; padding: 0.4rem 0.9rem; font-size: 0.82rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;">
       <i data-lucide="layers" style="width: 13px; height: 13px;"></i>
-      <span>Explore Topics →</span>
+      <span>All Categories →</span>
     </a>
 
   </div>

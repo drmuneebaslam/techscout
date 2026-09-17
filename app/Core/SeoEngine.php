@@ -13,7 +13,7 @@ class SeoEngine {
             ['loc' => $appUrl . '/tools', 'priority' => '0.8', 'changefreq' => 'daily'],
             ['loc' => $appUrl . '/gpts', 'priority' => '0.8', 'changefreq' => 'daily'],
             ['loc' => $appUrl . '/prompts', 'priority' => '0.8', 'changefreq' => 'daily'],
-            ['loc' => $appUrl . '/topics', 'priority' => '0.7', 'changefreq' => 'weekly'],
+            ['loc' => $appUrl . '/categories', 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['loc' => $appUrl . '/jobs', 'priority' => '0.7', 'changefreq' => 'daily'],
             ['loc' => $appUrl . '/challenges', 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['loc' => $appUrl . '/author/apply', 'priority' => '0.6', 'changefreq' => 'monthly'],

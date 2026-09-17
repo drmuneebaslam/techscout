@@ -29,6 +29,39 @@ try {
     $relatedPrompts = array_values(array_filter($relatedPrompts, fn($rp) => (int)$rp['id'] !== (int)$prompt['id']));
     $relatedPrompts = array_slice($relatedPrompts, 0, 3);
 } catch (\Throwable $e) {}
+
+// Multi-taxonomy relationship (Primary + Secondary Categories)
+$entityKind = $isImageEngine ? 'image_prompt' : 'prompt';
+$contentCategories = [];
+try {
+    $contentCategories = \App\Core\Database::query(
+        "SELECT cat.id, cat.name, cat.slug, cat.icon_name, cat.color_hex, cc.is_primary 
+         FROM content_categories cc 
+         JOIN categories cat ON cc.category_id = cat.id 
+         WHERE cc.content_id = ? 
+         ORDER BY cc.is_primary DESC, cat.name ASC",
+        [$prompt['id']]
+    );
+} catch (\Throwable $e) {}
+
+$primaryCategory = null;
+$secondaryCategories = [];
+foreach ($contentCategories as $cc) {
+    if ((int)$cc['is_primary'] === 1 && !$primaryCategory) {
+        $primaryCategory = $cc;
+    } else {
+        $secondaryCategories[] = $cc;
+    }
+}
+if (!$primaryCategory && !empty($prompt['category_name'])) {
+    $primaryCategory = [
+        'id' => $prompt['category_id'] ?? 0,
+        'name' => $prompt['category_name'],
+        'slug' => $prompt['category_slug'] ?? '',
+        'icon_name' => 'terminal',
+        'color_hex' => '#10b981'
+    ];
+}
 ?>
 
 <div class="container" style="padding-top: 2rem; margin-bottom: 5rem;">
@@ -65,9 +98,26 @@ try {
         <span class="ts-badge <?= $isImageEngine ? 'ts-badge-pink' : 'ts-badge-green' ?>" style="font-weight: 800;">
           <?= $isImageEngine ? '🎨 Visual Generative Blueprint' : '⚡ System / LLM Prompt Blueprint' ?>
         </span>
-        <a href="<?= url('/prompts?category=' . urlencode($prompt['category_slug'] ?? '')) ?>" class="ts-badge ts-badge-cyan" style="text-decoration: none;">
-          <?= htmlspecialchars($prompt['category_name'] ?? 'AI Prompt') ?>
-        </a>
+
+        <?php if (!empty($primaryCategory['name'])): ?>
+          <a href="<?= url('/category/' . urlencode($primaryCategory['slug']) . '?entity=' . $entityKind) ?>" class="ts-badge ts-badge-cyan" style="text-decoration: none; font-weight: 700;" title="Primary Entity Category">
+            ⭐ <?= htmlspecialchars($primaryCategory['name']) ?>
+          </a>
+        <?php endif; ?>
+
+        <?php foreach ($secondaryCategories as $secCat): ?>
+          <a href="<?= url('/category/' . urlencode($secCat['slug']) . '?entity=' . $entityKind) ?>" class="ts-badge ts-badge-indigo" style="text-decoration: none; font-size: 0.76rem;" title="Secondary Category">
+            #<?= htmlspecialchars($secCat['name']) ?>
+          </a>
+        <?php endforeach; ?>
+
+        <?php if (!empty($primaryCategory['id'])): ?>
+          <button type="button" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.65rem; font-size: 0.74rem; border-radius: 9999px;" onclick="quickFollowCategory(<?= (int)$primaryCategory['id'] ?>, this)">
+            <i data-lucide="bell" style="width: 11px; height: 11px;"></i>
+            <span>Follow <?= htmlspecialchars($primaryCategory['name']) ?></span>
+          </button>
+        <?php endif; ?>
+
         <?php if (!empty($prompt['custom_badge'])): ?>
           <span class="ts-badge ts-badge-amber"><?= htmlspecialchars($prompt['custom_badge']) ?></span>
         <?php endif; ?>
@@ -914,6 +964,32 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(temp);
     }
 });
+
+async function quickFollowCategory(catId, btn) {
+    try {
+        const res = await fetch('<?= url('/category/subscribe/') ?>' + catId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            if (data.is_subscribed) {
+                btn.classList.remove('ts-btn-outline');
+                btn.classList.add('ts-btn-primary');
+                btn.innerHTML = `<i data-lucide="check" style="width: 11px; height: 11px;"></i> Following`;
+                if (typeof showToast === 'function') showToast('Category subscribed! 🚀', 'success');
+            } else {
+                btn.classList.remove('ts-btn-primary');
+                btn.classList.add('ts-btn-outline');
+                btn.innerHTML = `<i data-lucide="bell" style="width: 11px; height: 11px;"></i> Follow`;
+                if (typeof showToast === 'function') showToast('Category unsubscribed.', 'info');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+    } catch(e) {
+        if (typeof showToast === 'function') showToast('Failed to update subscription.', 'error');
+    }
+}
 </script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

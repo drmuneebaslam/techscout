@@ -262,7 +262,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
           $dynamicNavItems = [
               ['label' => 'Home', 'url' => '/', 'target' => '_self'],
               ['label' => 'Articles', 'url' => '/blog', 'target' => '_self'],
-              ['label' => 'Topics', 'url' => '/topics', 'target' => '_self'],
+              ['label' => 'Categories', 'url' => '/categories', 'target' => '_self'],
               ['label' => 'AI Tools', 'url' => '/tools', 'target' => '_self'],
               ['label' => 'Prompts', 'url' => '/prompts', 'target' => '_self'],
               ['label' => 'GPTs', 'url' => '/gpts', 'target' => '_self'],
@@ -479,9 +479,9 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
                 <span>Support &amp; Helpdesk</span>
               </a>
 
-              <a href="<?= url('/topics') ?>" class="ts-dropdown-item">
+              <a href="<?= url('/categories') ?>" class="ts-dropdown-item">
                 <i data-lucide="sparkles" style="color: #ec4899;"></i>
-                <span>Personalize Feed &amp; Topics 🌟</span>
+                <span>Explore Categories &amp; Follow 🌟</span>
               </a>
 
               <?php if (Auth::isAuthor()): ?>
@@ -554,9 +554,9 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
         <i data-lucide="file-text"></i>
         <span>Technical Articles</span>
       </a>
-      <a href="<?= url('/topics') ?>" class="mobile-nav-link">
+      <a href="<?= url('/categories') ?>" class="mobile-nav-link">
         <i data-lucide="layers"></i>
-        <span>Topics & 100+ Categories</span>
+        <span>Categories &amp; Subcategories</span>
       </a>
       <a href="<?= url('/tools') ?>" class="mobile-nav-link">
         <i data-lucide="cpu"></i>
@@ -662,9 +662,9 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
           <span>Support &amp; Helpdesk</span>
         </a>
 
-        <a href="<?= url('/topics') ?>" class="mobile-nav-link">
+        <a href="<?= url('/categories') ?>" class="mobile-nav-link">
           <i data-lucide="sparkles" style="color: #ec4899;"></i>
-          <span>Personalize Feed &amp; Topics 🌟</span>
+          <span>Explore Categories &amp; Follow 🌟</span>
         </a>
 
         <?php if (Auth::isAuthor()): ?>

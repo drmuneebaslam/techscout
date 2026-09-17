@@ -20,6 +20,37 @@ try {
     }
 } catch (\Throwable $e) {}
 
+// Multi-taxonomy relationships (Primary + Secondary Categories)
+$articleCategories = [];
+try {
+    $articleCategories = \App\Core\Database::query(
+        "SELECT cat.id, cat.name, cat.slug, cat.icon_name, cat.color_hex, cc.is_primary 
+         FROM content_categories cc 
+         JOIN categories cat ON cc.category_id = cat.id 
+         WHERE cc.content_id = ? 
+         ORDER BY cc.is_primary DESC, cat.name ASC",
+        [(int)$article['id']]
+    );
+} catch (\Throwable $e) {}
+
+$primaryCat = null;
+$secondaryCats = [];
+foreach ($articleCategories as $ac) {
+    if ((int)$ac['is_primary'] === 1 && !$primaryCat) {
+        $primaryCat = $ac;
+    } else {
+        $secondaryCats[] = $ac;
+    }
+}
+if (!$primaryCat && !empty($article['category_name'])) {
+    $primaryCat = [
+        'id' => $article['category_id'] ?? 0,
+        'name' => $article['category_name'],
+        'slug' => $article['category_slug'] ?? 'ai',
+        'color_hex' => '#38bdf8'
+    ];
+}
+
 // Platform treasury wallets for author tipping [TS-CR-05]
 $tipWallets = [
     'BTC' => \App\Core\Database::queryScalar("SELECT key_value FROM site_settings WHERE key_name = 'crypto_wallet_btc' LIMIT 1") ?: 'bc1qtechscoutcrypto7482910482910btcxx',
@@ -72,20 +103,20 @@ if (\App\Core\Auth::check()) {
 
 <div class="container" style="padding-top: 2rem; margin-bottom: 5rem;">
   <article class="article-single-column" style="max-width: 860px; margin: 0 auto;">
-    <!-- Breadcrumbs & Topic Follow Bar -->
+    <!-- Breadcrumbs & Category Follow Bar -->
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; font-size: 0.85rem; color: var(--ts-text-tertiary); margin-bottom: 1.25rem;">
       <div style="display: flex; gap: 0.5rem; align-items: center;">
         <a href="<?= url('/') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">Home</a> <span>/</span>
-        <a href="<?= url('/blog') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">Blog</a> <span>/</span>
-        <a href="<?= url('/blog/category/' . ($article['category_slug'] ?? '')) ?>" style="color: var(--ts-accent-light); font-weight: 600; text-decoration: none;">
-          <?= htmlspecialchars($article['category_name'] ?? 'Architecture') ?>
+        <a href="<?= url('/blog') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">Articles</a> <span>/</span>
+        <a href="<?= url('/category/' . ($primaryCat['slug'] ?? 'ai') . '?entity=article') ?>" style="color: var(--ts-accent-light); font-weight: 600; text-decoration: none;">
+          <?= htmlspecialchars($primaryCat['name'] ?? 'Architecture') ?>
         </a>
       </div>
 
-      <?php if (!empty($article['topic_name'])): ?>
-        <button type="button" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;" onclick="toggleTopicSubscription(<?= (int)$article['topic_id'] ?>, this)">
-          <i data-lucide="plus" style="width: 12px; height: 12px;"></i>
-          <span>Follow <?= htmlspecialchars($article['topic_name']) ?></span>
+      <?php if (!empty($primaryCat['id'])): ?>
+        <button type="button" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.15rem 0.65rem; font-size: 0.74rem; border-radius: 9999px;" onclick="toggleCategorySubscription(<?= (int)$primaryCat['id'] ?>, this)">
+          <i data-lucide="bell" style="width: 12px; height: 12px;"></i>
+          <span>Follow <?= htmlspecialchars($primaryCat['name']) ?></span>
         </button>
       <?php endif; ?>
     </div>
@@ -104,9 +135,16 @@ if (\App\Core\Auth::check()) {
         </span>
       <?php endif; ?>
 
-      <a href="<?= url('/category/' . ($article['category_slug'] ?? 'ai')) ?>" class="ts-badge ts-badge-cyan" style="text-decoration: none;">
-        <?= htmlspecialchars($article['category_name'] ?? 'Artificial Intelligence') ?>
+      <a href="<?= url('/category/' . ($primaryCat['slug'] ?? 'ai') . '?entity=article') ?>" class="ts-badge ts-badge-cyan" style="text-decoration: none; font-weight: 700;" title="Primary Category">
+        ⭐ <?= htmlspecialchars($primaryCat['name'] ?? 'Artificial Intelligence') ?>
       </a>
+
+      <?php foreach ($secondaryCats as $sc): ?>
+        <a href="<?= url('/category/' . $sc['slug'] . '?entity=article') ?>" class="ts-badge ts-badge-indigo" style="text-decoration: none; font-size: 0.76rem;" title="Secondary Category">
+          #<?= htmlspecialchars($sc['name']) ?>
+        </a>
+      <?php endforeach; ?>
+
       <span class="ts-badge ts-badge-indigo"><?= strtoupper(htmlspecialchars($article['content_type'] ?? 'article')) ?></span>
 
       <span id="reading-session-badge" class="ts-badge ts-badge-green" style="display: none; font-size: 0.72rem;"></span>

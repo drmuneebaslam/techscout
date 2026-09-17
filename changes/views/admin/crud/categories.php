@@ -9,7 +9,7 @@ $subcategories = $subcategories ?? [];
 $parentCategories = $parentCategories ?? [];
 
 // Category metrics
-$catScopeCounts = ['all' => count($categories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'campaign' => 0];
+$catScopeCounts = ['all' => count($categories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
 $totalSubcategoriesCount = 0;
 $totalCategoryItems = 0;
 $featuredCategoryCount = 0;
@@ -26,7 +26,7 @@ foreach ($categories as $cat) {
 }
 
 // Subcategory metrics
-$subScopeCounts = ['all' => count($subcategories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'campaign' => 0];
+$subScopeCounts = ['all' => count($subcategories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
 $totalSubcategoryItems = 0;
 $featuredSubcategoryCount = 0;
 $parentsRepresented = [];
@@ -137,6 +137,9 @@ foreach ($subcategories as $sub) {
     </a>
     <a href="<?= url('/admin/categories?tab=categories&scope=prompt') ?>" class="ts-subtab-link <?= $currentScope === 'prompt' ? 'active' : '' ?>">
       ⚡ Prompts (<?= $catScopeCounts['prompt'] ?>)
+    </a>
+    <a href="<?= url('/admin/categories?tab=categories&scope=image_prompt') ?>" class="ts-subtab-link <?= $currentScope === 'image_prompt' ? 'active' : '' ?>">
+      🎨 Image Prompts (<?= $catScopeCounts['image_prompt'] ?? 0 ?>)
     </a>
     <a href="<?= url('/admin/categories?tab=categories&scope=ai_tool') ?>" class="ts-subtab-link <?= $currentScope === 'ai_tool' ? 'active' : '' ?>">
       🛠️ AI Tools (<?= $catScopeCounts['ai_tool'] ?>)
@@ -328,6 +331,9 @@ foreach ($subcategories as $sub) {
     </a>
     <a href="<?= url('/admin/categories?tab=subcategories&scope=prompt' . ($filterParent ? '&parent_id=' . $filterParent : '')) ?>" class="ts-subtab-link <?= $currentScope === 'prompt' ? 'active' : '' ?>">
       ⚡ Prompts (<?= $subScopeCounts['prompt'] ?>)
+    </a>
+    <a href="<?= url('/admin/categories?tab=subcategories&scope=image_prompt' . ($filterParent ? '&parent_id=' . $filterParent : '')) ?>" class="ts-subtab-link <?= $currentScope === 'image_prompt' ? 'active' : '' ?>">
+      🎨 Image Prompts (<?= $subScopeCounts['image_prompt'] ?? 0 ?>)
     </a>
     <a href="<?= url('/admin/categories?tab=subcategories&scope=ai_tool' . ($filterParent ? '&parent_id=' . $filterParent : '')) ?>" class="ts-subtab-link <?= $currentScope === 'ai_tool' ? 'active' : '' ?>">
       🛠️ AI Tools (<?= $subScopeCounts['ai_tool'] ?>)
@@ -556,7 +562,8 @@ foreach ($subcategories as $sub) {
           </label>
           <select name="applicable_to" class="admin-input" required>
             <option value="all">🌐 Global (All Sections &amp; Directories)</option>
-            <option value="prompt">⚡ Prompt Blueprints &amp; Images Only</option>
+            <option value="prompt">⚡ Text / Code Prompt Blueprints Only</option>
+            <option value="image_prompt">🎨 Image Gen Prompts Only</option>
             <option value="ai_tool">🛠️ AI Tools Radar Only</option>
             <option value="gpt_listing">🤖 Custom GPTs &amp; Agents Only</option>
             <option value="article">📝 Technical Articles Only</option>
@@ -663,10 +670,10 @@ foreach ($subcategories as $sub) {
         <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
           Parent Root Category <span style="color: #ef4444;">*</span>
         </label>
-        <select name="parent_id" class="admin-input" required style="font-weight: 600;">
-          <option value="">-- Select Root Parent Category --</option>
+        <select name="parent_id" id="tab_sub_parent" class="admin-input" required style="font-weight: 600;" onchange="handleParentScopeChange(this, 'tab_sub_scope')">
+          <option value="" data-scope="all">-- Select Root Parent Category --</option>
           <?php foreach ($parentCategories as $parent): ?>
-            <option value="<?= $parent['id'] ?>" <?= ($filterParent === (int)$parent['id']) ? 'selected' : '' ?>>
+            <option value="<?= $parent['id'] ?>" data-scope="<?= htmlspecialchars($parent['applicable_to'] ?? 'all') ?>" <?= ($filterParent === (int)$parent['id']) ? 'selected' : '' ?>>
               📁 <?= htmlspecialchars($parent['name']) ?> (Scope: <?= htmlspecialchars($parent['applicable_to']) ?>)
             </option>
           <?php endforeach; ?>
@@ -696,9 +703,10 @@ foreach ($subcategories as $sub) {
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
             Applicable Scope <span style="color: #ef4444;">*</span>
           </label>
-          <select name="applicable_to" class="admin-input" required>
+          <select name="applicable_to" id="tab_sub_scope" class="admin-input" required>
             <option value="all">🌐 Inherit / Global (All Sections)</option>
-            <option value="prompt">⚡ Prompt Blueprints &amp; Images Only</option>
+            <option value="prompt">⚡ Text / Code Prompt Blueprints Only</option>
+            <option value="image_prompt">🎨 Image Gen Prompts Only</option>
             <option value="ai_tool">🛠️ AI Tools Radar Only</option>
             <option value="gpt_listing">🤖 Custom GPTs &amp; Agents Only</option>
             <option value="article">📝 Technical Articles Only</option>
@@ -824,7 +832,8 @@ foreach ($subcategories as $sub) {
             </label>
             <select name="applicable_to" id="modal_cat_scope" class="admin-input" required>
               <option value="all">🌐 Global (All Sections)</option>
-              <option value="prompt">⚡ Prompt Blueprints Only</option>
+              <option value="prompt">⚡ Text / Code Prompt Blueprints Only</option>
+              <option value="image_prompt">🎨 Image Gen Prompts Only</option>
               <option value="ai_tool">🛠️ AI Tools Only</option>
               <option value="gpt_listing">🤖 Custom GPTs Only</option>
               <option value="article">📝 Articles Only</option>
@@ -931,10 +940,10 @@ foreach ($subcategories as $sub) {
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
             Parent Root Category <span style="color: #ef4444;">*</span>
           </label>
-          <select name="parent_id" id="modal_sub_parent" class="admin-input" required style="font-weight: 600;">
-            <option value="">-- Choose Parent Category --</option>
+          <select name="parent_id" id="modal_sub_parent" class="admin-input" required style="font-weight: 600;" onchange="handleParentScopeChange(this, 'modal_sub_scope')">
+            <option value="" data-scope="all">-- Choose Parent Category --</option>
             <?php foreach ($parentCategories as $parent): ?>
-              <option value="<?= $parent['id'] ?>">📁 <?= htmlspecialchars($parent['name']) ?></option>
+              <option value="<?= $parent['id'] ?>" data-scope="<?= htmlspecialchars($parent['applicable_to'] ?? 'all') ?>">📁 <?= htmlspecialchars($parent['name']) ?> (Scope: <?= htmlspecialchars($parent['applicable_to']) ?>)</option>
             <?php endforeach; ?>
           </select>
         </div>
@@ -964,7 +973,8 @@ foreach ($subcategories as $sub) {
             </label>
             <select name="applicable_to" id="modal_sub_scope" class="admin-input" required>
               <option value="all">🌐 Inherit / Global (All Sections)</option>
-              <option value="prompt">⚡ Prompt Blueprints Only</option>
+              <option value="prompt">⚡ Text / Code Prompt Blueprints Only</option>
+              <option value="image_prompt">🎨 Image Gen Prompts Only</option>
               <option value="ai_tool">🛠️ AI Tools Only</option>
               <option value="gpt_listing">🤖 Custom GPTs Only</option>
               <option value="article">📝 Articles Only</option>
@@ -1201,6 +1211,17 @@ function filterSubcategoryTable() {
     var countText = document.getElementById('subcategoryRowCountText');
     if (countText) {
         countText.innerText = 'Showing ' + visible + ' matching subcategories';
+    }
+}
+
+function handleParentScopeChange(parentSelect, childScopeSelectId) {
+    var selOpt = parentSelect.options[parentSelect.selectedIndex];
+    var pScope = selOpt ? selOpt.getAttribute('data-scope') : 'all';
+    var childScopeSelect = document.getElementById(childScopeSelectId);
+    if (!childScopeSelect) return;
+
+    if (pScope && pScope !== 'all') {
+        childScopeSelect.value = pScope;
     }
 }
 </script>

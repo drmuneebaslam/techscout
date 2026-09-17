@@ -986,6 +986,12 @@ ALTER TABLE `system_error_logs`
               </button>
             </form>
           <?php endif; ?>
+          <form action="<?= url('/admin/db-manager/migrations/run') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Force re-run ALL migrations safely? All scripts are idempotent.');">
+            <input type="hidden" name="re_run_all" value="1">
+            <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.35);">
+              <i data-lucide="refresh-cw"></i> Re-Run All Migrations
+            </button>
+          </form>
           <?php if (!empty($migrationsList)): ?>
             <form action="<?= url('/admin/db-manager/migrations/rollback') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Rollback the latest batch of migrations?');">
               <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">
@@ -1030,7 +1036,8 @@ ALTER TABLE `system_error_logs`
                 <th>Migration Name</th>
                 <th>Batch Number</th>
                 <th>Applied Timestamp</th>
-                <th style="text-align: right;">Status</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -1047,14 +1054,22 @@ ALTER TABLE `system_error_logs`
                     <td style="color: var(--admin-text-muted); font-size: 0.82rem; font-family: var(--admin-font-mono);">
                       <?= htmlspecialchars($m['applied_at']) ?>
                     </td>
-                    <td style="text-align: right;">
+                    <td>
                       <span class="ts-badge ts-badge-green">✓ Applied</span>
+                    </td>
+                    <td style="text-align: right;">
+                      <form action="<?= url('/admin/db-manager/migrations/run') ?>" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Re-run <?= htmlspecialchars($m['migration_name']) ?>?');">
+                        <input type="hidden" name="rerun_name" value="<?= htmlspecialchars($m['migration_name']) ?>">
+                        <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.2rem 0.55rem; font-size: 0.72rem; color: #38bdf8; border-color: rgba(56,189,248,0.35);" title="Re-run this migration">
+                          <i data-lucide="refresh-cw" style="width: 11px; height: 11px;"></i> Re-run
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 <?php endforeach; ?>
               <?php else: ?>
                 <tr>
-                  <td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--admin-text-muted);">
+                  <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--admin-text-muted);">
                     No migrations recorded in history yet.
                   </td>
                 </tr>

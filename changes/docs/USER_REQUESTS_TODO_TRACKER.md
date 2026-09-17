@@ -18,6 +18,7 @@
 | **#7** | Eliminate `$lockPath` Undefined Variable Notice in `index.php` | `COMPLETED` | 100% | Early variable declaration, clean bootstrap |
 | **#8** | Taxonomy Separation, Zero Runtime DDL/Seeds, Modal Speed Engine | `COMPLETED` | 100% | Purged runtime DDL, panel migrations, fast modal engine |
 | **#9** | Fix MariaDB LIMIT Quoting, Secure Frontend Error Screen, Same-Screen Categories & Tracker | `COMPLETED` | 100% | Typed PDO binding, branded error UI, same-screen taxonomy tabs |
+| **#10** | Strict Entity Separation, Dynamic Parent Scope Locking, Single Sidebar Option, Topics Elimination, Multi-Category Relations & Re-run Migrations | `COMPLETED` | 100% | Entity separation, parent-child scope lock, single sidebar link, categories subscribe, Many-to-Many categories, re-runnable migrations |
 
 ---
 
@@ -192,6 +193,36 @@
   - [x] **Workspace Master TODO Tracker**: Create `docs/USER_REQUESTS_TODO_TRACKER.md` tracking all prompts, granular tasks, implementation extent, and future appending protocol.
 - **Implementation Extent:** **100% Complete**
 - **Files Modified:** `app/Core/Database.php`, `app/Models/DatabaseBackupManager.php`, `app/Controllers/AdminController.php`, `views/admin/crud/categories.php`, `views/admin/crud/subcategories.php`, `docs/USER_REQUESTS_TODO_TRACKER.md`.
+
+---
+
+### 🔹 Prompt #10: Strict Entity Separation, Dynamic Parent Scope Locking, Single Sidebar Option, Topics Elimination, Multi-Category Relations & Re-run Migrations
+- **Verbatim Prompt:**
+  ```text
+  listen 
+  all entities are separate and as their categories and subcategories are also 
+  and if a root category is aassigned to article the only sub categories that can be added are also the same entity linked 
+  and also admin sidebar have categories and sub categories options both it should have only one 
+  and also verify all changes to rules and mistakes and you have to check that no documented mistake reoccurs in the code please
+  prompts and image gen prompts are also 2 separate entities
+  and their should be no page named topics 
+  instead all categories or sub categories can be subscribed by user 
+  and each entity and category sub category have many to many relationship like a single prompt , image gen prompt or any entity can be assigned to 1 primary category and many secondary that will also be written their so the user can open that specific category page in that specific entity and much more enhanced system please
+  and alll migrations can be re ran
+  and you have to set your code standards learning from mistakes you should not repeat them , you are now doing that 
+  you have learnt many mistakes and repeatedly occur even after you had learn them
+  ```
+- **Granular Requirements & Scope:**
+  - [x] **Strict Entity Separation**: Segregated taxonomies across `article`, `prompt` (text/coding), `image_prompt` (image generation), `ai_tool`, `gpt_listing`, `campaign`.
+  - [x] **Dynamic Parent-to-Child Entity Scope Locking**: When a root category is assigned to a specific entity (e.g. `article`), child subcategories are locked to the same entity both on the frontend (`data-scope` auto-sync) and backend validation in `AdminController::saveSubcategory`.
+  - [x] **Admin Sidebar Consolidation**: Replaced separate "Categories" and "Subcategories" links in `views/layouts/admin_header.php` with a single unified option: "Categories & Subcategories" (`/admin/categories`).
+  - [x] **Elimination of "Topics" Terminology & Pages**: Removed `/topics` and `/topic/{slug}` pages, replacing them with a public Category Explorer (`/categories`), unified Category showcase (`/category/{slug}`), and 301 legacy redirects.
+  - [x] **1-Click Category & Subcategory Subscriptions**: Implemented user subscription engine for any category or subcategory with AJAX toggling (`/category/subscribe/{id}`) and live subscriber counts.
+  - [x] **Many-to-Many Entity-Category Architecture**: Created `content_categories` junction table supporting 1 primary category and unlimited secondary categories/subcategories per entity; updated `prompt_single.php` and `article.php` to render primary and secondary category links leading to entity-filtered category views (`/category/{slug}?entity={type}`).
+  - [x] **Re-Runnable Migrations Engine**: Created idempotent migration `database/migrations/2026_09_17_000002_entity_categories_and_subscriptions.sql`; enhanced `AdminController::runMigrations()` to support `re_run_all=1` and `rerun_name=...` with clean comment filtering; added "Re-Run All Migrations" and individual "Re-run" buttons in DB Manager.
+  - [x] **Mistakes Document & Rules Compliance**: Audited all changes against `docs/MISTAKES_LEARNED.md`. Zero runtime DDL in request paths, safe PDO binding, no inline colors on web UI, dark/light theme support.
+- **Implementation Extent:** **100% Complete**
+- **Files Modified:** `app/Controllers/AdminController.php`, `app/Controllers/CategoryController.php`, `app/Core/SeoEngine.php`, `assets/js/main.js`, `database/migrations/2026_09_17_000002_entity_categories_and_subscriptions.sql`, `docs/USER_REQUESTS_TODO_TRACKER.md`, `index.php`, `views/admin/crud/categories.php`, `views/admin/crud/topics.php`, `views/admin/db_manager.php`, `views/admin/subscribers.php`, `views/blog/article.php`, `views/components/category_explorer.php`, `views/directory/prompt_single.php`, `views/layouts/admin_header.php`, `views/layouts/header.php`, `views/public/categories.php`, `views/public/category_single.php`, `views/public/home.php`.
 
 ---
 

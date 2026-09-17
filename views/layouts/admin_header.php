@@ -378,11 +378,8 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
               <a href="<?= url('/admin/jobs') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/jobs') ? 'active' : '' ?>" data-tooltip="Tech Jobs Board">
                 <i data-lucide="briefcase"></i> <span>Tech Jobs Board</span>
               </a>
-              <a href="<?= url('/admin/categories') ?>" class="admin-nav-link <?= (str_contains($currentPath, '/admin/categories') && !str_contains($currentPath, '/admin/subcategories')) ? 'active' : '' ?>" data-tooltip="Root Categories CRUD">
-                <i data-lucide="folder"></i> <span>Categories CRUD</span>
-              </a>
-              <a href="<?= url('/admin/subcategories') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/subcategories') ? 'active' : '' ?>" data-tooltip="Subcategories CRUD">
-                <i data-lucide="folder-tree"></i> <span>Subcategories CRUD</span>
+              <a href="<?= url('/admin/categories') ?>" class="admin-nav-link <?= (str_contains($currentPath, '/admin/categories') || str_contains($currentPath, '/admin/subcategories')) ? 'active' : '' ?>" data-tooltip="Taxonomy: Categories &amp; Subcategories">
+                <i data-lucide="folder-tree"></i> <span>Categories &amp; Subcategories</span>
               </a>
               <a href="<?= url('/admin/media') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/media') ? 'active' : '' ?>" data-tooltip="Media Library &amp; DAM">
                 <i data-lucide="image"></i> <span>Media Library (DAM)</span>

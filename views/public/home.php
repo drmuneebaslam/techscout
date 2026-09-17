@@ -42,12 +42,12 @@
       <?php if (!isset($sectionsMap['topics']) || (int)$sectionsMap['topics']['is_enabled'] === 1): ?>
         <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.75rem;">
           <?php foreach (array_slice($allTopics ?? [], 0, 5) as $t): ?>
-            <a href="<?= url('/topic/' . $t['slug']) ?>" class="ts-badge" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); color: var(--ts-text-secondary); text-decoration: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 9999px;">
+            <a href="<?= url('/category/' . $t['slug']) ?>" class="ts-badge" style="background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); color: var(--ts-text-secondary); text-decoration: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 9999px;">
               <i data-lucide="<?= htmlspecialchars($t['icon_name'] ?: 'layers') ?>" style="width: 12px; height: 12px; color: <?= htmlspecialchars($t['color_hex'] ?: '#6366f1') ?>;"></i>
               <?= htmlspecialchars($t['name']) ?>
             </a>
           <?php endforeach; ?>
-          <a href="<?= url('/topics') ?>" class="ts-badge ts-badge-pink" style="text-decoration: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 9999px;">
+          <a href="<?= url('/categories') ?>" class="ts-badge ts-badge-pink" style="text-decoration: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 9999px;">
             + All 100+ Categories →
           </a>
         </div>
@@ -117,9 +117,9 @@
           <div style="display: flex; align-items: center; gap: 0.4rem;">
             <i data-lucide="sparkles" style="color: #ec4899; width: 16px;"></i>
             <strong style="color: var(--ts-text-primary); font-size: 0.95rem;">Personalize Your Developer Feed:</strong>
-            <span style="font-size: 0.82rem; color: var(--ts-text-secondary);">Follow topics you work with to build your custom radar.</span>
+            <span style="font-size: 0.82rem; color: var(--ts-text-secondary);">Follow categories you work with to build your custom radar.</span>
           </div>
-          <a href="<?= url('/topics') ?>" style="color: var(--ts-text-accent); font-size: 0.8rem; text-decoration: none;">View All 100+ Categories →</a>
+          <a href="<?= url('/categories') ?>" style="color: var(--ts-text-accent); font-size: 0.8rem; text-decoration: none;">View All 100+ Categories →</a>
         </div>
 
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -175,9 +175,9 @@
         <?php else: ?>
           <div class="ts-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
             <i data-lucide="sparkles" style="width: 40px; height: 40px; color: var(--ts-primary); margin-bottom: 0.75rem;"></i>
-            <h3>No articles match your followed topics yet</h3>
-            <p style="color: var(--ts-text-secondary); font-size: 0.88rem; margin-top: 0.25rem;">Follow more topics from the Topics hub to expand your feed.</p>
-            <a href="<?= url('/topics') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="margin-top: 0.75rem;">Browse Topics →</a>
+            <h3>No articles match your followed categories yet</h3>
+            <p style="color: var(--ts-text-secondary); font-size: 0.88rem; margin-top: 0.25rem;">Follow more categories from the Categories hub to expand your feed.</p>
+            <a href="<?= url('/categories') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="margin-top: 0.75rem;">Browse Categories →</a>
           </div>
         <?php endif; ?>
       </div>
@@ -595,10 +595,9 @@ function switchHomeFeedTab(tab) {
 
 async function quickFollowTopic(topicId, btn) {
   try {
-    const res = await fetch('<?= url('/api/v1/subscriptions/toggle') ?>', {
+    const res = await fetch('<?= url('/category/subscribe/') ?>' + topicId, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'topic', id: topicId })
+      headers: { 'Content-Type': 'application/json' }
     });
     const data = await res.json();
     if (data.success) {
@@ -606,12 +605,12 @@ async function quickFollowTopic(topicId, btn) {
         btn.classList.remove('ts-btn-outline');
         btn.classList.add('ts-btn-primary');
         btn.innerHTML = `<i data-lucide="check" style="width: 12px; height: 12px;"></i> Following`;
-        showToast('Topic added to your personalized radar! 🚀', 'success');
+        showToast('Category added to your personalized radar! 🚀', 'success');
       } else {
         btn.classList.remove('ts-btn-primary');
         btn.classList.add('ts-btn-outline');
         btn.innerHTML = `<i data-lucide="plus" style="width: 12px; height: 12px;"></i> Follow`;
-        showToast('Topic unfollowed.', 'info');
+        showToast('Category unfollowed.', 'info');
       }
       if (typeof lucide !== 'undefined') lucide.createIcons();
     }

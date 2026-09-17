@@ -197,6 +197,8 @@ class AdminController {
             Session::flash('success', "Article '{$title}' created successfully.");
         }
         $targetContentId = $id ? (int)$id : $newId;
+        $secondaryCats = (array)($request->post('secondary_categories') ?: []);
+        $this->syncContentTaxonomy($targetContentId, $categoryId, $secondaryCats);
         \App\Core\TagHelper::syncTags($targetContentId, $request->post('tags', ''));
 
         Response::redirect('/admin/articles');
@@ -620,6 +622,8 @@ class AdminController {
             Session::flash('success', "Prompt blueprint created successfully.");
         }
         $targetPromptId = $id ? (int)$id : $newId;
+        $secondaryCats = (array)($request->post('secondary_categories') ?: []);
+        $this->syncContentTaxonomy($targetPromptId, $categoryId, $secondaryCats);
         \App\Core\TagHelper::syncTags($targetPromptId, $request->post('tags', ''));
 
         Response::redirect('/admin/prompts');
@@ -1099,6 +1103,15 @@ class AdminController {
             Session::flash('error', 'A subcategory cannot be its own parent.');
             Response::redirect('/admin/categories?tab=subcategories');
             return;
+        }
+
+        // Enforce parent-child entity scope alignment:
+        // If parent root category is assigned to a specific entity, child subcategories MUST match
+        if ($parentId > 0) {
+            $parentCat = Database::fetch("SELECT applicable_to FROM categories WHERE id = ?", [$parentId]);
+            if ($parentCat && !empty($parentCat['applicable_to']) && $parentCat['applicable_to'] !== 'all') {
+                $applicableTo = $parentCat['applicable_to'];
+            }
         }
 
         if ($id) {
@@ -5231,9 +5244,12 @@ class AdminController {
         }
     }
 
-    // [TS-DB-06] Run Pending Schema Migrations
+    // [TS-DB-06] Run Pending or Force Re-Run Schema Migrations
     public function runMigrations(Request $request): void {
         try {
+            $reRunAll = (bool)$request->post('re_run_all');
+            $rerunName = trim((string)$request->post('rerun_name', ''));
+
             $applied = Database::query("SELECT migration_name FROM migrations");
             $appliedNames = array_column($applied, 'migration_name');
 
@@ -5246,23 +5262,48 @@ class AdminController {
 
             foreach ($migrationFiles as $mf) {
                 $baseName = basename($mf, '.sql');
-                if (!in_array($baseName, $appliedNames, true)) {
+                $shouldRun = false;
+
+                if ($rerunName !== '') {
+                    $shouldRun = ($baseName === $rerunName);
+                } elseif ($reRunAll) {
+                    $shouldRun = true;
+                } else {
+                    $shouldRun = !in_array($baseName, $appliedNames, true);
+                }
+
+                if ($shouldRun) {
                     $sqlContent = file_get_contents($mf);
-                    $stmts = array_filter(array_map('trim', explode(';', $sqlContent)));
+                    // Filter comment lines
+                    $lines = explode("\n", $sqlContent);
+                    $cleanLines = [];
+                    foreach ($lines as $line) {
+                        $trimmedLine = trim($line);
+                        if (!str_starts_with($trimmedLine, '--')) {
+                            $cleanLines[] = $line;
+                        }
+                    }
+                    $cleanSql = implode("\n", $cleanLines);
+                    $stmts = array_filter(array_map('trim', explode(';', $cleanSql)));
                     foreach ($stmts as $stmt) {
                         if (!empty($stmt)) {
                             Database::execute($stmt);
                         }
                     }
-                    Database::execute("INSERT INTO migrations (migration_name, batch, applied_at) VALUES (?, ?, NOW())", [
-                        $baseName, $newBatch
-                    ]);
+                    if (in_array($baseName, $appliedNames, true)) {
+                        Database::execute("UPDATE migrations SET batch = ?, applied_at = NOW() WHERE migration_name = ?", [$newBatch, $baseName]);
+                    } else {
+                        Database::execute("INSERT INTO migrations (migration_name, batch, applied_at) VALUES (?, ?, NOW())", [$baseName, $newBatch]);
+                    }
                     $ranCount++;
                 }
             }
 
             if ($ranCount > 0) {
-                Session::flash('success', "Batch #{$newBatch} completed: Successfully executed {$ranCount} pending migration(s)!");
+                $msg = $rerunName !== '' 
+                    ? "Successfully re-ran migration: '{$rerunName}'!"
+                    : ($reRunAll ? "Successfully re-ran ALL {$ranCount} migrations safely!" : "Batch #{$newBatch} completed: Successfully executed {$ranCount} pending migration(s)!");
+                Session::flash('success', $msg);
             } else {
                 Session::flash('info', "All database migrations are already up to date. 0 migrations to run.");
             }
@@ -5270,6 +5311,27 @@ class AdminController {
             Session::flash('error', "Migration failed: " . $e->getMessage());
         }
         Response::redirect('/admin/db-manager?tab=migrations');
+    }
+
+    private function syncContentTaxonomy(int $contentId, int $primaryCategoryId, array $secondaryCategoryIds = []): void {
+        try {
+            Database::execute("DELETE FROM content_categories WHERE content_id = ?", [$contentId]);
+            if ($primaryCategoryId > 0) {
+                Database::execute("INSERT IGNORE INTO content_categories (content_id, category_id, is_primary) VALUES (?, ?, 1)", [
+                    $contentId, $primaryCategoryId
+                ]);
+            }
+            foreach ($secondaryCategoryIds as $secId) {
+                $secId = (int)$secId;
+                if ($secId > 0 && $secId !== $primaryCategoryId) {
+                    Database::execute("INSERT IGNORE INTO content_categories (content_id, category_id, is_primary) VALUES (?, ?, 0)", [
+                        $contentId, $secId
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log("Failed to sync content taxonomy: " . $e->getMessage());
+        }
     }
 
     // [TS-DB-06] Rollback Last Migration Batch

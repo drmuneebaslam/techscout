@@ -48,6 +48,7 @@ use App\Controllers\AuthorApplicationController;
 use App\Controllers\AdminController;
 use App\Controllers\AuthorProfileController;
 use App\Controllers\TopicController;
+use App\Controllers\CategoryController;
 use App\Controllers\ApiController;
 use App\Controllers\SupportController;
 use App\Controllers\InboxController;
@@ -197,9 +198,12 @@ $router->get('/articles', [BlogController::class, 'index']);
 // ----------------------------------------------------------------------------
 // 3. DIRECTORIES: TOOLS, GPTS, PROMPTS, CAMPAIGNS & AFFILIATES
 // ----------------------------------------------------------------------------
-$router->get('/topics', [TopicController::class, 'index']);
-$router->get('/categories', [TopicController::class, 'index']);
-$router->get('/topic/{slug}', [TopicController::class, 'show']);
+$router->get('/topics', [CategoryController::class, 'legacyTopicsRedirect']);
+$router->get('/topic/{slug}', [CategoryController::class, 'legacyTopicSingleRedirect']);
+$router->get('/categories', [CategoryController::class, 'index']);
+$router->get('/category/{slug}', [CategoryController::class, 'show']);
+$router->post('/category/subscribe/{id}', [CategoryController::class, 'subscribe']);
+$router->get('/category/subscribe/{id}', [CategoryController::class, 'subscribe']);
 
 $router->get('/tools/categories', [DirectoryController::class, 'toolCategories']);
 $router->get('/tools', [DirectoryController::class, 'tools']);
@@ -230,7 +234,7 @@ $router->get('/jobs', [DirectoryController::class, 'jobs']);
 $router->get('/jobs/{slug}', [DirectoryController::class, 'jobSingle']);
 $router->post('/jobs/{slug}/apply', [DirectoryController::class, 'applyJob']);
 
-$router->get('/category/{slug}', [BlogController::class, 'category']);
+$router->get('/category/{slug}', [CategoryController::class, 'show']);
 $router->get('/go/gpt/{slug}', [DirectoryController::class, 'affiliateRedirect']);
 $router->get('/go/tool/{slug}', [DirectoryController::class, 'affiliateRedirect']);
 $router->get('/go/{slug}', [DirectoryController::class, 'affiliateRedirect']);

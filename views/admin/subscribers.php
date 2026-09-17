@@ -12,8 +12,8 @@
     </div>
 
     <div style="display: flex; gap: 0.75rem;">
-      <a href="<?= url('/admin/topics') ?>" class="ts-btn ts-btn-outline ts-btn-sm">
-        <i data-lucide="layers"></i> Manage Topics
+      <a href="<?= url('/admin/categories') ?>" class="ts-btn ts-btn-outline ts-btn-sm">
+        <i data-lucide="layers"></i> Manage Categories
       </a>
       <a href="<?= url('/admin/users') ?>" class="ts-btn ts-btn-outline ts-btn-sm">
         <i data-lucide="users"></i> Manage Users
