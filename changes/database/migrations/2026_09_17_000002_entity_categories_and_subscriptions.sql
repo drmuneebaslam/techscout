@@ -42,3 +42,7 @@ ALTER TABLE `categories` MODIFY COLUMN `applicable_to` VARCHAR(50) NOT NULL DEFA
 -- 5. Safe indexing on categories
 ALTER TABLE `categories` ADD INDEX IF NOT EXISTS `idx_cat_parent_scope` (`parent_id`, `applicable_to`);
 ALTER TABLE `categories` ADD INDEX IF NOT EXISTS `idx_cat_scope_featured` (`applicable_to`, `is_featured_home`);
+
+-- 6. Permanently purge legacy Topics from navigation menus
+DELETE FROM `navigation_menus` WHERE `label` = 'Topics' OR `url` LIKE '%/topics%';
+

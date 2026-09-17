@@ -110,9 +110,15 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
       };
     })();
   </script>
-  <script src="<?= url('/assets/js/telemetry-error-logger.js') ?>"></script>
+  <script src="<?= url('/assets/js/telemetry-error-logger.js') ?>" defer></script>
   <title><?= htmlspecialchars($title ?? 'TechScout — The Frontier of Tech, Scouted for Builders') ?></title>
   
+  <!-- Network & CDN Preconnect Hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
   <!-- Favicon Assets -->
   <link rel="icon" type="image/svg+xml" href="<?= url('assets/favicon.svg') ?>">
   <link rel="alternate icon" href="<?= url('favicon.ico') ?>">
@@ -129,14 +135,25 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <!-- TechScout Design System (High Priority Stylesheet) -->
   <link rel="stylesheet" href="<?= url('/assets/css/style.css?v=' . time()) ?>">
   
-  <!-- Local High-Performance Lucide Icons with CDN Fallback -->
-  <script src="<?= url('/assets/js/lucide.min.js') ?>" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js';"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+  <!-- Local High-Performance Deferred Scripts & Styles -->
+  <script src="<?= url('/assets/js/lucide.min.js') ?>" defer onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js';"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" media="print" onload="this.media='all'">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" defer></script>
+
+  <?php
+    $currentUri = $_SERVER['REQUEST_URI'] ?? '';
+    $needsPrism = str_contains($currentUri, '/article/') 
+      || str_contains($currentUri, '/prompt/') 
+      || str_contains($currentUri, '/editor')
+      || (!empty($article['body_html']) && str_contains($article['body_html'], '<pre'));
+  ?>
+  <?php if ($needsPrism): ?>
+    <!-- Conditionally Loaded Prism Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" media="print" onload="this.media='all'">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+  <?php endif; ?>
   
   <meta name="theme-color" content="#0284c7">
   <link rel="apple-touch-icon" href="<?= url('/favicon.ico') ?>">
@@ -283,6 +300,10 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
       <ul class="ts-nav-links">
         <?php foreach ($dynamicNavItems as $nav): ?>
           <?php 
+            $navLabel = trim((string)($nav['label'] ?? ''));
+            $navRawUrl = trim((string)($nav['url'] ?? ''));
+            if (strcasecmp($navLabel, 'topics') === 0 || strcasecmp($navLabel, 'topic') === 0) continue;
+            if (trim($navRawUrl, '/') === 'topics' || str_contains($navRawUrl, '/topics')) continue;
             if (!$isNavVisible($nav['url'])) continue;
             $navUrl = str_starts_with($nav['url'], 'http') ? $nav['url'] : url($nav['url']); 
             $isActive = $isNavActive($nav['url']);

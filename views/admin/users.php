@@ -288,7 +288,7 @@
     </div>
 
     <!-- 10 Sub-Panel Navigation Strip -->
-    <div style="display: flex; gap: 0.25rem; overflow-x: auto; background: rgba(15,23,42,0.8); padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); flex: 0 0 auto;">
+    <div id="ud_tabs_strip" style="display: flex; gap: 0.25rem; overflow-x: auto; background: rgba(15,23,42,0.8); padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); flex: 0 0 auto;">
       <?php
       $detailTabs = [
         'profile' => 'Profile',
@@ -312,6 +312,24 @@
           <?= $dtLabel ?>
         </button>
       <?php endforeach; ?>
+    </div>
+
+    <!-- Instant Shell High-Tech Glowing Pulse & Spinner Skeleton (0ms Perception) -->
+    <div id="ud_modal_skeleton" class="ts-modal-skeleton-wrap" style="display: none; flex: 1 1 auto; overflow-y: auto;">
+      <div class="ts-modal-skeleton-pulse">
+        <div class="ts-modal-skeleton-spinner"></div>
+        <div style="font-size: 0.88rem; color: #38bdf8; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+          Synchronizing User Telemetry...
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 0.5rem;">
+        <div class="skeleton-shimmer" style="height: 44px; border-radius: 8px;"></div>
+        <div class="skeleton-shimmer" style="height: 44px; border-radius: 8px;"></div>
+        <div class="skeleton-shimmer" style="height: 44px; border-radius: 8px;"></div>
+        <div class="skeleton-shimmer" style="height: 44px; border-radius: 8px;"></div>
+        <div class="skeleton-shimmer" style="height: 44px; border-radius: 8px; grid-column: 1 / -1;"></div>
+        <div class="skeleton-shimmer" style="height: 80px; border-radius: 8px; grid-column: 1 / -1;"></div>
+      </div>
     </div>
 
     <!-- Scrollable Modal Body -->
@@ -555,6 +573,22 @@
       <h3 class="admin-modal-title" style="color: #38bdf8;"><i data-lucide="edit-2"></i> Edit User Profile &amp; Governance</h3>
       <button type="button" onclick="closeEditUserModal()" class="admin-modal-close">✕</button>
     </div>
+
+    <!-- Instant Shell Glowing Skeleton (0ms Perception) -->
+    <div id="eu_modal_skeleton" class="ts-modal-skeleton-wrap" style="display: none;">
+      <div class="ts-modal-skeleton-pulse">
+        <div class="ts-modal-skeleton-spinner"></div>
+        <div style="font-size: 0.85rem; color: #38bdf8; font-weight: 700;">Loading Profile Data...</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+        <div class="skeleton-shimmer" style="height: 42px; border-radius: 6px;"></div>
+        <div class="skeleton-shimmer" style="height: 42px; border-radius: 6px;"></div>
+        <div class="skeleton-shimmer" style="height: 42px; border-radius: 6px;"></div>
+        <div class="skeleton-shimmer" style="height: 42px; border-radius: 6px;"></div>
+        <div class="skeleton-shimmer" style="height: 42px; border-radius: 6px; grid-column: 1 / -1;"></div>
+      </div>
+    </div>
+
     <form id="editUserForm" action="" method="POST">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div>
@@ -1052,18 +1086,57 @@ function closeCreateUserModal() {
 }
 
 function openEditUserModal(u) {
-  document.getElementById('editUserForm').action = `<?= url('/admin/users/edit/') ?>${u.id}`;
-  document.getElementById('eu_display_name').value = u.display_name || u.username || '';
-  document.getElementById('eu_email').value = u.email || '';
-  document.getElementById('eu_role').value = u.role || 'member';
-  document.getElementById('eu_status').value = u.status || 'active';
-  document.getElementById('eu_badge').value = u.verification_badge || 'none';
-  document.getElementById('eu_headline').value = u.headline || '';
-  document.getElementById('eu_bio').value = u.bio || '';
-  document.getElementById('editUserModal').style.display = 'flex';
+  const modal = document.getElementById('editUserModal');
+  const skeleton = document.getElementById('eu_modal_skeleton');
+  const form = document.getElementById('editUserForm');
+
+  // Instant Shell Display (0ms Perception)
+  modal.style.display = 'flex';
+
+  if (typeof u === 'object' && u !== null) {
+    if (skeleton) skeleton.style.display = 'none';
+    if (form) form.style.display = 'block';
+    document.getElementById('editUserForm').action = `<?= url('/admin/users/edit/') ?>${u.id}`;
+    document.getElementById('eu_display_name').value = u.display_name || u.username || '';
+    document.getElementById('eu_email').value = u.email || '';
+    document.getElementById('eu_role').value = u.role || 'member';
+    document.getElementById('eu_status').value = u.status || 'active';
+    document.getElementById('eu_badge').value = u.verification_badge || 'none';
+    document.getElementById('eu_headline').value = u.headline || '';
+    document.getElementById('eu_bio').value = u.bio || '';
+    if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();
+  } else {
+    // If user ID was passed, show high-tech glowing pulse skeleton immediately
+    if (skeleton) skeleton.style.display = 'block';
+    if (form) form.style.display = 'none';
+    fetch(`<?= url('/admin/users/detail/') ?>${u}`)
+      .then(r => r.json())
+      .then(d => {
+        if (skeleton) skeleton.style.display = 'none';
+        if (form) form.style.display = 'block';
+        if (d.success && d.user) {
+          const usr = d.user;
+          document.getElementById('editUserForm').action = `<?= url('/admin/users/edit/') ?>${usr.id}`;
+          document.getElementById('eu_display_name').value = usr.display_name || usr.username || '';
+          document.getElementById('eu_email').value = usr.email || '';
+          document.getElementById('eu_role').value = usr.role || 'member';
+          document.getElementById('eu_status').value = usr.status || 'active';
+          document.getElementById('eu_badge').value = usr.verification_badge || 'none';
+          document.getElementById('eu_headline').value = usr.headline || '';
+          document.getElementById('eu_bio').value = usr.bio || '';
+          if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();
+        }
+      })
+      .catch(err => {
+        if (skeleton) skeleton.style.display = 'none';
+        if (form) form.style.display = 'block';
+      });
+  }
 }
 function closeEditUserModal() {
   document.getElementById('editUserModal').style.display = 'none';
+  const skeleton = document.getElementById('eu_modal_skeleton');
+  if (skeleton) skeleton.style.display = 'none';
 }
 
 function openChangePasswordModal(userId, username) {
@@ -1131,12 +1204,31 @@ function toggleNotifAudience(val) {
   }
 }
 
-// 9-Tab User Detail Modal Fetcher
+// 9-Tab User Detail Modal Fetcher with 0ms Instant Shell & Skeleton Pulse
 function openUserDetailModal(userId) {
-  document.getElementById('userDetailModal').style.display = 'flex';
+  const modal = document.getElementById('userDetailModal');
+  const skeleton = document.getElementById('ud_modal_skeleton');
+  const body = document.getElementById('ud_modal_content_body');
+  const tabsStrip = document.getElementById('ud_tabs_strip');
+
+  // Instant Shell Trigger: Immediately display modal (0ms perception)
+  modal.style.display = 'flex';
+  if (skeleton) skeleton.style.display = 'block';
+  if (body) body.style.display = 'none';
+  if (tabsStrip) tabsStrip.style.display = 'none';
+
+  document.getElementById('ud_name_header').innerText = 'Loading Member Profile #' + userId + '...';
+  document.getElementById('ud_sub_header').innerText = 'Synchronizing telemetry, publishing history & security log...';
+  document.getElementById('ud_avatar').innerHTML = '<span class="ts-spinner" style="width: 18px; height: 18px; border: 2px solid rgba(56,189,248,0.3); border-top-color: #38bdf8; border-radius: 50%; display: inline-block; animation: tsSpin 0.7s linear infinite;"></span>';
+
   fetch(`<?= url('/admin/users/detail/') ?>${userId}`)
     .then(r => r.json())
     .then(d => {
+      // Replace skeleton with loaded data
+      if (skeleton) skeleton.style.display = 'none';
+      if (body) body.style.display = 'block';
+      if (tabsStrip) tabsStrip.style.display = 'flex';
+
       if (!d.success) {
         alert(d.message || 'Error loading user details.');
         return;
@@ -1416,9 +1508,15 @@ function openUserDetailModal(userId) {
       }
 
       switchDetailSubTab('profile');
-      document.getElementById('userDetailModal').style.display = 'flex';
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();
     })
     .catch(err => {
+      const skeleton = document.getElementById('ud_modal_skeleton');
+      const body = document.getElementById('ud_modal_content_body');
+      const tabsStrip = document.getElementById('ud_tabs_strip');
+      if (skeleton) skeleton.style.display = 'none';
+      if (body) body.style.display = 'block';
+      if (tabsStrip) tabsStrip.style.display = 'flex';
       console.error(err);
       if (typeof showToast === 'function') {
         showToast('Failed to load user details: ' + (err.message || 'Server exception'), 'error');
@@ -1446,6 +1544,12 @@ function switchDetailSubTab(tabKey) {
 
 function closeUserDetailModal() {
   document.getElementById('userDetailModal').style.display = 'none';
+  const skeleton = document.getElementById('ud_modal_skeleton');
+  const body = document.getElementById('ud_modal_content_body');
+  const tabsStrip = document.getElementById('ud_tabs_strip');
+  if (skeleton) skeleton.style.display = 'none';
+  if (body) body.style.display = 'block';
+  if (tabsStrip) tabsStrip.style.display = 'flex';
 }
 
 // ---------------------------------------------------------------------------

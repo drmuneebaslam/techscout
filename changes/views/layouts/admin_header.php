@@ -194,13 +194,31 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
     }
   </style>
 
-  <!-- Toastify Notifications -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <!-- Network & CDN Preconnect Hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 
-  <!-- Local High-Performance Lucide Icons & Chart.js -->
-  <script src="<?= url('assets/js/lucide.min.js') ?>" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js';"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Toastify Notifications (Deferred for 0ms render-blocking) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <!-- Local High-Performance Lucide Icons (Deferred) & Conditional Chart.js -->
+  <script defer src="<?= url('assets/js/lucide.min.js') ?>" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js';"></script>
+  <?php 
+    $adminReqUri = $_SERVER['REQUEST_URI'] ?? '';
+    $adminReqPath = trim(parse_url($adminReqUri, PHP_URL_PATH), '/');
+    $needsChart = (
+      strpos($adminReqUri, '/admin/dashboard') !== false || 
+      strpos($adminReqUri, '/admin/analytics') !== false || 
+      strpos($adminReqUri, '/admin/revenue') !== false ||
+      $adminReqPath === 'admin' || 
+      $adminReqPath === 'techscout.n/admin' ||
+      (isset($activeNav) && in_array($activeNav, ['dashboard', 'analytics', 'revenue']))
+    );
+    if ($needsChart):
+  ?>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <?php endif; ?>
 
   <script>
     (function() {
