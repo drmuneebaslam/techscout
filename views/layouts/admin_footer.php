@@ -581,6 +581,7 @@
       }
     })();
   </script>
+  <script src="<?= url('/assets/js/admin-modals.js?v=2.5.0') ?>"></script>
   <script src="<?= url('/assets/js/admin_table_paginator.js') ?>"></script>
 </body>
 </html>

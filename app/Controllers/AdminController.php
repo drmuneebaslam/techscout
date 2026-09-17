@@ -932,73 +932,36 @@ class AdminController {
     }
 
     // ------------------------------------------------------------------------
-    // 7. CATEGORIES & TAXONOMIES CRUD
+    // ------------------------------------------------------------------------
+    // 7. CATEGORIES CRUD (Root / Top-Level Taxonomies)
     // ------------------------------------------------------------------------
     public function categories(Request $request): void {
-        $rawCategories = Database::query("
-            SELECT c.*, p.name as parent_name, t.name as topic_name, COUNT(cnt.id) as total_items 
-            FROM categories c 
-            LEFT JOIN categories p ON c.parent_id = p.id 
-            LEFT JOIN topics t ON c.topic_id = t.id 
-            LEFT JOIN contents cnt ON c.id = cnt.category_id 
-            GROUP BY c.id 
-            ORDER BY c.sort_order ASC, c.name ASC
-        ");
-
-        // Build parent lookup and recursive tree for unlimited nesting
-        $catMap = [];
-        $childrenMap = [];
-        foreach ($rawCategories as $c) {
-            $catMap[$c['id']] = $c;
-            $pId = $c['parent_id'] ? (int)$c['parent_id'] : 0;
-            $childrenMap[$pId][] = (int)$c['id'];
-        }
-
-        // Recursive tree builder with anti-cycle and anti-deep recursion guards (MISTAKE-30)
-        $flattenedTree = [];
-        $buildTree = function($parentId, $depth, $ancestors) use (&$buildTree, &$flattenedTree, &$catMap, &$childrenMap) {
-            if ($depth > 10) return;
-            if (empty($childrenMap[$parentId])) return;
-
-            foreach ($childrenMap[$parentId] as $cId) {
-                if (in_array($cId, $ancestors, true)) continue;
-                $item = $catMap[$cId];
-                $item['depth'] = $depth;
-                $item['ancestors'] = $ancestors;
-                $item['breadcrumb'] = array_merge($ancestors, [$item['name']]);
-                $item['breadcrumb_text'] = implode(' › ', $item['breadcrumb']);
-                $item['has_children'] = !empty($childrenMap[$cId]);
-                $item['children_count'] = count($childrenMap[$cId] ?? []);
-                $flattenedTree[] = $item;
-
-                $buildTree($cId, $depth + 1, array_merge($ancestors, [$item['name']]));
-            }
-        };
-
-        // Start recursion from top-level roots
-        $buildTree(0, 0, []);
-
-        // Include any orphaned categories
-        $seenIds = array_column($flattenedTree, 'id');
-        foreach ($rawCategories as $c) {
-            if (!in_array($c['id'], $seenIds)) {
-                $c['depth'] = 0;
-                $c['breadcrumb_text'] = $c['name'];
-                $c['has_children'] = !empty($childrenMap[$c['id']]);
-                $c['children_count'] = count($childrenMap[$c['id']] ?? []);
-                $flattenedTree[] = $c;
-            }
-        }
-
-        $topics = Database::query("SELECT * FROM topics ORDER BY sort_order ASC, name ASC");
         $currentScope = trim((string)$request->query('scope', 'all'));
+        $currentTab = trim((string)$request->query('tab', 'list'));
+
+        $sql = "
+            SELECT c.*, 
+                   COUNT(DISTINCT sub.id) as subcategories_count,
+                   COUNT(DISTINCT cnt.id) as total_items
+            FROM categories c
+            LEFT JOIN categories sub ON sub.parent_id = c.id
+            LEFT JOIN contents cnt ON c.id = cnt.category_id
+            WHERE c.parent_id IS NULL
+        ";
+        $params = [];
+        if ($currentScope !== 'all') {
+            $sql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
+            $params[] = $currentScope;
+        }
+        $sql .= " GROUP BY c.id ORDER BY c.sort_order ASC, c.name ASC";
+
+        $categories = Database::query($sql, $params);
 
         Response::view('admin/crud/categories', [
-            'title' => 'Categories & Hierarchical Taxonomies CRUD | Admin Hub',
-            'categories' => $flattenedTree,
-            'allCategoriesList' => $rawCategories,
-            'topics' => $topics,
-            'currentScope' => $currentScope
+            'title' => 'Categories Management | Admin Hub',
+            'categories' => $categories,
+            'currentScope' => $currentScope,
+            'activeTab' => $currentTab
         ]);
     }
 
@@ -1009,8 +972,6 @@ class AdminController {
         if ($slug === '') {
             $slug = Sanitizer::slug($name);
         }
-        $topicId = $request->post('topic_id') ? (int)$request->post('topic_id') : null;
-        $parentId = $request->post('parent_id') ? (int)$request->post('parent_id') : null;
         $applicableTo = (string)$request->post('applicable_to', 'all');
         $isFeaturedHome = $request->post('is_featured_home') ? 1 : 0;
         $description = trim((string)$request->post('description', ''));
@@ -1018,38 +979,25 @@ class AdminController {
         $color = trim((string)$request->post('color_hex', '#6366f1'));
         $sortOrder = (int)$request->post('sort_order', 0);
 
-        // Anti-cycle and self-parenting guard (MISTAKE-30)
-        if ($id && $parentId) {
-            if ($id === $parentId) {
-                $parentId = null;
-            } else {
-                $checkId = $parentId;
-                $visited = [$id];
-                while ($checkId) {
-                    if (in_array($checkId, $visited, true)) {
-                        $parentId = null; // Cycle detected, reset to root
-                        break;
-                    }
-                    $visited[] = $checkId;
-                    $pRow = Database::fetch("SELECT parent_id FROM categories WHERE id = ?", [$checkId]);
-                    $checkId = $pRow && $pRow['parent_id'] ? (int)$pRow['parent_id'] : null;
-                }
-            }
+        if (empty($name)) {
+            Session::flash('error', 'Category name is required.');
+            Response::redirect('/admin/categories');
+            return;
         }
 
         if ($id) {
-            Database::execute("UPDATE categories SET name = ?, slug = ?, topic_id = ?, parent_id = ?, applicable_to = ?, is_featured_home = ?, description = ?, icon_name = ?, color_hex = ?, sort_order = ? WHERE id = ?", [
-                $name, $slug, $topicId, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder, $id
+            Database::execute("UPDATE categories SET name = ?, slug = ?, parent_id = NULL, applicable_to = ?, is_featured_home = ?, description = ?, icon_name = ?, color_hex = ?, sort_order = ? WHERE id = ?", [
+                $name, $slug, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder, $id
             ]);
-            \App\Core\AuditLog::log('admin.category_update', 'categories', $id, ['name' => $name, 'parent_id' => $parentId]);
-            Session::flash('success', "Category '{$name}' updated.");
+            \App\Core\AuditLog::log('admin.category_update', 'categories', $id, ['name' => $name]);
+            Session::flash('success', "Category '{$name}' updated successfully.");
         } else {
-            Database::execute("INSERT INTO categories (name, slug, topic_id, parent_id, applicable_to, is_featured_home, description, icon_name, color_hex, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                $name, $slug, $topicId, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder
+            Database::execute("INSERT INTO categories (name, slug, parent_id, applicable_to, is_featured_home, description, icon_name, color_hex, sort_order) VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?)", [
+                $name, $slug, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder
             ]);
             $newId = (int)Database::lastInsertId();
-            \App\Core\AuditLog::log('admin.category_create', 'categories', $newId, ['name' => $name, 'parent_id' => $parentId]);
-            Session::flash('success', "Category '{$name}' created.");
+            \App\Core\AuditLog::log('admin.category_create', 'categories', $newId, ['name' => $name]);
+            Session::flash('success', "Category '{$name}' created successfully.");
         }
 
         Response::redirect('/admin/categories' . ($applicableTo !== 'all' ? '?scope=' . urlencode($applicableTo) : ''));
@@ -1063,58 +1011,119 @@ class AdminController {
     }
 
     // ------------------------------------------------------------------------
-    // 7.1 TOPICS CRUD (High-Level Aggregations)
+    // 7.1 SUBCATEGORIES CRUD (Child Taxonomies)
     // ------------------------------------------------------------------------
-    public function topics(Request $request): void {
-        $topics = Database::query("SELECT t.*, COUNT(DISTINCT c.id) as category_count, COUNT(DISTINCT us.user_id) as subscriber_count 
-                                  FROM topics t 
-                                  LEFT JOIN categories c ON t.id = c.topic_id 
-                                  LEFT JOIN user_subscriptions us ON (us.subscribable_type = 'topic' AND us.subscribable_id = t.id)
-                                  GROUP BY t.id 
-                                  ORDER BY t.sort_order ASC, t.name ASC");
+    public function subcategories(Request $request): void {
+        $currentScope = trim((string)$request->query('scope', 'all'));
+        $currentTab = trim((string)$request->query('tab', 'list'));
+        $filterParent = (int)$request->query('parent_id', 0);
 
-        Response::view('admin/crud/topics', [
-            'title' => 'Topics Taxonomy CRUD | Admin Hub',
-            'topics' => $topics
+        $sql = "
+            SELECT c.*, 
+                   p.name as parent_name,
+                   p.slug as parent_slug,
+                   COUNT(DISTINCT child.id) as child_subcategories_count,
+                   COUNT(DISTINCT cnt.id) as total_items
+            FROM categories c
+            JOIN categories p ON c.parent_id = p.id
+            LEFT JOIN categories child ON child.parent_id = c.id
+            LEFT JOIN contents cnt ON c.id = cnt.category_id
+            WHERE c.parent_id IS NOT NULL
+        ";
+        $params = [];
+        if ($filterParent > 0) {
+            $sql .= " AND c.parent_id = ?";
+            $params[] = $filterParent;
+        }
+        if ($currentScope !== 'all') {
+            $sql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
+            $params[] = $currentScope;
+        }
+        $sql .= " GROUP BY c.id ORDER BY p.name ASC, c.sort_order ASC, c.name ASC";
+
+        $subcategories = Database::query($sql, $params);
+        $parentCategories = Database::query("SELECT id, name, applicable_to FROM categories WHERE parent_id IS NULL ORDER BY name ASC");
+
+        Response::view('admin/crud/subcategories', [
+            'title' => 'Subcategories Management | Admin Hub',
+            'subcategories' => $subcategories,
+            'parentCategories' => $parentCategories,
+            'currentScope' => $currentScope,
+            'filterParent' => $filterParent,
+            'activeTab' => $currentTab
         ]);
     }
 
-    public function saveTopic(Request $request): void {
-        $id = $request->post('id');
+    public function saveSubcategory(Request $request): void {
+        $id = $request->post('id') ? (int)$request->post('id') : null;
+        $parentId = (int)$request->post('parent_id', 0);
         $name = trim((string)$request->post('name', ''));
-        $slug = Sanitizer::slug(trim((string)$request->post('slug', '')) ?: $name);
+        $slug = trim((string)$request->post('slug', ''));
+        if ($slug === '') {
+            $slug = Sanitizer::slug($name);
+        }
+        $applicableTo = (string)$request->post('applicable_to', 'all');
+        $isFeaturedHome = $request->post('is_featured_home') ? 1 : 0;
         $description = trim((string)$request->post('description', ''));
-        $icon = trim((string)$request->post('icon_name', 'layers'));
+        $icon = trim((string)$request->post('icon_name', 'folder'));
         $color = trim((string)$request->post('color_hex', '#6366f1'));
         $sortOrder = (int)$request->post('sort_order', 0);
-        $isFeatured = $request->post('is_featured') ? 1 : 0;
 
         if (empty($name)) {
-            Session::flash('error', 'Topic name is required.');
-            Response::redirect('/admin/topics');
+            Session::flash('error', 'Subcategory name is required.');
+            Response::redirect('/admin/subcategories');
+            return;
+        }
+        if ($parentId <= 0) {
+            Session::flash('error', 'A valid parent category is required for a subcategory.');
+            Response::redirect('/admin/subcategories');
+            return;
+        }
+        if ($id && $id === $parentId) {
+            Session::flash('error', 'A subcategory cannot be its own parent.');
+            Response::redirect('/admin/subcategories');
             return;
         }
 
         if ($id) {
-            Database::execute("UPDATE topics SET name = ?, slug = ?, description = ?, icon_name = ?, color_hex = ?, sort_order = ?, is_featured = ? WHERE id = ?", [
-                $name, $slug, $description, $icon, $color, $sortOrder, $isFeatured, $id
+            Database::execute("UPDATE categories SET name = ?, slug = ?, parent_id = ?, applicable_to = ?, is_featured_home = ?, description = ?, icon_name = ?, color_hex = ?, sort_order = ? WHERE id = ?", [
+                $name, $slug, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder, $id
             ]);
-            Session::flash('success', "Topic '{$name}' updated successfully.");
+            \App\Core\AuditLog::log('admin.subcategory_update', 'categories', $id, ['name' => $name, 'parent_id' => $parentId]);
+            Session::flash('success', "Subcategory '{$name}' updated successfully.");
         } else {
-            Database::execute("INSERT INTO topics (name, slug, description, icon_name, color_hex, sort_order, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?)", [
-                $name, $slug, $description, $icon, $color, $sortOrder, $isFeatured
+            Database::execute("INSERT INTO categories (name, slug, parent_id, applicable_to, is_featured_home, description, icon_name, color_hex, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                $name, $slug, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder
             ]);
-            Session::flash('success', "Topic '{$name}' created successfully.");
+            $newId = (int)Database::lastInsertId();
+            \App\Core\AuditLog::log('admin.subcategory_create', 'categories', $newId, ['name' => $name, 'parent_id' => $parentId]);
+            Session::flash('success', "Subcategory '{$name}' created successfully.");
         }
 
-        Response::redirect('/admin/topics');
+        Response::redirect('/admin/subcategories' . ($applicableTo !== 'all' ? '?scope=' . urlencode($applicableTo) : ''));
+    }
+
+    public function deleteSubcategory(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        Database::execute("DELETE FROM categories WHERE id = ?", [$id]);
+        Session::flash('success', "Subcategory deleted.");
+        Response::redirect('/admin/subcategories');
+    }
+
+    // ------------------------------------------------------------------------
+    // 7.2 TOPICS REDIRECT (Consolidated into Categories & Subcategories)
+    // ------------------------------------------------------------------------
+    public function topics(Request $request): void {
+        Session::flash('info', 'Topics taxonomy has been consolidated into Categories & Subcategories.');
+        Response::redirect('/admin/categories');
+    }
+
+    public function saveTopic(Request $request): void {
+        Response::redirect('/admin/categories');
     }
 
     public function deleteTopic(Request $request, array $params): void {
-        $id = (int)($params['id'] ?? 0);
-        Database::execute("DELETE FROM topics WHERE id = ?", [$id]);
-        Session::flash('success', "Topic deleted.");
-        Response::redirect('/admin/topics');
+        Response::redirect('/admin/categories');
     }
 
     // ------------------------------------------------------------------------

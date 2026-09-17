@@ -366,6 +366,11 @@ $router->get('/admin/categories', [AdminController::class, 'categories'], ['admi
 $router->post('/admin/categories/save', [AdminController::class, 'saveCategory'], ['admin']);
 $router->post('/admin/categories/delete/{id}', [AdminController::class, 'deleteCategory'], ['admin']);
 
+// Subcategories CRUD
+$router->get('/admin/subcategories', [AdminController::class, 'subcategories'], ['admin']);
+$router->post('/admin/subcategories/save', [AdminController::class, 'saveSubcategory'], ['admin']);
+$router->post('/admin/subcategories/delete/{id}', [AdminController::class, 'deleteSubcategory'], ['admin']);
+
 // Content Review Queue & Actions
 $router->get('/admin/content', [AdminController::class, 'contentQueue'], ['admin']);
 $router->post('/admin/content/action/{id}', [AdminController::class, 'contentAction'], ['admin']);
