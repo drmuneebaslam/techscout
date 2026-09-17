@@ -283,6 +283,38 @@
 
 ---
 
+### 🔹 Prompt #12: Fix `/admin/categories/save` Blank White Screen, Filter Users by ID, Scope Categories by Specific Type & Resolve Residual Errors
+- **Verbatim Prompt:**
+  ```text
+  when clicking some button it opens a link like the following https://funwithcoding.free.nf/admin/categories/save
+  with a blank white screen on all over the admin panel and also users bot filtered by id it should also be there and categories not filtered when opening specific type and much more errors are there all should be solved
+  ```
+- **Granular Requirements & Scope:**
+  - [x] **Eliminate Blank White Screen on Category/Subcategory Actions**:
+    - Identified fatal `Error: Class "App\Core\AuditLog" not found` in `AdminController::saveCategory` and `AdminController::saveSubcategory`.
+    - Created `app/Core/AuditLog.php` as an architectural bridge forwarding to `App\Models\AuditLog`.
+    - Replaced all explicit `\App\Core\AuditLog::log` references with `AuditLog::log` in `AdminController.php`.
+    - Added fallback GET routes for `/admin/categories/save` and `/admin/subcategories/save` in `index.php` that gracefully redirect to `/admin/categories`.
+  - [x] **Users Filtering by ID**:
+    - Updated `AdminController::users` to support direct ID filtering via `?id=...` and `?user_id=...` URL parameters.
+    - Updated the search filter in `AdminController::users` with numeric recognition (`is_numeric(ltrim($search, '#'))`) so searching `#12` or `12` checks `u.id = ?` directly.
+    - Updated the search bar placeholder in `views/admin/users.php` to `Search by User ID (e.g. 2, #2), username, email, or name...`.
+  - [x] **Categories & Subcategories Filtering by Specific Type**:
+    - Updated `AdminController::categories` to recognize `scope`, `type`, and `entity` parameter names.
+    - Removed loose `OR applicable_to = 'all'` fallbacks from single-type filtering:
+      - Roots: filtered by `c.applicable_to = ? OR EXISTS (SELECT 1 FROM categories sub2 WHERE sub2.parent_id = c.id AND sub2.applicable_to = ?)`.
+      - Subcategories: strictly filtered by `c.applicable_to = ?`.
+    - Pre-computed global scope inventory counts (`catScopeCounts` and `subScopeCounts`) across all roots and subcategories so tab badges reflect total counts regardless of the active filter.
+    - Added table-existence check (`SHOW TABLES LIKE 'content_categories'`) in `CategoryController.php` (MISTAKE-04) and supported entity-scoped filtering across junction and legacy contents table.
+  - [x] **Verification & Deployment Standards**:
+    - Verified all changes against `docs/MISTAKES_LEARNED.md`.
+    - Cleaned `changes/` folder prior to staging.
+    - Deployed modified files via direct FTP to `/htdocs/`.
+- **Implementation Extent:** **100% Complete**
+- **Files Modified:** `app/Core/AuditLog.php` (new bridge), `app/Controllers/AdminController.php`, `app/Controllers/CategoryController.php`, `index.php`, `views/admin/crud/categories.php`, `views/admin/users.php`, `docs/USER_REQUESTS_TODO_TRACKER.md`.
+
+---
+
 ## 📌 Protocol for Future User Prompts
 
 Whenever a new user prompt is received:
@@ -292,3 +324,4 @@ Whenever a new user prompt is received:
 4. Update implementation status (`PENDING` -> `IN PROGRESS` -> `COMPLETED`) and record percentage extent.
 5. Record all modified and created file paths.
 6. Commit and deploy in accordance with project rules.
+

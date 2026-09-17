@@ -64,7 +64,7 @@
       <input type="hidden" name="segment" value="<?= htmlspecialchars($activeSegment) ?>">
       <div style="position: relative; flex: 1; min-width: 280px;">
         <i data-lucide="search" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #64748b;"></i>
-        <input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>" placeholder="Search by username, email, or display name..." class="admin-modal-input" style="padding-left: 2.4rem;">
+        <input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>" placeholder="Search by User ID (e.g. 2, #2), username, email, or name..." class="admin-modal-input" style="padding-left: 2.4rem;">
       </div>
       <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm">Search Users</button>
       <?php if (!empty($searchQuery)): ?>

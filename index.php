@@ -367,11 +367,13 @@ $router->post('/admin/topics/delete/{id}', [AdminController::class, 'deleteTopic
 
 // Categories CRUD
 $router->get('/admin/categories', [AdminController::class, 'categories'], ['admin']);
+$router->get('/admin/categories/save', function() { \App\Core\Response::redirect('/admin/categories'); }, ['admin']);
 $router->post('/admin/categories/save', [AdminController::class, 'saveCategory'], ['admin']);
 $router->post('/admin/categories/delete/{id}', [AdminController::class, 'deleteCategory'], ['admin']);
 
 // Subcategories CRUD
 $router->get('/admin/subcategories', [AdminController::class, 'subcategories'], ['admin']);
+$router->get('/admin/subcategories/save', function() { \App\Core\Response::redirect('/admin/categories?tab=subcategories'); }, ['admin']);
 $router->post('/admin/subcategories/save', [AdminController::class, 'saveSubcategory'], ['admin']);
 $router->post('/admin/subcategories/delete/{id}', [AdminController::class, 'deleteSubcategory'], ['admin']);
 

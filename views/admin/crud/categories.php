@@ -9,15 +9,19 @@ $subcategories = $subcategories ?? [];
 $parentCategories = $parentCategories ?? [];
 
 // Category metrics
-$catScopeCounts = ['all' => count($categories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
+if (!isset($catScopeCounts)) {
+    $catScopeCounts = ['all' => count($categories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
+    foreach ($categories as $cat) {
+        $sc = $cat['applicable_to'] ?? 'all';
+        if (isset($catScopeCounts[$sc])) {
+            $catScopeCounts[$sc]++;
+        }
+    }
+}
 $totalSubcategoriesCount = 0;
 $totalCategoryItems = 0;
 $featuredCategoryCount = 0;
 foreach ($categories as $cat) {
-    $sc = $cat['applicable_to'] ?? 'all';
-    if (isset($catScopeCounts[$sc])) {
-        $catScopeCounts[$sc]++;
-    }
     $totalSubcategoriesCount += (int)($cat['subcategories_count'] ?? 0);
     $totalCategoryItems += (int)($cat['total_items'] ?? 0);
     if (!empty($cat['is_featured_home'])) {
@@ -26,15 +30,19 @@ foreach ($categories as $cat) {
 }
 
 // Subcategory metrics
-$subScopeCounts = ['all' => count($subcategories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
+if (!isset($subScopeCounts)) {
+    $subScopeCounts = ['all' => count($subcategories), 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
+    foreach ($subcategories as $sub) {
+        $sc = $sub['applicable_to'] ?? 'all';
+        if (isset($subScopeCounts[$sc])) {
+            $subScopeCounts[$sc]++;
+        }
+    }
+}
 $totalSubcategoryItems = 0;
 $featuredSubcategoryCount = 0;
 $parentsRepresented = [];
 foreach ($subcategories as $sub) {
-    $sc = $sub['applicable_to'] ?? 'all';
-    if (isset($subScopeCounts[$sc])) {
-        $subScopeCounts[$sc]++;
-    }
     $totalSubcategoryItems += (int)($sub['total_items'] ?? 0);
     if (!empty($sub['is_featured_home'])) {
         $featuredSubcategoryCount++;

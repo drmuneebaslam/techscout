@@ -940,7 +940,7 @@ class AdminController {
     // 7. CATEGORIES & SUBCATEGORIES UNIFIED CRUD
     // ------------------------------------------------------------------------
     public function categories(Request $request): void {
-        $currentScope = trim((string)$request->query('scope', 'all'));
+        $currentScope = trim((string)($request->query('scope') ?? $request->query('type') ?? $request->query('entity') ?? 'all'));
         $rawTab = trim((string)$request->query('tab', 'categories'));
         $filterParent = (int)$request->query('parent_id', 0);
 
@@ -960,6 +960,27 @@ class AdminController {
             $activeTab = 'categories';
         }
 
+        // Global scope inventory counts for Root Categories and Subcategories tabs
+        $catScopeCounts = ['all' => 0, 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
+        $allRoots = Database::query("SELECT id, applicable_to FROM categories WHERE parent_id IS NULL");
+        $catScopeCounts['all'] = count($allRoots);
+        foreach ($allRoots as $r) {
+            $sc = $r['applicable_to'] ?? 'all';
+            if (isset($catScopeCounts[$sc])) {
+                $catScopeCounts[$sc]++;
+            }
+        }
+
+        $subScopeCounts = ['all' => 0, 'article' => 0, 'ai_tool' => 0, 'gpt_listing' => 0, 'prompt' => 0, 'image_prompt' => 0, 'campaign' => 0];
+        $allSubs = Database::query("SELECT id, applicable_to FROM categories WHERE parent_id IS NOT NULL");
+        $subScopeCounts['all'] = count($allSubs);
+        foreach ($allSubs as $s) {
+            $sc = $s['applicable_to'] ?? 'all';
+            if (isset($subScopeCounts[$sc])) {
+                $subScopeCounts[$sc]++;
+            }
+        }
+
         // 1. Fetch Root Categories (parent_id IS NULL)
         $catSql = "
             SELECT c.*, 
@@ -972,7 +993,8 @@ class AdminController {
         ";
         $catParams = [];
         if ($currentScope !== 'all') {
-            $catSql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
+            $catSql .= " AND (c.applicable_to = ? OR EXISTS (SELECT 1 FROM categories sub2 WHERE sub2.parent_id = c.id AND sub2.applicable_to = ?))";
+            $catParams[] = $currentScope;
             $catParams[] = $currentScope;
         }
         $catSql .= " GROUP BY c.id ORDER BY c.sort_order ASC, c.name ASC";
@@ -997,7 +1019,7 @@ class AdminController {
             $subParams[] = $filterParent;
         }
         if ($currentScope !== 'all') {
-            $subSql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
+            $subSql .= " AND c.applicable_to = ?";
             $subParams[] = $currentScope;
         }
         $subSql .= " GROUP BY c.id ORDER BY p.name ASC, c.sort_order ASC, c.name ASC";
@@ -1011,6 +1033,8 @@ class AdminController {
             'categories' => $categories,
             'subcategories' => $subcategories,
             'parentCategories' => $parentCategories,
+            'catScopeCounts' => $catScopeCounts,
+            'subScopeCounts' => $subScopeCounts,
             'currentScope' => $currentScope,
             'filterParent' => $filterParent,
             'activeTab' => $activeTab
@@ -1041,14 +1065,14 @@ class AdminController {
             Database::execute("UPDATE categories SET name = ?, slug = ?, parent_id = NULL, applicable_to = ?, is_featured_home = ?, description = ?, icon_name = ?, color_hex = ?, sort_order = ? WHERE id = ?", [
                 $name, $slug, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder, $id
             ]);
-            \App\Core\AuditLog::log('admin.category_update', 'categories', $id, ['name' => $name]);
+            AuditLog::log('admin.category_update', 'categories', $id, ['name' => $name]);
             Session::flash('success', "Root Category '{$name}' updated successfully.");
         } else {
             Database::execute("INSERT INTO categories (name, slug, parent_id, applicable_to, is_featured_home, description, icon_name, color_hex, sort_order) VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?)", [
                 $name, $slug, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder
             ]);
             $newId = (int)Database::lastInsertId();
-            \App\Core\AuditLog::log('admin.category_create', 'categories', $newId, ['name' => $name]);
+            AuditLog::log('admin.category_create', 'categories', $newId, ['name' => $name]);
             Session::flash('success', "Root Category '{$name}' created successfully.");
         }
 
@@ -1118,14 +1142,14 @@ class AdminController {
             Database::execute("UPDATE categories SET name = ?, slug = ?, parent_id = ?, applicable_to = ?, is_featured_home = ?, description = ?, icon_name = ?, color_hex = ?, sort_order = ? WHERE id = ?", [
                 $name, $slug, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder, $id
             ]);
-            \App\Core\AuditLog::log('admin.subcategory_update', 'categories', $id, ['name' => $name, 'parent_id' => $parentId]);
+            AuditLog::log('admin.subcategory_update', 'categories', $id, ['name' => $name, 'parent_id' => $parentId]);
             Session::flash('success', "Subcategory '{$name}' updated successfully.");
         } else {
             Database::execute("INSERT INTO categories (name, slug, parent_id, applicable_to, is_featured_home, description, icon_name, color_hex, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
                 $name, $slug, $parentId, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder
             ]);
             $newId = (int)Database::lastInsertId();
-            \App\Core\AuditLog::log('admin.subcategory_create', 'categories', $newId, ['name' => $name, 'parent_id' => $parentId]);
+            AuditLog::log('admin.subcategory_create', 'categories', $newId, ['name' => $name, 'parent_id' => $parentId]);
             Session::flash('success', "Subcategory '{$name}' created successfully.");
         }
 
@@ -1327,6 +1351,7 @@ class AdminController {
     public function users(Request $request): void {
         $segment = (string)$request->query('segment', 'all');
         $search = trim((string)$request->query('q', ''));
+        $idFilter = $request->query('id') ?? $request->query('user_id');
 
         // Base Query with expanded governance attributes
         $sql = "SELECT u.*, a.id as author_id, a.display_name, a.reputation_score, a.promo_credits, a.verification_badge, 
@@ -1340,6 +1365,12 @@ class AdminController {
                 LEFT JOIN authors a ON u.id = a.user_id 
                 WHERE 1=1";
         $params = [];
+
+        // Direct ID filter (?id=... or ?user_id=...)
+        if (!empty($idFilter)) {
+            $sql .= " AND u.id = ?";
+            $params[] = (int)$idFilter;
+        }
 
         // Apply Segment Filters
         switch ($segment) {
@@ -1369,12 +1400,21 @@ class AdminController {
                 break;
         }
 
-        // Apply Search Filter
+        // Apply Search Filter (supports direct numeric ID, #ID prefix, username, email, display name)
         if (!empty($search)) {
-            $sql .= " AND (u.username LIKE ? OR u.email LIKE ? OR a.display_name LIKE ?)";
-            $params[] = "%{$search}%";
-            $params[] = "%{$search}%";
-            $params[] = "%{$search}%";
+            $cleanSearch = ltrim($search, '#');
+            if (is_numeric($cleanSearch)) {
+                $sql .= " AND (u.id = ? OR u.username LIKE ? OR u.email LIKE ? OR a.display_name LIKE ?)";
+                $params[] = (int)$cleanSearch;
+                $params[] = "%{$search}%";
+                $params[] = "%{$search}%";
+                $params[] = "%{$search}%";
+            } else {
+                $sql .= " AND (u.username LIKE ? OR u.email LIKE ? OR a.display_name LIKE ?)";
+                $params[] = "%{$search}%";
+                $params[] = "%{$search}%";
+                $params[] = "%{$search}%";
+            }
         }
 
         $sql .= " ORDER BY u.created_at DESC LIMIT 200";
@@ -3143,7 +3183,7 @@ class AdminController {
         Database::execute("UPDATE author_tips SET status = 'completed' WHERE id = ?", [$tipId]);
 
         // Audit log recording
-        \App\Core\AuditLog::log('admin.tip_verified', 'author_tips', $tipId, [
+        AuditLog::log('admin.tip_verified', 'author_tips', $tipId, [
             'gross' => $gross,
             'fee' => $fee,
             'net' => $net,
@@ -3163,7 +3203,7 @@ class AdminController {
             Database::execute("UPDATE author_tips SET status = 'refunded' WHERE id = ?", [$tipId]);
             
             // Audit log recording
-            \App\Core\AuditLog::log('admin.tip_rejected', 'author_tips', $tipId, [
+            AuditLog::log('admin.tip_rejected', 'author_tips', $tipId, [
                 'rejected_by' => \App\Core\Auth::id()
             ]);
 
