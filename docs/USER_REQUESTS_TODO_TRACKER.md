@@ -315,6 +315,58 @@
 
 ---
 
+### 🔹 Prompt #13: Entity Category Scoping, Multi-Image Gallery & Showcase, Dynamic Prompt Parameters, and Duplicate Slug Error Prevention
+- **Prompt Date**: 2026-09-17
+- **Status**: **COMPLETED (100%)**
+- **User Prompt**:
+  ```text
+  when creating an entity like article should show only categories that are applicable to articles and so for all
+  Temperature
+  0.70
+
+  0.0 (Deterministic)
+  2.0 (Creative)
+  Top_P Sampling
+  0.95
+  Max Tokens
+  4096
+  Complexity Tier
+
+  Intermediate Engineer
+
+  this thing can be hidden or shown depending on prompt
+  in image prompt addition can add multiple images uploads and one will be showcase that will be shown in front and all others can also be seen
+  and frontend validation of each and everything every text every field should be there so no duplicate or wrong thing can be entered and much mroe good please
+  as for now when adding single prompt for 2 times gives database error and not adding prompt
+  kindly validation of each and everything please should be there no errors like this should occur
+  ```
+- **Granular Requirements & Scope:**
+  - [x] **Strict Entity Category Scoping**:
+    - Articles: `SELECT * FROM categories WHERE applicable_to IN ('all', 'article') ORDER BY name ASC` in `AdminController::articles`.
+    - AI Tools: `SELECT * FROM categories WHERE applicable_to IN ('all', 'ai_tool') ORDER BY name ASC` in `AdminController::tools`.
+    - Custom GPTs: `SELECT * FROM categories WHERE applicable_to IN ('all', 'gpt_listing') ORDER BY name ASC` in `AdminController::gpts`.
+    - Prompts: `data-applicable` attributes added to each option. `filterPromptCategories(type)` dynamically shows only `applicable_to IN ('all', 'prompt')` for text prompts, and `applicable_to IN ('all', 'image_prompt')` for image prompts.
+    - Author Studio Editor: `data-applicable` attributes added to `doc_category_id` options; `filterAuthorCategories(val)` dynamically scopes options when switching publication format (`article`, `prompt`, `ai_tool`, `gpt_listing`).
+  - [x] **Dynamic Parameter Visibility (Text vs. Image Prompts)**:
+    - Wrapped LLM parameters (Temperature, Top_P, Max Tokens, Complexity Tier) in `#llmParamContainer`.
+    - Updated `setPromptType(type)` to display `#llmParamContainer` for text prompts and hide it for image prompts.
+    - Display `#diffusionParamContainer` (Negative Prompt, Aspect Ratio) for image prompts and hide it for text prompts.
+  - [x] **Multi-Image Gallery & Showcase Selection for Image Prompts**:
+    - Added multi-file upload (`gallery_files[]`), direct URL input, and interactive preview cards grid in `views/admin/crud/prompts.php`.
+    - Added showcase image selector (`Set as Showcase` / `⭐ Showcase (Cover)`) setting `showcase_index` and `featured_image_url` for hero front display.
+    - In `AdminController::savePrompt`, uploaded and entered gallery images are saved into `prompt_images` table (`prompt_id`, `image_url`, `caption`, `sort_order`).
+    - The designated showcase image is saved in `contents.featured_image_url` for front directory cards and hero views.
+  - [x] **Duplicate Entry Database Error Elimination (Slug Collision Prevention)**:
+    - Fixed root-cause crash where adding an entity with the same title twice threw `SQLSTATE[23000]: 1062 Duplicate entry for key 'slug'`.
+    - Implemented collision-safe slug generation while-loops appending `-2`, `-3`, etc., in `AdminController::savePrompt`, `saveArticle`, `saveGpt`, `saveCampaign`, and `saveTool`.
+  - [x] **Comprehensive Client-Side & Server-Side Form Validation**:
+    - Added exhaustive validation on `adminPromptForm`, `adminArticleForm`, `adminToolForm`, and `adminGptForm` checking title lengths, required categories, summaries, valid ranges, variable syntax, and image presence.
+    - Automatically switches to the invalid tab, focuses and highlights the invalid input, and renders clear alert/toast feedback without allowing raw database crashes.
+- **Implementation Extent:** **100% Complete**
+- **Files Modified:** `app/Controllers/AdminController.php`, `views/admin/crud/prompts.php`, `views/admin/crud/articles.php`, `views/admin/crud/tools.php`, `views/admin/crud/gpts.php`, `views/author/editor.php`, `docs/USER_REQUESTS_TODO_TRACKER.md`.
+
+---
+
 ## 📌 Protocol for Future User Prompts
 
 Whenever a new user prompt is received:
@@ -324,4 +376,5 @@ Whenever a new user prompt is received:
 4. Update implementation status (`PENDING` -> `IN PROGRESS` -> `COMPLETED`) and record percentage extent.
 5. Record all modified and created file paths.
 6. Commit and deploy in accordance with project rules.
+
 

@@ -143,7 +143,7 @@ class AdminController {
                                     WHERE c.content_type = 'article' 
                                     ORDER BY c.is_pinned DESC, c.created_at DESC");
         
-        $categories = Database::query("SELECT * FROM categories ORDER BY name ASC");
+        $categories = Database::query("SELECT * FROM categories WHERE applicable_to IN ('all', 'article') ORDER BY name ASC");
         $authors = Database::query("SELECT * FROM authors ORDER BY display_name ASC");
 
         Response::view('admin/crud/articles', [
@@ -172,7 +172,16 @@ class AdminController {
             $authorId = (int)(Auth::user()['author_id'] ?? 1);
         }
 
-        $slug = Sanitizer::slug($title);
+        $baseSlug = Sanitizer::slug($title);
+        if ($baseSlug === '') $baseSlug = 'article-' . time();
+        $slug = $baseSlug;
+        $counter = 1;
+        while (true) {
+            $existing = Database::fetch("SELECT id FROM contents WHERE slug = ? " . ($id ? "AND id != ?" : ""), $id ? [$slug, (int)$id] : [$slug]);
+            if (!$existing) break;
+            $counter++;
+            $slug = "{$baseSlug}-{$counter}";
+        }
         $qualityScore = min(100.0, 60.0 + (str_word_count(strip_tags($bodyHtml)) > 400 ? 25 : 10) + (str_contains($bodyHtml, '<pre') ? 15 : 0));
 
         if ($id) {
@@ -313,7 +322,7 @@ class AdminController {
                                  LEFT JOIN categories cat ON c.category_id = cat.id 
                                  ORDER BY c.created_at DESC");
         
-        $categories = Database::query("SELECT * FROM categories ORDER BY name ASC");
+        $categories = Database::query("SELECT * FROM categories WHERE applicable_to IN ('all', 'ai_tool') ORDER BY name ASC");
 
         Response::view('admin/crud/tools', [
             'title' => 'AI Tools Directory (Full Enterprise CRUD) | Admin Hub',
@@ -331,12 +340,14 @@ class AdminController {
         $imageUrl = image_url(trim((string)$request->post('featured_image_url', '')));
         $authorId = (int)(Auth::user()['author_id'] ?? 1);
         $baseSlug = Sanitizer::slug($title);
+        if ($baseSlug === '') $baseSlug = 'tool-' . time();
         $slug = $baseSlug;
         $counter = 1;
         while (true) {
-            $existingSlug = Database::fetch("SELECT id FROM contents WHERE slug = ? " . ($id ? "AND id != ?" : ""), $id ? [$slug, $id] : [$slug]);
+            $existingSlug = Database::fetch("SELECT id FROM contents WHERE slug = ? " . ($id ? "AND id != ?" : ""), $id ? [$slug, (int)$id] : [$slug]);
             if (!$existingSlug) break;
-            $slug = $baseSlug . '-' . (++$counter);
+            $counter++;
+            $slug = "{$baseSlug}-{$counter}";
         }
 
         // Core Official Links & Metadata
@@ -498,7 +509,24 @@ class AdminController {
                                        ORDER BY c.created_at DESC");
         }
         
-        $categories = Database::query("SELECT * FROM categories ORDER BY name ASC");
+        $categories = Database::query("SELECT * FROM categories WHERE applicable_to IN ('all', 'prompt', 'image_prompt') ORDER BY name ASC");
+
+        // Attach gallery images to prompts for rich editing
+        $promptIds = array_column($prompts, 'id');
+        $allPromptImages = [];
+        if (!empty($promptIds)) {
+            $inClause = implode(',', array_map('intval', $promptIds));
+            $imgs = Database::querySilent("SELECT * FROM prompt_images WHERE prompt_id IN ($inClause) ORDER BY sort_order ASC, id ASC");
+            if ($imgs) {
+                foreach ($imgs as $img) {
+                    $allPromptImages[$img['prompt_id']][] = $img;
+                }
+            }
+        }
+        foreach ($prompts as &$p) {
+            $p['gallery_images'] = $allPromptImages[$p['id']] ?? [];
+        }
+        unset($p);
 
         $kpiStats = [
             'total' => count($prompts),
@@ -571,9 +599,21 @@ class AdminController {
         $internalNotes = json_encode($meta, JSON_UNESCAPED_SLASHES);
 
         $authorId = (int)(Auth::user()['author_id'] ?? 1);
-        $slug = Sanitizer::slug($title);
+        
+        $baseSlug = Sanitizer::slug($title);
+        if ($baseSlug === '') $baseSlug = 'prompt-' . time();
+        $slug = $baseSlug;
+        $counter = 1;
+        while (true) {
+            $existing = Database::fetch("SELECT id FROM contents WHERE slug = ? " . ($id ? "AND id != ?" : ""), $id ? [$slug, (int)$id] : [$slug]);
+            if (!$existing) break;
+            $counter++;
+            $slug = "{$baseSlug}-{$counter}";
+        }
 
         $imageUrl = null;
+        $galleryImages = []; // Array of ['url' => ..., 'caption' => ...]
+
         if ($promptType === 'image') {
             // Retrieve existing image URL if updating
             if ($id) {
@@ -581,19 +621,83 @@ class AdminController {
                 $imageUrl = $existing['featured_image_url'] ?? null;
             }
 
-            // Handle direct image file upload
+            // Existing gallery images retained
+            $existingGalleryUrls = (array)($request->post('existing_gallery_urls', []) ?: []);
+            $existingGalleryCaptions = (array)($request->post('existing_gallery_captions', []) ?: []);
+            for ($k = 0; $k < count($existingGalleryUrls); $k++) {
+                $eUrl = trim((string)$existingGalleryUrls[$k]);
+                if ($eUrl !== '') {
+                    $galleryImages[] = [
+                        'url' => image_url($eUrl),
+                        'caption' => trim((string)($existingGalleryCaptions[$k] ?? 'Visual Sample'))
+                    ];
+                }
+            }
+
+            $uploadDir = dirname(__DIR__, 2) . '/storage/uploads/prompts';
+            if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+
+            // Single image direct file upload (legacy / quick upload)
             if (!empty($_FILES['image_file']['tmp_name']) && is_uploaded_file($_FILES['image_file']['tmp_name'])) {
-                $uploadDir = dirname(__DIR__, 2) . '/storage/uploads/prompts';
-                if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
                 $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
                 if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'gif'])) {
                     $filename = 'prompt_visual_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
                     if (move_uploaded_file($_FILES['image_file']['tmp_name'], $uploadDir . '/' . $filename)) {
-                        $imageUrl = '/storage/uploads/prompts/' . $filename;
+                        $singleUploadedUrl = '/storage/uploads/prompts/' . $filename;
+                        $galleryImages[] = ['url' => $singleUploadedUrl, 'caption' => 'Showcase Sample'];
                     }
                 }
-            } elseif (!empty($request->post('featured_image_url'))) {
-                $imageUrl = image_url(trim((string)$request->post('featured_image_url')));
+            }
+
+            // Multi-image file uploads
+            if (!empty($_FILES['gallery_files']['name']) && is_array($_FILES['gallery_files']['name'])) {
+                $fileCount = count($_FILES['gallery_files']['name']);
+                for ($i = 0; $i < $fileCount; $i++) {
+                    if (!empty($_FILES['gallery_files']['tmp_name'][$i]) && is_uploaded_file($_FILES['gallery_files']['tmp_name'][$i])) {
+                        $ext = strtolower(pathinfo($_FILES['gallery_files']['name'][$i], PATHINFO_EXTENSION));
+                        if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'gif'])) {
+                            $filename = 'prompt_visual_' . time() . '_' . $i . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                            if (move_uploaded_file($_FILES['gallery_files']['tmp_name'][$i], $uploadDir . '/' . $filename)) {
+                                $galleryImages[] = [
+                                    'url' => '/storage/uploads/prompts/' . $filename,
+                                    'caption' => 'Render Variation ' . ($i + 1)
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Multi-image text URLs entered
+            $inputGalleryUrls = (array)($request->post('gallery_urls', []) ?: []);
+            foreach ($inputGalleryUrls as $gu) {
+                $gu = trim((string)$gu);
+                if ($gu !== '') {
+                    $galleryImages[] = ['url' => image_url($gu), 'caption' => 'Visual Sample'];
+                }
+            }
+
+            // Direct featured_image_url input
+            $directFeatured = trim((string)$request->post('featured_image_url', ''));
+            if ($directFeatured !== '') {
+                $directFeatured = image_url($directFeatured);
+                $found = false;
+                foreach ($galleryImages as $gi) {
+                    if ($gi['url'] === $directFeatured) { $found = true; break; }
+                }
+                if (!$found) {
+                    array_unshift($galleryImages, ['url' => $directFeatured, 'caption' => 'Master Showcase']);
+                }
+            }
+
+            // Showcase selection: pick designated index or first image
+            $showcaseIndex = (int)$request->post('showcase_index', 0);
+            if (isset($galleryImages[$showcaseIndex])) {
+                $imageUrl = $galleryImages[$showcaseIndex]['url'];
+            } elseif (!empty($galleryImages)) {
+                $imageUrl = $galleryImages[0]['url'];
+            } elseif ($directFeatured !== '') {
+                $imageUrl = $directFeatured;
             }
         } else {
             // Text prompts strictly have no image attached
@@ -622,6 +726,24 @@ class AdminController {
             Session::flash('success', "Prompt blueprint created successfully.");
         }
         $targetPromptId = $id ? (int)$id : $newId;
+
+        // Synchronize Multi-Image Gallery Records
+        if ($promptType === 'image') {
+            if (!empty($galleryImages)) {
+                Database::executeSilent("DELETE FROM prompt_images WHERE prompt_id = ?", [$targetPromptId]);
+                $sort = 0;
+                foreach ($galleryImages as $idx => $gItem) {
+                    $gUrl = $gItem['url'];
+                    $gCap = $gItem['caption'] ?? ('Sample ' . ($idx + 1));
+                    Database::executeSilent("INSERT INTO prompt_images (prompt_id, image_url, caption, sort_order) VALUES (?, ?, ?, ?)", [
+                        $targetPromptId, $gUrl, $gCap, $sort++
+                    ]);
+                }
+            }
+        } else {
+            Database::executeSilent("DELETE FROM prompt_images WHERE prompt_id = ?", [$targetPromptId]);
+        }
+
         $secondaryCats = (array)($request->post('secondary_categories') ?: []);
         $this->syncContentTaxonomy($targetPromptId, $categoryId, $secondaryCats);
         \App\Core\TagHelper::syncTags($targetPromptId, $request->post('tags', ''));
@@ -647,7 +769,7 @@ class AdminController {
                                 LEFT JOIN categories cat ON c.category_id = cat.id 
                                 ORDER BY c.created_at DESC");
 
-        $categories = Database::query("SELECT * FROM categories ORDER BY name ASC");
+        $categories = Database::query("SELECT * FROM categories WHERE applicable_to IN ('all', 'gpt_listing') ORDER BY name ASC");
 
         $kpiStats = [
             'total' => count($gpts),
@@ -699,18 +821,14 @@ class AdminController {
             $status = 'published';
         }
 
-        // Capabilities & Tool Metadata stored in internal_notes JSON
-        $capabilities = $request->post('capabilities');
-        if (!is_array($capabilities)) $capabilities = ['web_browsing', 'code_interpreter'];
-
+        // Parse meta hyperparameters
         $meta = [
-            'capabilities' => array_values($capabilities),
-            'actions_count' => (int)$request->post('actions_count', 0),
-            'actions_list' => trim((string)$request->post('actions_list', '')),
-            'access_level' => (string)$request->post('access_level', 'free'),
-            'rating' => (float)$request->post('rating', 4.8),
-            'creator_website' => trim((string)$request->post('creator_website', '')),
-            'target_audience' => trim((string)$request->post('target_audience', ''))
+            'reasoning_effort' => (string)$request->post('param_reasoning_effort', 'medium'),
+            'context_window' => (string)$request->post('param_context_window', '128k'),
+            'knowledge_cutoff' => (string)$request->post('param_knowledge_cutoff', 'Oct 2024'),
+            'capabilities' => (array)($request->post('capabilities') ?: []),
+            'actions_schema' => trim((string)$request->post('actions_schema', '')),
+            'system_instructions' => trim((string)$request->post('system_instructions', ''))
         ];
 
         // Parse Dynamic Additional Custom Links
@@ -733,7 +851,17 @@ class AdminController {
         $internalNotes = json_encode($meta, JSON_UNESCAPED_SLASHES);
 
         $authorId = (int)(Auth::user()['author_id'] ?? 1);
-        $slug = Sanitizer::slug($title);
+        
+        $baseSlug = Sanitizer::slug($title);
+        if ($baseSlug === '') $baseSlug = 'gpt-' . time();
+        $slug = $baseSlug;
+        $counter = 1;
+        while (true) {
+            $existing = Database::fetch("SELECT id FROM contents WHERE slug = ? " . ($id ? "AND id != ?" : ""), $id ? [$slug, (int)$id] : [$slug]);
+            if (!$existing) break;
+            $counter++;
+            $slug = "{$baseSlug}-{$counter}";
+        }
 
         $imageUrl = null;
         if ($id) {
@@ -838,8 +966,16 @@ class AdminController {
         $type = (string)$request->post('campaign_type', 'hackathon');
         $startDate = (string)$request->post('start_date', date('Y-m-d H:i:s'));
         $endDate = (string)$request->post('end_date', date('Y-m-d H:i:s', strtotime('+30 days')));
-        $authorId = (int)(Auth::user()['author_id'] ?? 1);
-        $slug = Sanitizer::slug($title);
+        $baseSlug = Sanitizer::slug($title);
+        if ($baseSlug === '') $baseSlug = 'campaign-' . time();
+        $slug = $baseSlug;
+        $counter = 1;
+        while (true) {
+            $existing = Database::fetch("SELECT id FROM contents WHERE slug = ? " . ($id ? "AND id != ?" : ""), $id ? [$slug, (int)$id] : [$slug]);
+            if (!$existing) break;
+            $counter++;
+            $slug = "{$baseSlug}-{$counter}";
+        }
 
         // Submission configuration fields
         $fields = $request->post('submission_fields', []);

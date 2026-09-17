@@ -174,47 +174,57 @@
             <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text-primary, #f8fafc); margin-bottom: 0.4rem;">Primary Category *</label>
             <select name="category_id" id="prompt_category_id" style="width: 100%; background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding: 0.75rem 1rem; border-radius: 6px; color: var(--admin-text-primary, #f8fafc);">
               <?php foreach ($categories as $cat): ?>
-                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                <option value="<?= $cat['id'] ?>" data-applicable="<?= htmlspecialchars($cat['applicable_to'] ?? 'all') ?>"><?= htmlspecialchars($cat['name']) ?> (<?= strtoupper($cat['applicable_to'] ?? 'ALL') ?>)</option>
               <?php endforeach; ?>
             </select>
           </div>
         </div>
 
-        <!-- Conditional Visual Showcase Container: Strictly for Image Generation Prompts -->
-        <div id="imageUploadContainer" style="display: none; margin-bottom: 1.5rem; background: rgba(236,72,153,0.04); border: 1px dashed rgba(236,72,153,0.3); border-radius: 10px; padding: 1.25rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+        <!-- Conditional Visual Showcase & Multi-Image Gallery: Strictly for Image Generation Prompts -->
+        <div id="imageUploadContainer" style="display: none; margin-bottom: 1.5rem; background: rgba(236,72,153,0.04); border: 1px dashed rgba(236,72,153,0.35); border-radius: 12px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <i data-lucide="image" style="width: 16px; height: 16px; color: #ec4899;"></i>
-              <span style="font-weight: 700; color: var(--admin-text-primary, #f8fafc); font-size: 0.88rem;">Visual Generation Showcase Image</span>
+              <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(236,72,153,0.15); display: flex; align-items: center; justify-content: center; color: #ec4899;">
+                <i data-lucide="images" style="width: 16px; height: 16px;"></i>
+              </div>
+              <div>
+                <span style="font-weight: 700; color: var(--admin-text-primary, #f8fafc); font-size: 0.92rem;">Visual Showcase &amp; Multi-Image Gallery</span>
+                <span style="display: block; font-size: 0.74rem; color: var(--admin-text-secondary, #94a3b8);">Upload multiple render variations. Pick one as the primary front showcase; all others can be viewed in the gallery lightbox.</span>
+              </div>
             </div>
-            <span class="ts-badge ts-badge-pink" style="font-size: 0.7rem;">Image Prompts Only</span>
+            <span class="ts-badge ts-badge-pink" style="font-size: 0.72rem; font-weight: 700;">Multi-Image Enabled</span>
           </div>
-          <p style="font-size: 0.78rem; color: var(--admin-text-secondary, #94a3b8); margin: 0 0 1rem 0;">
-            Upload a high-fidelity output render sample demonstrating this prompt in action (PNG, JPG, WEBP up to 10MB).
-          </p>
 
-          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem; align-items: center;">
+          <!-- Upload Controls Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.85rem; margin-bottom: 1rem;">
             <div>
-              <label class="ts-btn ts-btn-outline" style="cursor: pointer; width: 100%; text-align: center; padding: 0.75rem; border-color: rgba(236,72,153,0.4); color: #ec4899; display: block; border-radius: 8px;">
-                <i data-lucide="upload-cloud" style="width: 16px; height: 16px; display: inline; margin-right: 0.35rem;"></i>
-                <span id="uploadButtonText">Choose Showcase Image File</span>
-                <input type="file" name="image_file" id="prompt_image_file" accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;" onchange="previewSelectedPromptImage(this)">
+              <label class="ts-btn ts-btn-outline" style="cursor: pointer; width: 100%; text-align: center; padding: 0.65rem; border-color: rgba(236,72,153,0.4); color: #ec4899; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 8px; font-weight: 600; font-size: 0.84rem;">
+                <i data-lucide="upload-cloud" style="width: 16px; height: 16px;"></i>
+                <span>Choose Multiple Image Files</span>
+                <input type="file" name="gallery_files[]" id="prompt_gallery_files" multiple accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;" onchange="handleMultipleGalleryFiles(this)">
               </label>
-              <div style="margin-top: 0.65rem;">
-                <label style="display: block; font-size: 0.75rem; color: var(--admin-text-secondary, #94a3b8); margin-bottom: 0.25rem;">Or Direct Image URL / Storage Path:</label>
-                <input type="text" name="featured_image_url" id="prompt_featured_image_url" placeholder="e.g. /storage/uploads/prompts/... or https://..." style="width: 100%; background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding: 0.5rem 0.75rem; border-radius: 6px; color: var(--admin-text-primary, #f8fafc); font-size: 0.82rem;" oninput="previewUrlPromptImage(this.value)">
-              </div>
             </div>
+            <div style="display: flex; gap: 0.4rem;">
+              <input type="text" id="manualGalleryUrlInput" placeholder="Paste image URL (https://...)" style="flex: 1; background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding: 0.6rem 0.75rem; border-radius: 6px; color: var(--admin-text-primary, #f8fafc); font-size: 0.82rem;">
+              <button type="button" onclick="addManualGalleryUrl()" class="ts-btn ts-btn-outline" style="border-color: #ec4899; color: #ec4899; padding: 0.6rem 0.85rem; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;">
+                + Add URL
+              </button>
+            </div>
+          </div>
 
-            <!-- Live Image Preview Card -->
-            <div id="promptImagePreviewBox" style="height: 140px; border-radius: 8px; border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); background: var(--admin-input-bg, #05070b); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
-              <img id="promptImagePreviewImg" src="" alt="Prompt Visual" style="display: none; width: 100%; height: 100%; object-fit: cover;">
-              <div id="promptImagePreviewPlaceholder" style="text-align: center; color: var(--admin-text-secondary, #94a3b8); font-size: 0.8rem;">
-                <i data-lucide="image" style="width: 28px; height: 28px; margin-bottom: 0.3rem; opacity: 0.5;"></i>
-                <div>No Image Attached</div>
-              </div>
-              <button type="button" id="removeImageBtn" onclick="clearPromptImagePreview()" style="display: none; position: absolute; top: 6px; right: 6px; background: rgba(239,68,68,0.85); color: #fff; border: none; border-radius: 4px; padding: 0.2rem 0.45rem; font-size: 0.7rem; cursor: pointer;">Remove</button>
-            </div>
+          <!-- Hidden input storing the index of the showcase image -->
+          <input type="hidden" name="showcase_index" id="prompt_showcase_index" value="0">
+          <input type="hidden" name="featured_image_url" id="prompt_featured_image_url" value="">
+
+          <!-- Interactive Multi-Image Gallery Cards Grid -->
+          <div id="promptGalleryCardsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.85rem; min-height: 80px;">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="galleryEmptyPlaceholder" style="text-align: center; padding: 1.5rem 1rem; border: 1px dashed rgba(148,163,184,0.2); border-radius: 8px; color: var(--admin-text-secondary, #94a3b8); font-size: 0.8rem;">
+            <i data-lucide="image" style="width: 28px; height: 28px; opacity: 0.4; margin-bottom: 0.35rem;"></i>
+            <div>No images added yet. Click <strong>Choose Multiple Image Files</strong> or enter a URL above.</div>
           </div>
         </div>
 
@@ -357,8 +367,8 @@
           </div>
         </div>
 
-        <!-- Hyperparameters Tuning Grid -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; background: var(--admin-card-bg-subtle, rgba(255,255,255,0.02)); padding: 1.25rem; border-radius: 10px; border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15));">
+        <!-- Hyperparameters Tuning Grid (Dynamically shown for Text/Code prompts, hidden for Image prompts) -->
+        <div id="llmParamContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; background: var(--admin-card-bg-subtle, rgba(255,255,255,0.02)); padding: 1.25rem; border-radius: 10px; border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15));">
           <!-- Temperature -->
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
@@ -734,6 +744,7 @@ function setPromptType(type) {
   const optImage = document.getElementById('type_opt_image');
   const uploadContainer = document.getElementById('imageUploadContainer');
   const textNotice = document.getElementById('textPromptNotice');
+  const llmParams = document.getElementById('llmParamContainer');
   const diffusionParams = document.getElementById('diffusionParamContainer');
 
   if (isImage) {
@@ -743,6 +754,7 @@ function setPromptType(type) {
     optText.style.background = 'transparent';
     uploadContainer.style.display = 'block';
     textNotice.style.display = 'none';
+    if (llmParams) llmParams.style.display = 'none';
     if (diffusionParams) diffusionParams.style.display = 'block';
   } else {
     optText.style.borderColor = '#38bdf8';
@@ -751,52 +763,186 @@ function setPromptType(type) {
     optImage.style.background = 'transparent';
     uploadContainer.style.display = 'none';
     textNotice.style.display = 'flex';
+    if (llmParams) llmParams.style.display = 'grid';
     if (diffusionParams) diffusionParams.style.display = 'none';
   }
+
+  filterPromptCategories(type);
 }
 
-// Image Preview Handlers
-function previewSelectedPromptImage(input) {
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    document.getElementById('uploadButtonText').textContent = file.name;
+// Strict Dynamic Category Scoping for Prompts
+function filterPromptCategories(type) {
+  const select = document.getElementById('prompt_category_id');
+  if (!select) return;
+  const options = select.querySelectorAll('option');
+  let firstValid = null;
+  let hasValid = false;
+  const currentVal = select.value;
+
+  options.forEach(opt => {
+    const applicable = opt.getAttribute('data-applicable') || 'all';
+    let match = false;
+    if (applicable === 'all') {
+      match = true;
+    } else if (type === 'image' && (applicable === 'image_prompt' || applicable === 'prompt')) {
+      match = true;
+    } else if (type === 'text' && applicable === 'prompt') {
+      match = true;
+    }
+
+    if (match) {
+      opt.style.display = '';
+      opt.disabled = false;
+      if (!firstValid) firstValid = opt;
+      if (opt.value === currentVal) hasValid = true;
+    } else {
+      opt.style.display = 'none';
+      opt.disabled = true;
+      if (opt.value === currentVal) opt.selected = false;
+    }
+  });
+
+  if (!hasValid && firstValid) {
+    firstValid.selected = true;
+  }
+}
+
+// Multi-Image Gallery State & Showcase Engine
+let currentPromptGallery = []; // Array of { url: '', caption: '', isShowcase: boolean, isExisting: boolean, isManualUrl: boolean }
+let showcaseIndex = 0;
+
+function renderPromptGalleryGrid() {
+  const container = document.getElementById('promptGalleryCardsGrid');
+  const emptyPlaceholder = document.getElementById('galleryEmptyPlaceholder');
+  if (!container) return;
+
+  container.innerHTML = '';
+  if (currentPromptGallery.length === 0) {
+    if (emptyPlaceholder) emptyPlaceholder.style.display = 'block';
+    document.getElementById('prompt_featured_image_url').value = '';
+    document.getElementById('prompt_showcase_index').value = '0';
+    return;
+  }
+
+  if (emptyPlaceholder) emptyPlaceholder.style.display = 'none';
+
+  if (showcaseIndex < 0 || showcaseIndex >= currentPromptGallery.length) {
+    showcaseIndex = 0;
+  }
+  document.getElementById('prompt_showcase_index').value = showcaseIndex;
+  document.getElementById('prompt_featured_image_url').value = currentPromptGallery[showcaseIndex].url || '';
+
+  currentPromptGallery.forEach((item, idx) => {
+    const isShowcase = (idx === showcaseIndex);
+    const card = document.createElement('div');
+    card.className = 'prompt-gallery-card';
+    card.style.cssText = `
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--admin-input-bg, #05070b);
+      border: 2px solid ${isShowcase ? '#ec4899' : 'var(--admin-border-color, rgba(148,163,184,0.2))'};
+      box-shadow: ${isShowcase ? '0 0 14px rgba(236,72,153,0.35)' : 'none'};
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+    `;
+
+    card.innerHTML = `
+      <div style="position: relative; height: 110px; background: #000; overflow: hidden;">
+        <img src="${escapeHtml(item.url)}" alt="Visual Sample" style="width: 100%; height: 100%; object-fit: cover;">
+        <button type="button" onclick="setShowcaseImage(${idx})" style="position: absolute; top: 6px; left: 6px; border: none; border-radius: 20px; padding: 0.25rem 0.55rem; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; ${isShowcase ? 'background: #ec4899; color: #fff;' : 'background: rgba(0,0,0,0.65); color: #e2e8f0; backdrop-filter: blur(4px);'}">
+          ${isShowcase ? '⭐ Showcase (Cover)' : 'Set as Showcase'}
+        </button>
+        <button type="button" onclick="removeGalleryItem(${idx})" style="position: absolute; top: 6px; right: 6px; background: rgba(239,68,68,0.85); color: #fff; border: none; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700;" title="Remove image">&times;</button>
+      </div>
+      <div style="padding: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
+        <input type="text" value="${escapeHtml(item.caption || '')}" oninput="updateGalleryCaption(${idx}, this.value)" placeholder="Caption / variant label" style="width: 100%; background: var(--admin-card-bg, #090d16); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding: 0.35rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: var(--admin-text-primary, #f8fafc);">
+        ${item.isExisting ? `
+          <input type="hidden" name="existing_gallery_urls[]" value="${escapeHtml(item.url)}">
+          <input type="hidden" name="existing_gallery_captions[]" value="${escapeHtml(item.caption || '')}">
+        ` : (item.isManualUrl ? `
+          <input type="hidden" name="gallery_urls[]" value="${escapeHtml(item.url)}">
+        ` : '')}
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function setShowcaseImage(idx) {
+  showcaseIndex = idx;
+  renderPromptGalleryGrid();
+}
+
+function removeGalleryItem(idx) {
+  currentPromptGallery.splice(idx, 1);
+  if (showcaseIndex >= currentPromptGallery.length) {
+    showcaseIndex = Math.max(0, currentPromptGallery.length - 1);
+  }
+  renderPromptGalleryGrid();
+}
+
+function updateGalleryCaption(idx, val) {
+  if (currentPromptGallery[idx]) {
+    currentPromptGallery[idx].caption = val;
+  }
+}
+
+function handleMultipleGalleryFiles(input) {
+  if (!input.files || input.files.length === 0) return;
+  const files = Array.from(input.files);
+  let loaded = 0;
+
+  files.forEach(file => {
     const reader = new FileReader();
     reader.onload = function(e) {
-      const img = document.getElementById('promptImagePreviewImg');
-      img.src = e.target.result;
-      img.style.display = 'block';
-      document.getElementById('promptImagePreviewPlaceholder').style.display = 'none';
-      document.getElementById('removeImageBtn').style.display = 'block';
+      currentPromptGallery.push({
+        url: e.target.result,
+        caption: file.name.replace(/\.[^/.]+$/, "").replace(/[_\-]/g, ' '),
+        isShowcase: (currentPromptGallery.length === 0),
+        isExisting: false,
+        isManualUrl: false
+      });
+      loaded++;
+      if (loaded === files.length) {
+        renderPromptGalleryGrid();
+      }
     };
     reader.readAsDataURL(file);
-  }
+  });
 }
 
-function previewUrlPromptImage(url) {
-  const img = document.getElementById('promptImagePreviewImg');
-  const placeholder = document.getElementById('promptImagePreviewPlaceholder');
-  const removeBtn = document.getElementById('removeImageBtn');
-
-  if (url && url.trim().length > 4) {
-    img.src = url;
-    img.style.display = 'block';
-    placeholder.style.display = 'none';
-    removeBtn.style.display = 'block';
-  } else {
-    img.style.display = 'none';
-    placeholder.style.display = 'block';
-    removeBtn.style.display = 'none';
+function addManualGalleryUrl() {
+  const input = document.getElementById('manualGalleryUrlInput');
+  const url = (input.value || '').trim();
+  if (!url || url.length < 4) {
+    if (window.Toast) Toast.error('Please enter a valid image URL');
+    else alert('Please enter a valid image URL');
+    return;
   }
+
+  currentPromptGallery.push({
+    url: url,
+    caption: 'Visual Sample',
+    isShowcase: (currentPromptGallery.length === 0),
+    isExisting: false,
+    isManualUrl: true
+  });
+
+  input.value = '';
+  renderPromptGalleryGrid();
 }
 
-function clearPromptImagePreview() {
-  document.getElementById('prompt_image_file').value = '';
-  document.getElementById('prompt_featured_image_url').value = '';
-  document.getElementById('uploadButtonText').textContent = 'Choose Showcase Image File';
-  document.getElementById('promptImagePreviewImg').style.display = 'none';
-  document.getElementById('promptImagePreviewImg').src = '';
-  document.getElementById('promptImagePreviewPlaceholder').style.display = 'block';
-  document.getElementById('removeImageBtn').style.display = 'none';
+function clearPromptGallery() {
+  currentPromptGallery = [];
+  showcaseIndex = 0;
+  const fileInput = document.getElementById('prompt_gallery_files');
+  if (fileInput) fileInput.value = '';
+  const urlInput = document.getElementById('manualGalleryUrlInput');
+  if (urlInput) urlInput.value = '';
+  renderPromptGalleryGrid();
 }
 
 // Target Models Cloud Toggle
@@ -1046,7 +1192,7 @@ function openNewPromptModal() {
   document.getElementById('adminPromptForm').reset();
   document.getElementById('prompt_id').value = '';
   document.getElementById('modalPromptTitle').textContent = 'Create Prompt Blueprint';
-  clearPromptImagePreview();
+  clearPromptGallery();
   setPromptType('text');
 
   currentVariables = [
@@ -1084,11 +1230,35 @@ function editPrompt(p) {
   const promptType = (p.prompt_type === 'image') ? 'image' : 'text';
   setPromptType(promptType);
 
-  if (p.featured_image_url) {
-    document.getElementById('prompt_featured_image_url').value = p.featured_image_url;
-    previewUrlPromptImage(p.featured_image_url);
-  } else {
-    clearPromptImagePreview();
+  clearPromptGallery();
+  if (promptType === 'image') {
+    const loadedUrls = new Set();
+    if (p.featured_image_url) {
+      currentPromptGallery.push({
+        url: p.featured_image_url,
+        caption: 'Master Showcase',
+        isShowcase: true,
+        isExisting: true,
+        isManualUrl: false
+      });
+      loadedUrls.add(p.featured_image_url);
+    }
+    if (Array.isArray(p.gallery_images)) {
+      p.gallery_images.forEach(gi => {
+        if (gi.image_url && !loadedUrls.has(gi.image_url)) {
+          currentPromptGallery.push({
+            url: gi.image_url,
+            caption: gi.caption || 'Render Sample',
+            isShowcase: false,
+            isExisting: true,
+            isManualUrl: false
+          });
+          loadedUrls.add(gi.image_url);
+        }
+      });
+    }
+    showcaseIndex = 0;
+    renderPromptGalleryGrid();
   }
 
   document.getElementById('prompt_template_body').value = p.prompt_template || '';
@@ -1126,6 +1296,144 @@ function editPrompt(p) {
   switchPromptTab('prompt-tab-identity');
   document.getElementById('promptFormModal').style.display = 'flex';
 }
+
+// Comprehensive Robust Frontend Form Validation
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('adminPromptForm');
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    function failValidation(msg, tabId, fieldId) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (tabId) switchPromptTab(tabId);
+      if (fieldId) {
+        const el = document.getElementById(fieldId);
+        if (el) {
+          el.focus();
+          el.style.outline = '2px solid #ef4444';
+          el.style.boxShadow = '0 0 12px rgba(239,68,68,0.6)';
+          setTimeout(() => {
+            el.style.outline = '';
+            el.style.boxShadow = '';
+          }, 3500);
+        }
+      }
+
+      if (window.Toast && typeof window.Toast.error === 'function') {
+        Toast.error(msg);
+      } else {
+        alert('Validation Error: ' + msg);
+      }
+      return false;
+    }
+
+    // 1. Validate Blueprint Title
+    const titleInput = document.getElementById('prompt_title');
+    const titleVal = (titleInput ? titleInput.value : '').trim();
+    if (titleVal.length < 3) {
+      return failValidation('Blueprint title must be at least 3 characters long.', 'prompt-tab-identity', 'prompt_title');
+    }
+    if (titleVal.length > 150) {
+      return failValidation('Blueprint title cannot exceed 150 characters.', 'prompt-tab-identity', 'prompt_title');
+    }
+
+    // 2. Validate Category Selection
+    const catSelect = document.getElementById('prompt_category_id');
+    if (!catSelect || !catSelect.value || catSelect.value === '0') {
+      return failValidation('Please select a valid primary category for this blueprint.', 'prompt-tab-identity', 'prompt_category_id');
+    }
+
+    // 3. Validate Summary
+    const summaryInput = document.getElementById('prompt_summary');
+    const summaryVal = (summaryInput ? summaryInput.value : '').trim();
+    if (summaryVal.length < 10) {
+      return failValidation('Executive summary must be at least 10 characters explaining what this prompt accomplishes.', 'prompt-tab-identity', 'prompt_summary');
+    }
+
+    // 4. Image Prompt Gallery Validation
+    const isImage = document.getElementById('prompt_type_image').checked;
+    if (isImage) {
+      const fileInput = document.getElementById('prompt_gallery_files');
+      const hasQueuedFiles = (fileInput && fileInput.files && fileInput.files.length > 0);
+      const hasGalleryImages = (currentPromptGallery && currentPromptGallery.length > 0);
+      if (!hasQueuedFiles && !hasGalleryImages) {
+        return failValidation('Visual Generation Prompts require at least 1 image upload or image URL to showcase output quality.', 'prompt-tab-identity', 'manualGalleryUrlInput');
+      }
+    }
+
+    // 5. Template Body Validation (Tab 2)
+    const templateInput = document.getElementById('prompt_template_body');
+    const templateVal = (templateInput ? templateInput.value : '').trim();
+    if (templateVal.length < 5) {
+      return failValidation('Prompt template content must be at least 5 characters long.', 'prompt-tab-template', 'prompt_template_body');
+    }
+
+    // 6. Template Variables Validation (Tab 2)
+    if (Array.isArray(currentVariables) && currentVariables.length > 0) {
+      const seenNames = new Set();
+      for (let i = 0; i < currentVariables.length; i++) {
+        const v = currentVariables[i];
+        const vName = (v.name || '').trim();
+        if (!vName) {
+          return failValidation('Variable #' + (i + 1) + ' is missing a identifier name. Provide a name like "user_query" or "model_param".', 'prompt-tab-template', null);
+        }
+        if (!/^[a-zA-Z0-9_\-]+$/.test(vName)) {
+          return failValidation('Variable "' + vName + '" contains invalid characters. Only alphanumeric characters and underscores are allowed.', 'prompt-tab-template', null);
+        }
+        const lowerName = vName.toLowerCase();
+        if (seenNames.has(lowerName)) {
+          return failValidation('Duplicate variable name detected: "' + vName + '". Each variable identifier must be unique.', 'prompt-tab-template', null);
+        }
+        seenNames.add(lowerName);
+      }
+    }
+
+    // 7. Hyperparameters Tuning Validation (Tab 3)
+    if (!isImage) {
+      const tempInput = document.getElementById('prompt_temperature');
+      const tempVal = parseFloat(tempInput ? tempInput.value : 0.7);
+      if (isNaN(tempVal) || tempVal < 0 || tempVal > 2.0) {
+        return failValidation('Temperature must be a valid float between 0.00 and 2.00.', 'prompt-tab-hyperparameters', 'prompt_temperature');
+      }
+
+      const topPInput = document.getElementById('prompt_top_p');
+      const topPVal = parseFloat(topPInput ? topPInput.value : 0.95);
+      if (isNaN(topPVal) || topPVal < 0 || topPVal > 1.0) {
+        return failValidation('Top_P Sampling must be a decimal between 0.00 and 1.00.', 'prompt-tab-hyperparameters', 'prompt_top_p');
+      }
+
+      const maxTokensInput = document.getElementById('prompt_max_tokens');
+      const maxTokensVal = parseInt(maxTokensInput ? maxTokensInput.value : 4096);
+      if (isNaN(maxTokensVal) || maxTokensVal < 1 || maxTokensVal > 65536) {
+        return failValidation('Max Tokens must be a positive integer between 1 and 65,536.', 'prompt-tab-hyperparameters', 'prompt_max_tokens');
+      }
+
+      const modelsInput = document.getElementById('prompt_models');
+      const modelsRaw = (modelsInput ? modelsInput.value : '').trim();
+      try {
+        const parsedModels = JSON.parse(modelsRaw);
+        if (!Array.isArray(parsedModels) || parsedModels.length === 0) {
+          return failValidation('Target models must contain at least 1 LLM model in the JSON array.', 'prompt-tab-hyperparameters', 'prompt_models');
+        }
+      } catch (err) {
+        return failValidation('Target models must be formatted as a valid JSON array of strings (e.g. ["ChatGPT 4o", "Claude 3.5 Sonnet"]).', 'prompt-tab-hyperparameters', 'prompt_models');
+      }
+    }
+
+    // 8. Quality Score Validation
+    const scoreInput = document.getElementById('prompt_quality_score');
+    if (scoreInput) {
+      const scoreVal = parseFloat(scoreInput.value);
+      if (isNaN(scoreVal) || scoreVal < 0 || scoreVal > 100) {
+        return failValidation('Quality Benchmark Score must be between 0.0 and 100.0%.', 'prompt-tab-hyperparameters', 'prompt_quality_score');
+      }
+    }
+
+    return true;
+  });
+});
 
 function renderPromptCustomLinks(links) {
   const container = document.getElementById('promptCustomLinksContainer');

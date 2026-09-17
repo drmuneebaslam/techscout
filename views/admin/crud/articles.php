@@ -539,6 +539,40 @@ document.addEventListener('DOMContentLoaded', function() {
     pageSize: 10,
     searchInputId: 'articleSearchInput'
   });
+
+  const form = document.getElementById('adminArticleForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const title = (document.getElementById('article_title').value || '').trim();
+      if (title.length < 3) {
+        e.preventDefault();
+        alert('Article title must be at least 3 characters.');
+        document.getElementById('article_title').focus();
+        return false;
+      }
+      const cat = document.getElementById('article_category_id').value;
+      if (!cat) {
+        e.preventDefault();
+        alert('Please select an article category.');
+        return false;
+      }
+      const summary = (document.getElementById('article_summary').value || '').trim();
+      if (summary.length < 10) {
+        e.preventDefault();
+        alert('Please provide an article summary of at least 10 characters.');
+        document.getElementById('article_summary').focus();
+        return false;
+      }
+      const body = (document.getElementById('article_body_html').value || '').trim();
+      if (body.length < 20) {
+        e.preventDefault();
+        alert('Article body content is too short. Please provide comprehensive technical documentation.');
+        document.getElementById('article_body_html').focus();
+        return false;
+      }
+      return true;
+    });
+  }
 });
 </script>
 

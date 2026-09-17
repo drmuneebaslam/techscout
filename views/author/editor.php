@@ -157,9 +157,9 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
           <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em;">
             Primary Engineering Domain
           </label>
-          <select name="category_id" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc; font-size: 0.95rem;">
+          <select name="category_id" id="doc_category_id" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc; font-size: 0.95rem;">
             <?php foreach ($categories as $cat): ?>
-              <option value="<?= $cat['id'] ?>" <?= ($content['category_id'] ?? 0) == $cat['id'] ? 'selected' : '' ?>>
+              <option value="<?= $cat['id'] ?>" data-applicable="<?= htmlspecialchars($cat['applicable_to'] ?? 'all') ?>" <?= ($content['category_id'] ?? 0) == $cat['id'] ? 'selected' : '' ?>>
                 <?= htmlspecialchars($cat['name']) ?> (<?= strtoupper($cat['applicable_to'] ?? 'ALL') ?>)
               </option>
             <?php endforeach; ?>
@@ -1069,6 +1069,40 @@ function onContentTypeChanged(val) {
   document.getElementById('pane_prompt_spec').style.display = (val === 'prompt') ? 'block' : 'none';
   document.getElementById('pane_gpt_spec').style.display = (val === 'gpt_listing') ? 'block' : 'none';
   document.getElementById('pane_tool_spec').style.display = (val === 'ai_tool') ? 'block' : 'none';
+  filterAuthorCategories(val);
+}
+
+function filterAuthorCategories(val) {
+  const catSelect = document.getElementById('doc_category_id');
+  if (!catSelect) return;
+  const options = catSelect.querySelectorAll('option');
+  let firstValid = null;
+  let hasValid = false;
+  const currentVal = catSelect.value;
+
+  options.forEach(opt => {
+    const applicable = opt.getAttribute('data-applicable') || 'all';
+    let match = (applicable === 'all');
+    if (val === 'article' && (applicable === 'article' || applicable === 'all')) match = true;
+    else if (val === 'prompt' && (applicable === 'prompt' || applicable === 'image_prompt' || applicable === 'all')) match = true;
+    else if (val === 'ai_tool' && (applicable === 'ai_tool' || applicable === 'all')) match = true;
+    else if (val === 'gpt_listing' && (applicable === 'gpt_listing' || applicable === 'all')) match = true;
+
+    if (match) {
+      opt.style.display = '';
+      opt.disabled = false;
+      if (!firstValid) firstValid = opt;
+      if (opt.value === currentVal) hasValid = true;
+    } else {
+      opt.style.display = 'none';
+      opt.disabled = true;
+      if (opt.value === currentVal) opt.selected = false;
+    }
+  });
+
+  if (!hasValid && firstValid) {
+    firstValid.selected = true;
+  }
 }
 
 function toggleAuthorPromptImage(val) {
@@ -1810,6 +1844,10 @@ function commitInlineComment() {
 document.addEventListener('DOMContentLoaded', () => {
   syncCanvasToHidden();
   updateStats();
+  const typeSelect = document.getElementById('doc_content_type');
+  if (typeSelect) {
+    filterAuthorCategories(typeSelect.value);
+  }
 });
 </script>
 

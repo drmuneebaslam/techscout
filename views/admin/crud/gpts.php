@@ -792,6 +792,44 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   if (typeof lucide !== 'undefined') lucide.createIcons();
+
+  const form = document.getElementById('adminGptForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const title = (document.getElementById('gpt_title').value || '').trim();
+      if (title.length < 2) {
+        e.preventDefault();
+        alert('Custom GPT Agent Name must be at least 2 characters.');
+        switchGptTab('gpt-tab-basic');
+        document.getElementById('gpt_title').focus();
+        return false;
+      }
+      const cat = document.getElementById('gpt_category_id').value;
+      if (!cat) {
+        e.preventDefault();
+        alert('Please select a valid GPT category.');
+        switchGptTab('gpt-tab-basic');
+        return false;
+      }
+      const openaiUrl = (document.getElementById('gpt_openai_url').value || '').trim();
+      if (!openaiUrl || !openaiUrl.startsWith('http')) {
+        e.preventDefault();
+        alert('Please provide a valid OpenAI Deep Link URL starting with http:// or https://');
+        switchGptTab('gpt-tab-basic');
+        document.getElementById('gpt_openai_url').focus();
+        return false;
+      }
+      const summary = (document.getElementById('gpt_summary').value || '').trim();
+      if (summary.length < 10) {
+        e.preventDefault();
+        alert('Please provide an Agent Summary of at least 10 characters.');
+        switchGptTab('gpt-tab-basic');
+        document.getElementById('gpt_summary').focus();
+        return false;
+      }
+      return true;
+    });
+  }
 });
 </script>
 

@@ -590,6 +590,36 @@ document.addEventListener('DOMContentLoaded', function() {
     pageSize: 10,
     searchInputId: 'toolSearchInput'
   });
+
+  const form = document.getElementById('adminToolForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const title = (document.getElementById('tool_title').value || '').trim();
+      if (title.length < 2) {
+        e.preventDefault();
+        alert('Tool Name must be at least 2 characters.');
+        switchToolTab('tab-basic');
+        document.getElementById('tool_title').focus();
+        return false;
+      }
+      const cat = document.getElementById('tool_category_id').value;
+      if (!cat) {
+        e.preventDefault();
+        alert('Please select a valid AI Tool category.');
+        switchToolTab('tab-basic');
+        return false;
+      }
+      const summary = (document.getElementById('tool_summary').value || '').trim();
+      if (summary.length < 10) {
+        e.preventDefault();
+        alert('Please provide a Directory Summary of at least 10 characters.');
+        switchToolTab('tab-basic');
+        document.getElementById('tool_summary').focus();
+        return false;
+      }
+      return true;
+    });
+  }
 });
 </script>
 
