@@ -933,13 +933,31 @@ class AdminController {
 
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
-    // 7. CATEGORIES CRUD (Root / Top-Level Taxonomies)
+    // 7. CATEGORIES & SUBCATEGORIES UNIFIED CRUD
     // ------------------------------------------------------------------------
     public function categories(Request $request): void {
         $currentScope = trim((string)$request->query('scope', 'all'));
-        $currentTab = trim((string)$request->query('tab', 'list'));
+        $rawTab = trim((string)$request->query('tab', 'categories'));
+        $filterParent = (int)$request->query('parent_id', 0);
 
-        $sql = "
+        // Normalize tab name
+        $tabAliases = [
+            'list' => 'categories',
+            'root' => 'categories',
+            'cat' => 'categories',
+            'sub' => 'subcategories',
+            'subs' => 'subcategories',
+            'add' => 'add_category',
+            'add_cat' => 'add_category',
+            'add_sub' => 'add_subcategory'
+        ];
+        $activeTab = $tabAliases[$rawTab] ?? $rawTab;
+        if (!in_array($activeTab, ['categories', 'subcategories', 'add_category', 'add_subcategory'], true)) {
+            $activeTab = 'categories';
+        }
+
+        // 1. Fetch Root Categories (parent_id IS NULL)
+        $catSql = "
             SELECT c.*, 
                    COUNT(DISTINCT sub.id) as subcategories_count,
                    COUNT(DISTINCT cnt.id) as total_items
@@ -948,20 +966,50 @@ class AdminController {
             LEFT JOIN contents cnt ON c.id = cnt.category_id
             WHERE c.parent_id IS NULL
         ";
-        $params = [];
+        $catParams = [];
         if ($currentScope !== 'all') {
-            $sql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
-            $params[] = $currentScope;
+            $catSql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
+            $catParams[] = $currentScope;
         }
-        $sql .= " GROUP BY c.id ORDER BY c.sort_order ASC, c.name ASC";
+        $catSql .= " GROUP BY c.id ORDER BY c.sort_order ASC, c.name ASC";
+        $categories = Database::query($catSql, $catParams);
 
-        $categories = Database::query($sql, $params);
+        // 2. Fetch Subcategories (parent_id IS NOT NULL)
+        $subSql = "
+            SELECT c.*, 
+                   p.name as parent_name,
+                   p.slug as parent_slug,
+                   COUNT(DISTINCT child.id) as child_subcategories_count,
+                   COUNT(DISTINCT cnt.id) as total_items
+            FROM categories c
+            JOIN categories p ON c.parent_id = p.id
+            LEFT JOIN categories child ON child.parent_id = c.id
+            LEFT JOIN contents cnt ON c.id = cnt.category_id
+            WHERE c.parent_id IS NOT NULL
+        ";
+        $subParams = [];
+        if ($filterParent > 0) {
+            $subSql .= " AND c.parent_id = ?";
+            $subParams[] = $filterParent;
+        }
+        if ($currentScope !== 'all') {
+            $subSql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
+            $subParams[] = $currentScope;
+        }
+        $subSql .= " GROUP BY c.id ORDER BY p.name ASC, c.sort_order ASC, c.name ASC";
+        $subcategories = Database::query($subSql, $subParams);
+
+        // 3. Parent categories inventory for dropdowns
+        $parentCategories = Database::query("SELECT id, name, applicable_to FROM categories WHERE parent_id IS NULL ORDER BY name ASC");
 
         Response::view('admin/crud/categories', [
-            'title' => 'Categories Management | Admin Hub',
+            'title' => 'Categories & Subcategories | Admin Hub',
             'categories' => $categories,
+            'subcategories' => $subcategories,
+            'parentCategories' => $parentCategories,
             'currentScope' => $currentScope,
-            'activeTab' => $currentTab
+            'filterParent' => $filterParent,
+            'activeTab' => $activeTab
         ]);
     }
 
@@ -981,7 +1029,7 @@ class AdminController {
 
         if (empty($name)) {
             Session::flash('error', 'Category name is required.');
-            Response::redirect('/admin/categories');
+            Response::redirect('/admin/categories?tab=add_category');
             return;
         }
 
@@ -990,68 +1038,36 @@ class AdminController {
                 $name, $slug, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder, $id
             ]);
             \App\Core\AuditLog::log('admin.category_update', 'categories', $id, ['name' => $name]);
-            Session::flash('success', "Category '{$name}' updated successfully.");
+            Session::flash('success', "Root Category '{$name}' updated successfully.");
         } else {
             Database::execute("INSERT INTO categories (name, slug, parent_id, applicable_to, is_featured_home, description, icon_name, color_hex, sort_order) VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?)", [
                 $name, $slug, $applicableTo, $isFeaturedHome, $description, $icon, $color, $sortOrder
             ]);
             $newId = (int)Database::lastInsertId();
             \App\Core\AuditLog::log('admin.category_create', 'categories', $newId, ['name' => $name]);
-            Session::flash('success', "Category '{$name}' created successfully.");
+            Session::flash('success', "Root Category '{$name}' created successfully.");
         }
 
-        Response::redirect('/admin/categories' . ($applicableTo !== 'all' ? '?scope=' . urlencode($applicableTo) : ''));
+        Response::redirect('/admin/categories?tab=categories' . ($applicableTo !== 'all' ? '&scope=' . urlencode($applicableTo) : ''));
     }
 
     public function deleteCategory(Request $request, array $params): void {
         $id = (int)($params['id'] ?? 0);
         Database::execute("DELETE FROM categories WHERE id = ?", [$id]);
         Session::flash('success', "Category deleted.");
-        Response::redirect('/admin/categories');
+        Response::redirect('/admin/categories?tab=categories');
     }
 
     // ------------------------------------------------------------------------
     // 7.1 SUBCATEGORIES CRUD (Child Taxonomies)
     // ------------------------------------------------------------------------
     public function subcategories(Request $request): void {
+        // Direct route to unified taxonomy screen with subcategories active
         $currentScope = trim((string)$request->query('scope', 'all'));
-        $currentTab = trim((string)$request->query('tab', 'list'));
+        $tab = trim((string)$request->query('tab', 'subcategories'));
         $filterParent = (int)$request->query('parent_id', 0);
-
-        $sql = "
-            SELECT c.*, 
-                   p.name as parent_name,
-                   p.slug as parent_slug,
-                   COUNT(DISTINCT child.id) as child_subcategories_count,
-                   COUNT(DISTINCT cnt.id) as total_items
-            FROM categories c
-            JOIN categories p ON c.parent_id = p.id
-            LEFT JOIN categories child ON child.parent_id = c.id
-            LEFT JOIN contents cnt ON c.id = cnt.category_id
-            WHERE c.parent_id IS NOT NULL
-        ";
-        $params = [];
-        if ($filterParent > 0) {
-            $sql .= " AND c.parent_id = ?";
-            $params[] = $filterParent;
-        }
-        if ($currentScope !== 'all') {
-            $sql .= " AND (c.applicable_to = ? OR c.applicable_to = 'all')";
-            $params[] = $currentScope;
-        }
-        $sql .= " GROUP BY c.id ORDER BY p.name ASC, c.sort_order ASC, c.name ASC";
-
-        $subcategories = Database::query($sql, $params);
-        $parentCategories = Database::query("SELECT id, name, applicable_to FROM categories WHERE parent_id IS NULL ORDER BY name ASC");
-
-        Response::view('admin/crud/subcategories', [
-            'title' => 'Subcategories Management | Admin Hub',
-            'subcategories' => $subcategories,
-            'parentCategories' => $parentCategories,
-            'currentScope' => $currentScope,
-            'filterParent' => $filterParent,
-            'activeTab' => $currentTab
-        ]);
+        $url = '/admin/categories?tab=' . urlencode($tab) . ($currentScope !== 'all' ? '&scope=' . urlencode($currentScope) : '') . ($filterParent > 0 ? '&parent_id=' . $filterParent : '');
+        Response::redirect($url);
     }
 
     public function saveSubcategory(Request $request): void {
@@ -1071,17 +1087,17 @@ class AdminController {
 
         if (empty($name)) {
             Session::flash('error', 'Subcategory name is required.');
-            Response::redirect('/admin/subcategories');
+            Response::redirect('/admin/categories?tab=add_subcategory');
             return;
         }
         if ($parentId <= 0) {
             Session::flash('error', 'A valid parent category is required for a subcategory.');
-            Response::redirect('/admin/subcategories');
+            Response::redirect('/admin/categories?tab=add_subcategory');
             return;
         }
         if ($id && $id === $parentId) {
             Session::flash('error', 'A subcategory cannot be its own parent.');
-            Response::redirect('/admin/subcategories');
+            Response::redirect('/admin/categories?tab=subcategories');
             return;
         }
 
@@ -1100,14 +1116,14 @@ class AdminController {
             Session::flash('success', "Subcategory '{$name}' created successfully.");
         }
 
-        Response::redirect('/admin/subcategories' . ($applicableTo !== 'all' ? '?scope=' . urlencode($applicableTo) : ''));
+        Response::redirect('/admin/categories?tab=subcategories' . ($applicableTo !== 'all' ? '&scope=' . urlencode($applicableTo) : ''));
     }
 
     public function deleteSubcategory(Request $request, array $params): void {
         $id = (int)($params['id'] ?? 0);
         Database::execute("DELETE FROM categories WHERE id = ?", [$id]);
         Session::flash('success', "Subcategory deleted.");
-        Response::redirect('/admin/subcategories');
+        Response::redirect('/admin/categories?tab=subcategories');
     }
 
     // ------------------------------------------------------------------------

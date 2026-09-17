@@ -406,7 +406,27 @@ This document serves as the permanent registry of architectural and implementati
   - Emits PHP warning notices on bootstrap that can break JSON API responses, corrupt HTTP headers, or display ugly warnings to end users on custom or local installations.
 * **Mandatory Rule**:
   - In `index.php`, all bootstrap state variables (`$lockPath`, `$reqUri`, `$isStaticAsset`, `$isInstallRoute`, `$isDbPopulated`) must be strictly initialized and declared *before* any installation checks, conditions, or redirects are executed.
-  - Always run `php -r "error_reporting(E_ALL); require_once 'index.php';"` during verification to guarantee zero undefined variable notices, deprecation warnings, or fatal exceptions.
+### 🔴 MISTAKE-35: String-Quoted Integer Placeholders in `LIMIT` and `OFFSET` Clauses
+* **Root Cause**:
+  - When executing parameterized PDO queries (`$stmt->execute($params)`) without explicit `bindValue` calls or with `PDO::ATTR_EMULATE_PREPARES => false`, PDO treats all values in `$params` as strings (`PDO::PARAM_STR`).
+  - Passing `[$limit]` to a query ending in `LIMIT ?` causes MariaDB/MySQL to receive `LIMIT '50'`.
+  - In MariaDB (such as InfinityFree production), quoted strings in `LIMIT` or `OFFSET` clauses trigger fatal `SQLSTATE[42000]: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''50'' at line 1`.
+* **Consequences**:
+  - Crashes database backup lists, analytical pagination, and any query utilizing `LIMIT ?` or `OFFSET ?`.
+* **Mandatory Rule**:
+  - In `Database.php`, implement typed parameter binding (`prepareAndExecute`) that explicitly inspects `$params` and binds integer values using `PDO::PARAM_INT`, booleans as `PDO::PARAM_BOOL`, and nulls as `PDO::PARAM_NULL`.
+  - In models constructing queries with dynamic limits, cast `$limit = (int)$limit` and interpolate the validated integer directly into the SQL string or ensure integer binding.
+
+### 🔴 MISTAKE-36: Exposure of Internal Database Credentials, Hostnames, and Queries on Frontend Error Screens
+* **Root Cause**:
+  - Previous revisions of `Database::renderDetailedError()` printed the database host (`sql306.infinityfree.com`), username (`if0_...`), database name, raw SQL string, and full stack trace directly into the HTML response when a query failed.
+* **Consequences**:
+  - Severe security vulnerability (CWE-209: Generation of Error Message Containing Sensitive Information).
+  - Unprofessional user experience exposing raw stack traces and internal architecture to end users and attackers.
+* **Mandatory Rule**:
+  - Never display raw database credentials, hostnames, passwords, database names, raw SQL query strings, or stack traces on the frontend.
+  - All detailed error forensics must be logged securely to server logs (`error_log`) or `ErrorLogger`.
+  - Render a clean, branded, dual-theme error screen informing users that an unexpected error occurred and that the administration team is actively working to resolve it, accompanied by an opaque incident reference code.
 
 ---
 
@@ -446,16 +466,5 @@ At the conclusion of any code generation, the agent must cross-check every modif
 32. [ ] **Zero-Crash Remote DB Lockout & Admin Query Optimization (MISTAKE-32)**: Are timeouts enforced, remote credentials bridged locally, setup wizard unlocked when disconnected, and listing queries stripped of `body_html`?
 33. [ ] **Auto-DB Creation, Unlocked First-Run FTP Restores & Custom SQL Support (MISTAKE-33)**: Does the installer verify actual table population instead of blindly relying on `installed.lock`, auto-create the database, allow custom `.sql` dump uploads, and bypass false locks on first-time setup?
 34. [ ] **Early Bootstrap Variable Initialization & Zero-Warning Cleanliness (MISTAKE-34)**: Are `$lockPath`, `$reqUri`, `$isStaticAsset`, and other router bootstrap variables declared strictly prior to usage to prevent PHP undefined variable warnings?
-
-
-
-
-
-
-
-
-
-
-
-
-
+35. [ ] **Typed Parameter Binding & LIMIT Quoting Prevention (MISTAKE-35)**: Are parameters in `LIMIT` and `OFFSET` clauses bound explicitly with `PDO::PARAM_INT` or cast to integers to prevent MariaDB SQLSTATE 42000 syntax errors?
+36. [ ] **Zero Credential & Trace Leakage in Error Screens (MISTAKE-36)**: Are database credentials, hostnames, raw SQL queries, and stack traces hidden from the frontend and logged securely to backend logs?

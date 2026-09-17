@@ -163,7 +163,8 @@ class DatabaseBackupManager {
      * Get all backups inventory
      */
     public static function getBackups(int $limit = 50): array {
-        $rows = Database::query("SELECT b.*, u.username as creator_name FROM database_backups b LEFT JOIN users u ON b.created_by = u.id ORDER BY b.created_at DESC LIMIT ?", [$limit]);
+        $limit = max(1, (int)$limit);
+        $rows = Database::query("SELECT b.*, u.username as creator_name FROM database_backups b LEFT JOIN users u ON b.created_by = u.id ORDER BY b.created_at DESC LIMIT {$limit}");
         foreach ($rows as &$r) {
             $r['file_size_formatted'] = self::formatBytes((int)$r['file_size_bytes']);
             $r['file_exists'] = file_exists($r['filepath']);
