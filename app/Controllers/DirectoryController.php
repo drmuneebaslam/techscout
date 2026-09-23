@@ -801,11 +801,38 @@ class DirectoryController {
     public function affiliateRedirect(Request $request, array $params): void {
         $slug = trim((string)($params['slug'] ?? ''));
 
-        // Support direct outbound redirect via parameter: /go?url=https%3A%2F%2F...
+        // 1. Support direct outbound redirect via parameter: /go?url=https%3A%2F%2F...
         $directUrl = trim((string)$request->query('url', ''));
         if (!empty($directUrl) && (str_starts_with($directUrl, 'http://') || str_starts_with($directUrl, 'https://'))) {
+            try {
+                Analytics::logEvent('click_outbound_direct', 0, ['url' => $directUrl]);
+            } catch (\Throwable $e) {}
             Response::redirect($directUrl, 302);
             return;
+        }
+
+        // 2. Support direct Ad / Sponsor redirect by ID: /go?ad_id=5 or /go/ad/{id} or /go/sponsor/{id}
+        $adId = (int)$request->query('ad_id', 0);
+        if ($adId === 0 && preg_match('/^(?:ad|sponsor)[-_](\d+)$/i', $slug, $adMatches)) {
+            $adId = (int)$adMatches[1];
+        } elseif ($adId === 0 && is_numeric($slug)) {
+            // Check if this numeric ID corresponds to an active advertisement
+            $adCheck = Database::fetch("SELECT id, target_url FROM advertisements WHERE id = ?", [(int)$slug]);
+            if ($adCheck && !empty($adCheck['target_url'])) {
+                $adId = (int)$adCheck['id'];
+            }
+        }
+
+        if ($adId > 0) {
+            try {
+                $ad = Database::fetch("SELECT id, target_url FROM advertisements WHERE id = ?", [$adId]);
+                if ($ad && !empty($ad['target_url'])) {
+                    Database::execute("UPDATE advertisements SET click_count = click_count + 1 WHERE id = ?", [$adId]);
+                    Analytics::logEvent('click_ad_outbound', $adId, ['target_url' => $ad['target_url']]);
+                    Response::redirect($ad['target_url'], 302);
+                    return;
+                }
+            } catch (\Throwable $e) {}
         }
 
         if (empty($slug)) {
@@ -815,10 +842,15 @@ class DirectoryController {
 
         $type = trim((string)$request->query('type', ''));
 
+        // 3. Check Unified Contents View / Table
         $content = Content::findBySlug($slug);
         if ($content) {
             try {
-                Analytics::logEvent('click_outbound', (int)$content['id']);
+                Analytics::logEvent('click_outbound', (int)$content['id'], [
+                    'slug' => $slug,
+                    'type' => $type ?: 'default',
+                    'content_type' => $content['content_type'] ?? 'unknown'
+                ]);
             } catch (\Throwable $e) {}
 
             // Handle type-specific deep external redirects (docs, source repo, discord community)
@@ -835,7 +867,7 @@ class DirectoryController {
                 return;
             }
 
-            if ($content['content_type'] === 'gpt_listing') {
+            if (($content['content_type'] ?? '') === 'gpt_listing') {
                 $target = !empty($content['openai_url']) ? $content['openai_url'] : 'https://chatgpt.com/g/';
                 Response::redirect($target, 302);
                 return;
@@ -846,10 +878,14 @@ class DirectoryController {
             return;
         }
 
-        // Direct table fallback for AI Tools if not in unified contents view
+        // 4. Direct table fallback for AI Tools if not in unified contents view
         try {
             $tool = Database::fetch("SELECT * FROM ai_tools WHERE slug = ?", [$slug]);
             if ($tool) {
+                try {
+                    Analytics::logEvent('click_outbound_tool', (int)($tool['id'] ?? 0), ['slug' => $slug]);
+                } catch (\Throwable $e) {}
+
                 if ($type === 'docs' && !empty($tool['docs_url'])) {
                     Response::redirect($tool['docs_url'], 302);
                     return;
@@ -867,18 +903,31 @@ class DirectoryController {
                 return;
             }
 
-            // Direct table fallback for GPT Listings
+            // 5. Direct table fallback for GPT Listings
             $gpt = Database::fetch("SELECT * FROM gpt_listings WHERE slug = ?", [$slug]);
             if ($gpt) {
+                try {
+                    Analytics::logEvent('click_outbound_gpt', (int)($gpt['id'] ?? 0), ['slug' => $slug]);
+                } catch (\Throwable $e) {}
                 $target = !empty($gpt['openai_url']) ? $gpt['openai_url'] : 'https://chatgpt.com/g/';
                 Response::redirect($target, 302);
                 return;
             }
 
-            // Direct table fallback for Jobs
+            // 6. Direct table fallback for Jobs
             $job = Database::fetch("SELECT * FROM jobs WHERE slug = ? AND is_active = 1", [$slug]);
             if ($job && !empty($job['apply_url'])) {
+                try {
+                    Analytics::logEvent('click_outbound_job', (int)($job['id'] ?? 0), ['slug' => $slug]);
+                } catch (\Throwable $e) {}
                 Response::redirect($job['apply_url'], 302);
+                return;
+            }
+
+            // 7. Check Sponsored Submissions / Campaigns
+            $sponsored = Database::fetch("SELECT * FROM sponsored_submissions WHERE slug = ? AND status = 'approved'", [$slug]);
+            if ($sponsored && !empty($sponsored['website_url'])) {
+                Response::redirect($sponsored['website_url'], 302);
                 return;
             }
         } catch (\Throwable $e) {}

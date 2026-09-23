@@ -5,6 +5,52 @@ namespace App\Core;
 
 class AdRenderer {
     /**
+     * Checks if current user is exempt from seeing advertisements
+     */
+    public static function isUserExemptFromAds(): bool {
+        try {
+            if (!class_exists('\\App\\Core\\Auth') || !Auth::check()) {
+                return false;
+            }
+            $user = Auth::user();
+            if (!$user) return false;
+
+            // 1. Donors are always exempt if configured
+            $exemptDonors = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_exempt_donors'")['key_value'] ?? '1';
+            if ($exemptDonors === '1') {
+                if (!empty($user['is_donor']) || ($user['role'] ?? '') === 'donor') {
+                    return true;
+                }
+                // Check author_tips or financial donations
+                $hasDonated = Database::fetch("SELECT id FROM author_tips WHERE supporter_user_id = ? AND status = 'completed' LIMIT 1", [(int)$user['id']]);
+                if ($hasDonated) {
+                    return true;
+                }
+            }
+
+            // 2. Exempt roles (admin, superadmin, moderator, author, vip)
+            $exemptRolesSetting = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_exempt_roles'")['key_value'] ?? 'admin,superadmin,moderator,vip';
+            $exemptRoles = array_map('trim', explode(',', strtolower($exemptRolesSetting)));
+            if (in_array(strtolower($user['role'] ?? ''), $exemptRoles, true)) {
+                return true;
+            }
+
+            // 3. Explicitly exempt user IDs
+            $exemptUserIdsSetting = Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_exempt_user_ids'")['key_value'] ?? '';
+            if (!empty($exemptUserIdsSetting)) {
+                $exemptIds = array_map('intval', explode(',', $exemptUserIdsSetting));
+                if (in_array((int)$user['id'], $exemptIds, true)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
      * Render an advertisement slot
      * 
      * @param string $slot header_banner, sidebar_banner, in_content, footer_banner
@@ -12,6 +58,10 @@ class AdRenderer {
      */
     public static function renderSlot(string $slot): string {
         try {
+            if (self::isUserExemptFromAds()) {
+                return '';
+            }
+
             $now = date('Y-m-d H:i:s');
             // Query active ads for this slot
             $ad = Database::fetch(

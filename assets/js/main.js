@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const currentTheme = document.documentElement.getAttribute('data-theme') || (function() {
     try { return localStorage.getItem('ts_theme'); } catch(e) { return null; }
-  })() || 'dark';
+  })() || 'light';
 
   if (currentTheme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
@@ -907,9 +907,78 @@ setInterval(function() {
     else if (diffSec < 90) el.textContent = '1m ago';
     else if (diffSec < 3600) el.textContent = Math.floor(diffSec / 60) + 'm ago';
     else if (diffSec < 86400) el.textContent = Math.floor(diffSec / 3600) + 'h ago';
-    else if (diffSec < 604800) el.textContent = Math.floor(diffSec / 86400) + 'd ago';
   });
 }, 30000);
+
+// [TS-TZ-01] Universal Client-Side GMT to Local Timezone Conversion Engine
+window.getUserTimezone = function() {
+  try {
+    const match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+    if (match) return decodeURIComponent(match[2].trim());
+    const cached = localStorage.getItem('ts_ip_timezone');
+    if (cached) return cached;
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch(e) {
+    return 'UTC';
+  }
+};
+
+window.localizeAllTimestamps = function(root, forcedTz) {
+  try {
+    const userTz = forcedTz || window.getUserTimezone();
+    if (userTz) {
+      const match = document.cookie.match(/(^|;)\s*user_timezone=([^;]+)/);
+      const currentCookie = match ? decodeURIComponent(match[2]) : null;
+      if (currentCookie !== userTz) {
+        document.cookie = "user_timezone=" + encodeURIComponent(userTz) + ";path=/;max-age=31536000;SameSite=Lax";
+      }
+    }
+
+    const scope = (root && root.querySelectorAll) ? root : document;
+    const timeEls = scope.querySelectorAll('time.ts-time[datetime]');
+    if (!timeEls || !timeEls.length) return;
+
+    timeEls.forEach(function(el) {
+      try {
+        const iso = el.getAttribute('datetime');
+        if (!iso) return;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return;
+
+        const formatType = el.getAttribute('data-format-type') || 'datetime';
+        let tzAbbr = '';
+        try {
+          const parts = new Intl.DateTimeFormat('en-US', { timeZone: userTz, timeZoneName: 'short' }).formatToParts(d);
+          const tzPart = parts.find(p => p.type === 'timeZoneName');
+          if (tzPart && tzPart.value) tzAbbr = tzPart.value;
+        } catch(e) {}
+
+        const timeStr = d.toLocaleTimeString('en-GB', { timeZone: userTz, hour12: false });
+        const dateStr = d.toLocaleDateString('en-US', { timeZone: userTz, month: 'short', day: 'numeric', year: 'numeric' });
+        const fullTitle = dateStr + ' ' + timeStr + (userTz ? ' (' + userTz + ')' : '');
+
+        if (formatType === 'compact_two_lines') {
+          const timePart = el.querySelector('.ts-time-part');
+          const datePart = el.querySelector('.ts-date-part');
+          if (timePart) timePart.textContent = timeStr;
+          if (datePart) {
+            datePart.innerHTML = dateStr + (tzAbbr ? ' <span class="ts-tz-abbr">(' + tzAbbr + ')</span>' : '');
+          }
+          el.setAttribute('title', fullTitle);
+        } else if (formatType === 'date_only') {
+          el.textContent = dateStr;
+          el.setAttribute('title', fullTitle);
+        } else if (formatType === 'time_only') {
+          el.textContent = timeStr + (tzAbbr ? ' ' + tzAbbr : '');
+          el.setAttribute('title', fullTitle);
+        } else {
+          el.textContent = dateStr + ' \u2022 ' + timeStr + (tzAbbr ? ' ' + tzAbbr : '');
+          el.setAttribute('title', fullTitle);
+        }
+      } catch(err) {}
+    });
+  } catch(e) {}
+};
 
 // [TS-TZ-06] Intelligent Travel Mode Timezone Detection Prompt
 function checkTravelModeTimezoneShift(detectedTz, city) {

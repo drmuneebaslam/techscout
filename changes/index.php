@@ -532,6 +532,14 @@ $router->post('/admin/webhooks/delete/{id}', [AdminController::class, 'deleteWeb
 $router->post('/admin/webhooks/test/{id}', [AdminController::class, 'testWebhook'], ['admin']);
 $router->post('/admin/webhooks/retry/{id}', [AdminController::class, 'retryWebhookDelivery'], ['admin']);
 
+// Incoming Webhooks Engine with Live JSON Listener
+$router->get('/admin/incoming-webhooks', [AdminController::class, 'incomingWebhooks'], ['admin']);
+$router->post('/admin/incoming-webhooks/save', [AdminController::class, 'saveIncomingWebhook'], ['admin']);
+$router->post('/admin/incoming-webhooks/save-mappings', [AdminController::class, 'saveIncomingWebhookMappings'], ['admin']);
+$router->post('/admin/incoming-webhooks/delete/{id}', [AdminController::class, 'deleteIncomingWebhook'], ['admin']);
+$router->post('/admin/incoming-webhooks/toggle/{id}', [AdminController::class, 'toggleIncomingWebhook'], ['admin']);
+$router->post('/admin/incoming-webhooks/clear-logs', [AdminController::class, 'clearIncomingWebhookLogs'], ['admin']);
+
 // Developer API Keys & Access Scopes
 $router->get('/admin/api-keys', [AdminController::class, 'apiKeys'], ['admin']);
 $router->post('/admin/api-keys/generate', [AdminController::class, 'generateApiKey'], ['admin']);
@@ -549,6 +557,12 @@ $router->get('/admin/announcements', [AdminController::class, 'announcements'], 
 $router->post('/admin/announcements/save', [AdminController::class, 'saveAnnouncement'], ['admin']);
 $router->post('/admin/announcements/toggle/{id}', [AdminController::class, 'toggleAnnouncement'], ['admin']);
 $router->post('/admin/announcements/delete/{id}', [AdminController::class, 'deleteAnnouncement'], ['admin']);
+
+// Custom Dynamic Popup Maker
+$router->get('/admin/popups', [AdminController::class, 'popups'], ['admin']);
+$router->post('/admin/popups/save', [AdminController::class, 'savePopup'], ['admin']);
+$router->post('/admin/popups/delete/{id}', [AdminController::class, 'deletePopup'], ['admin']);
+$router->post('/admin/popups/toggle/{id}', [AdminController::class, 'togglePopup'], ['admin']);
 
 // Content Blacklist & Auto-Moderation Filters
 $router->get('/admin/content-filters', [AdminController::class, 'contentFilters'], ['admin']);
@@ -659,9 +673,14 @@ $router->get('/feed/articles.xml', [\App\Controllers\FeedController::class, 'art
 $router->get('/feed/articles.json', [\App\Controllers\FeedController::class, 'articlesJson']);
 $router->get('/feed.xml', [\App\Controllers\FeedController::class, 'articlesXml']);
 $router->get('/sitemap.xml', [\App\Controllers\FeedController::class, 'sitemapIndex']);
+$router->get('/sitemap-static.xml', [\App\Controllers\FeedController::class, 'sitemapStatic']);
+$router->get('/sitemap-categories.xml', [\App\Controllers\FeedController::class, 'sitemapCategories']);
 $router->get('/sitemap-articles.xml', [\App\Controllers\FeedController::class, 'sitemapArticles']);
 $router->get('/sitemap-tools.xml', [\App\Controllers\FeedController::class, 'sitemapTools']);
 $router->get('/sitemap-prompts.xml', [\App\Controllers\FeedController::class, 'sitemapPrompts']);
+$router->get('/sitemap-gpts.xml', [\App\Controllers\FeedController::class, 'sitemapGpts']);
+$router->get('/sitemap-{type}-{page}.xml', [\App\Controllers\FeedController::class, 'sitemapPartition']);
+
 
 // System, Audit Logs & Backup Exporter
 $router->get('/admin/audit-logs', [AdminController::class, 'auditLogs'], ['admin']);
@@ -709,6 +728,22 @@ $router->post('/admin/support/categories/{id}/subcategory/delete', [SupportContr
 // ----------------------------------------------------------------------------
 // 8. RESTful API v1 ENDPOINTS
 // ----------------------------------------------------------------------------
+// Enterprise Incoming Webhooks Engine
+$router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate'], ['admin']);
+$router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream'], ['admin']);
+$router->post('/api/v1/webhook/{endpoint_slug}', [\App\Controllers\IncomingWebhookController::class, 'handle']);
+
+// Enterprise REST API Gateway (Bearer Auth Protected)
+$router->get('/api/v1/tools', [ApiController::class, 'v1Tools']);
+$router->get('/api/v1/prompts', [ApiController::class, 'v1Prompts']);
+$router->get('/api/v1/gpts', [ApiController::class, 'v1Gpts']);
+$router->get('/api/v1/articles', [ApiController::class, 'v1Articles']);
+$router->get('/api/v1/admin/telemetry', [ApiController::class, 'v1AdminTelemetry']);
+
+// Dynamic Popup Analytics
+$router->post('/api/v1/popup-impression', [ApiController::class, 'v1PopupImpression']);
+$router->post('/api/v1/popup-click', [ApiController::class, 'v1PopupClick']);
+
 $router->post('/api/v1/content/{id}/react', [ApiController::class, 'react']);
 $router->post('/api/v1/content/{id}/comments', [ApiController::class, 'addComment']);
 $router->get('/api/v1/content/{id}/comments/poll', [ApiController::class, 'pollComments']);

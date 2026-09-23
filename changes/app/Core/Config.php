@@ -9,7 +9,7 @@ class Config {
         'primary_color' => '#38bdf8',
         'support_email' => 'support@techscout.ai',
         'site_copyright' => '© 2026 TechScout Inc. All rights reserved.',
-        'default_theme' => 'dark',
+        'default_theme' => 'light',
         'logo_url' => '',
         'favicon_url' => '',
 

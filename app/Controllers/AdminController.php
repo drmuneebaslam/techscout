@@ -3224,7 +3224,10 @@ class AdminController {
             'platform_wallet_usdt' => trim((string)$request->post('platform_wallet_usdt', '')),
             'platform_wallet_sol' => trim((string)$request->post('platform_wallet_sol', '')),
             'author_tip_platform_fee_pct' => (string)(float)$request->post('author_tip_platform_fee_pct', 5),
-            'author_min_payout_threshold' => (string)(float)$request->post('author_min_payout_threshold', 50.00)
+            'author_min_payout_threshold' => (string)(float)$request->post('author_min_payout_threshold', 50.00),
+            'ad_exempt_donors' => $request->post('ad_exempt_donors') ? '1' : '0',
+            'ad_exempt_roles' => trim((string)$request->post('ad_exempt_roles', 'admin,superadmin,moderator,vip,donor')),
+            'ad_exempt_user_ids' => trim((string)$request->post('ad_exempt_user_ids', ''))
         ];
 
         foreach ($settingsToSave as $k => $v) {
@@ -8992,6 +8995,192 @@ class AdminController {
         }
 
         Response::json(['success' => true, 'issues' => $issues]);
+    }
+
+    // ------------------------------------------------------------------------
+    // INCOMING WEBHOOKS ENGINE & LIVE JSON LISTENER
+    // ------------------------------------------------------------------------
+    public function incomingWebhooks(Request $request): void {
+        $webhooks = [];
+        $logs = [];
+        try {
+            $webhooks = Database::query("SELECT * FROM incoming_webhooks ORDER BY id DESC");
+            $logs = Database::query("SELECT * FROM incoming_webhook_logs ORDER BY id DESC LIMIT 50");
+        } catch (\Throwable $e) {}
+
+        Response::view('admin/incoming_webhooks', [
+            'title' => 'Incoming Webhooks & Live JSON Listener | Admin Hub',
+            'incomingWebhooks' => $webhooks,
+            'incomingLogs' => $logs,
+            'permittedTables' => \App\Core\IncomingWebhookEngine::$permittedTables
+        ]);
+    }
+
+    public function saveIncomingWebhook(Request $request): void {
+        $name = trim((string)$request->post('name', ''));
+        $rawSlug = trim((string)$request->post('slug', ''));
+        $slug = strtolower(preg_replace('/[^a-z0-9_-]/', '-', $rawSlug));
+        $targetTable = trim((string)$request->post('target_table', 'contents'));
+        $authType = trim((string)$request->post('auth_type', 'none'));
+        $secretKey = trim((string)$request->post('secret_key', ''));
+
+        if (empty($name) || empty($slug)) {
+            Session::flash('error', 'Webhook name and slug are required.');
+            Response::redirect('/admin/incoming-webhooks');
+            return;
+        }
+
+        if (empty($secretKey)) {
+            $secretKey = 'whsec_ts_live_' . bin2hex(random_bytes(16));
+        }
+
+        try {
+            Database::execute(
+                "INSERT INTO incoming_webhooks (name, slug, secret_key, target_table, mapping_rules_json, auth_type, is_active) 
+                 VALUES (?, ?, ?, ?, '[]', ?, 1) 
+                 ON DUPLICATE KEY UPDATE name = VALUES(name), target_table = VALUES(target_table), auth_type = VALUES(auth_type), secret_key = VALUES(secret_key)",
+                [$name, $slug, $secretKey, $targetTable, $authType]
+            );
+            Session::flash('success', "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' created successfully.");
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error creating webhook: ' . $e->getMessage());
+        }
+
+        Response::redirect('/admin/incoming-webhooks');
+    }
+
+    public function saveIncomingWebhookMappings(Request $request): void {
+        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $id = (int)($input['id'] ?? 0);
+        $rulesJson = $input['mapping_rules_json'] ?? '[]';
+
+        if ($id <= 0) {
+            Response::json(['success' => false, 'error' => 'Invalid webhook ID'], 400);
+            return;
+        }
+
+        try {
+            Database::execute("UPDATE incoming_webhooks SET mapping_rules_json = ? WHERE id = ?", [$rulesJson, $id]);
+            Response::json(['success' => true]);
+        } catch (\Throwable $e) {
+            Response::json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteIncomingWebhook(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        try {
+            Database::execute("DELETE FROM incoming_webhooks WHERE id = ?", [$id]);
+            Database::execute("DELETE FROM incoming_webhook_logs WHERE webhook_id = ?", [$id]);
+            Session::flash('success', 'Incoming webhook and associated logs deleted.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error deleting webhook: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/incoming-webhooks');
+    }
+
+    public function toggleIncomingWebhook(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        try {
+            Database::execute("UPDATE incoming_webhooks SET is_active = IF(is_active = 1, 0, 1) WHERE id = ?", [$id]);
+            Session::flash('success', 'Webhook status toggled successfully.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error toggling webhook: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/incoming-webhooks');
+    }
+
+    public function clearIncomingWebhookLogs(Request $request): void {
+        try {
+            Database::execute("TRUNCATE TABLE incoming_webhook_logs");
+            Session::flash('success', 'Incoming execution logs cleared successfully.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error clearing logs: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/incoming-webhooks');
+    }
+
+    // ------------------------------------------------------------------------
+    // CUSTOM DYNAMIC POPUP MAKER CRUD
+    // ------------------------------------------------------------------------
+    public function popups(Request $request): void {
+        $popups = [];
+        try {
+            $popups = Database::query("SELECT * FROM custom_popups ORDER BY id DESC");
+        } catch (\Throwable $e) {}
+
+        Response::view('admin/popups', [
+            'title' => 'Custom Dynamic Popup Maker | Admin Hub',
+            'popups' => $popups
+        ]);
+    }
+
+    public function savePopup(Request $request): void {
+        $id = (int)$request->post('id', 0);
+        $title = trim((string)$request->post('title', ''));
+        $badge = trim((string)$request->post('badge_text', 'FEATURED ANNOUNCEMENT'));
+        $headline = trim((string)$request->post('headline', ''));
+        $contentHtml = trim((string)$request->post('content_html', ''));
+        $ctaText = trim((string)$request->post('cta_button_text', 'Learn More ↗'));
+        $ctaUrl = trim((string)$request->post('cta_button_url', '/'));
+        $secText = trim((string)$request->post('secondary_button_text', ''));
+        $secUrl = trim((string)$request->post('secondary_button_url', ''));
+        $targetAudience = trim((string)$request->post('target_audience', 'all'));
+        $displayTrigger = trim((string)$request->post('display_trigger', 'delay'));
+        $delaySec = (int)$request->post('trigger_delay_seconds', 3);
+        $scrollPct = (int)$request->post('trigger_scroll_percentage', 50);
+        $frequency = trim((string)$request->post('frequency', 'once_per_session'));
+        $theme = trim((string)$request->post('popup_theme', 'modern_gradient'));
+        $isActive = $request->post('is_active') ? 1 : 0;
+
+        if (empty($title) || empty($headline) || empty($contentHtml)) {
+            Session::flash('error', 'Title, headline, and message content are required.');
+            Response::redirect('/admin/popups');
+            return;
+        }
+
+        try {
+            if ($id > 0) {
+                Database::execute(
+                    "UPDATE custom_popups SET title = ?, badge_text = ?, headline = ?, content_html = ?, cta_button_text = ?, cta_button_url = ?, secondary_button_text = ?, secondary_button_url = ?, target_audience = ?, display_trigger = ?, trigger_delay_seconds = ?, trigger_scroll_percentage = ?, frequency = ?, popup_theme = ?, is_active = ? WHERE id = ?",
+                    [$title, $badge, $headline, $contentHtml, $ctaText, $ctaUrl, $secText ?: null, $secUrl ?: null, $targetAudience, $displayTrigger, $delaySec, $scrollPct, $frequency, $theme, $isActive, $id]
+                );
+                Session::flash('success', "Popup '{$title}' updated successfully.");
+            } else {
+                Database::execute(
+                    "INSERT INTO custom_popups (title, badge_text, headline, content_html, cta_button_text, cta_button_url, secondary_button_text, secondary_button_url, target_audience, display_trigger, trigger_delay_seconds, trigger_scroll_percentage, frequency, popup_theme, is_active) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [$title, $badge, $headline, $contentHtml, $ctaText, $ctaUrl, $secText ?: null, $secUrl ?: null, $targetAudience, $displayTrigger, $delaySec, $scrollPct, $frequency, $theme, $isActive]
+                );
+                Session::flash('success', "Popup '{$title}' created successfully.");
+            }
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error saving popup: ' . $e->getMessage());
+        }
+
+        Response::redirect('/admin/popups');
+    }
+
+    public function deletePopup(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        try {
+            Database::execute("DELETE FROM custom_popups WHERE id = ?", [$id]);
+            Session::flash('success', 'Popup permanently removed.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error deleting popup: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/popups');
+    }
+
+    public function togglePopup(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        try {
+            Database::execute("UPDATE custom_popups SET is_active = IF(is_active = 1, 0, 1) WHERE id = ?", [$id]);
+            Session::flash('success', 'Popup active status toggled.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error toggling popup: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/popups');
     }
 }
 

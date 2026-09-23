@@ -211,9 +211,9 @@
         ?>
 
         <?php if ($isImagePrompt): ?>
-          <!-- PURE IMAGE GRID CARD: Clicking opens single prompt AND popunder ad -->
+          <!-- PURE IMAGE GRID CARD -->
           <div class="prompt-image-grid-card" 
-               onclick="openPromptWithAd(event, '<?= $singlePromptUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
+               onclick="window.location.href = '<?= $singlePromptUrl ?>'"
                style="position: relative; height: 350px; border-radius: 14px; overflow: hidden; cursor: pointer; border: 1px solid var(--ts-border-main); background: #070a12; transition: transform 0.25s ease, box-shadow 0.25s ease;">
             
             <?php if (!empty($imageUrl) && $imageUrl !== 'https://funwithcoding.free.nf/'): ?>
@@ -229,22 +229,11 @@
               </div>
             <?php endif; ?>
 
-            <!-- Top Floating Model Pill & Quick Copy Button -->
+            <!-- Top Floating Model Pill -->
             <div style="position: absolute; top: 0.75rem; left: 0.75rem; right: 0.75rem; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 2;">
               <span class="ts-badge ts-badge-pink" style="font-size: 0.72rem; font-weight: 800; backdrop-filter: blur(8px); background: rgba(236,72,153,0.85); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
                 <?= htmlspecialchars($primaryModel) ?>
               </span>
-              
-              <button type="button" 
-                      class="btn-copy-card-prompt"
-                      title="Quick Copy Prompt"
-                      onclick="copyCardPrompt(event, '<?= htmlspecialchars(addslashes($promptText)) ?>')"
-                      style="pointer-events: auto; background: rgba(5,7,11,0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; padding: 0.35rem 0.6rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; transition: all 0.2s ease;"
-                      onmouseover="this.style.background='rgba(56,189,248,0.9)'; this.style.color='#000';"
-                      onmouseout="this.style.background='rgba(5,7,11,0.75)'; this.style.color='#fff';">
-                <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
-                <span>Copy</span>
-              </button>
             </div>
 
             <!-- Bottom Gradient Scrim Overlay with Title & Metadata -->
@@ -293,7 +282,7 @@
               </div>
 
               <h3 style="font-size: 1.12rem; margin-bottom: 0.45rem; line-height: 1.35;">
-                <a href="<?= $singlePromptUrl ?>" onclick="openPromptWithAd(event, '<?= $singlePromptUrl ?>', '<?= htmlspecialchars($adUrl) ?>')" style="color: var(--ts-text-primary); text-decoration: none;">
+                <a href="<?= $singlePromptUrl ?>" style="color: var(--ts-text-primary); text-decoration: none;">
                   <?= htmlspecialchars($p['title']) ?>
                 </a>
               </h3>
@@ -314,7 +303,6 @@
 
               <div style="display: flex; gap: 0.5rem;">
                 <a href="<?= $singlePromptUrl ?>" 
-                   onclick="openPromptWithAd(event, '<?= $singlePromptUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
                    class="ts-btn ts-btn-primary ts-btn-sm" style="flex: 1; text-align: center; font-weight: 700;">
                   View Blueprint &amp; Copy ⚡
                 </a>
@@ -336,70 +324,6 @@
 </div>
 
 <script>
-// Click on prompt opens single prompt and fires the popunder ad
-function openPromptWithAd(e, targetUrl, adUrl) {
-  if (e.target.closest('.btn-copy-card-prompt')) {
-    return;
-  }
-  
-  e.preventDefault();
-  
-  if (adUrl) {
-    try {
-      const adWin = window.open(adUrl, '_blank');
-      if (adWin) {
-        try {
-          adWin.blur();
-          window.focus();
-        } catch(err) {}
-      }
-    } catch(err) {
-      window.open(adUrl, '_blank');
-    }
-  }
-
-  window.location.href = targetUrl;
-}
-
-// Quick 1-click prompt copy from image tile
-function copyCardPrompt(e, promptText) {
-  e.stopPropagation();
-  e.preventDefault();
-  
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(promptText).then(() => {
-      showCopyToast();
-    }).catch(() => {
-      copyFallback(promptText);
-    });
-  } else {
-    copyFallback(promptText);
-  }
-}
-
-function showCopyToast() {
-  if (typeof showToast === 'function') {
-    showToast('Prompt blueprint copied to clipboard! 🚀', 'success');
-  } else if (window.Toast) {
-    Toast.success('Prompt blueprint copied to clipboard! 🚀');
-  } else {
-    alert('Prompt blueprint copied to clipboard! 🚀');
-  }
-}
-
-function copyFallback(text) {
-  const temp = document.createElement('textarea');
-  temp.value = text;
-  temp.style.position = 'fixed';
-  temp.style.left = '-9999px';
-  document.body.appendChild(temp);
-  temp.select();
-  try {
-    document.execCommand('copy');
-    showCopyToast();
-  } catch(e) {}
-  document.body.removeChild(temp);
-}
 
 function applyPromptFilters() {
   const search = document.getElementById('promptSearchInput').value.trim();

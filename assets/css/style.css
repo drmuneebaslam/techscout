@@ -22,7 +22,63 @@
   --ts-danger: #ef4444;
   --ts-info: #3b82f6;
 
-  /* Obsidian Dark Theme Surfaces (Default) */
+  /* Crisp Light Theme Surfaces (Platform Default) */
+  color-scheme: light;
+  --ts-bg: #f8fafc;
+  --ts-bg-base: #f8fafc;
+  --ts-bg-main: #f8fafc;
+  --ts-bg-surface: #ffffff;
+  --ts-bg-surface-2: #f1f5f9;
+  --ts-bg-surface-elevated: #f1f5f9;
+  --ts-bg-surface-hover: #e2e8f0;
+  --ts-bg-subtle: #f8fafc;
+  --ts-bg-glass: rgba(255, 255, 255, 0.92);
+  --ts-bg-glass-card: rgba(255, 255, 255, 0.96);
+
+  --ts-card-bg: #ffffff;
+  --ts-card-bg-elevated: #f8fafc;
+
+  /* Typography Colors (Light Default) */
+  --ts-text-primary: #0f172a;
+  --ts-text-secondary: #334155;
+  --ts-text-tertiary: #64748b;
+  --ts-text-muted: #64748b;
+  --ts-text-accent: #0284c7;
+  --ts-border: rgba(15, 23, 42, 0.12);
+  --ts-border-main: rgba(15, 23, 42, 0.12);
+  --ts-border-subtle: rgba(15, 23, 42, 0.06);
+  --ts-border-focus: rgba(99, 102, 241, 0.8);
+
+  /* Fonts */
+  --ts-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ts-font-heading: 'Outfit', 'Inter', sans-serif;
+  --ts-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Shadows & Radius */
+  --ts-radius-sm: 6px;
+  --ts-radius-md: 10px;
+  --ts-radius-lg: 16px;
+  --ts-radius-xl: 24px;
+  --ts-radius-full: 9999px;
+
+  --ts-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --ts-shadow-md: 0 4px 14px -1px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --ts-shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+  --ts-shadow-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+  --ts-shadow-cyan: 0 0 20px rgba(2, 132, 199, 0.15);
+
+  --ts-max-width: 1280px;
+  --ts-header-height: 72px;
+
+  /* Custom Scrollbar Tokens (Light Mode Default) */
+  --ts-scrollbar-thumb: #cbd5e1;
+  --ts-scrollbar-track: #f1f5f9;
+}
+
+/* ==========================================================================
+   OBSIDIAN DARK THEME DESIGN SYSTEM TOKENS & SURFACES
+   ========================================================================== */
+html[data-theme="dark"], html.theme-dark, body[data-theme="dark"], body.theme-dark {
   color-scheme: dark;
   --ts-bg: #07090e;
   --ts-bg-base: #07090e;
@@ -38,7 +94,6 @@
   --ts-card-bg: #0f172a;
   --ts-card-bg-elevated: #1e293b;
 
-  /* Typography Colors */
   --ts-text-primary: #f8fafc;
   --ts-text-secondary: #94a3b8;
   --ts-text-tertiary: #64748b;
@@ -49,17 +104,18 @@
   --ts-border-subtle: rgba(148, 163, 184, 0.08);
   --ts-border-focus: rgba(99, 102, 241, 0.6);
 
-  /* Fonts */
-  --ts-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --ts-font-heading: 'Outfit', 'Inter', sans-serif;
-  --ts-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --ts-primary: #6366f1;
+  --ts-primary-hover: #4f46e5;
+  --ts-primary-light: #818cf8;
+  --ts-primary-glow: rgba(99, 102, 241, 0.35);
 
-  /* Shadows & Radius */
-  --ts-radius-sm: 6px;
-  --ts-radius-md: 10px;
-  --ts-radius-lg: 16px;
-  --ts-radius-xl: 24px;
-  --ts-radius-full: 9999px;
+  --ts-accent: #06b6d4;
+  --ts-accent-hover: #0891b2;
+  --ts-accent-light: #22d3ee;
+  --ts-accent-glow: rgba(6, 182, 212, 0.35);
+
+  --ts-secondary: #ec4899;
+  --ts-secondary-glow: rgba(236, 72, 153, 0.35);
 
   --ts-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --ts-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
@@ -67,12 +123,74 @@
   --ts-shadow-glow: 0 0 25px var(--ts-primary-glow);
   --ts-shadow-cyan: 0 0 25px var(--ts-accent-glow);
 
-  --ts-max-width: 1280px;
-  --ts-header-height: 72px;
-
-  /* Custom Scrollbar Tokens (Dark Mode Default) */
   --ts-scrollbar-thumb: #1e293b;
   --ts-scrollbar-track: #05070b;
+}
+
+html[data-theme="dark"] body,
+html.theme-dark body,
+body[data-theme="dark"],
+body.theme-dark {
+  background-color: var(--ts-bg-main);
+  color: var(--ts-text-secondary);
+}
+
+html[data-theme="dark"] .ts-card,
+html.theme-dark .ts-card,
+body[data-theme="dark"] .ts-card,
+body.theme-dark .ts-card,
+html[data-theme="dark"] .ts-box,
+html.theme-dark .ts-box,
+body[data-theme="dark"] .ts-box,
+body.theme-dark .ts-box,
+html[data-theme="dark"] .ts-dropdown-menu,
+html.theme-dark .ts-dropdown-menu,
+body[data-theme="dark"] .ts-dropdown-menu,
+body.theme-dark .ts-dropdown-menu,
+html[data-theme="dark"] .ts-modal-box,
+html.theme-dark .ts-modal-box,
+body[data-theme="dark"] .ts-modal-box,
+body.theme-dark .ts-modal-box,
+html[data-theme="dark"] .ts-nav-header,
+html.theme-dark .ts-nav-header,
+body[data-theme="dark"] .ts-nav-header,
+body.theme-dark .ts-nav-header,
+html[data-theme="dark"] .ts-header,
+html.theme-dark .ts-header,
+body[data-theme="dark"] .ts-header,
+body.theme-dark .ts-header {
+  background: var(--ts-bg-surface);
+  border-color: var(--ts-border-main);
+}
+
+html[data-theme="dark"] .ts-input,
+html.theme-dark .ts-input,
+body[data-theme="dark"] .ts-input,
+body.theme-dark .ts-input,
+html[data-theme="dark"] .ts-textarea,
+html.theme-dark .ts-textarea,
+body[data-theme="dark"] .ts-textarea,
+body.theme-dark .ts-textarea,
+html[data-theme="dark"] .ts-select,
+html.theme-dark .ts-select,
+body[data-theme="dark"] .ts-select,
+body.theme-dark .ts-select {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #64748b !important;
 }
 
 /* ==========================================================================

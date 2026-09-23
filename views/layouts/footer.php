@@ -156,33 +156,57 @@
 
 
 
-  <!-- Dynamic Direct / Popunder Ad Trigger -->
+  <!-- Dynamic Popup Manager Component -->
+  <?= class_exists('\\App\\Core\\PopupManager') ? \App\Core\PopupManager::renderActivePopup() : '' ?>
+
+  <!-- Advertisement Click Guard & Throttled Direct Ad Trigger -->
   <?php 
+    $isExempt = class_exists('\\App\\Core\\AdRenderer') && \App\Core\AdRenderer::isUserExemptFromAds();
     $popunderUrl = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'ad_popunder_url'")['key_value'] ?? 'https://omg10.com/4/11737440';
   ?>
-  <?php if (!empty($popunderUrl)): ?>
+  <?php if (!$isExempt && !empty($popunderUrl)): ?>
   <script>
   (function() {
+    // Advertisement Click Guard: Strictly prevents card clicks from hijacking user navigation
+    // Frequency Throttling: Limits any sponsored popunder to once per user session
     const popunderUrl = <?= json_encode($popunderUrl) ?>;
-    let popunderFired = false;
-    if (!sessionStorage.getItem('ts_popunder_fired') && popunderUrl) {
-      function triggerSitePopunder(e) {
-        if (popunderFired) return;
-        const target = e.target.closest('a, button, input, select, textarea');
-        if (target && target.tagName === 'A' && (target.getAttribute('href')?.startsWith('#') || target.getAttribute('href')?.startsWith('javascript:'))) return;
-        popunderFired = true;
-        sessionStorage.setItem('ts_popunder_fired', '1');
-        try {
-          const win = window.open(popunderUrl, '_blank');
-          if (win) {
-            win.blur();
-            window.focus();
-          }
-        } catch(err) {}
-        document.removeEventListener('click', triggerSitePopunder, true);
+    
+    // Explicit Sponsor / Ad click handler with session frequency cooldown
+    window.triggerExplicitSponsoredAd = function(e, customUrl) {
+      if (e) {
+        e.stopPropagation();
       }
-      document.addEventListener('click', triggerSitePopunder, true);
-    }
+      
+      const lastTrigger = sessionStorage.getItem('ts_ad_last_click');
+      const now = Date.now();
+      // Enforce 15-minute frequency throttling
+      if (lastTrigger && (now - parseInt(lastTrigger, 10) < 900000)) {
+        return;
+      }
+      
+      const targetUrl = customUrl || popunderUrl;
+      if (!targetUrl) return;
+      
+      sessionStorage.setItem('ts_ad_last_click', now.toString());
+      try {
+        const adWin = window.open(targetUrl, '_blank');
+        if (adWin) {
+          try {
+            adWin.blur();
+            window.focus();
+          } catch(err) {}
+        }
+      } catch(err) {}
+    };
+
+    // Attach click listeners exclusively to explicit sponsored tags & ad slots
+    document.addEventListener('click', function(e) {
+      const sponsoredTag = e.target.closest('.ts-sponsored-badge, .ts-sponsored-tag, [data-ad-trigger="1"]');
+      if (sponsoredTag) {
+        const adUrl = sponsoredTag.getAttribute('data-ad-url') || popunderUrl;
+        window.triggerExplicitSponsoredAd(e, adUrl);
+      }
+    }, false);
   })();
   </script>
   <?php endif; ?>

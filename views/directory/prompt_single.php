@@ -902,22 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const promptId = copyBtn.getAttribute('data-prompt-id');
             const adUrl = copyBtn.getAttribute('data-ad-url') || siteAdUrl;
 
-            // 1. Trigger Popunder / Direct Link Ad SYNCHRONOUSLY
-            if (adUrl) {
-                try {
-                    const adWin = window.open(adUrl, '_blank');
-                    if (adWin) {
-                        try {
-                            adWin.blur();
-                            window.focus();
-                        } catch(e) {}
-                    }
-                } catch(e) {
-                    window.open(adUrl, '_blank');
-                }
-            }
-
-            // 2. Reveal full prompt visually & clear blur overlay
+            // 1. Reveal full prompt visually & clear blur overlay
             if (previewContainer) {
                 previewContainer.style.maxHeight = 'none';
                 if (fadeOverlay) fadeOverlay.style.display = 'none';

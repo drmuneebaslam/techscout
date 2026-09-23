@@ -126,9 +126,9 @@
           $notes = json_decode($p['internal_notes'] ?? '{}', true) ?: [];
           $aspectRatio = $notes['aspect_ratio'] ?? '16:9';
         ?>
-        <!-- Interactive Image Card: Click opens single prompt and triggers popunder ad -->
+        <!-- Interactive Image Card: Direct Navigation to Prompt Detail -->
         <div class="prompt-image-grid-card" 
-             onclick="openImagePromptWithAd(event, '<?= $singlePromptUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
+             onclick="window.location.href = '<?= $singlePromptUrl ?>'"
              style="position: relative; height: 350px; border-radius: 14px; overflow: hidden; cursor: pointer; border: 1px solid var(--ts-border-main); background: #070a12; transition: transform 0.25s ease, box-shadow 0.25s ease;">
           
           <!-- Image Asset -->
@@ -150,18 +150,6 @@
             <span class="ts-badge ts-badge-pink" style="font-size: 0.72rem; font-weight: 800; backdrop-filter: blur(8px); background: rgba(236,72,153,0.85); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
               <?= htmlspecialchars($primaryModel) ?>
             </span>
-            
-            <!-- Quick Copy Button (Stops card click) -->
-            <button type="button" 
-                    class="btn-copy-card-prompt"
-                    title="Quick Copy Prompt"
-                    onclick="copyCardPrompt(event, '<?= htmlspecialchars(addslashes($promptText)) ?>')"
-                    style="pointer-events: auto; background: rgba(5,7,11,0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; padding: 0.35rem 0.6rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; transition: all 0.2s ease;"
-                    onmouseover="this.style.background='rgba(56,189,248,0.9)'; this.style.color='#000';"
-                    onmouseout="this.style.background='rgba(5,7,11,0.75)'; this.style.color='#fff';">
-              <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
-              <span>Copy</span>
-            </button>
           </div>
 
           <!-- Bottom Gradient Scrim Overlay with Title & Metadata -->
@@ -203,74 +191,6 @@
 </div>
 
 <script>
-// Click on image card opens the single prompt and fires the popunder ad
-function openImagePromptWithAd(e, targetUrl, adUrl) {
-  // If clicked directly on the Copy button, ignore card navigation
-  if (e.target.closest('.btn-copy-card-prompt')) {
-    return;
-  }
-  
-  e.preventDefault();
-  
-  // 1. Trigger Popunder Ad in new background window
-  if (adUrl) {
-    try {
-      const adWin = window.open(adUrl, '_blank');
-      if (adWin) {
-        try {
-          adWin.blur();
-          window.focus();
-        } catch(err) {}
-      }
-    } catch(err) {
-      window.open(adUrl, '_blank');
-    }
-  }
-
-  // 2. Open single prompt page in current window
-  window.location.href = targetUrl;
-}
-
-// Quick 1-click prompt copy from image tile
-function copyCardPrompt(e, promptText) {
-  e.stopPropagation();
-  e.preventDefault();
-  
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(promptText).then(() => {
-      showCopyToast();
-    }).catch(() => {
-      copyFallback(promptText);
-    });
-  } else {
-    copyFallback(promptText);
-  }
-}
-
-function showCopyToast() {
-  if (typeof showToast === 'function') {
-    showToast('Prompt blueprint copied to clipboard! 🎨', 'success');
-  } else if (window.Toast) {
-    Toast.success('Prompt blueprint copied to clipboard! 🎨');
-  } else {
-    alert('Prompt blueprint copied to clipboard! 🎨');
-  }
-}
-
-function copyFallback(text) {
-  const temp = document.createElement('textarea');
-  temp.value = text;
-  temp.style.position = 'fixed';
-  temp.style.left = '-9999px';
-  document.body.appendChild(temp);
-  temp.select();
-  try {
-    document.execCommand('copy');
-    showCopyToast();
-  } catch(e) {}
-  document.body.removeChild(temp);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
 });

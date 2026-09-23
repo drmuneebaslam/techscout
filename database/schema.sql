@@ -1485,6 +1485,75 @@ CREATE TABLE `legal_pages` (
   KEY `idx_legal_published` (`is_published`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `incoming_webhooks`;
+CREATE TABLE `incoming_webhooks` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(100) NOT NULL,
+  `secret_key` varchar(128) NOT NULL,
+  `target_table` varchar(100) NOT NULL DEFAULT 'contents',
+  `mapping_rules_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `auth_type` enum('none','bearer','signature') NOT NULL DEFAULT 'none',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `received_count` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `last_received_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_inwh_slug` (`slug`),
+  KEY `idx_inwh_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `incoming_webhook_logs`;
+CREATE TABLE `incoming_webhook_logs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `webhook_id` int(10) unsigned DEFAULT NULL,
+  `endpoint_slug` varchar(100) NOT NULL,
+  `headers_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `payload_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `status` enum('success','failed','ignored') NOT NULL DEFAULT 'success',
+  `response_code` int(11) NOT NULL DEFAULT 200,
+  `records_affected` int(11) NOT NULL DEFAULT 0,
+  `error_message` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_inwh_log_wh` (`webhook_id`),
+  KEY `idx_inwh_log_slug` (`endpoint_slug`),
+  KEY `idx_inwh_log_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `custom_popups`;
+CREATE TABLE `custom_popups` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `badge_text` varchar(100) NOT NULL DEFAULT 'FEATURED ANNOUNCEMENT',
+  `headline` varchar(255) NOT NULL,
+  `content_html` mediumtext NOT NULL,
+  `cta_button_text` varchar(100) NOT NULL DEFAULT 'Explore Now ↗',
+  `cta_button_url` varchar(500) NOT NULL,
+  `secondary_button_text` varchar(100) DEFAULT NULL,
+  `secondary_button_url` varchar(500) DEFAULT NULL,
+  `target_audience` enum('all','guests_only','logged_in_only','donors_only') NOT NULL DEFAULT 'all',
+  `display_trigger` enum('immediate','delay','scroll_depth','exit_intent') NOT NULL DEFAULT 'delay',
+  `trigger_delay_seconds` int(11) NOT NULL DEFAULT 3,
+  `trigger_scroll_percentage` int(11) NOT NULL DEFAULT 50,
+  `frequency` enum('always','once_per_session','once_ever') NOT NULL DEFAULT 'once_per_session',
+  `popup_theme` enum('modern_gradient','minimal_card','dark_glass','cyber_amber') NOT NULL DEFAULT 'modern_gradient',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `start_date` datetime DEFAULT NULL,
+  `end_date` datetime DEFAULT NULL,
+  `views_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `clicks_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_popups_active` (`is_active`),
+  KEY `idx_popups_audience` (`target_audience`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET SQL_MODE=@OLD_SQL_MODE;
+
+
 

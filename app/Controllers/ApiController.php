@@ -1706,7 +1706,378 @@ class ApiController {
 
         Response::json(['success' => true]);
     }
+
+    /**
+     * =========================================================================
+     * ENTERPRISE REST API GATEWAY (v1)
+     * Bearer Token Authentication Protected
+     * =========================================================================
+     */
+
+    /**
+     * GET /api/v1/tools
+     * Query verified AI tools directory with filtering and pagination
+     */
+    public function v1Tools(Request $request): void {
+        \App\Core\BearerAuth::requireAuth($request, 'tools:read');
+
+        $page = max(1, (int)($request->get('page', 1)));
+        $perPage = min(100, max(1, (int)($request->get('per_page', 20))));
+        $offset = ($page - 1) * $perPage;
+
+        $search = trim((string)($request->get('search', '')));
+        $category = trim((string)($request->get('category', '')));
+        $pricing = trim((string)($request->get('pricing_type', '')));
+
+        $where = ["c.content_type = 'tool'", "c.status = 'published'"];
+        $params = [];
+
+        if ($search !== '') {
+            $where[] = "(c.title LIKE :s1 OR c.summary LIKE :s2 OR t.tagline LIKE :s3)";
+            $params[':s1'] = "%$search%";
+            $params[':s2'] = "%$search%";
+            $params[':s3'] = "%$search%";
+        }
+        if ($category !== '') {
+            $where[] = "cat.slug = :cat";
+            $params[':cat'] = $category;
+        }
+        if ($pricing !== '') {
+            $where[] = "t.pricing_type = :pr";
+            $params[':pr'] = $pricing;
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $db = Database::getConnection();
+
+        // Total count
+        $countStmt = $db->prepare("
+            SELECT COUNT(DISTINCT c.id) as total 
+            FROM contents c
+            LEFT JOIN ai_tools t ON t.content_id = c.id
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+        ");
+        $countStmt->execute($params);
+        $totalItems = (int)($countStmt->fetchColumn() ?: 0);
+
+        // Data query
+        $stmt = $db->prepare("
+            SELECT 
+                c.id, c.uuid, c.title, c.slug, c.summary, c.views_count, c.reaction_count,
+                c.avg_rating, c.review_count, c.created_at, c.updated_at,
+                t.tagline, t.pricing_type, t.pricing_starting_at, t.website_url, t.affiliate_url,
+                t.is_featured, t.is_verified, t.verified_badge_tier,
+                cat.name as category_name, cat.slug as category_slug
+            FROM contents c
+            LEFT JOIN ai_tools t ON t.content_id = c.id
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+            ORDER BY c.views_count DESC, c.id DESC
+            LIMIT " . (int)$offset . ", " . (int)$perPage . "
+        ");
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        Response::json([
+            'success' => true,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_items' => $totalItems,
+                'total_pages' => ceil($totalItems / $perPage)
+            ],
+            'data' => $items
+        ]);
+    }
+
+    /**
+     * GET /api/v1/prompts
+     * Query verified Prompt blueprints and engineering cards
+     */
+    public function v1Prompts(Request $request): void {
+        \App\Core\BearerAuth::requireAuth($request, 'prompts:read');
+
+        $page = max(1, (int)($request->get('page', 1)));
+        $perPage = min(100, max(1, (int)($request->get('per_page', 20))));
+        $offset = ($page - 1) * $perPage;
+
+        $search = trim((string)($request->get('search', '')));
+        $category = trim((string)($request->get('category', '')));
+        $model = trim((string)($request->get('model', '')));
+
+        $where = ["c.content_type = 'prompt'", "c.status = 'published'"];
+        $params = [];
+
+        if ($search !== '') {
+            $where[] = "(c.title LIKE :s1 OR c.summary LIKE :s2 OR p.prompt_text LIKE :s3)";
+            $params[':s1'] = "%$search%";
+            $params[':s2'] = "%$search%";
+            $params[':s3'] = "%$search%";
+        }
+        if ($category !== '') {
+            $where[] = "cat.slug = :cat";
+            $params[':cat'] = $category;
+        }
+        if ($model !== '') {
+            $where[] = "p.model_compatibility LIKE :mdl";
+            $params[':mdl'] = "%$model%";
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $db = Database::getConnection();
+
+        $countStmt = $db->prepare("
+            SELECT COUNT(DISTINCT c.id) as total 
+            FROM contents c
+            LEFT JOIN prompts p ON p.content_id = c.id
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+        ");
+        $countStmt->execute($params);
+        $totalItems = (int)($countStmt->fetchColumn() ?: 0);
+
+        $stmt = $db->prepare("
+            SELECT 
+                c.id, c.uuid, c.title, c.slug, c.summary, c.views_count, c.reaction_count,
+                c.created_at, c.updated_at,
+                p.prompt_text, p.negative_prompt, p.model_compatibility, p.version_tag,
+                p.is_tested, p.usage_count, p.parameters_json,
+                cat.name as category_name, cat.slug as category_slug
+            FROM contents c
+            LEFT JOIN prompts p ON p.content_id = c.id
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+            ORDER BY c.views_count DESC, c.id DESC
+            LIMIT " . (int)$offset . ", " . (int)$perPage . "
+        ");
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        Response::json([
+            'success' => true,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_items' => $totalItems,
+                'total_pages' => ceil($totalItems / $perPage)
+            ],
+            'data' => $items
+        ]);
+    }
+
+    /**
+     * GET /api/v1/gpts
+     * Query custom GPT agents & OpenAI Assistants directory
+     */
+    public function v1Gpts(Request $request): void {
+        \App\Core\BearerAuth::requireAuth($request, 'gpts:read');
+
+        $page = max(1, (int)($request->get('page', 1)));
+        $perPage = min(100, max(1, (int)($request->get('per_page', 20))));
+        $offset = ($page - 1) * $perPage;
+
+        $search = trim((string)($request->get('search', '')));
+        $category = trim((string)($request->get('category', '')));
+
+        $where = ["c.content_type = 'custom_gpt'", "c.status = 'published'"];
+        $params = [];
+
+        if ($search !== '') {
+            $where[] = "(c.title LIKE :s1 OR c.summary LIKE :s2)";
+            $params[':s1'] = "%$search%";
+            $params[':s2'] = "%$search%";
+        }
+        if ($category !== '') {
+            $where[] = "cat.slug = :cat";
+            $params[':cat'] = $category;
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $db = Database::getConnection();
+
+        $countStmt = $db->prepare("
+            SELECT COUNT(DISTINCT c.id) as total 
+            FROM contents c
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+        ");
+        $countStmt->execute($params);
+        $totalItems = (int)($countStmt->fetchColumn() ?: 0);
+
+        $stmt = $db->prepare("
+            SELECT 
+                c.id, c.uuid, c.title, c.slug, c.summary, c.views_count, c.reaction_count,
+                c.avg_rating, c.review_count, c.created_at, c.updated_at,
+                cat.name as category_name, cat.slug as category_slug
+            FROM contents c
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+            ORDER BY c.views_count DESC, c.id DESC
+            LIMIT " . (int)$offset . ", " . (int)$perPage . "
+        ");
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        Response::json([
+            'success' => true,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_items' => $totalItems,
+                'total_pages' => ceil($totalItems / $perPage)
+            ],
+            'data' => $items
+        ]);
+    }
+
+    /**
+     * GET /api/v1/articles
+     * Query editorial tech reviews and engineering articles
+     */
+    public function v1Articles(Request $request): void {
+        \App\Core\BearerAuth::requireAuth($request, 'articles:read');
+
+        $page = max(1, (int)($request->get('page', 1)));
+        $perPage = min(100, max(1, (int)($request->get('per_page', 20))));
+        $offset = ($page - 1) * $perPage;
+
+        $search = trim((string)($request->get('search', '')));
+        $category = trim((string)($request->get('category', '')));
+
+        $where = ["c.content_type = 'article'", "c.status = 'published'"];
+        $params = [];
+
+        if ($search !== '') {
+            $where[] = "(c.title LIKE :s1 OR c.summary LIKE :s2)";
+            $params[':s1'] = "%$search%";
+            $params[':s2'] = "%$search%";
+        }
+        if ($category !== '') {
+            $where[] = "cat.slug = :cat";
+            $params[':cat'] = $category;
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $db = Database::getConnection();
+
+        $countStmt = $db->prepare("
+            SELECT COUNT(DISTINCT c.id) as total 
+            FROM contents c
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+        ");
+        $countStmt->execute($params);
+        $totalItems = (int)($countStmt->fetchColumn() ?: 0);
+
+        $stmt = $db->prepare("
+            SELECT 
+                c.id, c.uuid, c.title, c.slug, c.summary, c.views_count, c.reaction_count,
+                c.reading_time_minutes, c.created_at, c.published_at,
+                cat.name as category_name, cat.slug as category_slug
+            FROM contents c
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            WHERE $whereClause
+            ORDER BY c.published_at DESC, c.id DESC
+            LIMIT " . (int)$offset . ", " . (int)$perPage . "
+        ");
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        Response::json([
+            'success' => true,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total_items' => $totalItems,
+                'total_pages' => ceil($totalItems / $perPage)
+            ],
+            'data' => $items
+        ]);
+    }
+
+    /**
+     * GET /api/v1/admin/telemetry
+     * Aggregate platform health, entity counts, error rates, and webhook telemetry
+     */
+    public function v1AdminTelemetry(Request $request): void {
+        \App\Core\BearerAuth::requireAuth($request, 'admin:telemetry');
+
+        $db = Database::getConnection();
+
+        // Entity Counts
+        $counts = [
+            'tools' => (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'tool' AND status = 'published'")->fetchColumn() ?: 0),
+            'prompts' => (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'prompt' AND status = 'published'")->fetchColumn() ?: 0),
+            'gpts' => (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'custom_gpt' AND status = 'published'")->fetchColumn() ?: 0),
+            'articles' => (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'article' AND status = 'published'")->fetchColumn() ?: 0),
+            'users' => (int)($db->query("SELECT COUNT(*) FROM users")->fetchColumn() ?: 0),
+            'incoming_webhooks' => (int)($db->query("SELECT COUNT(*) FROM incoming_webhooks WHERE is_active = 1")->fetchColumn() ?: 0),
+            'popups_active' => (int)($db->query("SELECT COUNT(*) FROM custom_popups WHERE is_active = 1")->fetchColumn() ?: 0),
+        ];
+
+        // Recent Webhook Logs summary
+        $whStats = $db->query("
+            SELECT 
+                COUNT(*) as total_logs,
+                SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_count,
+                SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_count
+            FROM incoming_webhook_logs
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+        ")->fetch(\PDO::FETCH_ASSOC);
+
+        // System Environment info
+        $serverTime = date('Y-m-d H:i:s T');
+        $phpVersion = PHP_VERSION;
+        $memoryUsage = memory_get_usage(true);
+
+        Response::json([
+            'success' => true,
+            'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
+            'telemetry' => [
+                'entities' => $counts,
+                'webhooks_24h' => [
+                    'total' => (int)($whStats['total_logs'] ?? 0),
+                    'successful' => (int)($whStats['success_count'] ?? 0),
+                    'failed' => (int)($whStats['failed_count'] ?? 0),
+                ],
+                'runtime' => [
+                    'php_version' => $phpVersion,
+                    'server_time' => $serverTime,
+                    'memory_usage_bytes' => $memoryUsage,
+                    'memory_usage_human' => round($memoryUsage / 1024 / 1024, 2) . ' MB',
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * POST /api/v1/popup-impression
+     */
+    public function v1PopupImpression(Request $request): void {
+        $id = (int)($request->get('id') ?? $request->post('id') ?? $request->json('id') ?? 0);
+        if ($id > 0) {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("UPDATE custom_popups SET views_count = views_count + 1 WHERE id = ?");
+            $stmt->execute([$id]);
+        }
+        Response::json(['success' => true]);
+    }
+
+    /**
+     * POST /api/v1/popup-click
+     */
+    public function v1PopupClick(Request $request): void {
+        $id = (int)($request->get('id') ?? $request->post('id') ?? $request->json('id') ?? 0);
+        if ($id > 0) {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("UPDATE custom_popups SET clicks_count = clicks_count + 1 WHERE id = ?");
+            $stmt->execute([$id]);
+        }
+        Response::json(['success' => true]);
+    }
 }
+
 
 
 

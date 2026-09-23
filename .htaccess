@@ -1,16 +1,30 @@
+# ==============================================================================
+# TechScout Production Enterprise Apache Directives
+# Optimized for AWS EC2, CloudFront CDN, and Direct Fast Delivery
+# ==============================================================================
+
+# 1. IMMEDIATE METADATA & REPOSITORY SHIELD
+# Block any direct HTTP access to Git repository metadata or environment files
+RedirectMatch 404 /\.git
+RedirectMatch 404 /\.env
+RedirectMatch 404 /\.user\.ini
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Security & Performance Headers
+    # Block sensitive directories and files directly
+    RewriteRule ^(\.git|\.env|app|database|docs|waste|changes|\.system_generated)/ - [F,L,NC]
+    RewriteRule \.(sql|log|bak|swp|sh|md)$ - [F,L,NC]
+
+    # Security & Protection Headers
     <IfModule mod_headers.c>
         Header set X-Content-Type-Options "nosniff"
         Header set X-Frame-Options "SAMEORIGIN"
         Header set X-XSS-Protection "1; mode=block"
         Header set Referrer-Policy "strict-origin-when-cross-origin"
+        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        Header set Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;"
     </IfModule>
-
-    # Disable direct access to sensitive directories
-    RewriteRule ^(app|database|docs|waste)/ - [F,L,NC]
 
     # Route all requests to index.php if file/dir does not exist
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -50,13 +64,13 @@
     ExpiresByType font/woff "access plus 1 month"
 </IfModule>
 
-# Cache-Control Headers & CDN Optimization
+# Cache-Control Headers & CDN CloudFront Static Asset Cache Optimization
 <IfModule mod_headers.c>
+    # Assets delivery (CSS, JS, Fonts, Images) - 7 Days (max-age=604800)
     <FilesMatch "\.(ico|pdf|jpg|jpeg|png|gif|webp|svg|js|css|woff|woff2|ttf|eot)$">
-        Header set Cache-Control "max-age=2592000, public, immutable"
+        Header set Cache-Control "public, max-age=604800, immutable"
     </FilesMatch>
     <FilesMatch "\.(html|htm|php)$">
         Header set Cache-Control "no-cache, no-store, must-revalidate"
     </FilesMatch>
 </IfModule>
-

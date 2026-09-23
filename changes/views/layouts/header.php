@@ -25,12 +25,12 @@ $isNavActive = function(string $route) use ($cleanPath): bool {
     }
     return str_starts_with($cleanPath, $route);
 };
-// Determine Active Theme with strict priority: URL query param (?theme=) > Cookie (ts_theme) > Default dark
-$activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
-    ? 'light'
-    : ((!empty($_GET['theme']) && $_GET['theme'] === 'dark')
-        ? 'dark'
-        : ((isset($_COOKIE['ts_theme']) && $_COOKIE['ts_theme'] === 'light') ? 'light' : 'dark'));
+// Determine Active Theme with strict priority: URL query param (?theme=) > Cookie (ts_theme) > Default light
+$activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
+    ? 'dark'
+    : ((!empty($_GET['theme']) && $_GET['theme'] === 'light')
+        ? 'light'
+        : ((isset($_COOKIE['ts_theme']) && $_COOKIE['ts_theme'] === 'dark') ? 'dark' : (Config::get('default_theme') ?: 'light')));
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?= $activeTheme ?>" class="<?= $activeTheme === 'light' ? 'theme-light' : '' ?>">
@@ -38,6 +38,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta name="google-site-verification" content="<?= htmlspecialchars($siteSettings['google_site_verification'] ?? 'google-site-verification-techscout-online') ?>">
   <script>
     (function() {
       try {
@@ -56,7 +57,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
       var storedTheme = null;
       try { storedTheme = localStorage.getItem('ts_theme'); } catch(e) {}
       var t = urlParams.get('theme') || storedTheme || cookieTheme || '<?= $activeTheme ?>';
-      if (t !== 'light' && t !== 'dark') t = 'dark';
+      if (t !== 'light' && t !== 'dark') t = 'light';
       document.documentElement.setAttribute('data-theme', t);
       if (t === 'light') {
         document.documentElement.classList.add('theme-light');

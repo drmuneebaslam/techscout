@@ -382,6 +382,37 @@
         </div>
       </div>
 
+      <!-- 4. Advertisement Guard & User Exemption Configuration -->
+      <div style="margin-bottom: 2rem; background: var(--admin-card-bg-elevated, rgba(15,23,42,0.4)); border: 1px solid var(--admin-border-main); border-radius: 12px; padding: 1.25rem;">
+        <h4 style="font-size: 1rem; color: var(--admin-text-primary); margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="shield-check" style="width: 18px; color: #10b981;"></i> Advertisement Guard &amp; User Ad-Free Exemptions
+        </h4>
+        <p style="font-size: 0.8rem; color: var(--admin-text-secondary); margin: 0 0 1rem 0;">
+          Configure which users and supporters should never receive ads or popunders across the platform.
+        </p>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.88rem; font-weight: 700; color: var(--admin-text-primary);">
+            <input type="checkbox" name="ad_exempt_donors" value="1" <?= ($platformSettings['ad_exempt_donors'] ?? '1') === '1' ? 'checked' : '' ?> style="width: 18px; height: 18px; accent-color: #10b981;">
+            <span>Exempt All Donors &amp; Tip Supporters from Ads (100% Ad-Free Experience)</span>
+          </label>
+          <span style="font-size: 0.75rem; color: var(--admin-text-secondary); display: block; margin-left: 28px;">Users who sent creator tips or platform crypto contributions automatically see zero advertisements.</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem;">Exempt User Roles (Comma-separated)</label>
+            <input type="text" name="ad_exempt_roles" value="<?= htmlspecialchars($platformSettings['ad_exempt_roles'] ?? 'admin,superadmin,moderator,vip,donor') ?>" class="admin-input" placeholder="admin,moderator,vip,donor">
+            <span style="font-size: 0.75rem; color: var(--admin-text-secondary);">Accounts with these system roles will never be served display banners or popunders.</span>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem;">Specific Exempt User IDs (Comma-separated)</label>
+            <input type="text" name="ad_exempt_user_ids" value="<?= htmlspecialchars($platformSettings['ad_exempt_user_ids'] ?? '') ?>" class="admin-input" placeholder="e.g. 1, 4, 12">
+            <span style="font-size: 0.75rem; color: var(--admin-text-secondary);">Whitelist specific user accounts for a completely ad-free viewing experience.</span>
+          </div>
+        </div>
+      </div>
+
       <button type="submit" class="admin-btn admin-btn-primary" style="padding: 0.75rem 1.75rem; font-weight: 700; margin-bottom: 2rem;">
         Save All Monetization &amp; Wallet Settings 🚀
       </button>
