@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # TechScout Production Server (AWS EC2) Deployment & Migration Sync
-# Pulls latest code from GitHub origin/main and executes pending database migrations
+# Pulls latest code from GitHub origin/main, runs database migrations,
+# clears OPcache/storage cache, and reloads PHP-FPM.
 #
 # Usage:
 #   bash /var/www/techscout/scripts/ec2_deploy_and_migrate.sh
@@ -86,20 +87,42 @@ if ($executed === 0) {
 }
 '
 
-# 3. Ensure permissions for web server (www-data / nginx / apache)
+# 3. Clear storage/cache directory (invalidate all app caches)
+echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Clearing storage/cache..."
+if [ -d "$APP_DIR/storage/cache" ]; then
+    find "$APP_DIR/storage/cache" -type f \( -name "*.php" -o -name "*.cache" -o -name "*.json" \) -delete 2>/dev/null || true
+    echo "  storage/cache cleared."
+fi
+
+# 4. Clear PHP OPcache via CLI (writes a temp script, executes it, then removes it)
+echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Resetting PHP OPcache..."
+OPCACHE_SCRIPT="$APP_DIR/storage/opcache_reset_$$.php"
+printf '<?php if(function_exists("opcache_reset")){opcache_reset();echo "OPcache reset OK\n";}else{echo "OPcache not available\n";}' > "$OPCACHE_SCRIPT"
+php "$OPCACHE_SCRIPT" 2>/dev/null || true
+rm -f "$OPCACHE_SCRIPT"
+
+# 5. Ensure permissions for web server
 echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Setting permissions for web server..."
 if id "www-data" &>/dev/null; then
-    chown -R www-data:www-data "$APP_DIR/storage" "$APP_DIR/public/uploads" 2>/dev/null || true
+    chown -R www-data:www-data "$APP_DIR" 2>/dev/null || true
 fi
+chmod -R 755 "$APP_DIR" 2>/dev/null || true
 chmod -R 775 "$APP_DIR/storage" 2>/dev/null || true
+[ -d "$APP_DIR/public/uploads" ] && chmod -R 775 "$APP_DIR/public/uploads" 2>/dev/null || true
 
-# 4. Optional: Reload PHP-FPM if active
-if systemctl is-active --quiet php8.2-fpm 2>/dev/null; then
-    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Reloading php8.2-fpm..."
-    systemctl reload php8.2-fpm || true
-elif systemctl is-active --quiet php8.3-fpm 2>/dev/null; then
+# 6. Reload PHP-FPM (this also flushes the web-process OPcache)
+if systemctl is-active --quiet php8.3-fpm 2>/dev/null; then
     echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Reloading php8.3-fpm..."
     systemctl reload php8.3-fpm || true
+elif systemctl is-active --quiet php8.2-fpm 2>/dev/null; then
+    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Reloading php8.2-fpm..."
+    systemctl reload php8.2-fpm || true
+fi
+
+# 7. Reload Apache for good measure
+if systemctl is-active --quiet apache2 2>/dev/null; then
+    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Reloading apache2..."
+    systemctl reload apache2 || true
 fi
 
 echo "================================================================="

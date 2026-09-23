@@ -1,5 +1,6 @@
 <?php
 use App\Core\Auth;
+use App\Core\Config;
 use App\Core\Database;
 
 $currentUser = Auth::user();
