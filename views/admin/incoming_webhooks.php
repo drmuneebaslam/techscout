@@ -409,7 +409,8 @@ function createRowElement(jsonKey, targetCol, columns) {
 }
 
 function escapeHtml(text) {
-  return text.replace(/[&<>"']/g, function(m) {
+  if (text === null || text === undefined) return '';
+  return String(text).replace(/[&<>"']/g, function(m) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
   });
 }

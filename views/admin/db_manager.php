@@ -1427,7 +1427,8 @@ async function handleQuerySubmit(e) {
   } catch (err) {
     if (errorBox) {
       errorBox.style.display = 'block';
-      errorBox.innerHTML = '<strong>⚠️ Execution Error:</strong> ' + escapeHtml(err.message);
+      const msg = (err && err.message) ? String(err.message) : String(err || 'Unknown execution error');
+      errorBox.innerHTML = '<strong>⚠️ Execution Error:</strong> ' + escapeHtml(msg);
     }
   } finally {
     if (btn) btn.disabled = false;
@@ -1466,7 +1467,7 @@ function renderLiveResults(data) {
 
   let headHtml = '<th style="width: 45px; text-align: center; color: var(--admin-text-muted); font-family: var(--admin-font-mono);">#</th>';
   cols.forEach(c => {
-    headHtml += `<th style="font-family: var(--admin-font-mono); color: #38bdf8; white-space: nowrap;">${escapeHtml(c)}</th>`;
+    headHtml += `<th style="font-family: var(--admin-font-mono); color: #38bdf8; white-space: nowrap;">${escapeHtml(String(c))}</th>`;
   });
 
   let bodyHtml = '';
@@ -1576,6 +1577,7 @@ function exportQueryResultsJson() {
 }
 
 function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -1583,6 +1585,7 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+window.escapeHtml = escapeHtml;
 
 function quickSelectTable(tableName) {
   const tabQueryUrl = '<?= url("/admin/db-manager?tab=query") ?>';

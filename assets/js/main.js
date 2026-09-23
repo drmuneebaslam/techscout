@@ -320,9 +320,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // HTML escaping helper
 function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
+window.escapeHtml = escapeHtml;
+
 
 // Global Unified Bookmark Toggle Engine
 window.toggleBookmark = async function(contentId, btnElement = null) {
