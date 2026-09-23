@@ -62,9 +62,11 @@ class Config {
     public static function detectBaseUrl(): string {
         $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+            || (!empty($_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO']) === 'https')
             || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')
             || (!empty($_SERVER['HTTP_CF_VISITOR']) && str_contains($_SERVER['HTTP_CF_VISITOR'], 'https'))
-            || ((int)($_SERVER['SERVER_PORT'] ?? 0) === 443);
+            || ((int)($_SERVER['SERVER_PORT'] ?? 0) === 443)
+            || (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'techscout.online'));
         $protocol = $isHttps ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $scriptDir = trim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
@@ -73,6 +75,23 @@ class Config {
 
     public static function get(string $key, $default = null) {
         $isLocal = self::isLocalEnvironment();
+
+        // Intelligent EC2 Auto-Detection: When running on EC2 production instance,
+        // guarantee local MySQL credentials and HTTPS base URL regardless of git sync state
+        $dirNormalized = str_replace('\\', '/', __DIR__);
+        $isEc2Server = str_starts_with($dirNormalized, '/var/www/techscout') 
+            || file_exists('/etc/techscout_ec2')
+            || (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'techscout.online'));
+
+        if ($isEc2Server) {
+            if ($key === 'db_host') return '127.0.0.1';
+            if ($key === 'db_port') return '3306';
+            if ($key === 'db_name') return 'techscout_db';
+            if ($key === 'db_user') return 'techscout_user';
+            if ($key === 'db_pass') return 'TS8nFyML9C@8nF';
+            if ($key === 'app_url') return 'https://techscout.online';
+            if ($key === 'environment') return 'production';
+        }
 
         // Intelligent bridge: When running on localhost from an FTP backup with InfinityFree credentials,
         // automatically route database credentials to local MySQL fallback

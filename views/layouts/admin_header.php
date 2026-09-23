@@ -33,6 +33,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'light')
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <script>
     (function() {
       // 1. IP Location & Timezone Auto-Detection

@@ -79,12 +79,14 @@ if (!empty($_GET['qa_auth']) && in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.
     }
 }
 
-// Dynamic Base URL Resolution: Supports reverse proxies (Cloudflare, InfinityFree) and multi-environment hosting
+// Dynamic Base URL Resolution: Supports reverse proxies (Cloudflare, CloudFront, InfinityFree) and multi-environment hosting
 $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+    || (!empty($_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO']) === 'https')
     || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')
     || (!empty($_SERVER['HTTP_CF_VISITOR']) && str_contains($_SERVER['HTTP_CF_VISITOR'], 'https'))
-    || ((int)($_SERVER['SERVER_PORT'] ?? 0) === 443);
+    || ((int)($_SERVER['SERVER_PORT'] ?? 0) === 443)
+    || (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'techscout.online'));
 $protocol = $isHttps ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $scriptDir = trim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
@@ -99,6 +101,9 @@ if ($dbHasConnection) {
     try {
         $cmsDomain = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'domain_app_url' LIMIT 1");
         $cmsUrl = !empty($cmsDomain['key_value']) ? rtrim(trim((string)$cmsDomain['key_value']), '/') : '';
+        if ($isHttps && str_starts_with($cmsUrl, 'http://')) {
+            $cmsUrl = 'https://' . substr($cmsUrl, 7);
+        }
         $cmsHost = $cmsUrl ? parse_url($cmsUrl, PHP_URL_HOST) : '';
         $cmsPath = $cmsUrl ? trim(parse_url($cmsUrl, PHP_URL_PATH) ?? '', '/') : '';
         $detectedPath = trim($scriptDir, '/');

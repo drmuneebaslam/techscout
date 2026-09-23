@@ -9,6 +9,9 @@ if (!function_exists('url')) {
         if ($path === '' || $path === '#') {
             return $path;
         }
+        if (str_starts_with($path, 'http://techscout.online')) {
+            $path = 'https://techscout.online' . substr($path, 23);
+        }
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:') || str_starts_with($path, 'mailto:') || str_starts_with($path, 'javascript:') || str_starts_with($path, 'tel:')) {
             return $path;
         }
@@ -41,6 +44,9 @@ if (!function_exists('image_url')) {
         $path = trim((string)$path);
         if ($path === '') {
             return $default;
+        }
+        if (str_starts_with($path, 'http://techscout.online')) {
+            $path = 'https://techscout.online' . substr($path, 23);
         }
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
             return $path;
