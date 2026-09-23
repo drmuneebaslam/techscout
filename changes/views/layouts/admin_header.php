@@ -440,6 +440,10 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/ad-manager') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/ad') ? 'active' : '' ?>" data-tooltip="Ad Placements & Sponsorships">
                 <i data-lucide="badge-dollar-sign"></i> <span>Ad Placements &amp; Sponsors</span>
               </a>
+              <a href="<?= url('/admin/popups') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/popups') ? 'active' : '' ?>" data-tooltip="Popup & Conversion Manager">
+                <i data-lucide="layout-panel-top"></i> <span>Popup &amp; Conversions</span>
+                <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.65rem;">NEW</span>
+              </a>
             <?php endif; ?>
           </div>
         </details>
@@ -553,8 +557,12 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/api-keys') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/api-keys') ? 'active' : '' ?>" data-tooltip="REST API Keys">
                 <i data-lucide="key"></i> <span>Developer API Keys</span>
               </a>
-              <a href="<?= url('/admin/webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/webhooks') ? 'active' : '' ?>" data-tooltip="Webhooks Engine">
-                <i data-lucide="webhook"></i> <span>Webhooks Engine</span>
+              <a href="<?= url('/admin/webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/webhooks') ? 'active' : '' ?>" data-tooltip="Outbound Webhooks">
+                <i data-lucide="webhook"></i> <span>Outbound Webhooks</span>
+              </a>
+              <a href="<?= url('/admin/incoming-webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/incoming-webhooks') ? 'active' : '' ?>" data-tooltip="Incoming Webhook Listener">
+                <i data-lucide="arrow-down-to-line"></i> <span>Incoming Webhooks</span>
+                <span class="ts-badge ts-badge-cyan" style="margin-left: auto; font-size: 0.65rem;">NEW</span>
               </a>
               <a href="<?= url('/admin/mail') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/mail') ? 'active' : '' ?>" data-tooltip="Mail & Templates">
                 <i data-lucide="mail-check"></i> <span>Mail &amp; Template Studio</span>
