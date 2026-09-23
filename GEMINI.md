@@ -35,3 +35,9 @@ Always follow this mandatory workflow for every prompt and code modification in 
      - Only create required parent subdirectories (e.g. `/htdocs/app/Core`, `/htdocs/assets/css`, `/htdocs/views/layouts`, etc.) if they do not already exist.
      - Ensure `app/Core/Config.php` uploaded to FTP contains the hosted InfinityFree credentials (`sql306.infinityfree.com`, `if0_40102772_techscoutmainafterallchanges`, `if0_40102772`, `Fp9QFWfj5fm`, `https://funwithcoding.free.nf`).
 
+8. **EC2 Production Server Synchronization & Migration Execution (`techscout.online`)**:
+   - For every change, the pushed commits on `origin/main` update the upstream repository for the Amazon EC2 instance (`/var/www/techscout`).
+   - Run or trigger the deployment & migration script (`scripts/ec2_deploy_and_migrate.sh`) or call `POST /admin/system/deploy-pull` (or webhook `POST /api/v1/deploy/sync?token=...`).
+   - All database migrations in `database/migrations/*.sql` must be executed sequentially on EC2 MySQL (`techscout_db`) so all new tables, columns, indexes, and seeded data are immediately active on production `https://techscout.online`.
+
+

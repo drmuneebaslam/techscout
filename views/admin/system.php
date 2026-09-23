@@ -1,11 +1,20 @@
 <?php require __DIR__ . '/../layouts/admin_header.php'; ?>
 
 <div class="admin-main">
-  <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; color: var(--admin-text-primary); margin: 0 0 0.25rem 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
-      System Diagnostics &amp; Disaster Recovery HUD
-    </h1>
-    <p style="color: var(--admin-text-secondary); font-size: 0.95rem; margin: 0;">Configure platform features, customize footer social icons &amp; channels, manage ad placements, and review audit telemetry.</p>
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 2rem; color: var(--admin-text-primary); margin: 0 0 0.25rem 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
+        System Diagnostics &amp; Disaster Recovery HUD
+      </h1>
+      <p style="color: var(--admin-text-secondary); font-size: 0.95rem; margin: 0;">Configure platform features, customize footer social icons &amp; channels, manage ad placements, and review audit telemetry.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <form action="<?= url('/admin/system/deploy-pull') ?>" method="POST" onsubmit="return confirm('Pull latest code from GitHub and run all pending migrations on this server?');" style="margin: 0;">
+        <button type="submit" class="admin-btn admin-btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+          <i data-lucide="cloud-download"></i> Sync &amp; Run Migrations
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- Site Settings & Social Media Customization -->

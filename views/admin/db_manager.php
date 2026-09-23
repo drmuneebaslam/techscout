@@ -986,6 +986,11 @@ ALTER TABLE `system_error_logs`
               </button>
             </form>
           <?php endif; ?>
+          <form action="<?= url('/admin/system/deploy-pull') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Pull latest code from GitHub and execute all pending schema migrations?');">
+            <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #3b82f6; font-weight: 700;">
+              <i data-lucide="git-pull-request"></i> Git Pull &amp; Migrate
+            </button>
+          </form>
           <form action="<?= url('/admin/db-manager/migrations/run') ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Force re-run ALL migrations safely? All scripts are idempotent.');">
             <input type="hidden" name="re_run_all" value="1">
             <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.35);">

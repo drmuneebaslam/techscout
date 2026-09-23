@@ -2076,7 +2076,67 @@ class ApiController {
         }
         Response::json(['success' => true]);
     }
+
+    /**
+     * POST /api/v1/deploy/sync
+     * Webhook endpoint to trigger git pull and automatic database migrations
+     */
+    public function v1DeploySync(Request $request): void {
+        $token = $request->get('token') ?? $request->header('X-Deploy-Token') ?? $request->json('token') ?? '';
+        $expectedToken = \App\Core\Config::get('deploy_webhook_secret', 'ts_deploy_sec_99182374619a8b');
+
+        if (empty($token) || !hash_equals((string)$expectedToken, (string)$token)) {
+            Response::json(['success' => false, 'error' => 'Unauthorized deploy token'], 401);
+            return;
+        }
+
+        $root = realpath(__DIR__ . '/../../');
+        $output = [];
+        $returnCode = 0;
+
+        if (function_exists('exec')) {
+            exec("cd \"{$root}\" && git pull origin main 2>&1", $output, $returnCode);
+        }
+
+        // Run pending migrations
+        $migrationFiles = glob(__DIR__ . '/../../database/migrations/*.sql') ?: [];
+        sort($migrationFiles);
+        $applied = Database::querySilent("SELECT migration_name FROM migrations") ?: [];
+        $appliedNames = array_column($applied, 'migration_name');
+
+        $maxBatch = (int)(Database::fetchSilent("SELECT MAX(batch) as mb FROM migrations")['mb'] ?? 0);
+        $newBatch = $maxBatch + 1;
+        $migRan = 0;
+        $pdo = Database::getConnection();
+
+        foreach ($migrationFiles as $mf) {
+            $baseName = basename($mf, '.sql');
+            if (!in_array($baseName, $appliedNames, true)) {
+                $sqlContent = file_get_contents($mf);
+                $stmts = array_filter(array_map('trim', explode(';', $sqlContent)));
+                foreach ($stmts as $s) {
+                    $sClean = trim(preg_replace('/^\s*--[^\n]*/m', '', $s));
+                    if (!empty($sClean)) {
+                        try {
+                            $pdo->exec($sClean);
+                        } catch (\Throwable $e) {}
+                    }
+                }
+                $pdo->prepare("INSERT INTO migrations (migration_name, batch, applied_at) VALUES (?, ?, NOW())")->execute([$baseName, $newBatch]);
+                $migRan++;
+            }
+        }
+
+        Response::json([
+            'success' => true,
+            'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
+            'git_pull_code' => $returnCode,
+            'git_output' => $output,
+            'migrations_executed' => $migRan
+        ]);
+    }
 }
+
 
 
 

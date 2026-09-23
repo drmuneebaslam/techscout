@@ -1,8 +1,7 @@
 -- ============================================================================
--- TechScout Enterprise Features & Infrastructure Upgrade V2
--- Standalone Non-Destructive DDL Script
--- Tables: incoming_webhooks, incoming_webhook_logs, custom_popups
--- Safe for execution on InfinityFree / MariaDB / MySQL 5.7+ / MySQL 8.0+
+-- Migration: 2026_09_23_000001_enterprise_v2_upgrade
+-- Tables: incoming_webhooks, incoming_webhook_logs, custom_popups, api_keys
+-- Safe for execution across MariaDB / MySQL 5.7+ / MySQL 8.0+
 -- ============================================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -105,4 +104,3 @@ INSERT IGNORE INTO `api_keys` (`id`, `user_id`, `key_name`, `api_key_prefix`, `a
 (1, 1, 'Master Developer Live Key', 'ts_live_admin', '484ae74d21495767eed8d94e57d646aca08d822d02f6a8c6661e34abb89ee6f9', '[\"tools:read\",\"prompts:read\",\"gpts:read\",\"articles:read\",\"admin:telemetry\"]', 120, 1);
 
 SET FOREIGN_KEY_CHECKS = 1;
-

@@ -688,6 +688,7 @@ $router->post('/admin/audit-logs/delete/{id}', [AdminController::class, 'deleteA
 $router->get('/admin/system', [AdminController::class, 'system'], ['admin']);
 $router->post('/admin/system/settings', [AdminController::class, 'saveSettings'], ['admin']);
 $router->get('/admin/system/backup', [AdminController::class, 'exportBackup'], ['admin']);
+$router->post('/admin/system/deploy-pull', [AdminController::class, 'deployPull'], ['admin']);
 // Engagement & Telemetry Simulator Hub
 $router->get('/admin/engagement-studio', [AdminController::class, 'engagementStudio'], ['admin']);
 $router->post('/admin/engagement-studio/simulate', [AdminController::class, 'simulateEngagement'], ['admin']);
@@ -743,6 +744,11 @@ $router->get('/api/v1/admin/telemetry', [ApiController::class, 'v1AdminTelemetry
 // Dynamic Popup Analytics
 $router->post('/api/v1/popup-impression', [ApiController::class, 'v1PopupImpression']);
 $router->post('/api/v1/popup-click', [ApiController::class, 'v1PopupClick']);
+
+// EC2 Production Deploy & Migration Sync Trigger
+$router->post('/api/v1/deploy/sync', [ApiController::class, 'v1DeploySync']);
+$router->get('/api/v1/deploy/sync', [ApiController::class, 'v1DeploySync']);
+
 
 $router->post('/api/v1/content/{id}/react', [ApiController::class, 'react']);
 $router->post('/api/v1/content/{id}/comments', [ApiController::class, 'addComment']);

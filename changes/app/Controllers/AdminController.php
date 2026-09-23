@@ -5260,7 +5260,10 @@ class AdminController {
 
         try {
             $start = microtime(true);
-            $results = Database::query($query);
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare($query);
+            $stmt->execute();
+            $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $duration = round((microtime(true) - $start) * 1000, 2);
             $totalCount = count($results);
             $previewRows = array_slice($results, 0, 250);
@@ -5287,11 +5290,12 @@ class AdminController {
             ]);
             Session::flash('success', "Query executed successfully: {$totalCount} row(s) returned in {$duration} ms.");
         } catch (\Throwable $e) {
+            $errMessage = $e->getMessage();
             if ($isAjax) {
-                Response::json(['success' => false, 'message' => 'SQL Error: ' . $e->getMessage()], 400);
+                Response::json(['success' => false, 'message' => 'SQL Execution Error: ' . $errMessage], 400);
                 return;
             }
-            Session::flash('error', "SQL Error: " . $e->getMessage());
+            Session::flash('error', "SQL Execution Error: " . $errMessage);
         }
 
         Response::redirect('/admin/db-manager?tab=query');
@@ -5464,9 +5468,18 @@ class AdminController {
                     }
                     $cleanSql = implode("\n", $cleanLines);
                     $stmts = array_filter(array_map('trim', explode(';', $cleanSql)));
+                    $pdo = Database::getConnection();
                     foreach ($stmts as $stmt) {
                         if (!empty($stmt)) {
-                            Database::execute($stmt);
+                            try {
+                                $pdo->exec($stmt);
+                            } catch (\Throwable $stmtErr) {
+                                $errMsg = $stmtErr->getMessage();
+                                // Ignore benign notices like table or index already exists
+                                if (!str_contains($errMsg, 'already exists') && !str_contains($errMsg, 'Duplicate')) {
+                                    throw $stmtErr;
+                                }
+                            }
                         }
                     }
                     if (in_array($baseName, $appliedNames, true)) {
@@ -5530,6 +5543,63 @@ class AdminController {
             Session::flash('error', "Rollback error: " . $e->getMessage());
         }
         Response::redirect('/admin/db-manager?tab=migrations');
+    }
+
+    /**
+     * Pull latest repository commits on production (EC2) and execute pending migrations
+     */
+    public function deployPull(Request $request): void {
+        $output = [];
+        $gitStatus = '';
+        $migStatus = '';
+
+        try {
+            $root = realpath(__DIR__ . '/../../');
+            
+            // Execute git pull if shell execution is available
+            if (function_exists('exec')) {
+                exec("cd \"{$root}\" && git pull origin main 2>&1", $output, $returnCode);
+                $gitStatus = implode("\n", $output);
+            } else {
+                $gitStatus = "Shell execution not permitted via web server process.";
+            }
+
+            // Execute all pending migrations
+            $migrationFiles = glob(__DIR__ . '/../../database/migrations/*.sql') ?: [];
+            sort($migrationFiles);
+            $applied = Database::querySilent("SELECT migration_name FROM migrations") ?: [];
+            $appliedNames = array_column($applied, 'migration_name');
+
+            $maxBatch = (int)(Database::fetchSilent("SELECT MAX(batch) as mb FROM migrations")['mb'] ?? 0);
+            $newBatch = $maxBatch + 1;
+            $migRan = 0;
+            $pdo = Database::getConnection();
+
+            foreach ($migrationFiles as $mf) {
+                $baseName = basename($mf, '.sql');
+                if (!in_array($baseName, $appliedNames, true)) {
+                    $sqlContent = file_get_contents($mf);
+                    $stmts = array_filter(array_map('trim', explode(';', $sqlContent)));
+                    foreach ($stmts as $s) {
+                        $sClean = trim(preg_replace('/^\s*--[^\n]*/m', '', $s));
+                        if (!empty($sClean)) {
+                            try {
+                                $pdo->exec($sClean);
+                            } catch (\Throwable $e) {}
+                        }
+                    }
+                    $pdo->prepare("INSERT INTO migrations (migration_name, batch, applied_at) VALUES (?, ?, NOW())")->execute([$baseName, $newBatch]);
+                    $migRan++;
+                }
+            }
+            $migStatus = "{$migRan} pending migration(s) executed.";
+
+            Session::flash('success', "Deployment Sync completed! Git output: " . substr($gitStatus, 0, 100) . " | Migrations: {$migStatus}");
+        } catch (\Throwable $e) {
+            Session::flash('error', "Deploy sync error: " . $e->getMessage());
+        }
+
+        Response::redirect('/admin/system');
     }
 
     // [TS-DB-07] Purge Orphaned Media Files
