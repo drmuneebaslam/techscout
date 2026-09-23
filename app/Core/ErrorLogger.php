@@ -7,6 +7,7 @@ use Throwable;
 class ErrorLogger {
     private static bool $isRegistered = false;
     private static bool $schemaChecked = false;
+    private static bool $isLogging = false;
 
     public static function register(): void {
         if (self::$isRegistered) return;
@@ -26,6 +27,12 @@ class ErrorLogger {
      * Comprehensive Exception and Error Telemetry Logger
      */
     public static function log(string $type, string $message, ?string $file = null, ?int $line = null, ?string $trace = null, ?array $extra = null): void {
+        if (self::$isLogging) {
+            @error_log("[SystemErrorLogger Reentrant] {$type}: {$message}");
+            return;
+        }
+        self::$isLogging = true;
+
         try {
             $pdo = Database::getConnection();
             if (!$pdo) return;
@@ -128,6 +135,8 @@ class ErrorLogger {
             }
         } catch (Throwable $e) {
             @error_log("[SystemErrorLogger] " . $type . ": " . $message . " | Error: " . $e->getMessage());
+        } finally {
+            self::$isLogging = false;
         }
     }
 
@@ -517,6 +526,11 @@ class ErrorLogger {
 
     public static function handleError(int $severity, string $message, string $file, int $line): bool {
         if (!(error_reporting() & $severity)) {
+            return false;
+        }
+
+        // Do not log cascaded headers already sent warnings to database
+        if (str_contains($message, 'headers already sent')) {
             return false;
         }
 

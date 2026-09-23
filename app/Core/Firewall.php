@@ -4,8 +4,18 @@ namespace App\Core;
 use Throwable;
 
 class Firewall {
+    private static bool $hasChecked = false;
+    private static bool $isChecking = false;
+
     public static function check(): void {
-        if (!FeatureFlag::isEnabled('enable_security_firewall', true)) return;
+        if (self::$hasChecked || self::$isChecking) return;
+        self::$isChecking = true;
+        self::$hasChecked = true;
+
+        if (!FeatureFlag::isEnabled('enable_security_firewall', true)) {
+            self::$isChecking = false;
+            return;
+        }
 
         $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
