@@ -477,9 +477,9 @@
           if (cached) return cached;
         } catch(e) {}
         try {
-          return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Karachi';
+          return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
         } catch(e) {
-          return 'Asia/Karachi';
+          return 'UTC';
         }
       };
 

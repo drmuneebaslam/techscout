@@ -109,7 +109,7 @@
       ?>
       <!-- Category Card -->
       <div class="ts-card image-cat-card" 
-           onclick="openCategoryWithAd(event, '<?= $targetUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
+           onclick="window.location.href = '<?= $targetUrl ?>'"
            style="padding: 0; overflow: hidden; border-radius: 14px; border: 1px solid var(--ts-border-main); background: var(--ts-bg-surface); cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease; display: flex; flex-direction: column;">
         
         <!-- Header Art Banner with Live Numbers Badge -->
@@ -164,24 +164,6 @@
 </div>
 
 <script>
-function openCategoryWithAd(e, targetUrl, adUrl) {
-  e.preventDefault();
-  if (adUrl) {
-    try {
-      const adWin = window.open(adUrl, '_blank');
-      if (adWin) {
-        try {
-          adWin.blur();
-          window.focus();
-        } catch(err) {}
-      }
-    } catch(err) {
-      window.open(adUrl, '_blank');
-    }
-  }
-  window.location.href = targetUrl;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
 });

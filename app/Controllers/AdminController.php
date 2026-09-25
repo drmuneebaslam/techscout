@@ -9252,7 +9252,81 @@ class AdminController {
         }
         Response::redirect('/admin/popups');
     }
+
+    // ------------------------------------------------------------------------
+    // CUSTOM API ENDPOINTS BUILDER CRUD
+    // ------------------------------------------------------------------------
+    public function customApiEndpoints(Request $request): void {
+        $endpoints = [];
+        try {
+            $endpoints = Database::query("SELECT * FROM custom_api_endpoints ORDER BY id DESC");
+        } catch (\Throwable $e) {}
+
+        Response::view('admin/custom_api_endpoints', [
+            'title' => 'Custom API Endpoints & Schema Inspector | Admin Hub',
+            'endpoints' => $endpoints,
+            'allowedTables' => \App\Controllers\CustomApiController::$allowedTables
+        ]);
+    }
+
+    public function saveCustomApiEndpoint(Request $request): void {
+        $name = trim((string)$request->post('name', ''));
+        $rawSlug = trim((string)$request->post('slug', ''));
+        $slug = strtolower(preg_replace('/[^a-z0-9_-]/', '-', $rawSlug));
+        $endpointType = trim((string)$request->post('endpoint_type', 'table_data'));
+        $targetTable = trim((string)$request->post('target_table', 'prompts'));
+        $selectedColumns = trim((string)$request->post('selected_columns', ''));
+        $orderByCol = trim((string)$request->post('order_by_column', 'id'));
+        $orderDir = strtoupper(trim((string)$request->post('order_direction', 'DESC')));
+        $customTemplate = trim((string)$request->post('custom_response_template', ''));
+        $authRequired = !empty($request->post('auth_required')) ? 1 : 0;
+        $secretToken = 'ts_api_tok_' . bin2hex(random_bytes(16));
+
+        if (empty($name) || empty($slug)) {
+            Session::flash('error', 'Endpoint name and slug are required.');
+            Response::redirect('/admin/custom-api');
+            return;
+        }
+
+        try {
+            Database::execute(
+                "INSERT INTO custom_api_endpoints 
+                 (name, slug, description, endpoint_type, target_table, selected_columns, order_by_column, order_direction, custom_response_template, auth_required, secret_token, is_active) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) 
+                 ON DUPLICATE KEY UPDATE name = VALUES(name), endpoint_type = VALUES(endpoint_type), target_table = VALUES(target_table), selected_columns = VALUES(selected_columns), order_by_column = VALUES(order_by_column), order_direction = VALUES(order_direction), custom_response_template = VALUES(custom_response_template), auth_required = VALUES(auth_required)",
+                [$name, $slug, "Custom API Endpoint for {$targetTable}", $endpointType, $targetTable, $selectedColumns, $orderByCol, $orderDir, $customTemplate, $authRequired, $secretToken]
+            );
+            Session::flash('success', "Custom API endpoint '/api/v1/custom/{$slug}' configured successfully.");
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error creating custom API endpoint: ' . $e->getMessage());
+        }
+
+        Response::redirect('/admin/custom-api');
+    }
+
+    public function toggleCustomApiEndpoint(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        try {
+            Database::execute("UPDATE custom_api_endpoints SET is_active = IF(is_active = 1, 0, 1) WHERE id = ?", [$id]);
+            Session::flash('success', 'Endpoint active status toggled.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error toggling endpoint: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/custom-api');
+    }
+
+    public function deleteCustomApiEndpoint(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        try {
+            Database::execute("DELETE FROM custom_api_endpoints WHERE id = ?", [$id]);
+            Session::flash('success', 'Endpoint permanently deleted.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error deleting endpoint: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/custom-api');
+    }
 }
+
 
 
 

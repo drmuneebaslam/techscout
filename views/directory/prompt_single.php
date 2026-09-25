@@ -212,11 +212,8 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
           <!-- Negative Prompt -->
           <?php if (!empty($notes['negative_prompt'])): ?>
             <div style="grid-column: 1 / -1; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); padding: 0.75rem 1rem; border-radius: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+              <div style="margin-bottom: 0.35rem;">
                 <span style="font-size: 0.75rem; color: #ec4899; font-weight: 700;">Negative Prompt (--no parameters):</span>
-                <button type="button" onclick="copyTextDirect('<?= htmlspecialchars(addslashes($notes['negative_prompt'])) ?>')" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.15rem 0.45rem; font-size: 0.7rem;">
-                  📋 Copy
-                </button>
               </div>
               <code style="color: var(--ts-text-secondary); font-size: 0.82rem; word-break: break-all;"><?= htmlspecialchars($notes['negative_prompt']) ?></code>
             </div>
@@ -551,7 +548,7 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
             ?>
             <?php if ($rpIsImage && !empty($rpImg) && $rpImg !== 'https://funwithcoding.free.nf/'): ?>
               <!-- Image Card -->
-              <div onclick="openPromptWithAd(event, '<?= $rpUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
+              <div onclick="window.location.href='<?= $rpUrl ?>'"
                    style="position: relative; height: 260px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--ts-border-main); background: #000; transition: transform 0.2s ease;">
                 <img src="<?= htmlspecialchars($rpImg) ?>" alt="<?= htmlspecialchars($rp['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
                 <div style="position: absolute; inset-x: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); padding: 1rem;">
@@ -567,7 +564,7 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
                 <div>
                   <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; margin-bottom: 0.4rem;"><?= htmlspecialchars($rp['category_name'] ?? 'Prompt') ?></span>
                   <h4 style="font-size: 0.95rem; margin: 0 0 0.35rem 0; line-height: 1.3;">
-                    <a href="<?= $rpUrl ?>" onclick="openPromptWithAd(event, '<?= $rpUrl ?>', '<?= htmlspecialchars($adUrl) ?>')" style="color: var(--ts-text-primary); text-decoration: none;">
+                    <a href="<?= $rpUrl ?>" style="color: var(--ts-text-primary); text-decoration: none;">
                       <?= htmlspecialchars($rp['title']) ?>
                     </a>
                   </h4>
@@ -850,19 +847,27 @@ function copyTextDirect(text) {
     }
 }
 
-function openPromptWithAd(e, targetUrl, adUrl) {
-    e.preventDefault();
-    if (adUrl) {
-        try {
-            const adWin = window.open(adUrl, '_blank');
-            if (adWin) {
-                try { adWin.blur(); window.focus(); } catch(err) {}
-            }
-        } catch(err) {
-            window.open(adUrl, '_blank');
-        }
+function handleShowcaseImageClick(index) {
+    const mainImg = document.getElementById('main-gallery-img');
+    if (!mainImg) return;
+    const src = mainImg.src;
+    const captionEl = document.getElementById('main-gallery-caption');
+    const caption = captionEl ? captionEl.innerText : '';
+    
+    let overlay = document.getElementById('ts-image-zoom-modal');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'ts-image-zoom-modal';
+        overlay.style.cssText = 'position: fixed; inset: 0; background: rgba(5,8,16,0.92); backdrop-filter: blur(10px); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;';
+        overlay.innerHTML = '<div style="max-width: 90vw; max-height: 85vh; text-align: center;"><img id="ts-zoom-modal-img" src="" style="max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);"><div id="ts-zoom-modal-caption" style="color: #cbd5e1; font-size: 0.9rem; margin-top: 0.75rem; font-weight: 600;"></div></div>';
+        overlay.onclick = function() { overlay.style.display = 'none'; };
+        document.body.appendChild(overlay);
     }
-    window.location.href = targetUrl;
+    const modalImg = document.getElementById('ts-zoom-modal-img');
+    const modalCap = document.getElementById('ts-zoom-modal-caption');
+    if (modalImg) modalImg.src = src;
+    if (modalCap) modalCap.innerText = caption;
+    overlay.style.display = 'flex';
 }
 
 // Variable Injector Live Sync

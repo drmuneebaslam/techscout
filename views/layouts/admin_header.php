@@ -240,7 +240,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       var storedTheme = null;
       try { storedTheme = localStorage.getItem('ts_theme'); } catch(e) {}
       var t = urlParams.get('theme') || storedTheme || cookieTheme || '<?= $activeAdminTheme ?>';
-      if (t !== 'light' && t !== 'dark') t = 'dark';
+      if (t !== 'light' && t !== 'dark') t = 'light';
       document.documentElement.setAttribute('data-theme', t);
       if (t === 'light') {
         document.documentElement.classList.add('theme-light');
@@ -256,7 +256,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
 <body data-theme="<?= $activeAdminTheme ?>" class="admin-body <?= $activeAdminTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($adminSiteSettings['enable_bg_grid_lines']) && $adminSiteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
 <script>
   (function() {
-    var t = document.documentElement.getAttribute('data-theme') || 'dark';
+    var t = document.documentElement.getAttribute('data-theme') || 'light';
     document.body.setAttribute('data-theme', t);
     if (t === 'light') {
       document.body.classList.add('theme-light');
@@ -563,6 +563,10 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/incoming-webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/incoming-webhooks') ? 'active' : '' ?>" data-tooltip="Incoming Webhook Listener">
                 <i data-lucide="arrow-down-to-line"></i> <span>Incoming Webhooks</span>
                 <span class="ts-badge ts-badge-cyan" style="margin-left: auto; font-size: 0.65rem;">NEW</span>
+              </a>
+              <a href="<?= url('/admin/custom-api') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/custom-api') ? 'active' : '' ?>" data-tooltip="Custom API Endpoints &amp; Schema Inspector">
+                <i data-lucide="code-2"></i> <span>Custom API Gateway</span>
+                <span class="ts-badge ts-badge-indigo" style="margin-left: auto; font-size: 0.65rem;">NEW</span>
               </a>
               <a href="<?= url('/admin/mail') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/mail') ? 'active' : '' ?>" data-tooltip="Mail & Templates">
                 <i data-lucide="mail-check"></i> <span>Mail &amp; Template Studio</span>

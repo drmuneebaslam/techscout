@@ -1045,9 +1045,22 @@ CREATE TABLE `plagiarism_scans` (
 DROP TABLE IF EXISTS `prompts`;
 CREATE TABLE `prompts` (
   `content_id` bigint(20) unsigned NOT NULL,
+  `prompt_type` varchar(50) NOT NULL DEFAULT 'text',
   `prompt_template` longtext NOT NULL,
-  `template_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`template_variables`)),
-  `target_models` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`target_models`)),
+  `aspect_ratio` varchar(20) DEFAULT '16:9',
+  `negative_prompt` text DEFAULT NULL,
+  `template_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `target_models` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `model_version` varchar(100) DEFAULT NULL,
+  `cfg_scale` decimal(5,2) DEFAULT 7.00,
+  `steps` int(11) DEFAULT 30,
+  `seed` bigint(20) DEFAULT NULL,
+  `sampler` varchar(50) DEFAULT 'Euler a',
+  `style_preset` varchar(100) DEFAULT 'Photorealistic',
+  `difficulty_level` varchar(50) NOT NULL DEFAULT 'beginner',
+  `system_prompt` text DEFAULT NULL,
+  `parameters_json` longtext DEFAULT NULL,
+  `how_to_use` text DEFAULT NULL,
   `copy_count` int(10) unsigned NOT NULL DEFAULT 0,
   `sample_output` text DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
@@ -1550,6 +1563,33 @@ CREATE TABLE `custom_popups` (
   PRIMARY KEY (`id`),
   KEY `idx_popups_active` (`is_active`),
   KEY `idx_popups_audience` (`target_audience`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `custom_api_endpoints`;
+CREATE TABLE `custom_api_endpoints` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) NOT NULL,
+  `slug` varchar(100) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `endpoint_type` enum('table_schema','table_list','table_data','custom_json') NOT NULL DEFAULT 'table_data',
+  `target_table` varchar(100) DEFAULT NULL,
+  `selected_columns` text DEFAULT NULL,
+  `where_conditions_json` text DEFAULT NULL,
+  `order_by_column` varchar(100) DEFAULT 'id',
+  `order_direction` enum('ASC','DESC') NOT NULL DEFAULT 'DESC',
+  `result_limit` int(11) NOT NULL DEFAULT 50,
+  `custom_response_template` longtext DEFAULT NULL,
+  `auth_required` tinyint(1) NOT NULL DEFAULT 0,
+  `secret_token` varchar(128) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `request_count` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `last_accessed_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_cae_slug` (`slug`),
+  KEY `idx_cae_active` (`is_active`),
+  KEY `idx_cae_type` (`endpoint_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

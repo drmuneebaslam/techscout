@@ -540,6 +540,12 @@ $router->post('/admin/incoming-webhooks/delete/{id}', [AdminController::class, '
 $router->post('/admin/incoming-webhooks/toggle/{id}', [AdminController::class, 'toggleIncomingWebhook'], ['admin']);
 $router->post('/admin/incoming-webhooks/clear-logs', [AdminController::class, 'clearIncomingWebhookLogs'], ['admin']);
 
+// Custom API Endpoints Builder & Database Schema Introspector
+$router->get('/admin/custom-api', [AdminController::class, 'customApiEndpoints'], ['admin']);
+$router->post('/admin/custom-api/save', [AdminController::class, 'saveCustomApiEndpoint'], ['admin']);
+$router->post('/admin/custom-api/toggle/{id}', [AdminController::class, 'toggleCustomApiEndpoint'], ['admin']);
+$router->post('/admin/custom-api/delete/{id}', [AdminController::class, 'deleteCustomApiEndpoint'], ['admin']);
+
 // Developer API Keys & Access Scopes
 $router->get('/admin/api-keys', [AdminController::class, 'apiKeys'], ['admin']);
 $router->post('/admin/api-keys/generate', [AdminController::class, 'generateApiKey'], ['admin']);
@@ -733,6 +739,9 @@ $router->post('/admin/support/categories/{id}/subcategory/delete', [SupportContr
 $router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate'], ['admin']);
 $router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream'], ['admin']);
 $router->post('/api/v1/webhook/{endpoint_slug}', [\App\Controllers\IncomingWebhookController::class, 'handle']);
+
+// Dynamic Custom REST API Gateway & Table Schema Introspector
+$router->get('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
 
 // Enterprise REST API Gateway (Bearer Auth Protected)
 $router->get('/api/v1/tools', [ApiController::class, 'v1Tools']);

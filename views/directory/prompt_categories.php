@@ -71,7 +71,7 @@
           $count = (int)($cat['prompt_count'] ?? 0);
           $copies = (int)($cat['total_copies'] ?? 0);
         ?>
-        <div class="ts-card" onclick="openCategoryWithAd(event, '<?= $targetUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
+        <div class="ts-card" onclick="window.location.href = '<?= $targetUrl ?>'"
              style="padding: 1.25rem; border-radius: 12px; border: 1px solid var(--ts-border-main); background: var(--ts-bg-surface); cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -127,7 +127,7 @@
           $count = (int)($cat['prompt_count'] ?? 0);
           $copies = (int)($cat['total_copies'] ?? 0);
         ?>
-        <div class="ts-card" onclick="openCategoryWithAd(event, '<?= $targetUrl ?>', '<?= htmlspecialchars($adUrl) ?>')"
+        <div class="ts-card" onclick="window.location.href = '<?= $targetUrl ?>'"
              style="padding: 1.25rem; border-radius: 12px; border: 1px solid var(--ts-border-main); background: var(--ts-bg-surface); cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -159,24 +159,6 @@
 </div>
 
 <script>
-function openCategoryWithAd(e, targetUrl, adUrl) {
-  e.preventDefault();
-  if (adUrl) {
-    try {
-      const adWin = window.open(adUrl, '_blank');
-      if (adWin) {
-        try {
-          adWin.blur();
-          window.focus();
-        } catch(err) {}
-      }
-    } catch(err) {
-      window.open(adUrl, '_blank');
-    }
-  }
-  window.location.href = targetUrl;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
 });
