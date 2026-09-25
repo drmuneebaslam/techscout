@@ -2480,10 +2480,14 @@ class AdminController {
         // Parse Uploaded File Attachments
         $attachmentFiles = [];
         if (!empty($_FILES['attachment_files']['name'])) {
-            $uploadDir = __DIR__ . '/../../public/uploads/mail/';
-            if (!is_dir($uploadDir)) {
-                @mkdir($uploadDir, 0777, true);
-            }
+            $rootPath = dirname(__DIR__, 2);
+            $assetsUploadDir = $rootPath . '/assets/uploads/mail/';
+            $publicUploadDir = $rootPath . '/public/uploads/mail/';
+            $rootUploadDir = $rootPath . '/uploads/mail/';
+
+            if (!is_dir($assetsUploadDir)) @mkdir($assetsUploadDir, 0777, true);
+            if (!is_dir($publicUploadDir)) @mkdir($publicUploadDir, 0777, true);
+            if (!is_dir($rootUploadDir)) @mkdir($rootUploadDir, 0777, true);
 
             $names = is_array($_FILES['attachment_files']['name']) ? $_FILES['attachment_files']['name'] : [$_FILES['attachment_files']['name']];
             $tmpNames = is_array($_FILES['attachment_files']['tmp_name']) ? $_FILES['attachment_files']['tmp_name'] : [$_FILES['attachment_files']['tmp_name']];
@@ -2493,13 +2497,15 @@ class AdminController {
                 if (!empty($tmpNames[$i]) && is_uploaded_file($tmpNames[$i])) {
                     $origName = basename($names[$i]);
                     $safeName = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $origName);
-                    $destPath = $uploadDir . $safeName;
+                    $destPath = $assetsUploadDir . $safeName;
                     if (move_uploaded_file($tmpNames[$i], $destPath)) {
+                        @copy($destPath, $publicUploadDir . $safeName);
+                        @copy($destPath, $rootUploadDir . $safeName);
                         $sizeKb = round($sizes[$i] / 1024, 1);
                         $sizeStr = $sizeKb > 1024 ? round($sizeKb / 1024, 1) . ' MB' : $sizeKb . ' KB';
                         $attachmentFiles[] = [
                             'name' => $origName,
-                            'url' => url('/uploads/mail/' . $safeName),
+                            'url' => url('/assets/uploads/mail/' . $safeName),
                             'size' => $sizeStr
                         ];
                     }
@@ -9082,7 +9088,7 @@ class AdminController {
             'title' => 'Incoming Webhooks & Live JSON Listener | Admin Hub',
             'incomingWebhooks' => $webhooks,
             'incomingLogs' => $logs,
-            'permittedTables' => \App\Core\IncomingWebhookEngine::$permittedTables
+            'permittedTables' => \App\Core\IncomingWebhookEngine::getTableDefinitions()
         ]);
     }
 
@@ -9262,10 +9268,17 @@ class AdminController {
             $endpoints = Database::query("SELECT * FROM custom_api_endpoints ORDER BY id DESC");
         } catch (\Throwable $e) {}
 
+        $allTablesData = Database::getAllTablesWithMetadata();
+        $tablesList = [];
+        foreach ($allTablesData as $t) {
+            $tablesList[$t['table_name']] = $t['table_comment'] ?: ("Database table " . $t['table_name']);
+        }
+
         Response::view('admin/custom_api_endpoints', [
             'title' => 'Custom API Endpoints & Schema Inspector | Admin Hub',
             'endpoints' => $endpoints,
-            'allowedTables' => \App\Controllers\CustomApiController::$allowedTables
+            'allowedTables' => $tablesList,
+            'allTablesMetadata' => $allTablesData
         ]);
     }
 
@@ -9324,36 +9337,6 @@ class AdminController {
             Session::flash('error', 'Error deleting endpoint: ' . $e->getMessage());
         }
         Response::redirect('/admin/custom-api');
-    }
-
-    // ------------------------------------------------------------------------
-    // PRODUCTION DEPLOY & MIGRATION SYNC
-    // ------------------------------------------------------------------------
-    public function deployPull(Request $request): void {
-        $root = realpath(__DIR__ . '/../../');
-        $output = [];
-        $returnCode = 0;
-
-        if (function_exists('exec')) {
-            @exec("git config --global --add safe.directory \"{$root}\" 2>&1");
-            @exec("chmod -R 777 \"{$root}/.git\" 2>/dev/null");
-            @exec("sudo -n chown -R www-data:www-data \"{$root}\" 2>/dev/null");
-
-            $deployScript = "{$root}/scripts/ec2_deploy_and_migrate.sh";
-            if (file_exists($deployScript)) {
-                @exec("sudo -n bash \"{$deployScript}\" 2>&1", $output, $returnCode);
-            }
-            if ($returnCode !== 0 || empty($output)) {
-                exec("cd \"{$root}\" && git pull origin main 2>&1", $output, $returnCode);
-            }
-        }
-
-        if (file_exists("{$root}/scripts/migrate.php")) {
-            require_once "{$root}/scripts/migrate.php";
-        }
-
-        Session::flash('success', 'Production deploy & migration sync executed.');
-        Response::redirect('/admin/system');
     }
 }
 

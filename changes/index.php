@@ -25,6 +25,42 @@ if (isset($_SERVER['REQUEST_URI'])) {
     }
 }
 
+// Direct Mail Attachment Delivery & Streaming Engine (Prevents any 404 when clicking email attachments)
+if (preg_match('#/(?:assets/|public/)?(?:uploads/mail|mail/attachment)/([^/?#]+)#i', $_SERVER['REQUEST_URI'] ?? '', $attMatches)) {
+    $attFilename = basename(urldecode($attMatches[1]));
+    $candidatePaths = [
+        __DIR__ . '/assets/uploads/mail/' . $attFilename,
+        __DIR__ . '/public/uploads/mail/' . $attFilename,
+        __DIR__ . '/uploads/mail/' . $attFilename,
+        __DIR__ . '/storage/uploads/mail/' . $attFilename
+    ];
+    foreach ($candidatePaths as $cp) {
+        if (file_exists($cp) && is_file($cp)) {
+            $ext = strtolower(pathinfo($cp, PATHINFO_EXTENSION));
+            $mimes = [
+                'pdf' => 'application/pdf',
+                'png' => 'image/png',
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'webp' => 'image/webp',
+                'gif' => 'image/gif',
+                'zip' => 'application/zip',
+                'txt' => 'text/plain',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'csv' => 'text/csv'
+            ];
+            $contentType = $mimes[$ext] ?? 'application/octet-stream';
+            header('Content-Type: ' . $contentType);
+            header('Content-Disposition: inline; filename="' . $attFilename . '"');
+            header('Content-Length: ' . filesize($cp));
+            header('Cache-Control: public, max-age=86400');
+            readfile($cp);
+            exit;
+        }
+    }
+}
+
 require_once __DIR__ . '/app/autoload.php';
 
 // Register Global Error, Exception & Fatal Crash Logger
@@ -54,6 +90,7 @@ use App\Controllers\SupportController;
 use App\Controllers\InboxController;
 use App\Controllers\PageController;
 use App\Controllers\InstallController;
+use App\Controllers\CustomApiController;
 
 // Start secure session
 Session::start();
@@ -695,6 +732,26 @@ $router->get('/admin/system', [AdminController::class, 'system'], ['admin']);
 $router->post('/admin/system/settings', [AdminController::class, 'saveSettings'], ['admin']);
 $router->get('/admin/system/backup', [AdminController::class, 'exportBackup'], ['admin']);
 $router->post('/admin/system/deploy-pull', [AdminController::class, 'deployPull'], ['admin']);
+
+// Custom Dynamic Popup Maker & Conversion Banners
+$router->get('/admin/popups', [AdminController::class, 'popups'], ['admin']);
+$router->post('/admin/popups/save', [AdminController::class, 'savePopup'], ['admin']);
+$router->post('/admin/popups/delete/{id}', [AdminController::class, 'deletePopup'], ['admin']);
+$router->post('/admin/popups/toggle/{id}', [AdminController::class, 'togglePopup'], ['admin']);
+
+// Incoming Webhooks Live JSON Listener Hub
+$router->get('/admin/incoming-webhooks', [AdminController::class, 'incomingWebhooks'], ['admin']);
+$router->post('/admin/incoming-webhooks/save', [AdminController::class, 'saveIncomingWebhook'], ['admin']);
+$router->post('/admin/incoming-webhooks/delete/{id}', [AdminController::class, 'deleteIncomingWebhook'], ['admin']);
+$router->post('/admin/incoming-webhooks/toggle/{id}', [AdminController::class, 'toggleIncomingWebhook'], ['admin']);
+$router->post('/admin/incoming-webhooks/test/{id}', [AdminController::class, 'testIncomingWebhook'], ['admin']);
+
+// Custom REST API Endpoints & Dynamic Table Introspector
+$router->get('/admin/custom-api', [AdminController::class, 'customApiEndpoints'], ['admin']);
+$router->post('/admin/custom-api/save', [AdminController::class, 'saveCustomApiEndpoint'], ['admin']);
+$router->post('/admin/custom-api/toggle/{id}', [AdminController::class, 'toggleCustomApiEndpoint'], ['admin']);
+$router->post('/admin/custom-api/delete/{id}', [AdminController::class, 'deleteCustomApiEndpoint'], ['admin']);
+
 // Engagement & Telemetry Simulator Hub
 $router->get('/admin/engagement-studio', [AdminController::class, 'engagementStudio'], ['admin']);
 $router->post('/admin/engagement-studio/simulate', [AdminController::class, 'simulateEngagement'], ['admin']);
@@ -742,6 +799,10 @@ $router->post('/api/v1/webhook/{endpoint_slug}', [\App\Controllers\IncomingWebho
 
 // Dynamic Custom REST API Gateway & Table Schema Introspector
 $router->get('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
+$router->post('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
+$router->put('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
+$router->patch('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
+$router->delete('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
 
 // Enterprise REST API Gateway (Bearer Auth Protected)
 $router->get('/api/v1/tools', [ApiController::class, 'v1Tools']);

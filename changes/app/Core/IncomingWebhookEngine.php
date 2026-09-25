@@ -6,62 +6,54 @@ namespace App\Core;
 class IncomingWebhookEngine {
 
     /**
-     * Whitelist of permitted target database tables for incoming webhook mapping
+     * Dynamically retrieve definitions, columns, and primary keys for all database tables
      */
-    public static array $permittedTables = [
-        'prompts' => [
-            'columns' => [
-                'title', 'slug', 'summary', 'prompt_template', 'prompt_type', 'aspect_ratio', 
-                'negative_prompt', 'target_models', 'model_version', 'cfg_scale', 'steps', 
-                'seed', 'sampler', 'style_preset', 'difficulty_level', 'system_prompt', 
-                'parameters_json', 'how_to_use', 'sample_output', 'template_variables', 
-                'featured_image_url', 'category_id'
-            ],
-            'unique_key' => 'slug',
-            'is_extension' => true,
-            'parent_content_type' => 'prompt'
-        ],
-        'contents' => [
-            'columns' => ['title', 'slug', 'summary', 'body_html', 'content_type', 'status', 'meta_description', 'canonical_url', 'featured_image_url'],
-            'unique_key' => 'slug',
-            'is_extension' => false
-        ],
-        'ai_tools' => [
-            'columns' => ['title', 'slug', 'summary', 'body_html', 'website_url', 'docs_url', 'pricing_type', 'starting_price', 'rating_score', 'verified', 'featured_image_url'],
-            'unique_key' => 'slug',
-            'is_extension' => true,
-            'parent_content_type' => 'ai_tool'
-        ],
-        'articles' => [
-            'columns' => ['title', 'slug', 'summary', 'body_html', 'read_time_minutes', 'primary_category', 'featured_image_url'],
-            'unique_key' => 'slug',
-            'is_extension' => true,
-            'parent_content_type' => 'article'
-        ],
-        'newsletter_subscribers' => [
-            'columns' => ['email', 'frequency', 'status', 'source_page'],
-            'unique_key' => 'email',
-            'is_extension' => false
-        ],
-        'custom_popups' => [
-            'columns' => ['title', 'badge_text', 'headline', 'content_html', 'cta_button_text', 'cta_button_url', 'secondary_button_text', 'secondary_button_url', 'target_audience', 'popup_theme'],
-            'unique_key' => 'title',
-            'is_extension' => false
-        ],
-        'custom_api_endpoints' => [
-            'columns' => ['name', 'slug', 'description', 'endpoint_type', 'target_table', 'selected_columns', 'where_conditions_json', 'order_by_column', 'order_direction', 'result_limit', 'custom_response_template', 'auth_required', 'secret_token', 'is_active'],
-            'unique_key' => 'slug',
-            'is_extension' => false
-        ],
-        'feedback_submissions' => [
-            'columns' => ['feedback_type', 'message', 'contact_email', 'page_url', 'status'],
-            'unique_key' => null,
-            'is_extension' => false
-        ]
-    ];
+    public static function getTableDefinitions(): array {
+        $tables = Database::getAllTablesWithMetadata();
+        $definitions = [];
+
+        foreach ($tables as $t) {
+            $tableName = $t['table_name'];
+            $cols = Database::getTableColumnsDetailed($tableName);
+            $colNames = array_column($cols, 'Field');
+            $uniqueKey = null;
+            $hasContentId = in_array('content_id', $colNames, true);
+
+            foreach ($cols as $c) {
+                if (($c['Key'] ?? '') === 'PRI') {
+                    $uniqueKey = $c['Field'];
+                    break;
+                }
+            }
+            if (!$uniqueKey && in_array('slug', $colNames, true)) {
+                $uniqueKey = 'slug';
+            } elseif (!$uniqueKey && in_array('email', $colNames, true)) {
+                $uniqueKey = 'email';
+            }
+
+            $parentContentType = null;
+            if ($hasContentId) {
+                if ($tableName === 'prompts') $parentContentType = 'prompt';
+                elseif ($tableName === 'ai_tools') $parentContentType = 'ai_tool';
+                elseif ($tableName === 'articles') $parentContentType = 'article';
+                else $parentContentType = $tableName;
+            }
+
+            $definitions[$tableName] = [
+                'columns' => $colNames,
+                'unique_key' => $uniqueKey,
+                'is_extension' => $hasContentId,
+                'parent_content_type' => $parentContentType,
+                'description' => $t['table_comment'] ?: "Database table {$tableName}",
+                'total_rows' => (int)($t['table_rows'] ?? 0)
+            ];
+        }
+
+        return $definitions;
+    }
 
     /**
-     * Process incoming webhook request
+     * Process incoming webhook request dynamically without static table whitelisting
      */
     public static function processPayload(string $slug, array $headers, string $rawBody, string $ip): array {
         $slug = trim($slug);
@@ -117,20 +109,34 @@ class IncomingWebhookEngine {
             $payload = [];
         }
 
-        // 4. Evaluate Dynamic Field Mappings
-        $rules = json_decode($webhook['mapping_rules_json'] ?? '[]', true) ?: [];
+        // 4. Dynamic Target Table Discovery (No static whitelisting)
+        $tableDefinitions = self::getTableDefinitions();
         $targetTable = $webhook['target_table'] ?? 'contents';
 
-        if (!isset(self::$permittedTables[$targetTable])) {
-            $targetTable = 'contents';
+        if (!isset($tableDefinitions[$targetTable])) {
+            $existingTableNames = array_column(Database::getAllTablesWithMetadata(), 'table_name');
+            if (in_array($targetTable, $existingTableNames, true)) {
+                $cols = Database::getTableColumnsDetailed($targetTable);
+                $tableDefinitions[$targetTable] = [
+                    'columns' => array_column($cols, 'Field'),
+                    'unique_key' => 'id',
+                    'is_extension' => in_array('content_id', array_column($cols, 'Field'), true),
+                    'parent_content_type' => null
+                ];
+            } else {
+                $targetTable = 'contents';
+            }
         }
 
-        $tableDef = self::$permittedTables[$targetTable];
+        $tableDef = $tableDefinitions[$targetTable];
         $allowedColumns = $tableDef['columns'];
         $uniqueKey = $tableDef['unique_key'];
         $isExtension = $tableDef['is_extension'] ?? false;
 
+        // 5. Evaluate Dynamic Field Mappings
+        $rules = json_decode($webhook['mapping_rules_json'] ?? '[]', true) ?: [];
         $extractedData = [];
+
         foreach ($rules as $rule) {
             $jsonKey = trim((string)($rule['json_key'] ?? ''));
             $targetCol = trim((string)($rule['target_column'] ?? ''));
@@ -155,7 +161,7 @@ class IncomingWebhookEngine {
             try {
                 $pdo = Database::getConnection();
 
-                // If table is an extension table (prompts, ai_tools, articles)
+                // If table is an extension table (prompts, ai_tools, articles, etc.)
                 if ($isExtension) {
                     $slugVal = $extractedData['slug'] ?? ('item-' . time() . '-' . mt_rand(100, 999));
                     $titleVal = $extractedData['title'] ?? 'Untitled Item';
@@ -164,7 +170,7 @@ class IncomingWebhookEngine {
                     $imgUrl = $extractedData['featured_image_url'] ?? null;
                     $catId = isset($extractedData['category_id']) ? (int)$extractedData['category_id'] : null;
 
-                    // 1. Check or create parent `contents` row
+                    // 1. Check or create parent contents row
                     $existingContent = Database::fetch("SELECT id FROM contents WHERE slug = ? LIMIT 1", [$slugVal]);
                     $contentId = null;
 
@@ -216,7 +222,7 @@ class IncomingWebhookEngine {
                         $insertedId = $contentId;
                     }
                 } else {
-                    // Standard direct single-table insertion
+                    // Standard direct single-table insertion or upsert
                     $columns = array_keys($extractedData);
                     $placeholders = array_fill(0, count($columns), '?');
                     $values = array_values($extractedData);
@@ -236,7 +242,7 @@ class IncomingWebhookEngine {
 
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute($values);
-                    $recordsAffected = $stmt->rowCount();
+                    $recordsAffected = $stmt->rowCount() ?: 1;
                     $insertedId = $pdo->lastInsertId();
                 }
             } catch (\Throwable $e) {
@@ -245,12 +251,12 @@ class IncomingWebhookEngine {
             }
         }
 
-        // 5. Update Webhook Stats
+        // 6. Update Webhook Stats
         try {
             Database::execute("UPDATE incoming_webhooks SET received_count = received_count + 1, last_received_at = NOW() WHERE id = ?", [$webhookId]);
         } catch (\Throwable $e) {}
 
-        // 6. Record Execution Log
+        // 7. Record Execution Log
         self::logExecution($webhookId, $slug, $headers, $rawBody, 'success', 200, $recordsAffected, null, $ip);
 
         return [

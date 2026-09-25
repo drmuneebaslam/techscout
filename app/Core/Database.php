@@ -495,4 +495,204 @@ class Database {
         <?php
         exit;
     }
+
+    /**
+     * Dynamically retrieve all tables with schema comments, row counts, and storage metrics
+     */
+    public static function getAllTablesWithMetadata(): array {
+        try {
+            $pdo = self::getConnection();
+            $sql = "SELECT TABLE_NAME as table_name, TABLE_COMMENT as table_comment, 
+                           COALESCE(TABLE_ROWS, 0) as table_rows, 
+                           COALESCE(DATA_LENGTH + INDEX_LENGTH, 0) as total_size_bytes, 
+                           ENGINE as engine, CREATE_TIME as create_time, UPDATE_TIME as update_time 
+                    FROM information_schema.TABLES 
+                    WHERE TABLE_SCHEMA = DATABASE() 
+                    ORDER BY TABLE_NAME ASC";
+            $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            if (!empty($rows)) {
+                return $rows;
+            }
+        } catch (Throwable $e) {}
+
+        // Fallback using SHOW TABLE STATUS
+        try {
+            $pdo = self::getConnection();
+            $statusRows = $pdo->query("SHOW TABLE STATUS")->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            $result = [];
+            foreach ($statusRows as $sr) {
+                $name = $sr['Name'] ?? ($sr['TABLE_NAME'] ?? '');
+                if (empty($name)) continue;
+                $result[] = [
+                    'table_name' => $name,
+                    'table_comment' => $sr['Comment'] ?? '',
+                    'table_rows' => (int)($sr['Rows'] ?? 0),
+                    'total_size_bytes' => (int)($sr['Data_length'] ?? 0) + (int)($sr['Index_length'] ?? 0),
+                    'engine' => $sr['Engine'] ?? 'InnoDB',
+                    'create_time' => $sr['Create_time'] ?? null,
+                    'update_time' => $sr['Update_time'] ?? null
+                ];
+            }
+            if (!empty($result)) {
+                return $result;
+            }
+        } catch (Throwable $e) {}
+
+        // Final fallback: SHOW TABLES
+        try {
+            $pdo = self::getConnection();
+            $tableNames = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN) ?: [];
+            $result = [];
+            foreach ($tableNames as $t) {
+                $result[] = [
+                    'table_name' => $t,
+                    'table_comment' => "Database table {$t}",
+                    'table_rows' => 0,
+                    'total_size_bytes' => 0,
+                    'engine' => 'InnoDB',
+                    'create_time' => null,
+                    'update_time' => null
+                ];
+            }
+            return $result;
+        } catch (Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Retrieve column metadata for any specific database table
+     */
+    public static function getTableColumnsDetailed(string $tableName): array {
+        $cleanTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
+        if (empty($cleanTable)) {
+            return [];
+        }
+        try {
+            $pdo = self::getConnection();
+            $stmt = $pdo->query("SHOW FULL COLUMNS FROM `{$cleanTable}`");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Provide comprehensive description of the entire database schema
+     */
+    public static function describeDatabase(): array {
+        $pdo = self::getConnection();
+        $dbName = (string)$pdo->query("SELECT DATABASE()")->fetchColumn();
+        $version = (string)$pdo->query("SELECT VERSION()")->fetchColumn();
+        $tables = self::getAllTablesWithMetadata();
+
+        $totalRows = 0;
+        $totalBytes = 0;
+        $detailedTables = [];
+
+        foreach ($tables as $t) {
+            $name = $t['table_name'];
+            $totalRows += (int)($t['table_rows'] ?? 0);
+            $totalBytes += (int)($t['total_size_bytes'] ?? 0);
+            $cols = self::getTableColumnsDetailed($name);
+            $pk = [];
+            $columnsSummary = [];
+            foreach ($cols as $col) {
+                if (($col['Key'] ?? '') === 'PRI') {
+                    $pk[] = $col['Field'];
+                }
+                $columnsSummary[] = [
+                    'name' => $col['Field'],
+                    'type' => $col['Type'],
+                    'nullable' => ($col['Null'] ?? '') === 'YES',
+                    'default' => $col['Default'],
+                    'key' => $col['Key'] ?? '',
+                    'extra' => $col['Extra'] ?? '',
+                    'comment' => $col['Comment'] ?? ''
+                ];
+            }
+
+            $detailedTables[] = [
+                'table_name' => $name,
+                'comment' => $t['table_comment'] ?? '',
+                'engine' => $t['engine'] ?? 'InnoDB',
+                'rows' => (int)($t['table_rows'] ?? 0),
+                'size_bytes' => (int)($t['total_size_bytes'] ?? 0),
+                'primary_keys' => $pk,
+                'columns_count' => count($cols),
+                'columns' => $columnsSummary
+            ];
+        }
+
+        return [
+            'database_name' => $dbName,
+            'server_version' => $version,
+            'timestamp_gmt' => gmdate('Y-m-d\TH:i:s\Z'),
+            'total_tables' => count($tables),
+            'total_estimated_rows' => $totalRows,
+            'total_size_bytes' => $totalBytes,
+            'total_size_mb' => round($totalBytes / (1024 * 1024), 2),
+            'tables' => $detailedTables
+        ];
+    }
+
+    /**
+     * Provide comprehensive description of a single table, its columns, indexes, and sample rows
+     */
+    public static function describeTable(string $tableName): array {
+        $cleanTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
+        if (empty($cleanTable)) {
+            return ['error' => 'Invalid table name'];
+        }
+        $pdo = self::getConnection();
+        $cols = self::getTableColumnsDetailed($cleanTable);
+        if (empty($cols)) {
+            return ['error' => "Table '{$cleanTable}' does not exist or has no columns"];
+        }
+
+        $indexes = [];
+        try {
+            $idxStmt = $pdo->query("SHOW INDEX FROM `{$cleanTable}`");
+            $indexes = $idxStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (Throwable $e) {}
+
+        $rowCount = 0;
+        try {
+            $rowCount = (int)$pdo->query("SELECT COUNT(*) FROM `{$cleanTable}`")->fetchColumn();
+        } catch (Throwable $e) {}
+
+        $sampleRows = [];
+        try {
+            $sampleRows = $pdo->query("SELECT * FROM `{$cleanTable}` ORDER BY 1 DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (Throwable $e) {}
+
+        return [
+            'table_name' => $cleanTable,
+            'timestamp_gmt' => gmdate('Y-m-d\TH:i:s\Z'),
+            'total_records' => $rowCount,
+            'total_columns' => count($cols),
+            'columns' => array_map(function($c) {
+                return [
+                    'name' => $c['Field'],
+                    'type' => $c['Type'],
+                    'collation' => $c['Collation'] ?? null,
+                    'nullable' => ($c['Null'] ?? '') === 'YES',
+                    'key' => $c['Key'] ?? '',
+                    'default' => $c['Default'],
+                    'extra' => $c['Extra'] ?? '',
+                    'comment' => $c['Comment'] ?? ''
+                ];
+            }, $cols),
+            'indexes' => array_map(function($idx) {
+                return [
+                    'key_name' => $idx['Key_name'] ?? '',
+                    'column_name' => $idx['Column_name'] ?? '',
+                    'non_unique' => (int)($idx['Non_unique'] ?? 0),
+                    'index_type' => $idx['Index_type'] ?? ''
+                ];
+            }, $indexes),
+            'sample_data' => $sampleRows
+        ];
+    }
 }
+

@@ -287,8 +287,12 @@
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Target Database Table</label>
         <select name="target_table" class="admin-input" required>
-          <?php foreach ($permittedTables as $tblName => $tblMeta): ?>
-            <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?> (<?= implode(', ', $tblMeta['columns']) ?>)</option>
+          <?php foreach ($permittedTables as $tblName => $tblMeta): 
+            $colSlice = array_slice($tblMeta['columns'] ?? [], 0, 6);
+            $colPreview = implode(', ', $colSlice);
+            if (count($tblMeta['columns'] ?? []) > 6) $colPreview .= '...';
+          ?>
+            <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?> (<?= htmlspecialchars($colPreview) ?> &bull; <?= (int)($tblMeta['total_rows'] ?? 0) ?> rows)</option>
           <?php endforeach; ?>
         </select>
       </div>

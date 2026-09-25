@@ -6,10 +6,10 @@
     <div>
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-indigo">ENTERPRISE API BUILDER &bull; DATA GATEWAY</span>
-        <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Table Introspection &amp; Custom REST JSON Endpoints</span>
+        <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Table Introspection, Whole DB Blueprint &amp; Custom REST Endpoints</span>
       </div>
       <h1 style="font-size: 1.6rem; color: var(--admin-text-primary); margin: 0; font-family: var(--admin-font-heading); font-weight: 800;">
-        Custom API Endpoints &amp; Schema Inspector
+        Custom API Gateway &amp; Schema Inspector
       </h1>
     </div>
 
@@ -17,11 +17,11 @@
       <a href="<?= url('/admin/incoming-webhooks') ?>" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600;">
         <i data-lucide="arrow-down-to-line"></i> Incoming Webhooks
       </a>
-      <a href="<?= url('/admin/api-keys') ?>" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600;">
-        <i data-lucide="key"></i> API Keys
-      </a>
+      <button type="button" onclick="loadWholeDatabaseBlueprint()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #38bdf8;">
+        <i data-lucide="database"></i> Describe Whole DB (JSON) ⚡
+      </button>
       <button type="button" onclick="openNewEndpointModal()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
-        <i data-lucide="plus"></i> New API Endpoint ⚡
+        <i data-lucide="plus"></i> New API Endpoint 🚀
       </button>
     </div>
   </div>
@@ -31,20 +31,99 @@
     <div class="admin-card" style="padding: 1.25rem; border-radius: 12px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg);">
       <div style="font-size: 0.78rem; color: var(--admin-text-secondary); text-transform: uppercase; font-weight: 700;">Total Endpoints</div>
       <div style="font-size: 1.8rem; font-weight: 800; color: #6366f1; margin: 0.25rem 0;"><?= count($endpoints ?? []) ?></div>
-      <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">Active endpoints available via HTTP</div>
+      <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">Configured custom REST endpoints</div>
     </div>
     <div class="admin-card" style="padding: 1.25rem; border-radius: 12px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg);">
-      <div style="font-size: 0.78rem; color: var(--admin-text-secondary); text-transform: uppercase; font-weight: 700;">Total API Dispatches</div>
-      <div style="font-size: 1.8rem; font-weight: 800; color: #10b981; margin: 0.25rem 0;">
-        <?= number_format(array_sum(array_column($endpoints ?? [], 'request_count'))) ?>
+      <div style="font-size: 0.78rem; color: var(--admin-text-secondary); text-transform: uppercase; font-weight: 700;">Total Tables In Database</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; margin: 0.25rem 0;">
+        <?= count($allTablesMetadata ?? $allowedTables ?? []) ?>
       </div>
-      <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">Total lifetime requests served</div>
+      <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">Dynamic introspection &bull; No whitelisting</div>
     </div>
     <div class="admin-card" style="padding: 1.25rem; border-radius: 12px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg);">
-      <div style="font-size: 0.78rem; color: var(--admin-text-secondary); text-transform: uppercase; font-weight: 700;">Introspection Types</div>
-      <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; margin: 0.25rem 0;">4 Modes</div>
-      <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">Table List, Table Schema, Data, Custom JSON</div>
+      <div style="font-size: 0.78rem; color: var(--admin-text-secondary); text-transform: uppercase; font-weight: 700;">Database Records (Estimated)</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: #10b981; margin: 0.25rem 0;">
+        <?= number_format(array_sum(array_column($allTablesMetadata ?? [], 'table_rows'))) ?>
+      </div>
+      <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">Across all platform tables</div>
     </div>
+    <div class="admin-card" style="padding: 1.25rem; border-radius: 12px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg);">
+      <div style="font-size: 0.78rem; color: var(--admin-text-secondary); text-transform: uppercase; font-weight: 700;">API Access Guard</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: #f59e0b; margin: 0.25rem 0;">Admin Only</div>
+      <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">Strictly restricted from regular users</div>
+    </div>
+  </div>
+
+  <!-- DATABASE BLUEPRINT & LIVE SCHEMA INSPECTOR PANEL -->
+  <div class="admin-card" style="padding: 1.5rem; border-radius: 14px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg); margin-bottom: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+      <div>
+        <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="layers" style="color: #6366f1;"></i> Dynamic Database Blueprint &amp; Table Introspector
+        </h3>
+        <p style="margin: 0.25rem 0 0 0; color: var(--admin-text-secondary); font-size: 0.82rem;">
+          Select any table in the database to instantly introspect its columns, data types, indexes, and sample rows.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <select id="quickTableSelect" onchange="inspectSelectedTable(this.value)" class="admin-input" style="min-width: 240px; font-weight: 600;">
+          <option value="">-- Choose Table to Describe --</option>
+          <?php foreach ($allowedTables as $tblName => $tblDesc): ?>
+            <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?> (<?= htmlspecialchars($tblDesc) ?>)</option>
+          <?php endforeach; ?>
+        </select>
+        <button type="button" onclick="inspectSelectedTable(document.getElementById('quickTableSelect').value)" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #6366f1;">
+          <i data-lucide="search"></i> Inspect
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Table Schema Display Box -->
+    <div id="tableInspectionBox" style="display: none; background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 10px; padding: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h4 id="inspectTableName" style="margin: 0; font-size: 1.1rem; color: #38bdf8; font-family: var(--admin-font-mono);">table_name</h4>
+          <span id="inspectTableStats" style="font-size: 0.75rem; color: var(--admin-text-secondary);">0 columns &bull; 0 records</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" onclick="testTableEndpoint('query')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem;">
+            🔍 Query Table (GET)
+          </button>
+          <button type="button" onclick="testTableEndpoint('insert')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem; color: #10b981;">
+            ➕ Insert Record (POST)
+          </button>
+        </div>
+      </div>
+
+      <!-- Columns Table -->
+      <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
+        <table class="admin-table" style="font-size: 0.8rem;">
+          <thead>
+            <tr>
+              <th>Column Name</th>
+              <th>Type</th>
+              <th>Nullable</th>
+              <th>Key</th>
+              <th>Default</th>
+              <th>Extra</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody id="inspectColumnsBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Endpoints Cards Grid Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.2rem; color: var(--admin-text-primary); margin: 0; font-weight: 700;">
+      Configured Custom API Endpoints (<?= count($endpoints ?? []) ?>)
+    </h2>
+    <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Direct Admin REST Endpoints</span>
   </div>
 
   <!-- Endpoints Cards Grid -->
@@ -85,7 +164,7 @@
                 </span>
               <?php endif; ?>
               <span class="ts-badge <?= !empty($ep['auth_required']) ? 'ts-badge-amber' : 'ts-badge-green' ?>" style="font-size: 0.7rem;">
-                <?= !empty($ep['auth_required']) ? '🔒 TOKEN REQUIRED' : '🌐 PUBLIC OPEN' ?>
+                <?= !empty($ep['auth_required']) ? '🔒 TOKEN REQUIRED' : '🛡️ ADMIN PROTECTED' ?>
               </span>
             </div>
 
@@ -99,30 +178,23 @@
               </button>
             </div>
 
-            <div style="font-size: 0.75rem; color: var(--admin-text-secondary); margin-bottom: 0.75rem;">
-              Requests: <strong><?= number_format((int)($ep['request_count'] ?? 0)) ?></strong> &bull; 
-              Last Access: 
-              <?php if (!empty($ep['last_accessed_at'])): ?>
-                <time class="ts-time" datetime="<?= htmlspecialchars(date('c', strtotime($ep['last_accessed_at']))) ?>">
-                  <?= htmlspecialchars($ep['last_accessed_at']) ?>
-                </time>
-              <?php else: ?>
-                Never
-              <?php endif; ?>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--admin-text-secondary); margin-bottom: 0.75rem;">
+              <span>Dispatches: <strong><?= number_format((int)($ep['request_count'] ?? 0)) ?></strong></span>
+              <span>Last Accessed: <strong><?= !empty($ep['last_accessed_at']) ? \App\Core\DateHelper::render($ep['last_accessed_at'], 'M j, H:i') : 'Never' ?></strong></span>
             </div>
           </div>
 
-          <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.75rem;">
-            <button type="button" onclick='openApiTester(<?= json_encode($ep) ?>)' class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-weight: 700; font-size: 0.78rem;">
-              <i data-lucide="play"></i> Live Sandbox Tester
+          <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.85rem;">
+            <button type="button" onclick='openApiTester(<?= json_encode($ep) ?>)' class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-size: 0.78rem; font-weight: 700;">
+              <i data-lucide="play"></i> Test &amp; Sandbox
             </button>
             <form action="<?= url('/admin/custom-api/toggle/' . $ep['id']) ?>" method="POST" style="margin: 0;">
-              <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Active Status">
+              <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Active">
                 <i data-lucide="<?= !empty($ep['is_active']) ? 'pause' : 'play' ?>" style="width: 14px; height: 14px;"></i>
               </button>
             </form>
-            <form action="<?= url('/admin/custom-api/delete/' . $ep['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this custom API endpoint?');" style="margin: 0;">
-              <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;" title="Delete Endpoint">
+            <form action="<?= url('/admin/custom-api/delete/' . $ep['id']) ?>" method="POST" onsubmit="return confirm('Permanently remove this custom API endpoint?');" style="margin: 0;">
+              <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;" title="Delete">
                 <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
               </button>
             </form>
@@ -130,22 +202,22 @@
         </div>
       <?php endforeach; ?>
     <?php else: ?>
-      <div class="admin-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+      <div class="admin-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem; border: 1px dashed var(--admin-border-main); background: var(--admin-card-bg);">
         <i data-lucide="code" style="width: 44px; height: 44px; color: var(--admin-text-secondary); margin-bottom: 0.75rem;"></i>
-        <h3 style="color: var(--admin-text-primary); margin: 0 0 0.5rem 0;">No Custom API Endpoints Yet</h3>
+        <h3 style="color: var(--admin-text-primary); margin: 0 0 0.5rem 0;">No Custom API Endpoints Configured</h3>
         <p style="color: var(--admin-text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">
-          Build dynamic REST endpoints to expose database tables, inspect table schemas, or serve custom JSON feeds.
+          Expose real-time data feeds, schema introspection, or custom JSON responses without writing PHP code.
         </p>
-        <button type="button" onclick="openNewEndpointModal()" class="admin-btn admin-btn-primary">Create First API Endpoint</button>
+        <button type="button" onclick="openNewEndpointModal()" class="admin-btn admin-btn-primary">Create First Endpoint</button>
       </div>
     <?php endif; ?>
   </div>
 
-  <!-- Live Sandbox & Response Inspector Drawer -->
+  <!-- LIVE SANDBOX & RESPONSE INSPECTOR DRAWER -->
   <div id="apiSandboxDrawer" class="admin-table-wrap" style="display: none; padding: 1.5rem; margin-bottom: 2.5rem; border: 2px solid var(--ts-primary, #6366f1); border-radius: 14px; background: var(--admin-card-bg);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
       <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE API SANDBOX</span>
+        <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE API SANDBOX &amp; C.R.U.D. RUNNER</span>
         <h3 style="margin: 0; color: var(--admin-text-primary);" id="sandboxEndpointTitle">API Sandbox</h3>
       </div>
       <button type="button" onclick="closeApiTester()" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;">
@@ -154,17 +226,30 @@
     </div>
 
     <!-- Request Builder Bar -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
-      <span class="ts-badge ts-badge-green" style="font-size: 0.82rem; font-weight: 800; padding: 0.45rem 0.75rem; display: flex; align-items: center;">GET</span>
-      <input type="text" id="sandboxRequestUrl" class="admin-input" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.82rem;" readonly>
-      <button type="button" onclick="executeSandboxQuery()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700; padding: 0 1.25rem;">
+    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <select id="sandboxMethod" onchange="toggleSandboxPayload(this.value)" class="admin-input" style="font-weight: 800;">
+        <option value="GET">GET (Query)</option>
+        <option value="POST">POST (Insert)</option>
+        <option value="PUT">PUT (Update)</option>
+        <option value="DELETE">DELETE (Remove)</option>
+      </select>
+      <input type="text" id="sandboxRequestUrl" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.82rem;">
+      <button type="button" onclick="executeSandboxQuery()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
         🚀 Send Request
       </button>
     </div>
 
+    <!-- Payload Box for POST / PUT -->
+    <div id="sandboxPayloadBox" style="display: none; margin-bottom: 0.75rem;">
+      <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--admin-text-secondary);">
+        Request Body (JSON Payload for Insert / Update):
+      </label>
+      <textarea id="sandboxPayload" rows="4" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.8rem;" placeholder='{"title": "Sample Item", "status": "active"}'></textarea>
+    </div>
+
     <!-- Response Preview Pane -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-      <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-secondary);">JSON Response Body</span>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-secondary);">Live Response Body</span>
       <div style="display: flex; gap: 0.5rem; align-items: center;">
         <span id="sandboxStatusBadge" class="ts-badge" style="font-size: 0.7rem; display: none;"></span>
         <button type="button" onclick="copySandboxResponse()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
@@ -179,7 +264,7 @@
 <!-- Modal: Create New API Endpoint -->
 <div id="newEndpointModal" class="admin-modal" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeNewEndpointModal()"></div>
-  <div class="admin-modal-content" style="max-width: 600px;">
+  <div class="admin-modal-content" style="max-width: 620px;">
     <div class="admin-modal-header">
       <h3 style="margin: 0; color: var(--admin-text-primary);">Create Custom API Endpoint</h3>
       <button type="button" onclick="closeNewEndpointModal()" class="admin-modal-close">&times;</button>
@@ -253,7 +338,7 @@
       <div style="margin-bottom: 1.25rem;">
         <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--admin-text-primary);">
           <input type="checkbox" name="auth_required" value="1">
-          Require Authentication (Bearer Token or ?token=)
+          Require Explicit API Token (Otherwise restricted to logged-in Admin Session)
         </label>
       </div>
 
@@ -266,6 +351,8 @@
 </div>
 
 <script>
+let activeSandboxUrl = '';
+
 function openNewEndpointModal() {
   document.getElementById('newEndpointModal').style.display = 'flex';
 }
@@ -308,8 +395,6 @@ function copyToClipboard(text) {
   }
 }
 
-let activeSandboxUrl = '';
-
 function openApiTester(endpoint) {
   const drawer = document.getElementById('apiSandboxDrawer');
   const title = document.getElementById('sandboxEndpointTitle');
@@ -323,6 +408,9 @@ function openApiTester(endpoint) {
   activeSandboxUrl = '<?= url('/api/v1/custom/') ?>' + endpoint.slug;
   urlInput.value = activeSandboxUrl;
 
+  document.getElementById('sandboxMethod').value = 'GET';
+  toggleSandboxPayload('GET');
+
   responseBody.textContent = '// Click "Send Request" to test live endpoint...';
   document.getElementById('sandboxStatusBadge').style.display = 'none';
 }
@@ -331,26 +419,54 @@ function closeApiTester() {
   document.getElementById('apiSandboxDrawer').style.display = 'none';
 }
 
+function toggleSandboxPayload(method) {
+  const box = document.getElementById('sandboxPayloadBox');
+  if (method === 'POST' || method === 'PUT') {
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
 function executeSandboxQuery() {
   const url = document.getElementById('sandboxRequestUrl').value;
+  const method = document.getElementById('sandboxMethod').value;
+  const payloadText = document.getElementById('sandboxPayload').value;
   const responseBody = document.getElementById('sandboxResponseBody');
   const statusBadge = document.getElementById('sandboxStatusBadge');
 
-  responseBody.textContent = '// Fetching response...';
+  responseBody.textContent = '// Dispatching ' + method + ' request to ' + url + '...';
+
+  const options = {
+    method: method,
+    headers: {
+      'Accept': 'application/json'
+    }
+  };
+
+  if ((method === 'POST' || method === 'PUT') && payloadText.trim() !== '') {
+    options.headers['Content-Type'] = 'application/json';
+    options.body = payloadText;
+  }
 
   const startTime = performance.now();
-  fetch(url)
+  fetch(url, options)
     .then(async r => {
       const elapsed = Math.round(performance.now() - startTime);
-      const data = await r.json();
-      responseBody.textContent = JSON.stringify(data, null, 2);
+      const text = await r.text();
+      try {
+        const json = JSON.parse(text);
+        responseBody.textContent = JSON.stringify(json, null, 2);
+      } catch (e) {
+        responseBody.textContent = text;
+      }
 
       statusBadge.style.display = 'inline-block';
       statusBadge.className = 'ts-badge ' + (r.ok ? 'ts-badge-green' : 'ts-badge-pink');
       statusBadge.textContent = 'HTTP ' + r.status + ' (' + elapsed + 'ms)';
     })
     .catch(err => {
-      responseBody.textContent = 'Error: ' + err.toString();
+      responseBody.textContent = 'Network or Client Error: ' + err.toString();
       statusBadge.style.display = 'inline-block';
       statusBadge.className = 'ts-badge ts-badge-pink';
       statusBadge.textContent = 'FETCH ERROR';
@@ -364,6 +480,93 @@ function copySandboxResponse() {
       alert('JSON response copied to clipboard!');
     });
   }
+}
+
+function inspectSelectedTable(tableName) {
+  if (!tableName) return;
+  const box = document.getElementById('tableInspectionBox');
+  const tName = document.getElementById('inspectTableName');
+  const tStats = document.getElementById('inspectTableStats');
+  const tbody = document.getElementById('inspectColumnsBody');
+
+  box.style.display = 'block';
+  tName.textContent = tableName;
+  tStats.textContent = 'Loading schema columns...';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--admin-text-secondary); padding: 1rem;">Fetching table blueprint...</td></tr>';
+
+  fetch('<?= url('/api/v1/custom/describe-table?table=') ?>' + encodeURIComponent(tableName))
+    .then(r => r.json())
+    .then(res => {
+      if (!res.success || !res.data) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color: #ef4444; padding: 1rem;">' + (res.error || 'Failed to inspect table.') + '</td></tr>';
+        return;
+      }
+      const data = res.data;
+      tStats.textContent = (data.total_columns || 0) + ' columns &bull; ' + (data.total_records || 0) + ' records';
+
+      let rowsHtml = '';
+      (data.columns || []).forEach(c => {
+        rowsHtml += `
+          <tr>
+            <td style="font-weight: 700; color: #38bdf8; font-family: var(--admin-font-mono);">${c.name}</td>
+            <td style="font-family: var(--admin-font-mono);">${c.type}</td>
+            <td>${c.nullable ? '<span class="ts-badge ts-badge-cyan" style="font-size:0.65rem;">YES</span>' : '<span class="ts-badge ts-badge-pink" style="font-size:0.65rem;">NO</span>'}</td>
+            <td>${c.key ? '<span class="ts-badge ts-badge-amber" style="font-size:0.65rem;">' + c.key + '</span>' : '&mdash;'}</td>
+            <td><code>${c.default !== null ? c.default : 'NULL'}</code></td>
+            <td style="font-size: 0.72rem; color: var(--admin-text-secondary);">${c.extra || ''}</td>
+            <td style="font-size: 0.75rem; color: var(--admin-text-secondary);">${c.comment || ''}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = rowsHtml;
+    })
+    .catch(err => {
+      tbody.innerHTML = '<tr><td colspan="7" style="color: #ef4444; padding: 1rem;">Inspection request failed: ' + err.toString() + '</td></tr>';
+    });
+}
+
+function testTableEndpoint(action) {
+  const table = document.getElementById('inspectTableName').textContent;
+  if (!table) return;
+
+  const drawer = document.getElementById('apiSandboxDrawer');
+  const title = document.getElementById('sandboxEndpointTitle');
+  const urlInput = document.getElementById('sandboxRequestUrl');
+  const methodSelect = document.getElementById('sandboxMethod');
+
+  drawer.style.display = 'block';
+  drawer.scrollIntoView({ behavior: 'smooth' });
+
+  if (action === 'query') {
+    title.innerText = 'Query Table: ' + table;
+    urlInput.value = '<?= url('/api/v1/custom/table-data?table=') ?>' + encodeURIComponent(table);
+    methodSelect.value = 'GET';
+    toggleSandboxPayload('GET');
+  } else if (action === 'insert') {
+    title.innerText = 'Insert Record into: ' + table;
+    urlInput.value = '<?= url('/api/v1/custom/table-insert?table=') ?>' + encodeURIComponent(table);
+    methodSelect.value = 'POST';
+    toggleSandboxPayload('POST');
+  }
+
+  executeSandboxQuery();
+}
+
+function loadWholeDatabaseBlueprint() {
+  const drawer = document.getElementById('apiSandboxDrawer');
+  const title = document.getElementById('sandboxEndpointTitle');
+  const urlInput = document.getElementById('sandboxRequestUrl');
+  const methodSelect = document.getElementById('sandboxMethod');
+
+  drawer.style.display = 'block';
+  drawer.scrollIntoView({ behavior: 'smooth' });
+
+  title.innerText = 'Full Database Blueprint & Schema Architecture';
+  urlInput.value = '<?= url('/api/v1/custom/describe-db') ?>';
+  methodSelect.value = 'GET';
+  toggleSandboxPayload('GET');
+
+  executeSandboxQuery();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

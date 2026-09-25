@@ -215,6 +215,34 @@
   </div>
 </div>
 
+<!-- Live Interactive Popup Simulator Modal -->
+<div id="popupSimulatorModal" class="admin-modal" style="display: none; z-index: 99999;">
+  <div class="admin-modal-backdrop" onclick="closePopupSimulator()"></div>
+  <div class="admin-modal-content" style="max-width: 540px; padding: 0; background: transparent; border: none; box-shadow: none;">
+    <div id="simPopupContainer" style="border-radius: 16px; padding: 2.25rem; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden;">
+      <button type="button" onclick="closePopupSimulator()" style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.15); border: none; color: inherit; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+      
+      <div style="margin-bottom: 0.75rem;">
+        <span id="simBadge" class="ts-badge ts-badge-pink" style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.5px;">FEATURED</span>
+      </div>
+
+      <h2 id="simHeadline" style="font-size: 1.45rem; font-weight: 800; margin: 0 0 0.75rem 0; line-height: 1.3;">Headline</h2>
+      
+      <div id="simBody" style="font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.5rem; opacity: 0.92;">Message Body</div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <a id="simCtaBtn" href="#" target="_blank" class="admin-btn admin-btn-primary" style="padding: 0.75rem 1.75rem; font-weight: 700; border-radius: 10px; text-decoration: none;">Explore Platform ↗</a>
+        <button type="button" id="simSecBtn" onclick="closePopupSimulator()" class="admin-btn admin-btn-outline" style="border-radius: 10px;">Maybe Later</button>
+      </div>
+      
+      <div style="margin-top: 1.5rem; font-size: 0.72rem; opacity: 0.7; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.75rem;">
+        <span id="simTriggerInfo">Trigger: Delay (3s)</span>
+        <span id="simAudienceInfo">Audience: Everyone</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 function openNewPopupModal() {
   document.getElementById('popup_id').value = '0';
@@ -261,7 +289,55 @@ function editPopup(p) {
 }
 
 function previewPopup(p) {
-  alert(`[Live Preview Simulator]\n\nBadge: ${p.badge_text}\nHeadline: ${p.headline}\nContent: ${p.content_html}\nButton: ${p.cta_button_text} -> ${p.cta_button_url}\nTrigger: ${p.display_trigger} (Delay: ${p.trigger_delay_seconds}s)\nTarget Audience: ${p.target_audience}`);
+  const container = document.getElementById('simPopupContainer');
+  const badge = document.getElementById('simBadge');
+  const headline = document.getElementById('simHeadline');
+  const body = document.getElementById('simBody');
+  const ctaBtn = document.getElementById('simCtaBtn');
+  const secBtn = document.getElementById('simSecBtn');
+  const triggerInfo = document.getElementById('simTriggerInfo');
+  const audienceInfo = document.getElementById('simAudienceInfo');
+
+  badge.textContent = p.badge_text || 'ANNOUNCEMENT';
+  headline.textContent = p.headline || 'Featured Update';
+  body.innerHTML = p.content_html || '';
+  ctaBtn.textContent = p.cta_button_text || 'Learn More ↗';
+  ctaBtn.href = p.cta_button_url || '#';
+
+  if (p.secondary_button_text) {
+    secBtn.style.display = 'inline-block';
+    secBtn.textContent = p.secondary_button_text;
+  } else {
+    secBtn.style.display = 'none';
+  }
+
+  triggerInfo.textContent = 'Trigger: ' + (p.display_trigger || 'delay') + ' (' + (p.trigger_delay_seconds || 3) + 's)';
+  audienceInfo.textContent = 'Target: ' + (p.target_audience || 'all');
+
+  const theme = p.popup_theme || 'modern_gradient';
+  if (theme === 'dark_glass') {
+    container.style.background = 'rgba(15, 23, 42, 0.95)';
+    container.style.color = '#f8fafc';
+    container.style.border = '1px solid rgba(56,189,248,0.35)';
+  } else if (theme === 'cyber_amber') {
+    container.style.background = '#0f172a';
+    container.style.color = '#fef3c7';
+    container.style.border = '2px solid #f59e0b';
+  } else if (theme === 'minimal_card') {
+    container.style.background = 'var(--admin-card-bg)';
+    container.style.color = 'var(--admin-text-primary)';
+    container.style.border = '1px solid var(--admin-border-main)';
+  } else {
+    container.style.background = 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)';
+    container.style.color = '#ffffff';
+    container.style.border = '1px solid rgba(99,102,241,0.4)';
+  }
+
+  document.getElementById('popupSimulatorModal').style.display = 'flex';
+}
+
+function closePopupSimulator() {
+  document.getElementById('popupSimulatorModal').style.display = 'none';
 }
 </script>
 
