@@ -103,7 +103,15 @@ class Router {
     }
 
     private function handleMiddleware(string $mw): void {
+        $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+            || (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json'))
+            || (isset($_SERVER['REQUEST_URI']) && (str_contains($_SERVER['REQUEST_URI'], '/api/') || str_contains($_SERVER['REQUEST_URI'], '/save-mappings')));
+
         if ($mw === 'auth' && !Auth::check()) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'code' => 401, 'error' => 'Please sign in to access this resource.'], 401);
+                exit;
+            }
             Session::flash('error', 'Please sign in to access this page.');
             Response::redirect('/auth/login');
             exit;
@@ -111,11 +119,19 @@ class Router {
 
         if ($mw === 'author') {
             if (!Auth::check()) {
+                if ($isAjax) {
+                    Response::json(['success' => false, 'code' => 401, 'error' => 'Please sign in to access the Creator Studio.'], 401);
+                    exit;
+                }
                 Session::flash('error', 'Please sign in to access the Creator Studio.');
                 Response::redirect('/auth/login');
                 exit;
             }
             if (!Auth::isAuthor()) {
+                if ($isAjax) {
+                    Response::json(['success' => false, 'code' => 403, 'error' => 'Author privileges required.'], 403);
+                    exit;
+                }
                 $status = Auth::authorApplicationStatus();
                 if ($status === 'rejected') {
                     Session::flash('error', 'Your author application has revisions requested. Please review editorial feedback and resubmit.');
@@ -130,12 +146,20 @@ class Router {
         }
 
         if ($mw === 'admin' && !Auth::isAdmin()) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'code' => 403, 'error' => 'Administrative access required.'], 403);
+                exit;
+            }
             Session::flash('error', 'Administrative access required.');
             Response::redirect('/auth/login');
             exit;
         }
 
         if ($mw === 'editor' && !Auth::isEditor()) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'code' => 403, 'error' => 'Editorial access required.'], 403);
+                exit;
+            }
             Session::flash('error', 'Editorial access required.');
             Response::redirect('/auth/login');
             exit;

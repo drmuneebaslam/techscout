@@ -185,7 +185,7 @@
           </div>
 
           <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.85rem;">
-            <button type="button" onclick='openApiTester(<?= json_encode($ep) ?>)' class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-size: 0.78rem; font-weight: 700;">
+            <button type="button" onclick="openApiTester(<?= htmlspecialchars(json_encode($ep, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-size: 0.78rem; font-weight: 700;">
               <i data-lucide="play"></i> Test &amp; Sandbox
             </button>
             <form action="<?= url('/admin/custom-api/toggle/' . $ep['id']) ?>" method="POST" style="margin: 0;">
@@ -439,8 +439,10 @@ function executeSandboxQuery() {
 
   const options = {
     method: method,
+    credentials: 'same-origin',
     headers: {
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
     }
   };
 
@@ -494,7 +496,13 @@ function inspectSelectedTable(tableName) {
   tStats.textContent = 'Loading schema columns...';
   tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--admin-text-secondary); padding: 1rem;">Fetching table blueprint...</td></tr>';
 
-  fetch('<?= url('/api/v1/custom/describe-table?table=') ?>' + encodeURIComponent(tableName))
+  fetch('<?= url('/api/v1/custom/describe-table?table=') ?>' + encodeURIComponent(tableName), {
+    credentials: 'same-origin',
+    headers: {
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
     .then(r => r.json())
     .then(res => {
       if (!res.success || !res.data) {

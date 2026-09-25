@@ -37,6 +37,7 @@ class IncomingWebhookEngine {
                 elseif ($tableName === 'ai_tools') $parentContentType = 'ai_tool';
                 elseif ($tableName === 'articles') $parentContentType = 'article';
                 else $parentContentType = $tableName;
+                $colNames = array_values(array_unique(array_merge(['title', 'slug', 'summary', 'featured_image_url', 'status', 'category_id'], $colNames)));
             }
 
             $definitions[$tableName] = [
@@ -202,6 +203,11 @@ class IncomingWebhookEngine {
                     // Ensure foreign key
                     if (in_array('content_id', $childCols, true)) {
                         $childData['content_id'] = $contentId;
+                    }
+
+                    // Auto-fill prompt_template if target is prompts table and not explicitly mapped
+                    if ($targetTable === 'prompts' && in_array('prompt_template', $childCols, true) && empty($childData['prompt_template'])) {
+                        $childData['prompt_template'] = !empty($summaryVal) ? $summaryVal : ($titleVal ?: 'Prompt Blueprint');
                     }
 
                     // Insert or update child record

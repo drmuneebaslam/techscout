@@ -1,0 +1,74 @@
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+/api/v1/webhook/live-stream/tool-sync?since_id=0:1  Failed to load resource: the server responded with a status of 403 (Forbidden)
+incoming-webhooks:1068  GET https://funwithcoding.free.nf/api/v1/webhook/live-stream/tool-sync?since_id=0 403 (Forbidden)
+pollLatestLogs @ incoming-webhooks:1068
+incoming-webhooks:1068  GET https://funwithcoding.free.nf/api/v1/webhook/live-stream/tool-sync?since_id=0 403 (Forbidden)
+pollLatestLogs @ incoming-webhooks:1068
+
+
+and also custom api page also not working and more to this 
+ubuntu@ip-172-31-22-175:~$ sudo deploy
+Starting TechScout Deployment...
+Saved working directory and index state WIP on (no branch): c0b7823 fix(critical): add missing use Config to admin_header (white screen), fix supporter_user_id->tipper_user_id in AdRenderer (DB error), add cache+OPcache clearing to deploy scripts
+Pulling latest changes from GitHub origin/main...
+From https://github.com/drmuneebaslam/techscout
+ * branch            main       -> FETCH_HEAD
+Previous HEAD position was c0b7823 fix(critical): add missing use Config to admin_header (white screen), fix supporter_user_id->tipper_user_id in AdRenderer (DB error), add cache+OPcache clearing to deploy scripts
+HEAD is now at f168db0 Fix production crash telemetry errors, implement server sudo deploy command, resolve funwithcoding blank screen, add CloudFront asset cache busting, and configure 3-environment credential profiles
+HEAD is now at f168db0 Fix production crash telemetry errors, implement server sudo deploy command, resolve funwithcoding blank screen, add CloudFront asset cache busting, and configure 3-environment credential profiles
+Running migrations and clearing cache...
+=================================================================
+[2026-09-25T22:37:18Z] TechScout EC2 Production Sync
+Target directory: /var/www/techscout
+=================================================================
+[2026-09-25T22:37:18Z] Pulling latest commits from GitHub origin main...
+From https://github.com/drmuneebaslam/techscout
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+[2026-09-25T22:37:18Z] Executing pending database migrations...
+Applying migration: 2026_09_26_000001_prompts_optimization_and_custom_api_gateway ... ERROR: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'IF NOT EXISTS `prompt_type` VARCHAR(50) NOT NULL DEFAULT 'text'' at line 1
+and also 
+
+Live JSON Listener: muneeb
+Target DB Table: prompts • Endpoint: https://techscout.online/api/v1/webhook/muneeb
+Refresh Stream
+× Close Studio
+Incoming Payloads Stream
+0 payloads received
+// Waiting for incoming HTTP POST requests to this webhook...
+// Click "Send Test Payload" below to simulate an incoming event.
+⚡ Send Test Simulation Payload
+Load Sample Data
+{
+    "title": "Autonomous AI Agent Hub",
+    "summary": "State-of-the-art framework for orchestrating multi-agent systems.",
+    "content_type": "ai_tool",
+    "status": "published",
+    "metadata": {
+        "author": "Engineering Lab",
+        "stars": 4500
+    }
+}
+🚀 Execute Test Dispatch
+✗ 400: Admin authorization required
+Dynamic Field Mapping Matrix
++ Add Field Map
+Map incoming JSON keys (supports dotted nesting like metadata.author) to target table columns.
+
+title
+→
+
+content_id
+×
+💾 Save Field Mapping Rules
+
+the api not working correctly please update this 
+first write this complete prompt in a file cintu.txt already there so when quot reached we will continue from here

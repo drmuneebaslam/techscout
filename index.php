@@ -746,12 +746,6 @@ $router->post('/admin/incoming-webhooks/delete/{id}', [AdminController::class, '
 $router->post('/admin/incoming-webhooks/toggle/{id}', [AdminController::class, 'toggleIncomingWebhook'], ['admin']);
 $router->post('/admin/incoming-webhooks/test/{id}', [AdminController::class, 'testIncomingWebhook'], ['admin']);
 
-// Custom REST API Endpoints & Dynamic Table Introspector
-$router->get('/admin/custom-api', [AdminController::class, 'customApiEndpoints'], ['admin']);
-$router->post('/admin/custom-api/save', [AdminController::class, 'saveCustomApiEndpoint'], ['admin']);
-$router->post('/admin/custom-api/toggle/{id}', [AdminController::class, 'toggleCustomApiEndpoint'], ['admin']);
-$router->post('/admin/custom-api/delete/{id}', [AdminController::class, 'deleteCustomApiEndpoint'], ['admin']);
-
 // Engagement & Telemetry Simulator Hub
 $router->get('/admin/engagement-studio', [AdminController::class, 'engagementStudio'], ['admin']);
 $router->post('/admin/engagement-studio/simulate', [AdminController::class, 'simulateEngagement'], ['admin']);
@@ -793,8 +787,8 @@ $router->post('/admin/support/categories/{id}/subcategory/delete', [SupportContr
 // 8. RESTful API v1 ENDPOINTS
 // ----------------------------------------------------------------------------
 // Enterprise Incoming Webhooks Engine
-$router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate'], ['admin']);
-$router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream'], ['admin']);
+$router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate']);
+$router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream']);
 $router->post('/api/v1/webhook/{endpoint_slug}', [\App\Controllers\IncomingWebhookController::class, 'handle']);
 
 // Dynamic Custom REST API Gateway & Table Schema Introspector

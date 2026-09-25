@@ -17,12 +17,8 @@ class CustomApiController {
      */
     public static function requireAdminAuth(Request $request, ?array $endpoint = null): bool {
         // 1. Session check: Logged-in admin or super_admin
-        if (Auth::check()) {
-            $user = Auth::user();
-            $role = strtolower((string)($user['role'] ?? ''));
-            if (in_array($role, ['admin', 'super_admin'], true)) {
-                return true;
-            }
+        if (Auth::isAdmin()) {
+            return true;
         }
 
         // 2. Token Extraction from Authorization Header, Query Parameter, or Custom Header
@@ -109,6 +105,16 @@ class CustomApiController {
         }
         if ($slug === 'tables') {
             $this->serveTablesCatalog($request);
+            return;
+        }
+        if ($slug === 'table-data') {
+            $targetTbl = trim((string)$request->query('table', 'prompts'));
+            $this->serveTableData($request, [
+                'name' => "Dynamic Table Data Explorer: {$targetTbl}",
+                'slug' => 'table-data',
+                'target_table' => $targetTbl,
+                'endpoint_type' => 'table_data'
+            ]);
             return;
         }
         if ($slug === 'table-insert') {

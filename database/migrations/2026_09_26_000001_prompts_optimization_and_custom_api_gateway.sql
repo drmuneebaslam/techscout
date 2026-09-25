@@ -35,19 +35,19 @@ CREATE TABLE IF NOT EXISTS `custom_api_endpoints` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. Safely add rich prompt generation columns to `prompts` table
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `prompt_type` VARCHAR(50) NOT NULL DEFAULT 'text';
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `aspect_ratio` VARCHAR(20) DEFAULT '16:9';
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `negative_prompt` TEXT NULL;
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `model_version` VARCHAR(100) NULL;
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `cfg_scale` DECIMAL(5,2) NULL DEFAULT 7.00;
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `steps` INT NULL DEFAULT 30;
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `seed` BIGINT NULL DEFAULT NULL;
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `sampler` VARCHAR(50) NULL DEFAULT 'Euler a';
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `style_preset` VARCHAR(100) NULL DEFAULT 'Photorealistic';
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `difficulty_level` VARCHAR(50) NOT NULL DEFAULT 'beginner';
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `system_prompt` TEXT NULL;
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `parameters_json` LONGTEXT NULL;
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `how_to_use` TEXT NULL;
+ALTER TABLE `prompts` ADD COLUMN `prompt_type` VARCHAR(50) NOT NULL DEFAULT 'text';
+ALTER TABLE `prompts` ADD COLUMN `aspect_ratio` VARCHAR(20) DEFAULT '16:9';
+ALTER TABLE `prompts` ADD COLUMN `negative_prompt` TEXT NULL;
+ALTER TABLE `prompts` ADD COLUMN `model_version` VARCHAR(100) NULL;
+ALTER TABLE `prompts` ADD COLUMN `cfg_scale` DECIMAL(5,2) NULL DEFAULT 7.00;
+ALTER TABLE `prompts` ADD COLUMN `steps` INT NULL DEFAULT 30;
+ALTER TABLE `prompts` ADD COLUMN `seed` BIGINT NULL DEFAULT NULL;
+ALTER TABLE `prompts` ADD COLUMN `sampler` VARCHAR(50) NULL DEFAULT 'Euler a';
+ALTER TABLE `prompts` ADD COLUMN `style_preset` VARCHAR(100) NULL DEFAULT 'Photorealistic';
+ALTER TABLE `prompts` ADD COLUMN `difficulty_level` VARCHAR(50) NOT NULL DEFAULT 'beginner';
+ALTER TABLE `prompts` ADD COLUMN `system_prompt` TEXT NULL;
+ALTER TABLE `prompts` ADD COLUMN `parameters_json` LONGTEXT NULL;
+ALTER TABLE `prompts` ADD COLUMN `how_to_use` TEXT NULL;
 
 -- 3. Seed Starter Custom API Endpoints if not present
 INSERT IGNORE INTO `custom_api_endpoints` 

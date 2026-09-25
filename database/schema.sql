@@ -1067,6 +1067,31 @@ CREATE TABLE `prompts` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`content_id`),
   CONSTRAINT `fk_prompts_content` FOREIGN KEY (`content_id`) REFERENCES `contents` (`id`) ON DELETE CASCADE
+DROP TABLE IF EXISTS `custom_api_endpoints`;
+CREATE TABLE `custom_api_endpoints` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) NOT NULL,
+  `slug` varchar(100) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `endpoint_type` enum('table_schema','table_list','table_data','custom_json') NOT NULL DEFAULT 'table_data',
+  `target_table` varchar(100) DEFAULT NULL,
+  `selected_columns` text DEFAULT NULL,
+  `where_conditions_json` text DEFAULT NULL,
+  `order_by_column` varchar(100) DEFAULT 'id',
+  `order_direction` enum('ASC','DESC') NOT NULL DEFAULT 'DESC',
+  `result_limit` int(11) NOT NULL DEFAULT 50,
+  `custom_response_template` longtext DEFAULT NULL,
+  `auth_required` tinyint(1) NOT NULL DEFAULT 0,
+  `secret_token` varchar(128) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `request_count` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `last_accessed_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_cae_slug` (`slug`),
+  KEY `idx_cae_active` (`is_active`),
+  KEY `idx_cae_type` (`endpoint_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `reactions`;

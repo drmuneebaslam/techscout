@@ -69,7 +69,7 @@
           </div>
 
           <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.75rem;">
-            <button type="button" onclick='openLiveListener(<?= json_encode($wh) ?>)' class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-weight: 700; font-size: 0.78rem;">
+            <button type="button" onclick="openLiveListener(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-weight: 700; font-size: 0.78rem;">
               <i data-lucide="radio"></i> Live Listener &amp; Mapper
             </button>
             <form action="<?= url('/admin/incoming-webhooks/toggle/' . $wh['id']) ?>" method="POST" style="margin: 0;">
@@ -437,7 +437,12 @@ async function saveFieldMappings(e) {
 
   const res = await fetch('<?= url('/admin/incoming-webhooks/save-mappings') ?>', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    headers: { 
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    },
     body: JSON.stringify({
       id: currentActiveWebhook.id,
       mapping_rules_json: JSON.stringify(rules)
@@ -455,7 +460,14 @@ async function saveFieldMappings(e) {
 async function pollLatestLogs() {
   if (!currentActiveWebhook) return;
   try {
-    const res = await fetch('<?= url('/api/v1/webhook/live-stream/') ?>' + currentActiveWebhook.slug + '?since_id=' + lastLogId);
+    const res = await fetch('<?= url('/api/v1/webhook/live-stream/') ?>' + currentActiveWebhook.slug + '?since_id=' + lastLogId, {
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    if (!res.ok) return;
     const data = await res.json();
     if (data.success && data.logs && data.logs.length) {
       const viewer = document.getElementById('livePayloadViewer');
@@ -490,6 +502,11 @@ async function sendTestSimulation() {
 
     const res = await fetch('<?= url('/api/v1/webhook/simulate') ?>', {
       method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
       body: fd
     });
     const data = await res.json();
