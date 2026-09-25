@@ -31,7 +31,29 @@ if (!function_exists('url')) {
         }
 
         $cleanPath = ltrim($path, '/');
-        return $cleanPath ? "{$base}/{$cleanPath}" : $base . '/';
+        $urlResult = $cleanPath ? "{$base}/{$cleanPath}" : $base . '/';
+
+        // Automatic CloudFront & Browser Cache-Busting: Append/update ?v=filemtime for static CSS/JS
+        if (preg_match('#^assets/(?:css|js)/.+\.(?:css|js)#i', $cleanPath)) {
+            $purePath = explode('?', $cleanPath)[0];
+            $fsPath = dirname(__DIR__, 2) . '/' . $purePath;
+            if (file_exists($fsPath) && is_file($fsPath)) {
+                $v = filemtime($fsPath);
+                $urlResult = explode('?', $urlResult)[0] . '?v=' . $v;
+            }
+        }
+
+        return $urlResult;
+    }
+}
+
+if (!function_exists('asset_url')) {
+    /**
+     * Asset URL with auto-invalidating cache-busting timestamp (?v=filemtime)
+     * Automatically invalidates CloudFront CDN and browser caches on every file change.
+     */
+    function asset_url(string $path = ''): string {
+        return url($path);
     }
 }
 

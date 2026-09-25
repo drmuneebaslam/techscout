@@ -21,11 +21,13 @@ class AdRenderer {
                 if (!empty($user['is_donor']) || ($user['role'] ?? '') === 'donor') {
                     return true;
                 }
-                // Check author_tips or financial donations (column is tipper_user_id)
-                $hasDonated = Database::fetch("SELECT id FROM author_tips WHERE tipper_user_id = ? AND status = 'completed' LIMIT 1", [(int)$user['id']]);
-                if ($hasDonated) {
-                    return true;
-                }
+                // Check author_tips or financial donations (defensive lookup)
+                try {
+                    $hasDonated = Database::fetchSilent("SELECT id FROM author_tips WHERE tipper_user_id = ? AND status = 'completed' LIMIT 1", [(int)$user['id']]);
+                    if ($hasDonated) {
+                        return true;
+                    }
+                } catch (\Throwable $e) {}
             }
 
             // 2. Exempt roles (admin, superadmin, moderator, author, vip)

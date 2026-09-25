@@ -12,48 +12,73 @@ class Config {
         'default_theme' => 'light',
         'logo_url' => '',
         'favicon_url' => '',
+        'session_lifetime' => 86400 * 7
+    ];
 
-        // Hosted InfinityFree Production Database
+    // 1. Hosted InfinityFree Production Environment (funwithcoding.free.nf)
+    public static array $infinityFreeSettings = [
         'db_host' => 'sql306.infinityfree.com',
         'db_port' => '3306',
         'db_name' => 'if0_40102772_techscoutmainafterallchanges',
         'db_user' => 'if0_40102772',
         'db_pass' => 'Fp9QFWfj5fm',
-
-        // Localhost Fallback Credentials (Used automatically when run locally from FTP backup)
-        'local_db_host' => '127.0.0.1',
-        'local_db_port' => '3306',
-        'local_db_name' => 'techscout_db',
-        'local_db_user' => 'root',
-        'local_db_pass' => '',
-        'local_app_url' => 'http://localhost/techscout.n',
-
-        'session_lifetime' => 86400 * 7,
-        'environment' => 'production' // 'development' or 'production'
+        'app_url' => 'https://funwithcoding.free.nf',
+        'environment' => 'production'
     ];
+
+    // 2. AWS EC2 Production Server (techscout.online)
+    public static array $ec2Settings = [
+        'db_host' => '127.0.0.1',
+        'db_port' => '3306',
+        'db_name' => 'techscout_db',
+        'db_user' => 'techscout_user',
+        'db_pass' => 'TS8nFyML9C@8nF',
+        'app_url' => 'https://techscout.online',
+        'environment' => 'production'
+    ];
+
+    // 3. Localhost Development Environment (XAMPP / Local PHP)
+    public static array $localSettings = [
+        'db_host' => '127.0.0.1',
+        'db_port' => '3306',
+        'db_name' => 'techscout_db',
+        'db_user' => 'root',
+        'db_pass' => '',
+        'app_url' => 'http://localhost/techscout.n',
+        'environment' => 'development'
+    ];
+
+    /**
+     * Resolves active execution environment: 'ec2', 'infinityfree', or 'local'
+     */
+    public static function getEnvironment(): string {
+        $dirNormalized = str_replace('\\', '/', __DIR__);
+        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '');
+
+        // 1. EC2 Production Detection
+        if (str_starts_with($dirNormalized, '/var/www') 
+            || str_contains($host, 'techscout.online')
+            || (getenv('APP_ENV') === 'ec2')) {
+            return 'ec2';
+        }
+
+        // 2. InfinityFree Hosted Detection
+        if (str_contains($host, 'free.nf')
+            || str_contains($dirNormalized, 'infinityfree')
+            || str_contains($dirNormalized, 'if0_')
+            || str_contains($dirNormalized, 'vol18_1')) {
+            return 'infinityfree';
+        }
+
+        // 3. Localhost Development
+        return 'local';
+    }
 
     /**
      * Determines whether current execution environment is a local development machine
      */
     public static function isLocalEnvironment(): bool {
-        if (php_sapi_name() === 'cli') {
-            return true;
-        }
-        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '');
-        $hostClean = strtolower(explode(':', $host)[0]);
-        if (in_array($hostClean, ['localhost', '127.0.0.1', '::1'], true) || str_ends_with($hostClean, '.test') || str_ends_with($hostClean, '.local')) {
-            return true;
-        }
-        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
-        if (in_array($remoteAddr, ['127.0.0.1', '::1'], true)
-            || str_starts_with($remoteAddr, '192.168.')
-            || str_starts_with($remoteAddr, '10.')
-            || str_starts_with($remoteAddr, '172.16.')
-            || str_starts_with($remoteAddr, '172.17.')
-            || str_starts_with($remoteAddr, '172.18.')) {
-            return true;
-        }
-        return false;
+        return self::getEnvironment() === 'local';
     }
 
     /**
@@ -74,40 +99,21 @@ class Config {
     }
 
     public static function get(string $key, $default = null) {
-        $isLocal = self::isLocalEnvironment();
+        $env = self::getEnvironment();
 
-        // Intelligent EC2 Auto-Detection: When running on EC2 production instance,
-        // guarantee local MySQL credentials and HTTPS base URL regardless of git sync state
-        $dirNormalized = str_replace('\\', '/', __DIR__);
-        $isEc2Server = str_starts_with($dirNormalized, '/var/www/techscout') 
-            || file_exists('/etc/techscout_ec2')
-            || (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'techscout.online'));
-
-        if ($isEc2Server) {
-            if ($key === 'db_host') return '127.0.0.1';
-            if ($key === 'db_port') return '3306';
-            if ($key === 'db_name') return 'techscout_db';
-            if ($key === 'db_user') return 'techscout_user';
-            if ($key === 'db_pass') return 'TS8nFyML9C@8nF';
-            if ($key === 'app_url') return 'https://techscout.online';
-            if ($key === 'environment') return 'production';
-        }
-
-        // Intelligent bridge: When running on localhost from an FTP backup with InfinityFree credentials,
-        // automatically route database credentials to local MySQL fallback
-        $remoteHost = self::$settings['db_host'] ?? '';
-        $isRemoteHostedDb = str_contains($remoteHost, 'infinityfree.com') 
-            || str_contains($remoteHost, 'epizy.com') 
-            || str_contains($remoteHost, 'byethost');
-
-        if ($isLocal && $isRemoteHostedDb) {
-            if ($key === 'db_host') return self::$settings['local_db_host'] ?? '127.0.0.1';
-            if ($key === 'db_port') return self::$settings['local_db_port'] ?? '3306';
-            if ($key === 'db_name') return self::$settings['local_db_name'] ?? 'techscout_db';
-            if ($key === 'db_user') return self::$settings['local_db_user'] ?? 'root';
-            if ($key === 'db_pass') return self::$settings['local_db_pass'] ?? '';
-            if ($key === 'app_url') return self::$settings['local_app_url'] ?? self::detectBaseUrl();
-            if ($key === 'environment') return 'development';
+        if ($env === 'ec2') {
+            if (isset(self::$ec2Settings[$key])) {
+                return self::$ec2Settings[$key];
+            }
+        } elseif ($env === 'infinityfree') {
+            if (isset(self::$infinityFreeSettings[$key])) {
+                return self::$infinityFreeSettings[$key];
+            }
+        } else {
+            // Local environment
+            if (isset(self::$localSettings[$key])) {
+                return self::$localSettings[$key];
+            }
         }
 
         return self::$settings[$key] ?? $default;

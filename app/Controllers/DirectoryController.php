@@ -880,7 +880,7 @@ class DirectoryController {
 
         // 4. Direct table fallback for AI Tools if not in unified contents view
         try {
-            $tool = Database::fetch("SELECT * FROM ai_tools WHERE slug = ?", [$slug]);
+            $tool = Database::fetchSilent("SELECT t.*, c.slug FROM ai_tools t JOIN contents c ON t.content_id = c.id WHERE c.slug = ?", [$slug]);
             if ($tool) {
                 try {
                     Analytics::logEvent('click_outbound_tool', (int)($tool['id'] ?? 0), ['slug' => $slug]);
@@ -904,7 +904,7 @@ class DirectoryController {
             }
 
             // 5. Direct table fallback for GPT Listings
-            $gpt = Database::fetch("SELECT * FROM gpt_listings WHERE slug = ?", [$slug]);
+            $gpt = Database::fetchSilent("SELECT g.*, c.slug FROM gpt_listings g JOIN contents c ON g.content_id = c.id WHERE c.slug = ?", [$slug]);
             if ($gpt) {
                 try {
                     Analytics::logEvent('click_outbound_gpt', (int)($gpt['id'] ?? 0), ['slug' => $slug]);

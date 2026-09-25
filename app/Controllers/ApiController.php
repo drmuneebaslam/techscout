@@ -2119,16 +2119,36 @@ class ApiController {
         $returnCode = 0;
 
         if (function_exists('exec')) {
-            @exec("git config --global --add safe.directory \"{$root}\" 2>&1");
-            @exec("chmod -R a+rwX \"{$root}/.git\" 2>/dev/null");
-            @exec("sudo -n chmod -R 777 \"{$root}/.git\" 2>/dev/null");
-            @exec("sudo -n chown -R www-data:www-data \"{$root}\" 2>/dev/null");
+            // Priority 1: Execute server's configured sudo deploy command
+            @exec("sudo deploy 2>&1", $output, $returnCode);
 
-            $deployScript = "{$root}/scripts/ec2_deploy_and_migrate.sh";
-            if (file_exists($deployScript)) {
-                @exec("sudo -n bash \"{$deployScript}\" 2>&1", $output, $returnCode);
-            }
+            // Priority 2: Full path sudo /usr/local/bin/deploy
             if ($returnCode !== 0 || empty($output)) {
+                $out2 = [];
+                @exec("sudo /usr/local/bin/deploy 2>&1", $out2, $rc2);
+                if (!empty($out2)) {
+                    $output = $out2;
+                    $returnCode = $rc2;
+                }
+            }
+
+            // Priority 3: Fallback to deploy & migration script
+            if ($returnCode !== 0 || empty($output)) {
+                $deployScript = "{$root}/scripts/ec2_deploy_and_migrate.sh";
+                if (file_exists($deployScript)) {
+                    $out3 = [];
+                    @exec("sudo -n bash \"{$deployScript}\" 2>&1", $out3, $rc3);
+                    if (!empty($out3)) {
+                        $output = $out3;
+                        $returnCode = $rc3;
+                    }
+                }
+            }
+
+            // Priority 4: Direct git pull with shared permissions
+            if ($returnCode !== 0 || empty($output)) {
+                @exec("git config --global --add safe.directory \"{$root}\" 2>&1");
+                @exec("sudo -n chmod -R 777 \"{$root}/.git\" 2>/dev/null; sudo -n chown -R www-data:www-data \"{$root}\" 2>/dev/null");
                 exec("cd \"{$root}\" && git -c core.sharedRepository=all pull origin main 2>&1", $output, $returnCode);
             }
         }

@@ -155,13 +155,13 @@ class SecurityAnomalyEngine {
      * Get Recent Security Anomalies for Admin Firewall HUD
      */
     public static function getRecentAnomalies(int $limit = 50): array {
+        $limit = max(1, (int)$limit);
         return Database::query(
             "SELECT sa.*, u.username, u.email 
              FROM security_anomalies sa
              LEFT JOIN users u ON sa.user_id = u.id
              ORDER BY sa.created_at DESC
-             LIMIT ?",
-            [$limit]
+             LIMIT {$limit}"
         );
     }
 

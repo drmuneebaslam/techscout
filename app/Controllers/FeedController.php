@@ -226,12 +226,12 @@ class FeedController {
         $baseUrl = rtrim(Config::url('/'), '/');
         $now = date('Y-m-d');
 
-        $categories = Database::query("SELECT slug, updated_at FROM categories ORDER BY id ASC");
+        $categories = Database::query("SELECT slug, created_at FROM categories ORDER BY id ASC");
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         foreach ($categories as $cat) {
-            $date = date('Y-m-d', strtotime($cat['updated_at'] ?? $now));
+            $date = date('Y-m-d', strtotime($cat['created_at'] ?? $now));
             echo "  <url><loc>{$baseUrl}/category/{$cat['slug']}</loc><lastmod>{$date}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>\n";
         }
         echo '</urlset>';

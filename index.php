@@ -26,7 +26,7 @@ if (isset($_SERVER['REQUEST_URI'])) {
 }
 
 // Direct Mail Attachment Delivery & Streaming Engine (Prevents any 404 when clicking email attachments)
-if (preg_match('#/(?:assets/|public/)?(?:uploads/mail|mail/attachment)/([^/?#]+)#i', $_SERVER['REQUEST_URI'] ?? '', $attMatches)) {
+if (preg_match('~/(?:assets/|public/)?(?:uploads/mail|mail/attachment)/([^/?#]+)~i', $_SERVER['REQUEST_URI'] ?? '', $attMatches)) {
     $attFilename = basename(urldecode($attMatches[1]));
     $candidatePaths = [
         __DIR__ . '/assets/uploads/mail/' . $attFilename,

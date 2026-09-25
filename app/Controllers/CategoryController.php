@@ -287,14 +287,30 @@ class CategoryController {
     }
 
     /**
+     * Category Subscription Alias for Router compatibility
+     */
+    public function subscribe(Request $request, array $params = []): void {
+        $this->toggleSubscribe($request, $params);
+    }
+
+    /**
      * Legacy Topics Redirection Helpers
      */
     public function legacyTopics(): void {
-        Response::redirect('/categories');
+        Response::redirect('/categories', 301);
+    }
+
+    public function legacyTopicsRedirect(Request $request = null): void {
+        Response::redirect('/categories', 301);
     }
 
     public function legacyTopicSingle(Request $request, array $params = []): void {
-        $slug = $params['slug'] ?? '';
-        Response::redirect('/category/' . urlencode($slug));
+        $slug = $params['slug'] ?? ($request ? $request->param('slug', '') : '');
+        Response::redirect('/category/' . urlencode($slug), 301);
+    }
+
+    public function legacyTopicSingleRedirect(Request $request = null, array $params = []): void {
+        $slug = $params['slug'] ?? ($request ? $request->param('slug', '') : '');
+        Response::redirect('/category/' . urlencode($slug), 301);
     }
 }

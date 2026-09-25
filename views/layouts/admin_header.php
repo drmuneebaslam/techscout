@@ -24,7 +24,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
     ? 'dark' 
     : ((!empty($_GET['theme']) && $_GET['theme'] === 'light')
         ? 'light'
-        : ((isset($_COOKIE['ts_theme']) && $_COOKIE['ts_theme'] === 'dark') ? 'dark' : (Config::get('default_theme') ?: 'light')));
+        : ((isset($_COOKIE['ts_theme']) && $_COOKIE['ts_theme'] === 'dark') ? 'dark' : (\App\Core\Config::get('default_theme') ?: 'light')));
 
 // Admin Top Header
 

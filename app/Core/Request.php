@@ -70,7 +70,7 @@ class Request {
         return $this->queryParams[$key] ?? $this->bodyParams[$key] ?? ($this->jsonBody[$key] ?? $default);
     }
 
-    public function json(string $key = null, $default = null) {
+    public function json(?string $key = null, $default = null) {
         if ($this->jsonBody === null) {
             return $default;
         }
