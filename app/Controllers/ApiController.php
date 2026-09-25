@@ -2095,7 +2095,17 @@ class ApiController {
         $returnCode = 0;
 
         if (function_exists('exec')) {
-            exec("cd \"{$root}\" && git pull origin main 2>&1", $output, $returnCode);
+            @exec("git config --global --add safe.directory \"{$root}\" 2>&1");
+            @exec("chmod -R 777 \"{$root}/.git\" 2>/dev/null");
+            @exec("sudo -n chown -R www-data:www-data \"{$root}\" 2>/dev/null");
+
+            $deployScript = "{$root}/scripts/ec2_deploy_and_migrate.sh";
+            if (file_exists($deployScript)) {
+                @exec("sudo -n bash \"{$deployScript}\" 2>&1", $output, $returnCode);
+            }
+            if ($returnCode !== 0 || empty($output)) {
+                exec("cd \"{$root}\" && git pull origin main 2>&1", $output, $returnCode);
+            }
         }
 
         // Run pending migrations
