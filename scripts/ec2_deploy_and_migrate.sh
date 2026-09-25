@@ -111,6 +111,7 @@ chmod -R 775 "$APP_DIR/storage" 2>/dev/null || true
 [ -d "$APP_DIR/public/uploads" ] && chmod -R 775 "$APP_DIR/public/uploads" 2>/dev/null || true
 
 # 6. Reload PHP-FPM (this also flushes the web-process OPcache)
+systemctl daemon-reload 2>/dev/null || true
 if systemctl is-active --quiet php8.3-fpm 2>/dev/null; then
     echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Reloading php8.3-fpm..."
     systemctl reload php8.3-fpm || true
