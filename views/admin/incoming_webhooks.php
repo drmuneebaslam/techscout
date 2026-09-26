@@ -343,69 +343,207 @@
 </div>
 
 <!-- ========================================================================= -->
-<!-- MODAL 2: EDIT INGESTION WEBHOOK (MODAL UPDATING)                          -->
+<!-- MODAL 2: 100X ENHANCED TABBED WEBHOOK STUDIO (STRICT VALIDATION & MAPPING) -->
 <!-- ========================================================================= -->
-<div id="editIncomingModal" class="admin-modal" style="display: none;">
-  <div class="admin-modal-backdrop" onclick="closeEditIncomingModal()"></div>
-  <div class="admin-modal-content" style="max-width: 580px;">
-    <div class="admin-modal-header">
-      <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i data-lucide="edit-3" style="color: #38bdf8;"></i> Edit Ingestion Webhook
-      </h3>
-      <button type="button" onclick="closeEditIncomingModal()" class="admin-modal-close">&times;</button>
+<div id="editIncomingModal" class="admin-modal" style="display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(3, 6, 12, 0.88); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 1.25rem;">
+  <div class="admin-modal-backdrop" onclick="closeEditIncomingModal()" style="position: absolute; inset: 0; z-index: 1;"></div>
+  <div class="admin-modal-content" style="position: relative; z-index: 2; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; background: var(--admin-bg-surface); border: 1px solid var(--admin-border-main); border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(99,102,241,0.2); overflow: hidden; padding: 0;">
+    
+    <!-- Modal Header -->
+    <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-elevated);">
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; font-weight: 700;">WEBHOOK STUDIO</span>
+        <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.2rem; font-family: var(--admin-font-heading); font-weight: 800;" id="editModalHeading">
+          Manage Ingestion Webhook
+        </h3>
+      </div>
+      <button type="button" onclick="closeEditIncomingModal()" class="admin-modal-close" style="background: none; border: none; font-size: 1.5rem; color: var(--admin-text-secondary); cursor: pointer; line-height: 1;">&times;</button>
     </div>
-    <form action="<?= url('/admin/incoming-webhooks/save') ?>" method="POST" id="editWebhookForm" onsubmit="submitEditWebhookForm(event)" style="padding: 1.25rem;">
-      <input type="hidden" name="id" id="edit_wh_id">
 
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Webhook Name</label>
-        <input type="text" name="name" id="edit_wh_name" class="admin-input" required>
+    <!-- Studio Tab Navigation Bar -->
+    <div style="display: flex; gap: 0.5rem; padding: 0.65rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); background: var(--admin-bg-surface); overflow-x: auto; flex-shrink: 0;">
+      <button type="button" onclick="switchWebhookTab('general')" id="whTabBtn_general" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
+        ⚙️ General &amp; Auth
+      </button>
+      <button type="button" onclick="switchWebhookTab('captured')" id="whTabBtn_captured" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #38bdf8;">
+        📡 Captured Payloads &amp; Detected Keys
+      </button>
+      <button type="button" onclick="switchWebhookTab('mapping')" id="whTabBtn_mapping" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #10b981;">
+        🗂️ Field Mapping &amp; Strict Validation
+      </button>
+      <button type="button" onclick="switchWebhookTab('simulator')" id="whTabBtn_simulator" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #a855f7;">
+        ⚡ Test Sandbox
+      </button>
+    </div>
+
+    <!-- Scrollable Body for Tabs -->
+    <div style="padding: 1.5rem; overflow-y: auto; flex: 1;">
+      
+      <!-- TAB 1: General & Auth Settings -->
+      <div id="whTabPane_general">
+        <form id="editGeneralForm" onsubmit="submitEditWebhookForm(event)">
+          <input type="hidden" name="id" id="edit_wh_id">
+          <input type="hidden" name="mapping_rules_json" id="edit_wh_mapping_rules_json">
+
+          <div style="margin-bottom: 1.15rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Webhook Name</label>
+            <input type="text" name="name" id="edit_wh_name" class="admin-input" required placeholder="e.g. Midjourney Prompts Ingest">
+          </div>
+
+          <div style="margin-bottom: 1.15rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
+              <input type="text" name="slug" id="edit_wh_slug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.15rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin: 0;">Target Database Table</label>
+              <span style="font-size: 0.72rem; color: var(--admin-text-secondary);">Table where records will be validated and inserted</span>
+            </div>
+            <select name="target_table" id="edit_wh_table" class="admin-input" onchange="onTargetTableChanged(this.value)" required>
+              <?php foreach ($permittedTables as $tblName => $tblMeta): ?>
+                <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?> (<?= count($tblMeta['columns'] ?? []) ?> columns)</option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.15rem;">
+            <div>
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Authentication Type</label>
+              <select name="auth_type" id="edit_wh_auth" class="admin-input">
+                <option value="none">None (Public Open Ingest)</option>
+                <option value="bearer">Bearer Token (Authorization Header)</option>
+                <option value="signature">HMAC-SHA256 (X-Ts-Signature Header)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Secret / Bearer Key</label>
+              <input type="text" name="secret_key" id="edit_wh_secret" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--admin-text-primary);">
+              <input type="checkbox" name="is_active" id="edit_wh_active" value="1">
+              Active Endpoint (Accept and process incoming HTTP POST payloads)
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--admin-border-main); padding-top: 1.25rem;">
+            <button type="button" onclick="closeEditIncomingModal()" class="admin-btn admin-btn-outline">Cancel</button>
+            <button type="submit" class="admin-btn admin-btn-primary" style="font-weight: 700;">Save Webhook Settings 💾</button>
+          </div>
+        </form>
       </div>
 
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
-          <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
-          <input type="text" name="slug" id="edit_wh_slug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+      <!-- TAB 2: Captured Payloads & Detected Keys -->
+      <div id="whTabPane_captured" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h4 style="margin: 0; color: #38bdf8; font-size: 1rem;">Detected Keys from Actual Payloads</h4>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.78rem; color: var(--admin-text-secondary);">
+              Inspect the exact JSON keys received in real HTTP requests to this webhook endpoint. Click "+ Map This Field" to create a strict validation &amp; insertion mapping.
+            </p>
+          </div>
+          <button type="button" onclick="reloadCapturedKeysForActiveWebhook()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem;">
+            <i data-lucide="refresh-cw"></i> Refresh Inspector
+          </button>
         </div>
-      </div>
 
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Target Database Table</label>
-        <select name="target_table" id="edit_wh_table" class="admin-input" required>
-          <?php foreach ($permittedTables as $tblName => $tblMeta): ?>
-            <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+        <!-- Detected Keys Badge Cloud -->
+        <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.5rem;">
+            Actual Incoming JSON Keys:
+          </div>
+          <div id="detectedKeysContainer" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="color: var(--admin-text-secondary); font-size: 0.8rem;">Loading detected keys from recent logs...</span>
+          </div>
+        </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <!-- Recent Payload Inspection Box -->
         <div>
-          <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Authentication Type</label>
-          <select name="auth_type" id="edit_wh_auth" class="admin-input">
-            <option value="none">None (Public Open Ingest)</option>
-            <option value="bearer">Bearer Token (Authorization Header)</option>
-            <option value="signature">HMAC-SHA256 (X-Ts-Signature Header)</option>
-          </select>
-        </div>
-        <div>
-          <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Secret / Bearer Key</label>
-          <input type="text" name="secret_key" id="edit_wh_secret" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem;">
+          <h5 style="margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--admin-text-primary);">Most Recent Raw Ingested Payload:</h5>
+          <pre id="latestCapturedPayloadDisplay" style="height: 220px; overflow-y: auto; background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.85rem; font-family: var(--admin-font-mono); font-size: 0.78rem; color: #38bdf8; margin: 0; white-space: pre-wrap; word-break: break-all;">No payloads logged yet.</pre>
         </div>
       </div>
 
-      <div style="margin-bottom: 1.25rem;">
-        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--admin-text-primary);">
-          <input type="checkbox" name="is_active" id="edit_wh_active" value="1">
-          Active Endpoint (Accept and process incoming payloads)
-        </label>
+      <!-- TAB 3: Strict Field Mapping & Validation Rules Matrix -->
+      <div id="whTabPane_mapping" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h4 style="margin: 0; color: #10b981; font-size: 1rem;">Strict Field Mapping &amp; Validation Engine</h4>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.78rem; color: var(--admin-text-secondary);">
+              <strong>Zero unmapped data:</strong> Only explicitly mapped fields are processed. Each field is validated against rules (e.g. <code>required</code>, <code>url</code>, <code>integer</code>, <code>min:3</code>, <code>max:255</code>) before inserting into the target table.
+            </p>
+          </div>
+          <button type="button" onclick="addModalMappingRow('', '', 'required', '')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #10b981; border-color: rgba(16,185,129,0.4);">
+            + Add Field Rule
+          </button>
+        </div>
+
+        <!-- Mapping Rules Table -->
+        <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 1fr 36px; gap: 0.5rem; font-size: 0.75rem; font-weight: 700; color: var(--admin-text-secondary); text-transform: uppercase; margin-bottom: 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--admin-border-main);">
+            <div>Incoming JSON Key</div>
+            <div>Target DB Column</div>
+            <div>Validation Rule</div>
+            <div>Default Value</div>
+            <div></div>
+          </div>
+          <div id="modalMappingRowsContainer" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 280px; overflow-y: auto; padding-right: 0.25rem;">
+            <!-- Rows injected dynamically via JS -->
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="font-size: 0.75rem; color: var(--admin-text-secondary);">
+            Supported rules: <code>required</code>, <code>string</code>, <code>integer</code>, <code>url</code>, <code>email</code>, <code>min:N</code>, <code>max:N</code>, <code>in:val1,val2</code>
+          </div>
+          <button type="button" onclick="saveModalFieldMappings()" class="admin-btn admin-btn-primary" style="font-weight: 700;">
+            💾 Save Validation &amp; Mapping Rules
+          </button>
+        </div>
       </div>
 
-      <div class="admin-modal-footer">
-        <button type="button" onclick="closeEditIncomingModal()" class="admin-btn admin-btn-outline">Cancel</button>
-        <button type="submit" class="admin-btn admin-btn-primary" style="font-weight: 700;">Save Changes 💾</button>
+      <!-- TAB 4: Test Sandbox & Simulator -->
+      <div id="whTabPane_simulator" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h4 style="margin: 0; color: #a855f7; font-size: 1rem;">Payload Ingestion Test Sandbox</h4>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.78rem; color: var(--admin-text-secondary);">
+              Dispatch a test JSON payload to this endpoint and verify validation, mapping, and database write outcomes.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <button type="button" onclick="loadSampleIntoModalSimulator()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem; color: #38bdf8;">
+              Load Table Sample
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">Request Payload (JSON)</label>
+            <textarea id="modalSimPayloadInput" rows="10" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem; width: 100%; height: 240px;"></textarea>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">Execution Response</label>
+            <pre id="modalSimResponseOutput" style="height: 240px; overflow-y: auto; background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.75rem; font-family: var(--admin-font-mono); font-size: 0.78rem; color: #34d399; margin: 0; white-space: pre-wrap;">// Response will appear here after execution</pre>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <span id="modalSimStatusMsg" style="font-size: 0.8rem; font-weight: 600;"></span>
+          <button type="button" onclick="executeModalSimDispatch()" class="admin-btn admin-btn-primary" style="font-weight: 700;">
+            🚀 Dispatch Ingestion Request
+          </button>
+        </div>
       </div>
-    </form>
+
+    </div>
   </div>
 </div>
 
@@ -623,7 +761,33 @@ function closeNewIncomingModal() {
   document.getElementById('newIncomingModal').style.display = 'none';
 }
 
+let activeWebhookTab = 'general';
+let activeModalWebhook = null;
+
+function switchWebhookTab(tabName) {
+  activeWebhookTab = tabName;
+  ['general', 'captured', 'mapping', 'simulator'].forEach(t => {
+    const btn = document.getElementById('whTabBtn_' + t);
+    const pane = document.getElementById('whTabPane_' + t);
+    if (!btn || !pane) return;
+    if (t === tabName) {
+      btn.className = 'admin-btn admin-btn-primary admin-btn-sm';
+      pane.style.display = 'block';
+    } else {
+      btn.className = 'admin-btn admin-btn-outline admin-btn-sm';
+      pane.style.display = 'none';
+    }
+  });
+
+  if (tabName === 'captured') {
+    reloadCapturedKeysForActiveWebhook();
+  } else if (tabName === 'simulator') {
+    loadSampleIntoModalSimulator();
+  }
+}
+
 function openEditIncomingModal(wh) {
+  activeModalWebhook = wh;
   document.getElementById('edit_wh_id').value = wh.id;
   document.getElementById('edit_wh_name').value = wh.name;
   document.getElementById('edit_wh_slug').value = wh.slug;
@@ -631,10 +795,232 @@ function openEditIncomingModal(wh) {
   document.getElementById('edit_wh_auth').value = wh.auth_type;
   document.getElementById('edit_wh_secret').value = wh.secret_key;
   document.getElementById('edit_wh_active').checked = (parseInt(wh.is_active, 10) === 1);
+  document.getElementById('edit_wh_mapping_rules_json').value = wh.mapping_rules_json || '[]';
+  document.getElementById('editModalHeading').textContent = 'Webhook Studio: ' + wh.name;
+
+  // Initialize rules in Tab 3
+  renderModalFieldMappings(wh);
+
+  // Switch to general tab by default
+  switchWebhookTab('general');
+
+  // Open modal
   document.getElementById('editIncomingModal').style.display = 'flex';
 }
+
 function closeEditIncomingModal() {
   document.getElementById('editIncomingModal').style.display = 'none';
+  activeModalWebhook = null;
+}
+
+function onTargetTableChanged(newTable) {
+  if (activeModalWebhook) {
+    activeModalWebhook.target_table = newTable;
+    renderModalFieldMappings(activeModalWebhook);
+  }
+}
+
+async function reloadCapturedKeysForActiveWebhook() {
+  if (!activeModalWebhook) return;
+  const container = document.getElementById('detectedKeysContainer');
+  const previewBox = document.getElementById('latestCapturedPayloadDisplay');
+  container.innerHTML = '<span style="color: var(--admin-text-secondary); font-size: 0.8rem;">Scanning recent captured payloads...</span>';
+
+  try {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/inspect/') ?>' + activeModalWebhook.slug, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': window.TECHSCOUT_CSRF_TOKEN || '',
+        'X-Admin-Token': window.TECHSCOUT_ADMIN_TOKEN || ''
+      }
+    });
+    const data = await res.json();
+    if (data.success) {
+      if (data.keys && data.keys.length > 0) {
+        container.innerHTML = '';
+        data.keys.forEach(k => {
+          const badge = document.createElement('div');
+          badge.style.cssText = 'display: inline-flex; align-items: center; gap: 0.4rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-main); border-radius: 6px; padding: 0.25rem 0.5rem;';
+          badge.innerHTML = `
+            <code style="font-family: var(--admin-font-mono); font-size: 0.76rem; color: #38bdf8;">${escapeHtml(k)}</code>
+            <button type="button" onclick="addModalMappingRow('${escapeHtml(k)}', '', 'required', '')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.68rem; padding: 0.15rem 0.4rem; color: #10b981; border-color: rgba(16,185,129,0.4);" title="Add strict mapping for ${escapeHtml(k)}">
+              + Map Field
+            </button>
+          `;
+          container.appendChild(badge);
+        });
+      } else {
+        container.innerHTML = '<span style="color: var(--admin-text-secondary); font-size: 0.8rem;">No payloads captured yet for this endpoint. Send a test payload to detect keys automatically!</span>';
+      }
+
+      if (data.payloads && data.payloads.length > 0) {
+        previewBox.textContent = JSON.stringify(data.payloads[0].payload, null, 2);
+      } else {
+        previewBox.textContent = '// No incoming requests logged yet.';
+      }
+    } else {
+      container.innerHTML = `<span style="color: #ef4444; font-size: 0.8rem;">Error: ${data.error || 'Failed to inspect payloads'}</span>`;
+    }
+  } catch(e) {
+    container.innerHTML = `<span style="color: #ef4444; font-size: 0.8rem;">Error loading keys: ${e.message}</span>`;
+  }
+}
+
+function renderModalFieldMappings(wh) {
+  const container = document.getElementById('modalMappingRowsContainer');
+  container.innerHTML = '';
+
+  const rules = JSON.parse(wh.mapping_rules_json || '[]');
+  if (rules.length === 0) {
+    // Show one empty row
+    addModalMappingRow('', '', 'required', '');
+  } else {
+    rules.forEach(r => {
+      addModalMappingRow(r.json_key || '', r.target_column || '', r.rule || 'required', r.default || '');
+    });
+  }
+}
+
+function addModalMappingRow(jsonKey = '', targetCol = '', rule = 'required', defVal = '') {
+  const container = document.getElementById('modalMappingRowsContainer');
+  const targetTable = activeModalWebhook ? activeModalWebhook.target_table : (document.getElementById('edit_wh_table')?.value || 'prompts');
+  const tableMeta = PERMITTED_TABLES[targetTable] || { columns: [] };
+
+  const row = document.createElement('div');
+  row.className = 'modal-map-row';
+  row.style.cssText = 'display: grid; grid-template-columns: 2fr 2fr 1.5fr 1fr 36px; gap: 0.5rem; align-items: center; background: var(--admin-card-bg); padding: 0.4rem; border-radius: 6px; border: 1px solid var(--admin-border-main);';
+
+  let colOptions = '<option value="">-- Choose Column --</option>';
+  tableMeta.columns.forEach(c => {
+    const sel = (c === targetCol) ? 'selected' : '';
+    colOptions += `<option value="${escapeHtml(c)}" ${sel}>${escapeHtml(c)}</option>`;
+  });
+
+  const ruleOptions = [
+    { val: 'required', label: 'Required (Any)' },
+    { val: 'string', label: 'String' },
+    { val: 'integer', label: 'Integer' },
+    { val: 'url', label: 'Valid URL' },
+    { val: 'email', label: 'Valid Email' },
+    { val: 'min:3', label: 'Min 3 Chars' },
+    { val: 'max:255', label: 'Max 255 Chars' }
+  ].map(r => `<option value="${r.val}" ${r.val === rule ? 'selected' : ''}>${r.label}</option>`).join('');
+
+  row.innerHTML = `
+    <input type="text" class="admin-input map-json-key" placeholder="JSON Key (e.g. data.title)" value="${escapeHtml(jsonKey)}" style="font-family: var(--admin-font-mono); font-size: 0.78rem;">
+    <select class="admin-input map-target-col" style="font-family: var(--admin-font-mono); font-size: 0.78rem;">
+      ${colOptions}
+    </select>
+    <select class="admin-input map-field-rule" style="font-size: 0.78rem;">
+      ${ruleOptions}
+    </select>
+    <input type="text" class="admin-input map-default-val" placeholder="Optional" value="${escapeHtml(defVal)}" style="font-size: 0.78rem;">
+    <button type="button" onclick="this.parentElement.remove()" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; padding: 0.2rem 0.4rem;" title="Remove Field">&times;</button>
+  `;
+
+  container.appendChild(row);
+}
+
+async function saveModalFieldMappings() {
+  if (!activeModalWebhook) return;
+  const rows = document.querySelectorAll('#modalMappingRowsContainer .modal-map-row');
+  const rules = [];
+
+  rows.forEach(r => {
+    const key = r.querySelector('.map-json-key').value.trim();
+    const col = r.querySelector('.map-target-col').value.trim();
+    const rule = r.querySelector('.map-field-rule').value.trim();
+    const def = r.querySelector('.map-default-val').value.trim();
+    if (key && col) {
+      rules.push({ json_key: key, target_column: col, rule: rule, default: def });
+    }
+  });
+
+  const rulesJson = JSON.stringify(rules);
+  document.getElementById('edit_wh_mapping_rules_json').value = rulesJson;
+  activeModalWebhook.mapping_rules_json = rulesJson;
+
+  try {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/save-mappings') ?>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': window.TECHSCOUT_CSRF_TOKEN || ''
+      },
+      body: JSON.stringify({
+        id: activeModalWebhook.id,
+        mapping_rules_json: rulesJson
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('✓ Strict mapping and validation rules saved successfully!');
+    } else {
+      alert('Error saving rules: ' + (data.error || 'Failed'));
+    }
+  } catch(e) {
+    alert('Network error saving rules: ' + e.message);
+  }
+}
+
+async function loadSampleIntoModalSimulator() {
+  if (!activeModalWebhook) return;
+  const table = activeModalWebhook.target_table || 'prompts';
+  try {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/sample/') ?>' + table, {
+      headers: { 'Accept': 'application/json', 'X-Admin-Token': window.TECHSCOUT_ADMIN_TOKEN || '' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('modalSimPayloadInput').value = JSON.stringify(data, null, 2);
+    }
+  } catch(e) {}
+}
+
+async function executeModalSimDispatch() {
+  if (!activeModalWebhook) return;
+  const rawBody = document.getElementById('modalSimPayloadInput').value;
+  const statusEl = document.getElementById('modalSimStatusMsg');
+  const outputBox = document.getElementById('modalSimResponseOutput');
+  statusEl.innerHTML = '<span style="color: #38bdf8;">Dispatching payload...</span>';
+
+  try {
+    const adminToken = window.TECHSCOUT_ADMIN_TOKEN || '';
+    const csrfToken = window.TECHSCOUT_CSRF_TOKEN || '';
+    const fd = new FormData();
+    fd.append('slug', activeModalWebhook.slug);
+    fd.append('payload', rawBody);
+    fd.append('token', adminToken);
+    fd.append('csrf_token', csrfToken);
+    if (activeModalWebhook.auth_type === 'bearer') {
+      fd.append('auth_header', 'Bearer ' + activeModalWebhook.secret_key);
+    }
+
+    const res = await fetch('<?= url('/admin/incoming-webhooks/simulate') ?>', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': csrfToken,
+        'X-Admin-Token': adminToken
+      },
+      body: fd
+    });
+    const data = await res.json();
+    outputBox.textContent = JSON.stringify(data, null, 2);
+    if (data.success) {
+      statusEl.innerHTML = `<span style="color: #10b981;">✓ 200 OK: Processed (${data.records_affected} rows inserted/updated)</span>`;
+    } else {
+      statusEl.innerHTML = `<span style="color: #ef4444;">✗ HTTP ${data.code || 400}: ${data.error}</span>`;
+    }
+  } catch(e) {
+    statusEl.innerHTML = `<span style="color: #ef4444;">Error: ${e.message}</span>`;
+    outputBox.textContent = e.message;
+  }
 }
 
 async function submitEditWebhookForm(e) {

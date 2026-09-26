@@ -192,4 +192,24 @@ class IncomingWebhookController {
             Response::json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Inspect recent captured payloads and detected keys for a webhook: GET /admin/incoming-webhooks/inspect/{slug}
+     */
+    public function inspectPayloads(Request $request, array $params): void {
+        if (!self::checkAdminAccess($request)) {
+            Response::json(['success' => false, 'code' => 403, 'error' => 'Admin authorization required'], 403);
+            return;
+        }
+
+        $slug = trim((string)($params['slug'] ?? ''));
+        $data = IncomingWebhookEngine::getRecentCapturedPayloads($slug, 10);
+
+        Response::json([
+            'success' => true,
+            'slug' => $slug,
+            'logs' => $data['logs'] ?? [],
+            'detected_keys' => $data['detected_keys'] ?? []
+        ]);
+    }
 }

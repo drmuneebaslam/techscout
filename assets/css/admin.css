@@ -644,19 +644,26 @@ body.admin-body {
 /* ==========================================================================
    BRANDED ADMIN MODALS & POPUPS SYSTEM
    ========================================================================== */
+.admin-modal,
 .admin-modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(3, 6, 12, 0.88);
   z-index: 99999;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
   will-change: transform, opacity;
   animation: adminModalFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.admin-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 
 @keyframes adminModalFadeIn {
@@ -670,16 +677,18 @@ body.admin-body {
   }
 }
 
+.admin-modal-content,
 .admin-modal-box {
   width: 100%;
-  max-width: 560px;
+  max-width: 580px;
   background: var(--admin-bg-surface);
   color: var(--admin-text-primary);
   border: 1px solid var(--admin-border-main);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.75rem;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(99, 102, 241, 0.15);
   position: relative;
+  z-index: 2;
   overflow: hidden;
   max-height: 90vh;
   overflow-y: auto;

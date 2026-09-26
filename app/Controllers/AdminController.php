@@ -9138,20 +9138,28 @@ class AdminController {
         if (empty($secretKey)) {
             $secretKey = 'whsec_ts_live_' . bin2hex(random_bytes(16));
         }
+        $mappingRulesJson = trim((string)($request->post('mapping_rules_json', '') ?: ($request->json('mapping_rules_json', '') ?: '')));
 
         try {
             if ($id > 0) {
-                Database::execute(
-                    "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, auth_type = ?, is_active = ? WHERE id = ?",
-                    [$name, $slug, $secretKey, $targetTable, $authType, $isActive, $id]
-                );
+                if ($mappingRulesJson !== '') {
+                    Database::execute(
+                        "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, mapping_rules_json = ?, auth_type = ?, is_active = ? WHERE id = ?",
+                        [$name, $slug, $secretKey, $targetTable, $mappingRulesJson, $authType, $isActive, $id]
+                    );
+                } else {
+                    Database::execute(
+                        "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, auth_type = ?, is_active = ? WHERE id = ?",
+                        [$name, $slug, $secretKey, $targetTable, $authType, $isActive, $id]
+                    );
+                }
                 $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' updated successfully.";
             } else {
                 Database::execute(
                     "INSERT INTO incoming_webhooks (name, slug, secret_key, target_table, mapping_rules_json, auth_type, is_active) 
-                     VALUES (?, ?, ?, ?, '[]', ?, ?) 
-                     ON DUPLICATE KEY UPDATE name = VALUES(name), target_table = VALUES(target_table), auth_type = VALUES(auth_type), secret_key = VALUES(secret_key), is_active = VALUES(is_active)",
-                    [$name, $slug, $secretKey, $targetTable, $authType, $isActive]
+                     VALUES (?, ?, ?, ?, ?, ?, ?) 
+                     ON DUPLICATE KEY UPDATE name = VALUES(name), target_table = VALUES(target_table), mapping_rules_json = VALUES(mapping_rules_json), auth_type = VALUES(auth_type), secret_key = VALUES(secret_key), is_active = VALUES(is_active)",
+                    [$name, $slug, $secretKey, $targetTable, $mappingRulesJson ?: '[]', $authType, $isActive]
                 );
                 $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' created successfully.";
             }

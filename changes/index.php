@@ -790,7 +790,9 @@ $router->post('/admin/support/categories/{id}/subcategory/delete', [SupportContr
 // Enterprise Incoming Webhooks Engine (Admin endpoints & Universal Omni-Webhook)
 $router->get('/admin/incoming-webhooks/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream'], ['admin']);
 $router->get('/admin/incoming-webhooks/sample/{table}', [\App\Controllers\IncomingWebhookController::class, 'samplePayload'], ['admin']);
+$router->get('/admin/incoming-webhooks/inspect/{slug}', [\App\Controllers\IncomingWebhookController::class, 'inspectPayloads'], ['admin']);
 $router->get('/api/v1/webhook/sample/{table}', [\App\Controllers\IncomingWebhookController::class, 'samplePayload']);
+$router->get('/api/v1/webhook/inspect/{slug}', [\App\Controllers\IncomingWebhookController::class, 'inspectPayloads']);
 $router->post('/admin/incoming-webhooks/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate'], ['admin']);
 $router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate']);
 $router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream']);
