@@ -123,7 +123,7 @@ class Content {
         }
 
         $sql .= " LIMIT {$limit} OFFSET {$offset}";
-        return Database::query($sql, $params);
+        return Database::cachedQuery($sql, $params, 300, ['contents', 'feed']);
     }
 
     public static function findBySlug(string $slug): ?array {
@@ -149,7 +149,18 @@ class Content {
                 LEFT JOIN campaigns camp ON c.id = camp.content_id
                 WHERE c.slug = ?";
         
-        return Database::fetch($sql, [$slug]);
+        return Database::cachedFetch($sql, [$slug], 600, ['contents', 'content:slug:' . $slug]);
+    }
+
+    public static function invalidateCache(?int $id = null, ?string $slug = null): void {
+        \App\Core\Cache::invalidateTag('contents');
+        \App\Core\Cache::invalidateTag('feed');
+        if ($id) {
+            \App\Core\Cache::invalidateTag('content:' . $id);
+        }
+        if ($slug) {
+            \App\Core\Cache::invalidateTag('content:slug:' . $slug);
+        }
     }
 
     public static function incrementViews(int $id): void {

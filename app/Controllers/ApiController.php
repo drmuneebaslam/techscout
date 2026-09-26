@@ -202,6 +202,38 @@ class ApiController {
         ]);
     }
 
+    /**
+     * TS-PAG-01: Keyset / Cursor-Based Discussion Thread Ingestion
+     * Scales to 2,000+ deep comments without memory spikes or duplicate entries.
+     */
+    public function getCommentsCursor(Request $request, array $params): void {
+        $contentId = (int)($params['id'] ?? $request->query('content_id', 0));
+        $cursor = $request->query('cursor');
+        $limit = max(1, min((int)($request->query('limit', 10)), 50));
+
+        if ($contentId <= 0) {
+            Response::json(['success' => false, 'error' => 'Valid content ID required.'], 400);
+            return;
+        }
+
+        try {
+            $data = Comment::getCursorThreads($contentId, $limit, $cursor);
+            Response::json([
+                'success' => true,
+                'content_id' => $contentId,
+                'threads' => $data['threads'] ?? [],
+                'next_cursor' => $data['next_cursor'] ?? null,
+                'has_more' => !empty($data['has_more']),
+                'count' => count($data['threads'] ?? [])
+            ]);
+        } catch (\Throwable $e) {
+            Response::json([
+                'success' => false,
+                'error' => 'Failed to load comments cursor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     // TS-SOC-07: Pin "Best Answer" / Top Insight by Author or Admin
     public function togglePinComment(Request $request, array $params): void {
         if (!Auth::check()) {

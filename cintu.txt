@@ -366,3 +366,11 @@ Sep 26, 2026 (GMT+5)
 ✓ Fix
 🗑️
 and also resolve all types of errorsand make a complete plan checklist for me to test each and everything perform each and every action and check each and everything in light and dark mode and mobile and laptop and tab also 
+
+
+
+
+
+cursor system overall on site sql to avoid duplicate entries please
+and our system you know is 30gb storage and 2 gb ram out of 30 2gb swap and 2vcpu i think
+you just make it more fast by caching all things even requests but when anything added linked to that like if you cache an article or tool and therre is an update to db in that just invalidate old cache and in this reduce number of sessions to sql also and more enhancements like this please

@@ -350,27 +350,104 @@ function toggleCollapseThread(commentId) {
   }
 }
 
+let activeCommentCursor = null;
+let isFetchingCommentsCursor = false;
+
 function loadMoreRootComments() {
   const hiddenRoots = document.querySelectorAll('.root-comment-wrapper[style*="display:none"], .root-comment-wrapper[style*="display: none"]');
-  let shown = 0;
-  hiddenRoots.forEach(node => {
-    if (shown < 5) {
-      node.style.display = 'block';
-      shown++;
-    }
-  });
-  
-  const remaining = hiddenRoots.length - shown;
-  const countSpan = document.getElementById('remaining-comments-count');
-  if (countSpan) countSpan.innerText = remaining;
+  if (hiddenRoots.length > 0) {
+    let shown = 0;
+    hiddenRoots.forEach(node => {
+      if (shown < 5) {
+        node.style.display = 'block';
+        shown++;
+      }
+    });
+    
+    const remaining = hiddenRoots.length - shown;
+    const countSpan = document.getElementById('remaining-comments-count');
+    if (countSpan) countSpan.innerText = remaining;
 
-  if (remaining <= 0) {
-    const wrap = document.getElementById('load-more-comments-wrap');
-    if (wrap) wrap.style.display = 'none';
+    if (remaining <= 0 && !activeCommentCursor) {
+      const wrap = document.getElementById('load-more-comments-wrap');
+      if (wrap) wrap.style.display = 'none';
+    }
+
+    if (window.lucide) lucide.createIcons();
+    if (window.localizeAllTimestamps) window.localizeAllTimestamps();
+    return;
   }
 
-  if (window.lucide) lucide.createIcons();
-  if (window.localizeAllTimestamps) window.localizeAllTimestamps();
+  // Fetch next cursor batch via AJAX Keyset Pagination (Prevents Duplication & Memory Choke)
+  if (isFetchingCommentsCursor) return;
+  const contentId = <?= (int)$contentId ?>;
+  if (!contentId) return;
+
+  const btn = document.querySelector('#load-more-comments-wrap button');
+  const originalBtnText = btn ? btn.innerHTML : '';
+  if (btn) btn.innerHTML = '<span class="ts-spinner" style="width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;display:inline-block;animation:spin 0.6s linear infinite;margin-right:6px;"></span> Loading older comments...';
+  isFetchingCommentsCursor = true;
+
+  const baseUrl = getCommentsApiBase();
+  const url = `${baseUrl}/api/v1/content/${contentId}/comments/cursor?limit=10` + (activeCommentCursor ? `&cursor=${encodeURIComponent(activeCommentCursor)}` : '');
+
+  fetch(url, {
+    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+  })
+    .then(r => r.json())
+    .then(data => {
+      isFetchingCommentsCursor = false;
+      if (btn) btn.innerHTML = originalBtnText;
+
+      if (!data.success || !data.threads || data.threads.length === 0) {
+        const wrap = document.getElementById('load-more-comments-wrap');
+        if (wrap) wrap.style.display = 'none';
+        return;
+      }
+
+      activeCommentCursor = data.next_cursor || null;
+      const stream = document.getElementById('comments-stream-container');
+      const wrap = document.getElementById('load-more-comments-wrap');
+
+      data.threads.forEach(t => {
+        // Anti-Duplication Guard
+        if (document.getElementById('comment-node-' + t.id)) return;
+
+        const rootWrap = document.createElement('div');
+        rootWrap.className = 'root-comment-wrapper';
+        rootWrap.innerHTML = `
+          <div class="comment-node-wrapper comment-item" id="comment-node-${t.id}" data-upvotes="${t.reaction_count || 0}" style="margin-bottom: 0.95rem;">
+            <div style="display: flex; gap: 0.65rem; align-items: flex-start;">
+              <img src="${t.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--ts-border-subtle);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="background: var(--ts-bg-surface-elevated, #131b2e); border: 1px solid var(--ts-border-subtle); border-radius: 12px; padding: 0.75rem 0.9rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                    <span style="font-weight: 700; font-size: 0.85rem; color: var(--ts-text-primary);">${t.display_name || t.username}</span>
+                    <span style="font-size: 0.72rem; color: var(--ts-text-muted);">${t.created_at || ''}</span>
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--ts-text-secondary); line-height: 1.45; word-break: break-word;">${t.comment_text}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        if (wrap) {
+          stream.insertBefore(rootWrap, wrap);
+        } else {
+          stream.appendChild(rootWrap);
+        }
+      });
+
+      if (!data.has_more) {
+        if (wrap) wrap.style.display = 'none';
+      }
+      if (window.lucide) lucide.createIcons();
+      if (window.localizeAllTimestamps) window.localizeAllTimestamps();
+    })
+    .catch(err => {
+      isFetchingCommentsCursor = false;
+      if (btn) btn.innerHTML = originalBtnText;
+    });
 }
 
 function insertCommentFormat(type, textareaId) {

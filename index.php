@@ -831,6 +831,9 @@ $router->get('/api/v1/deploy/sync', [ApiController::class, 'v1DeploySync']);
 
 
 $router->post('/api/v1/content/{id}/react', [ApiController::class, 'react']);
+$router->get('/api/v1/content/{id}/comments/cursor', [ApiController::class, 'getCommentsCursor']);
+$router->get('/api/v1/content/{id}/comments', [ApiController::class, 'getCommentsCursor']);
+$router->get('/api/v1/comments/cursor', [ApiController::class, 'getCommentsCursor']);
 $router->post('/api/v1/content/{id}/comments', [ApiController::class, 'addComment']);
 $router->get('/api/v1/content/{id}/comments/poll', [ApiController::class, 'pollComments']);
 $router->post('/api/v1/comments/{id}/upvote', [ApiController::class, 'upvoteComment']);

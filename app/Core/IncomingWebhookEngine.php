@@ -449,6 +449,15 @@ class IncomingWebhookEngine {
         // 7. Record Execution Log (Always valid ENUM: 'success', 'failed', 'ignored')
         self::logExecution($webhookId, $slug, $headers, $rawBody, ($totalAffected > 0 ? 'success' : 'ignored'), 200, $totalAffected, null, $ip);
 
+        // 8. Targeted Cache Invalidation: Instant Live Refresh on Site
+        try {
+            foreach (array_keys($tablesModified) as $tbl) {
+                Cache::invalidateTag($tbl);
+            }
+            Cache::invalidateTag('contents');
+            Cache::invalidateTag('feed');
+        } catch (\Throwable $ce) {}
+
         return [
             'success' => true,
             'code' => 200,

@@ -15,6 +15,7 @@ use App\Models\Author;
 use App\Models\Content;
 use App\Models\FinancialLedger;
 use App\Core\NotificationHelper;
+use App\Core\Cache;
 
 class AdminController {
     // ------------------------------------------------------------------------
@@ -209,6 +210,8 @@ class AdminController {
         $secondaryCats = (array)($request->post('secondary_categories') ?: []);
         $this->syncContentTaxonomy($targetContentId, $categoryId, $secondaryCats);
         \App\Core\TagHelper::syncTags($targetContentId, $request->post('tags', ''));
+        Content::invalidateCache($targetContentId, $slug);
+        Cache::invalidateTag('articles');
 
         Response::redirect('/admin/articles');
     }
@@ -234,6 +237,8 @@ class AdminController {
                 Auth::id(), $id
             ]);
             AuditLog::log('admin.article_approved', 'content', $id, ['title' => $title]);
+            Content::invalidateCache($id, $article['slug']);
+            Cache::invalidateTag('articles');
             if ($authorUserId) {
                 \App\Core\NotificationHelper::dispatch(
                     $authorUserId,
@@ -308,6 +313,8 @@ class AdminController {
         $id = (int)($params['id'] ?? 0);
         Database::execute("DELETE FROM contents WHERE id = ? AND content_type = 'article'", [$id]);
         AuditLog::log('admin.article_delete', 'content', $id);
+        Content::invalidateCache($id);
+        Cache::invalidateTag('articles');
         Session::flash('success', "Article deleted successfully.");
         Response::redirect('/admin/articles');
     }
@@ -478,6 +485,8 @@ class AdminController {
         }
         $targetToolId = $id ? (int)$id : $newId;
         \App\Core\TagHelper::syncTags($targetToolId, $request->post('tags', ''));
+        Content::invalidateCache($targetToolId, $slug);
+        Cache::invalidateTag('tools');
 
         Response::redirect('/admin/tools');
     }
@@ -486,6 +495,8 @@ class AdminController {
         $id = (int)($params['id'] ?? 0);
         Database::execute("DELETE FROM contents WHERE id = ? AND content_type = 'ai_tool'", [$id]);
         AuditLog::log('admin.tool_delete', 'ai_tool', $id);
+        Content::invalidateCache($id);
+        Cache::invalidateTag('tools');
         Session::flash('success', "AI Tool removed from directory.");
         Response::redirect('/admin/tools');
     }
@@ -747,6 +758,8 @@ class AdminController {
         $secondaryCats = (array)($request->post('secondary_categories') ?: []);
         $this->syncContentTaxonomy($targetPromptId, $categoryId, $secondaryCats);
         \App\Core\TagHelper::syncTags($targetPromptId, $request->post('tags', ''));
+        Content::invalidateCache($targetPromptId, $slug);
+        Cache::invalidateTag('prompts');
 
         Response::redirect('/admin/prompts');
     }
@@ -755,6 +768,8 @@ class AdminController {
         $id = (int)($params['id'] ?? 0);
         Database::execute("DELETE FROM contents WHERE id = ? AND content_type = 'prompt'", [$id]);
         AuditLog::log('admin.prompt_delete', 'prompt', $id);
+        Content::invalidateCache($id);
+        Cache::invalidateTag('prompts');
         Session::flash('success', "Prompt deleted.");
         Response::redirect('/admin/prompts');
     }
