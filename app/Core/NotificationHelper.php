@@ -18,8 +18,9 @@ class NotificationHelper {
                 }
             }
             $metaJson = !empty($metadata) ? json_encode($metadata) : null;
-            Database::execute("INSERT INTO notifications (user_id, type, title, message, action_url, is_read, created_at) VALUES (?, ?, ?, ?, ?, 0, NOW())", [
-                $userId, $type, $title, $message, $actionUrl
+            $eventType = !empty($metadata['event_type']) ? (string)$metadata['event_type'] : ($type ?: 'system');
+            Database::execute("INSERT INTO notifications (user_id, type, event_type, title, message, action_url, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?, 0, NOW())", [
+                $userId, $type, $eventType, $title, $message, $actionUrl
             ]);
             return true;
         } catch (\Throwable $e) {

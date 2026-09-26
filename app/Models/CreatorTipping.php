@@ -121,14 +121,15 @@ class CreatorTipping {
      * Get Top Supporters / Patrons for an Author
      */
     public static function getAuthorSupporters(int $authorId, int $limit = 10): array {
+        $limitInt = max(1, (int)$limit);
         return Database::query(
             "SELECT COALESCE(tipper_name, 'Generous Patron') as tipper_name, COALESCE(tipper_name, 'Generous Patron') as supporter_name, is_anonymous, SUM(amount_usd) as total_tipped, COUNT(*) as tip_count, MAX(created_at) as last_tipped_at
              FROM author_tips
              WHERE author_id = ? AND status = 'completed'
              GROUP BY IF(is_anonymous = 1, CONCAT('anon_', id), COALESCE(tipper_user_id, tipper_name))
              ORDER BY total_tipped DESC, last_tipped_at DESC
-             LIMIT ?",
-            [$authorId, $limit]
+             LIMIT {$limitInt}",
+            [$authorId]
         );
     }
 
@@ -136,14 +137,15 @@ class CreatorTipping {
      * Get Recent Tips for an Article
      */
     public static function getArticleTips(int $articleId, int $limit = 8): array {
+        $limitInt = max(1, (int)$limit);
         return Database::query(
             "SELECT t.*, a_tip.avatar_url as tipper_avatar
              FROM author_tips t
              LEFT JOIN authors a_tip ON t.tipper_user_id = a_tip.user_id
              WHERE t.article_id = ? AND t.status = 'completed'
              ORDER BY t.created_at DESC
-             LIMIT ?",
-            [$articleId, $limit]
+             LIMIT {$limitInt}",
+            [$articleId]
         );
     }
 
@@ -151,14 +153,14 @@ class CreatorTipping {
      * Get All Tips Stream for Admin Revenue
      */
     public static function getAllTips(int $limit = 50): array {
+        $limitInt = max(1, (int)$limit);
         return Database::query(
             "SELECT t.*, a.display_name as author_name, a.slug as author_slug, art.title as article_title, art.slug as article_slug
              FROM author_tips t
              JOIN authors a ON t.author_id = a.id
              LEFT JOIN contents art ON t.article_id = art.id
              ORDER BY t.created_at DESC
-             LIMIT ?",
-            [$limit]
+             LIMIT {$limitInt}"
         );
     }
 }

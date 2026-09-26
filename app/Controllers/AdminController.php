@@ -6738,14 +6738,15 @@ class AdminController {
         }
 
         // Fetch current batch of subscribers with joined profiles
+        $batchSizeInt = max(1, (int)$batchSize);
+        $offsetInt = max(0, (int)$offset);
         $subscribers = Database::query(
             "SELECT ns.id, ns.email, ns.subscriber_type, u.username, a.display_name 
              FROM newsletter_subscriptions ns 
              LEFT JOIN users u ON ns.email = u.email 
              LEFT JOIN authors a ON u.id = a.user_id 
              WHERE ns.status = 'subscribed' 
-             ORDER BY ns.id ASC LIMIT ? OFFSET ?",
-            [$batchSize, $offset]
+             ORDER BY ns.id ASC LIMIT {$batchSizeInt} OFFSET {$offsetInt}"
         );
 
         $appUrl = \App\Core\Config::url();
@@ -7957,6 +7958,12 @@ class AdminController {
         Response::redirect('/admin/system-logs');
     }
 
+    public function resolveAllSystemLogs(Request $request): void {
+        Database::execute("UPDATE system_error_logs SET resolved = 1 WHERE resolved = 0");
+        Session::flash('success', 'All system error logs marked as resolved.');
+        Response::redirect('/admin/system-logs');
+    }
+
     public function clearSystemLogs(Request $request): void {
         Database::execute("TRUNCATE TABLE system_error_logs");
         Session::flash('success', 'All system error logs cleared.');
@@ -9093,14 +9100,21 @@ class AdminController {
     }
 
     public function saveIncomingWebhook(Request $request): void {
-        $name = trim((string)$request->post('name', ''));
-        $rawSlug = trim((string)$request->post('slug', ''));
+        $id = (int)($request->post('id', 0) ?: ($request->json('id', 0) ?: 0));
+        $name = trim((string)($request->post('name', '') ?: ($request->json('name', '') ?: '')));
+        $rawSlug = trim((string)($request->post('slug', '') ?: ($request->json('slug', '') ?: '')));
         $slug = strtolower(preg_replace('/[^a-z0-9_-]/', '-', $rawSlug));
-        $targetTable = trim((string)$request->post('target_table', 'contents'));
-        $authType = trim((string)$request->post('auth_type', 'none'));
-        $secretKey = trim((string)$request->post('secret_key', ''));
+        $targetTable = trim((string)($request->post('target_table', 'contents') ?: ($request->json('target_table', 'contents') ?: 'contents')));
+        $authType = trim((string)($request->post('auth_type', 'none') ?: ($request->json('auth_type', 'none') ?: 'none')));
+        $secretKey = trim((string)($request->post('secret_key', '') ?: ($request->json('secret_key', '') ?: '')));
+        $isActive = ($request->post('is_active') !== null) ? ((int)$request->post('is_active') ? 1 : 0) : 1;
+        $isAjax = $request->header('X-Requested-With') === 'XMLHttpRequest' || str_contains($request->header('Accept') ?? '', 'application/json');
 
         if (empty($name) || empty($slug)) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'error' => 'Webhook name and slug are required.'], 400);
+                return;
+            }
             Session::flash('error', 'Webhook name and slug are required.');
             Response::redirect('/admin/incoming-webhooks');
             return;
@@ -9111,15 +9125,32 @@ class AdminController {
         }
 
         try {
-            Database::execute(
-                "INSERT INTO incoming_webhooks (name, slug, secret_key, target_table, mapping_rules_json, auth_type, is_active) 
-                 VALUES (?, ?, ?, ?, '[]', ?, 1) 
-                 ON DUPLICATE KEY UPDATE name = VALUES(name), target_table = VALUES(target_table), auth_type = VALUES(auth_type), secret_key = VALUES(secret_key)",
-                [$name, $slug, $secretKey, $targetTable, $authType]
-            );
-            Session::flash('success', "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' created successfully.");
+            if ($id > 0) {
+                Database::execute(
+                    "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, auth_type = ?, is_active = ? WHERE id = ?",
+                    [$name, $slug, $secretKey, $targetTable, $authType, $isActive, $id]
+                );
+                $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' updated successfully.";
+            } else {
+                Database::execute(
+                    "INSERT INTO incoming_webhooks (name, slug, secret_key, target_table, mapping_rules_json, auth_type, is_active) 
+                     VALUES (?, ?, ?, ?, '[]', ?, ?) 
+                     ON DUPLICATE KEY UPDATE name = VALUES(name), target_table = VALUES(target_table), auth_type = VALUES(auth_type), secret_key = VALUES(secret_key), is_active = VALUES(is_active)",
+                    [$name, $slug, $secretKey, $targetTable, $authType, $isActive]
+                );
+                $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' created successfully.";
+            }
+            if ($isAjax) {
+                Response::json(['success' => true, 'message' => $msg, 'slug' => $slug]);
+                return;
+            }
+            Session::flash('success', $msg);
         } catch (\Throwable $e) {
-            Session::flash('error', 'Error creating webhook: ' . $e->getMessage());
+            if ($isAjax) {
+                Response::json(['success' => false, 'error' => $e->getMessage()], 500);
+                return;
+            }
+            Session::flash('error', 'Error saving webhook: ' . $e->getMessage());
         }
 
         Response::redirect('/admin/incoming-webhooks');
@@ -9283,35 +9314,60 @@ class AdminController {
     }
 
     public function saveCustomApiEndpoint(Request $request): void {
-        $name = trim((string)$request->post('name', ''));
-        $rawSlug = trim((string)$request->post('slug', ''));
+        $id = (int)($request->post('id', 0) ?: ($request->json('id', 0) ?: 0));
+        $name = trim((string)($request->post('name', '') ?: ($request->json('name', '') ?: '')));
+        $rawSlug = trim((string)($request->post('slug', '') ?: ($request->json('slug', '') ?: '')));
         $slug = strtolower(preg_replace('/[^a-z0-9_-]/', '-', $rawSlug));
-        $endpointType = trim((string)$request->post('endpoint_type', 'table_data'));
-        $targetTable = trim((string)$request->post('target_table', 'prompts'));
-        $selectedColumns = trim((string)$request->post('selected_columns', ''));
-        $orderByCol = trim((string)$request->post('order_by_column', 'id'));
-        $orderDir = strtoupper(trim((string)$request->post('order_direction', 'DESC')));
-        $customTemplate = trim((string)$request->post('custom_response_template', ''));
-        $authRequired = !empty($request->post('auth_required')) ? 1 : 0;
+        $endpointType = trim((string)($request->post('endpoint_type', 'table_data') ?: ($request->json('endpoint_type', 'table_data') ?: 'table_data')));
+        $targetTable = trim((string)($request->post('target_table', 'prompts') ?: ($request->json('target_table', 'prompts') ?: 'prompts')));
+        $selectedColumns = trim((string)($request->post('selected_columns', '') ?: ($request->json('selected_columns', '') ?: '')));
+        $orderByCol = trim((string)($request->post('order_by_column', 'id') ?: ($request->json('order_by_column', 'id') ?: 'id')));
+        $orderDir = strtoupper(trim((string)($request->post('order_direction', 'DESC') ?: ($request->json('order_direction', 'DESC') ?: 'DESC'))));
+        $customTemplate = trim((string)($request->post('custom_response_template', '') ?: ($request->json('custom_response_template', '') ?: '')));
+        $authRequired = ($request->post('auth_required') !== null) ? (!empty($request->post('auth_required')) ? 1 : 0) : (!empty($request->json('auth_required')) ? 1 : 0);
         $secretToken = 'ts_api_tok_' . bin2hex(random_bytes(16));
+        $isAjax = $request->header('X-Requested-With') === 'XMLHttpRequest' || str_contains($request->header('Accept') ?? '', 'application/json');
 
         if (empty($name) || empty($slug)) {
+            if ($isAjax) {
+                Response::json(['success' => false, 'error' => 'Endpoint name and slug are required.'], 400);
+                return;
+            }
             Session::flash('error', 'Endpoint name and slug are required.');
             Response::redirect('/admin/custom-api');
             return;
         }
 
         try {
-            Database::execute(
-                "INSERT INTO custom_api_endpoints 
-                 (name, slug, description, endpoint_type, target_table, selected_columns, order_by_column, order_direction, custom_response_template, auth_required, secret_token, is_active) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) 
-                 ON DUPLICATE KEY UPDATE name = VALUES(name), endpoint_type = VALUES(endpoint_type), target_table = VALUES(target_table), selected_columns = VALUES(selected_columns), order_by_column = VALUES(order_by_column), order_direction = VALUES(order_direction), custom_response_template = VALUES(custom_response_template), auth_required = VALUES(auth_required)",
-                [$name, $slug, "Custom API Endpoint for {$targetTable}", $endpointType, $targetTable, $selectedColumns, $orderByCol, $orderDir, $customTemplate, $authRequired, $secretToken]
-            );
-            Session::flash('success', "Custom API endpoint '/api/v1/custom/{$slug}' configured successfully.");
+            if ($id > 0) {
+                Database::execute(
+                    "UPDATE custom_api_endpoints 
+                     SET name = ?, slug = ?, endpoint_type = ?, target_table = ?, selected_columns = ?, order_by_column = ?, order_direction = ?, custom_response_template = ?, auth_required = ?
+                     WHERE id = ?",
+                    [$name, $slug, $endpointType, $targetTable, $selectedColumns, $orderByCol, $orderDir, $customTemplate, $authRequired, $id]
+                );
+                $msg = "Custom API endpoint '/api/v1/custom/{$slug}' updated successfully.";
+            } else {
+                Database::execute(
+                    "INSERT INTO custom_api_endpoints 
+                     (name, slug, description, endpoint_type, target_table, selected_columns, order_by_column, order_direction, custom_response_template, auth_required, secret_token, is_active) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) 
+                     ON DUPLICATE KEY UPDATE name = VALUES(name), endpoint_type = VALUES(endpoint_type), target_table = VALUES(target_table), selected_columns = VALUES(selected_columns), order_by_column = VALUES(order_by_column), order_direction = VALUES(order_direction), custom_response_template = VALUES(custom_response_template), auth_required = VALUES(auth_required)",
+                    [$name, $slug, "Custom API Endpoint for {$targetTable}", $endpointType, $targetTable, $selectedColumns, $orderByCol, $orderDir, $customTemplate, $authRequired, $secretToken]
+                );
+                $msg = "Custom API endpoint '/api/v1/custom/{$slug}' configured successfully.";
+            }
+            if ($isAjax) {
+                Response::json(['success' => true, 'message' => $msg, 'slug' => $slug]);
+                return;
+            }
+            Session::flash('success', $msg);
         } catch (\Throwable $e) {
-            Session::flash('error', 'Error creating custom API endpoint: ' . $e->getMessage());
+            if ($isAjax) {
+                Response::json(['success' => false, 'error' => $e->getMessage()], 500);
+                return;
+            }
+            Session::flash('error', 'Error saving custom API endpoint: ' . $e->getMessage());
         }
 
         Response::redirect('/admin/custom-api');

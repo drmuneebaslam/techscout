@@ -129,9 +129,17 @@ class IncomingWebhookController {
             return;
         }
 
-        $slug = trim((string)$request->post('slug', ''));
-        $rawBody = trim((string)$request->post('payload', '{}'));
-        $authHeader = trim((string)$request->post('auth_header', ''));
+        $slug = trim((string)($request->post('slug', '') ?: ($request->json('slug', '') ?: 'omni')));
+        $rawBody = $request->post('payload', '');
+        if (empty($rawBody)) {
+            $jsonPayload = $request->json('payload', null);
+            if ($jsonPayload !== null) {
+                $rawBody = is_array($jsonPayload) ? json_encode($jsonPayload, JSON_UNESCAPED_UNICODE) : (string)$jsonPayload;
+            } else {
+                $rawBody = '{}';
+            }
+        }
+        $authHeader = trim((string)($request->post('auth_header', '') ?: $request->json('auth_header', '')));
 
         $headers = function_exists('getallheaders') ? getallheaders() : [];
         if (!empty($authHeader)) {
@@ -140,6 +148,18 @@ class IncomingWebhookController {
 
         $result = IncomingWebhookEngine::processPayload($slug, $headers, $rawBody, Request::ip());
         Response::json($result, $result['code'] ?? 200);
+    }
+
+    /**
+     * Get Sample Data JSON for Any Table: GET /admin/incoming-webhooks/sample/{table}
+     */
+    public function samplePayload(Request $request, array $params): void {
+        $table = trim((string)($params['table'] ?? 'prompts'));
+        if ($table === 'multi' || $table === 'multitable') {
+            Response::json(IncomingWebhookEngine::getMultiTableSamplePayload());
+        } else {
+            Response::json(IncomingWebhookEngine::getSamplePayloadForTable($table));
+        }
     }
 
     /**

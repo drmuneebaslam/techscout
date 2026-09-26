@@ -156,14 +156,47 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
           </button>
         </div>
 
+        <style>
+        .main-gallery-caption-bar {
+          position: absolute;
+          bottom: 0;
+          inset-x: 0;
+          background: linear-gradient(to top, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.65) 60%, transparent 100%);
+          padding: 1.25rem 1rem 0.85rem 1rem;
+          text-align: left;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 0.75rem;
+          transition: all 0.3s ease;
+        }
+        [data-theme="light"] .main-gallery-caption-bar,
+        .theme-light .main-gallery-caption-bar {
+          background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.8) 60%, transparent 100%);
+          border-top: 1px solid rgba(226, 232, 240, 0.7);
+        }
+        #main-gallery-caption {
+          font-size: 0.88rem;
+          font-weight: 600;
+          color: #f8fafc;
+          line-height: 1.4;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+        [data-theme="light"] #main-gallery-caption,
+        .theme-light #main-gallery-caption {
+          color: #0f172a;
+          text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+        }
+        </style>
+
         <!-- Hero Primary Image Viewport: Clicking triggers Popunder Ad AND Lightbox -->
         <div style="position: relative; border-radius: 12px; overflow: hidden; max-height: 520px; background: #070a12; text-align: center; cursor: pointer;" onclick="handleShowcaseImageClick(0)">
           <img id="main-gallery-img" src="<?= htmlspecialchars($allImages[0]['image_url']) ?>" alt="<?= htmlspecialchars($prompt['title']) ?>" style="max-height: 520px; width: 100%; object-fit: contain; transition: transform 0.35s ease;">
-          <div style="position: absolute; bottom: 0; inset-x: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding: 1rem; text-align: left; display: flex; justify-content: space-between; align-items: flex-end;">
-            <span id="main-gallery-caption" style="color: #ffffff; font-size: 0.85rem; font-weight: 600;">
+          <div class="main-gallery-caption-bar">
+            <span id="main-gallery-caption">
               <?= htmlspecialchars($allImages[0]['caption']) ?>
             </span>
-            <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; backdrop-filter: blur(8px);">
+            <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; backdrop-filter: blur(8px); flex-shrink: 0;">
               🔍 Click to Enlarge (HD)
             </span>
           </div>
@@ -182,7 +215,18 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
       </div>
     <?php endif; ?>
 
-    <!-- 2. Generation & Hyperparameters HUD -->
+    <!-- 2. Generation & Hyperparameters HUD (Optional & Conditionally Rendered) -->
+    <?php 
+    $hasModels = !empty($models) && count($models) > 0;
+    $hasAspectRatio = $isImageEngine && !empty($notes['aspect_ratio']);
+    $hasNegativePrompt = $isImageEngine && !empty($notes['negative_prompt']);
+    $hasTemperature = !$isImageEngine && !empty($notes['temperature']);
+    $hasTopP = !$isImageEngine && !empty($notes['top_p']);
+    $hasDifficulty = !$isImageEngine && !empty($notes['difficulty']);
+    $hasCustomLinks = !empty($notes['custom_links']) && is_array($notes['custom_links']);
+    $hasAnyParams = $hasModels || $hasAspectRatio || $hasNegativePrompt || $hasTemperature || $hasTopP || $hasDifficulty || $hasCustomLinks;
+    ?>
+    <?php if ($hasAnyParams): ?>
     <div class="ts-card" style="margin-bottom: 2rem; border-radius: 14px; padding: 1.25rem 1.5rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main);">
       <div style="font-weight: 700; font-size: 0.92rem; color: var(--ts-text-primary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.45rem;">
         <i data-lucide="sliders" style="width: 16px; height: 16px; color: var(--ts-primary);"></i>
@@ -190,7 +234,7 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
-        <!-- Models -->
+        <?php if ($hasModels): ?>
         <div>
           <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Target Engine(s)</span>
           <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
@@ -199,18 +243,19 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
             <?php endforeach; ?>
           </div>
         </div>
+        <?php endif; ?>
 
         <?php if ($isImageEngine): ?>
-          <!-- Aspect Ratio -->
+          <?php if ($hasAspectRatio): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Aspect Ratio</span>
             <span class="ts-badge ts-badge-indigo" style="font-family: var(--ts-font-mono); font-size: 0.8rem;">
-              --ar <?= htmlspecialchars($notes['aspect_ratio'] ?? '16:9') ?>
+              --ar <?= htmlspecialchars($notes['aspect_ratio']) ?>
             </span>
           </div>
+          <?php endif; ?>
 
-          <!-- Negative Prompt -->
-          <?php if (!empty($notes['negative_prompt'])): ?>
+          <?php if ($hasNegativePrompt): ?>
             <div style="grid-column: 1 / -1; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); padding: 0.75rem 1rem; border-radius: 8px;">
               <div style="margin-bottom: 0.35rem;">
                 <span style="font-size: 0.75rem; color: #ec4899; font-weight: 700;">Negative Prompt (--no parameters):</span>
@@ -220,28 +265,35 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
           <?php endif; ?>
 
         <?php else: ?>
-          <!-- LLM Parameters -->
+          <?php if ($hasTemperature): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Sampling Temperature</span>
             <span style="font-family: var(--ts-font-mono); font-weight: 700; color: #38bdf8; font-size: 0.88rem;">
-              <?= number_format((float)($notes['temperature'] ?? 0.7), 2) ?>
+              <?= number_format((float)$notes['temperature'], 2) ?>
             </span>
           </div>
+          <?php endif; ?>
+
+          <?php if ($hasTopP): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Top_P Sampling</span>
             <span style="font-family: var(--ts-font-mono); font-weight: 700; color: #10b981; font-size: 0.88rem;">
-              <?= number_format((float)($notes['top_p'] ?? 0.95), 2) ?>
+              <?= number_format((float)$notes['top_p'], 2) ?>
             </span>
           </div>
+          <?php endif; ?>
+
+          <?php if ($hasDifficulty): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Complexity Tier</span>
             <span class="ts-badge ts-badge-green" style="font-size: 0.78rem;">
-              <?= htmlspecialchars($notes['difficulty'] ?? 'Production') ?>
+              <?= htmlspecialchars($notes['difficulty']) ?>
             </span>
           </div>
+          <?php endif; ?>
         <?php endif; ?>
 
-        <?php if (!empty($notes['custom_links']) && is_array($notes['custom_links'])): ?>
+        <?php if ($hasCustomLinks): ?>
           <div style="grid-column: 1 / -1; padding-top: 0.75rem; border-top: 1px solid var(--ts-border-subtle); display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700;">Additional Links:</span>
             <?php foreach ($notes['custom_links'] as $cLink): ?>
@@ -255,12 +307,13 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
         <?php endif; ?>
       </div>
     </div>
+    <?php endif; ?>
 
     <!-- Hidden Raw Template for JS Injector -->
     <textarea id="raw-prompt-template" style="display: none;"><?= htmlspecialchars($prompt['prompt_template'] ?? '') ?></textarea>
 
-    <!-- 3. Dynamic Variable Customizer Box (If Applicable) -->
-    <?php if (!empty($variables)): ?>
+    <!-- 3. Dynamic Variable Customizer Box (Only if variables present & template has {{...}}) -->
+    <?php if (!empty($variables) && count($variables) > 0 && str_contains($prompt['prompt_template'] ?? '', '{{')): ?>
       <div class="ts-card" style="margin-bottom: 2rem; border-color: rgba(16, 185, 129, 0.4); border-radius: 14px;">
         <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; color: #34d399;">
           <i data-lucide="sliders" style="width: 18px;"></i> Dynamic Variable Injector
@@ -326,8 +379,12 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
       </div>
 
       <!-- Half-Visible Teaser Wrapper -->
-      <div id="prompt-preview-container" class="prompt-half-visible" style="position: relative; max-height: 140px; overflow: hidden; border-radius: 10px; border: 1px solid var(--ts-border-main); background: #080c16; transition: max-height 0.4s ease;">
-        <pre style="margin: 0; padding: 1.25rem; font-family: var(--ts-font-mono); font-size: 0.88rem; white-space: pre-wrap; word-break: break-word; color: #34d399; line-height: 1.6;"><code id="rendered-prompt-output" class="language-markdown"></code></pre>
+      <div id="prompt-preview-container" class="prompt-half-visible no-copy-inject" style="position: relative; max-height: 140px; overflow: hidden; border-radius: 10px; border: 1px solid var(--ts-border-main); background: #080c16; transition: max-height 0.4s ease;">
+        <button type="button" id="prompt-box-top-copy-btn" onclick="copyUnlockedPrompt()" title="Copy prompt blueprint" style="display: none; position: absolute; top: 10px; right: 10px; z-index: 20; padding: 6px 14px; background: rgba(15,23,42,0.85); color: #34d399; border: 1px solid rgba(52,211,153,0.4); border-radius: 6px; cursor: pointer; font-family: monospace; font-size: 0.78rem; font-weight: 700; align-items: center; gap: 0.35rem; backdrop-filter: blur(6px); transition: 0.2s;">
+          📋 Copy Prompt
+        </button>
+
+        <pre class="no-copy-inject" style="margin: 0; padding: 1.25rem; font-family: var(--ts-font-mono); font-size: 0.88rem; white-space: pre-wrap; word-break: break-word; color: #34d399; line-height: 1.6;"><code id="rendered-prompt-output" class="language-markdown"></code></pre>
         
         <!-- Gradient Blurred Fade Mask -->
         <div id="prompt-fade-overlay" style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 15%, rgba(8,12,22,0.75) 60%, rgba(8,12,22,0.98) 100%); pointer-events: none; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.75rem;">
@@ -893,6 +950,28 @@ document.querySelectorAll('.prompt-var-input').forEach(inp => {
 });
 updateRenderedPrompt();
 
+function copyUnlockedPrompt() {
+    const rawTemplateEl = document.getElementById('raw-prompt-template');
+    const renderedPromptEl = document.getElementById('rendered-prompt-output');
+    const textToCopy = renderedPromptEl ? (renderedPromptEl.innerText || renderedPromptEl.textContent) : (rawTemplateEl ? rawTemplateEl.value : '');
+    const topBtn = document.getElementById('prompt-box-top-copy-btn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            if (topBtn) {
+                topBtn.innerHTML = '✅ Copied!';
+                topBtn.style.color = '#34d399';
+                setTimeout(() => { 
+                    if (topBtn) {
+                        topBtn.innerHTML = '📋 Copy Prompt'; 
+                        topBtn.style.color = '#34d399'; 
+                    }
+                }, 2000);
+            }
+            if (typeof showToast === 'function') showToast('Prompt copied to clipboard! 📋', 'success');
+        });
+    }
+}
+
 // Hook Unlock & Copy Prompt Button with Popunder / Direct Link Ad
 document.addEventListener('DOMContentLoaded', () => {
     const copyBtn = document.getElementById('btn-copy-prompt');
@@ -907,18 +986,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const promptId = copyBtn.getAttribute('data-prompt-id');
             const adUrl = copyBtn.getAttribute('data-ad-url') || siteAdUrl;
 
-            // 1. Reveal full prompt visually & clear blur overlay
+            // 1. Open Ad in new tab
+            if (adUrl && adUrl !== '#' && adUrl !== '') {
+                try {
+                    window.open(adUrl, '_blank');
+                } catch(e) {}
+            }
+
+            // 2. Reveal full prompt visually & clear blur overlay
             if (previewContainer) {
                 previewContainer.style.maxHeight = 'none';
                 if (fadeOverlay) fadeOverlay.style.display = 'none';
             }
+
+            // 3. Show top-right copy button on prompt box
+            const topBoxBtn = document.getElementById('prompt-box-top-copy-btn');
+            if (topBoxBtn) {
+                topBoxBtn.style.display = 'inline-flex';
+            }
+
+            // 4. Update large button status
             const iconEl = document.getElementById('copy-btn-icon');
             const labelEl = document.getElementById('copy-btn-label');
             if (iconEl) iconEl.setAttribute('data-lucide', 'check');
-            if (labelEl) labelEl.innerText = 'Copied to Clipboard! 🎉';
+            if (labelEl) labelEl.innerText = '✓ Prompt Copied to Clipboard! 🎉';
             if (window.lucide) lucide.createIcons();
 
-            // 3. Copy text to clipboard
+            // 5. Copy text to clipboard
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
                     if (typeof showToast === 'function') {
@@ -931,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 copyFallback(textToCopy);
             }
 
-            // 4. Send background telemetry
+            // 6. Send background telemetry
             if (promptId) {
                 fetch('<?= url('/api/v1/prompts/') ?>' + promptId + '/copy', { method: 'POST' }).catch(() => {});
             }

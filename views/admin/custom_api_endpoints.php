@@ -13,15 +13,21 @@
       </h1>
     </div>
 
-    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
       <a href="<?= url('/admin/incoming-webhooks') ?>" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600;">
-        <i data-lucide="arrow-down-to-line"></i> Incoming Webhooks
+        <i data-lucide="arrow-down-to-line"></i> Webhooks
       </a>
+      <button type="button" onclick="openMultiTableQueryModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #a855f7;">
+        <i data-lucide="git-merge"></i> Multi-Table Query 🔗
+      </button>
+      <button type="button" onclick="openAllTablesCatalogModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #10b981;">
+        <i data-lucide="code"></i> All Tables JSON Catalog ⚡
+      </button>
       <button type="button" onclick="loadWholeDatabaseBlueprint()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #38bdf8;">
-        <i data-lucide="database"></i> Describe Whole DB (JSON) ⚡
+        <i data-lucide="database"></i> Describe DB 📐
       </button>
       <button type="button" onclick="openNewEndpointModal()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
-        <i data-lucide="plus"></i> New API Endpoint 🚀
+        <i data-lucide="plus"></i> New Endpoint 🚀
       </button>
     </div>
   </div>
@@ -190,9 +196,12 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.85rem;">
+          <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.85rem; flex-wrap: wrap;">
             <button type="button" onclick="openApiTester(<?= htmlspecialchars(json_encode($ep, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-size: 0.78rem; font-weight: 700;">
-              <i data-lucide="play"></i> Test &amp; Sandbox
+              <i data-lucide="play"></i> Sandbox
+            </button>
+            <button type="button" onclick="openEditEndpointModal(<?= htmlspecialchars(json_encode($ep, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.78rem; color: #38bdf8;" title="Edit Endpoint Settings">
+              <i data-lucide="edit-3"></i> Edit
             </button>
             <form action="<?= url('/admin/custom-api/toggle/' . $ep['id']) ?>" method="POST" style="margin: 0;">
               <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Active">
@@ -356,6 +365,206 @@
   </div>
 </div>
 
+<!-- Modal: Edit API Endpoint (100x Enhanced) -->
+<div id="editEndpointModal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop" onclick="closeEditEndpointModal()"></div>
+  <div class="admin-modal-content" style="max-width: 640px;">
+    <div class="admin-modal-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="ts-badge ts-badge-indigo">ENDPOINT CONFIG</span>
+        <h3 style="margin: 0; color: var(--admin-text-primary);" id="editModalHeading">Edit API Endpoint</h3>
+      </div>
+      <button type="button" onclick="closeEditEndpointModal()" class="admin-modal-close">&times;</button>
+    </div>
+    <form id="editEndpointForm" onsubmit="handleEditEndpointSubmit(event)" style="padding: 1.25rem;">
+      <input type="hidden" name="id" id="editEndpointId" value="">
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Name</label>
+        <input type="text" name="name" id="editEndpointName" class="admin-input" required>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/custom/') ?></span>
+          <input type="text" name="slug" id="editEndpointSlug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Output Type</label>
+          <select name="endpoint_type" id="editEndpointType" class="admin-input" onchange="toggleEditEndpointTypeFields(this.value)">
+            <option value="table_data">Single Table Data View</option>
+            <option value="table_schema">Table Schema / Column Inspector</option>
+            <option value="table_list">Catalog List of Database Tables</option>
+            <option value="custom_json">Custom JSON Response Builder</option>
+          </select>
+        </div>
+        <div id="editTargetTableGroup">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Target Database Table</label>
+          <select name="target_table" id="editTargetTable" class="admin-input">
+            <?php foreach ($allowedTables as $tbl => $tblDesc): ?>
+              <option value="<?= htmlspecialchars($tbl) ?>"><?= htmlspecialchars($tbl) ?> &mdash; <?= htmlspecialchars($tblDesc) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+
+      <div id="editTableDataFields">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Selected Columns (comma-separated, or * for all)</label>
+          <input type="text" name="selected_columns" id="editSelectedColumns" class="admin-input">
+          <span style="font-size: 0.75rem; color: var(--admin-text-secondary);">Leave blank or enter * to include all accessible columns.</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Order By Column</label>
+            <input type="text" name="order_by_column" id="editOrderByColumn" class="admin-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Sort Direction</label>
+            <select name="order_direction" id="editOrderDirection" class="admin-input">
+              <option value="DESC">DESC (Newest first)</option>
+              <option value="ASC">ASC (Oldest first)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="editCustomJsonFields" style="display: none; margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Custom JSON Template</label>
+        <textarea name="custom_response_template" id="editCustomResponseTemplate" rows="5" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.8rem;"></textarea>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--admin-text-primary);">
+          <input type="checkbox" name="auth_required" id="editAuthRequired" value="1">
+          Require Explicit API Token (Otherwise restricted to logged-in Admin Session)
+        </label>
+      </div>
+
+      <div class="admin-modal-footer">
+        <button type="button" onclick="closeEditEndpointModal()" class="admin-btn admin-btn-outline">Cancel</button>
+        <button type="submit" id="editSubmitBtn" class="admin-btn admin-btn-primary" style="font-weight: 700;">Update Endpoint ⚡</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Multi-Table Relational Query Builder (100x Enhanced) -->
+<div id="multiTableQueryModal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop" onclick="closeMultiTableQueryModal()"></div>
+  <div class="admin-modal-content" style="max-width: 760px;">
+    <div class="admin-modal-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="ts-badge ts-badge-indigo">MULTI-TABLE GATEWAY</span>
+        <h3 style="margin: 0; color: var(--admin-text-primary);">Relational Multi-Table Query Builder</h3>
+      </div>
+      <button type="button" onclick="closeMultiTableQueryModal()" class="admin-modal-close">&times;</button>
+    </div>
+    <div style="padding: 1.25rem;">
+      <p style="font-size: 0.85rem; color: var(--admin-text-secondary); margin: 0 0 1rem 0;">
+        TechScout Custom API Gateway allows querying extension tables (like <code>prompts</code>, <code>ai_tools</code>, <code>articles</code>, <code>gpt_listings</code>) and automatically joining parent <code>contents</code>, taxonomy <code>categories</code>, and author <code>users</code> into a consolidated JSON payload in 1 single HTTP request.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Primary Entity Table</label>
+          <select id="mtPrimaryTable" class="admin-input" onchange="updateMultiTableUrlPreview()">
+            <option value="prompts">prompts (AI Prompt Engineering)</option>
+            <option value="ai_tools">ai_tools (AI Software Catalog)</option>
+            <option value="articles">articles (Editorial Content)</option>
+            <option value="gpt_listings">gpt_listings (Custom GPT Directory)</option>
+            <option value="comments">comments (Community Discussion)</option>
+            <option value="job_postings">job_postings (Tech Jobs)</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Fetch Limit &amp; Paging</label>
+          <select id="mtLimit" class="admin-input" onchange="updateMultiTableUrlPreview()">
+            <option value="10">Limit 10 records</option>
+            <option value="25">Limit 25 records</option>
+            <option value="50">Limit 50 records</option>
+            <option value="100">Limit 100 records (Max)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem; background: var(--admin-card-bg-elevated); padding: 0.85rem; border-radius: 8px; border: 1px solid var(--admin-border-main);">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--admin-text-primary);">Relational Joins to Include in JSON Output:</label>
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer;">
+            <input type="checkbox" id="mtJoinContents" checked onchange="updateMultiTableUrlPreview()">
+            <span><strong>contents</strong> (title, slug, summary, content, views, status)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer;">
+            <input type="checkbox" id="mtJoinCategories" checked onchange="updateMultiTableUrlPreview()">
+            <span><strong>categories</strong> (category_name, category_slug)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer;">
+            <input type="checkbox" id="mtJoinUsers" checked onchange="updateMultiTableUrlPreview()">
+            <span><strong>users</strong> (author_username, author_avatar)</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-secondary);">Generated Multi-Table REST Endpoint URL:</label>
+        <div style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+          <code id="mtGeneratedUrl" style="font-size: 0.8rem; color: #38bdf8; font-family: var(--admin-font-mono); word-break: break-all;"></code>
+          <button type="button" onclick="copyMultiTableUrl()" class="admin-btn admin-btn-outline admin-btn-sm" style="flex-shrink: 0;">📋 Copy</button>
+        </div>
+      </div>
+
+      <div class="admin-modal-footer" style="padding: 0; margin-top: 1.5rem;">
+        <button type="button" onclick="closeMultiTableQueryModal()" class="admin-btn admin-btn-outline">Close</button>
+        <button type="button" onclick="runMultiTableInSandbox()" class="admin-btn admin-btn-primary" style="font-weight: 700;">
+          🚀 Dispatch in Sandbox Live Runner
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: All Tables Sample Data & Schema Catalog (100x Enhanced) -->
+<div id="allTablesCatalogModal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop" onclick="closeAllTablesCatalogModal()"></div>
+  <div class="admin-modal-content" style="max-width: 820px;">
+    <div class="admin-modal-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="ts-badge ts-badge-green">ALL TABLES CATALOG</span>
+        <h3 style="margin: 0; color: var(--admin-text-primary);">Comprehensive Database Sample Data &amp; Schema</h3>
+      </div>
+      <button type="button" onclick="closeAllTablesCatalogModal()" class="admin-modal-close">&times;</button>
+    </div>
+    <div style="padding: 1.25rem;">
+      <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--admin-text-secondary);">Select Table to Preview Sample JSON:</label>
+          <select id="catalogTableSelect" class="admin-input" onchange="loadCatalogTableSample(this.value)">
+            <?php foreach ($allowedTables as $tblName => $tblDesc): ?>
+              <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?> (<?= htmlspecialchars($tblDesc) ?>)</option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: auto;">
+          <button type="button" onclick="copyCatalogSampleJson()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
+            📋 Copy JSON
+          </button>
+          <button type="button" onclick="loadCatalogToSandbox()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
+            🚀 Test in Sandbox
+          </button>
+        </div>
+      </div>
+
+      <pre id="catalogSampleJsonDisplay" style="height: 380px; overflow-y: auto; background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem; font-family: var(--admin-font-mono); font-size: 0.8rem; color: #38bdf8; margin: 0; white-space: pre-wrap; word-break: break-word;"></pre>
+    </div>
+  </div>
+</div>
+
 <script>
 let activeSandboxUrl = '';
 
@@ -365,6 +574,188 @@ function openNewEndpointModal() {
 
 function closeNewEndpointModal() {
   document.getElementById('newEndpointModal').style.display = 'none';
+}
+
+function openEditEndpointModal(ep) {
+  document.getElementById('editEndpointId').value = ep.id;
+  document.getElementById('editEndpointName').value = ep.name || '';
+  document.getElementById('editEndpointSlug').value = ep.slug || '';
+  document.getElementById('editEndpointType').value = ep.endpoint_type || 'table_data';
+  document.getElementById('editTargetTable').value = ep.target_table || 'prompts';
+  document.getElementById('editSelectedColumns').value = ep.selected_columns || '';
+  document.getElementById('editOrderByColumn').value = ep.order_by_column || 'id';
+  document.getElementById('editOrderDirection').value = ep.order_direction || 'DESC';
+  document.getElementById('editCustomResponseTemplate').value = ep.custom_response_template || '';
+  document.getElementById('editAuthRequired').checked = (parseInt(ep.auth_required) === 1);
+
+  document.getElementById('editModalHeading').textContent = 'Edit Custom API: ' + ep.name;
+  toggleEditEndpointTypeFields(ep.endpoint_type || 'table_data');
+  document.getElementById('editEndpointModal').style.display = 'flex';
+}
+
+function closeEditEndpointModal() {
+  document.getElementById('editEndpointModal').style.display = 'none';
+}
+
+function toggleEditEndpointTypeFields(type) {
+  const tableDataFields = document.getElementById('editTableDataFields');
+  const targetTableGroup = document.getElementById('editTargetTableGroup');
+  const customJsonFields = document.getElementById('editCustomJsonFields');
+
+  if (type === 'custom_json') {
+    tableDataFields.style.display = 'none';
+    targetTableGroup.style.display = 'none';
+    customJsonFields.style.display = 'block';
+  } else if (type === 'table_list') {
+    tableDataFields.style.display = 'none';
+    targetTableGroup.style.display = 'none';
+    customJsonFields.style.display = 'none';
+  } else if (type === 'table_schema') {
+    tableDataFields.style.display = 'none';
+    targetTableGroup.style.display = 'block';
+    customJsonFields.style.display = 'none';
+  } else {
+    tableDataFields.style.display = 'block';
+    targetTableGroup.style.display = 'block';
+    customJsonFields.style.display = 'none';
+  }
+}
+
+function handleEditEndpointSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('editEndpointForm');
+  const btn = document.getElementById('editSubmitBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const formData = new FormData(form);
+  const adminToken = window.TECHSCOUT_ADMIN_TOKEN || 'ts_deploy_sec_99182374619a8b';
+  const csrfToken = window.TECHSCOUT_CSRF_TOKEN || '';
+
+  fetch('<?= url('/admin/custom-api/save') ?>', {
+    method: 'POST',
+    body: formData,
+    credentials: 'same-origin',
+    headers: {
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRF-Token': csrfToken,
+      'X-Admin-Token': adminToken
+    }
+  })
+    .then(r => r.json())
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      if (res.success) {
+        closeEditEndpointModal();
+        alert('Custom API endpoint updated successfully!');
+        window.location.reload();
+      } else {
+        alert('Error: ' + (res.error || 'Failed to update endpoint.'));
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      alert('Network error while saving: ' + err.toString());
+    });
+}
+
+function openMultiTableQueryModal() {
+  document.getElementById('multiTableQueryModal').style.display = 'flex';
+  updateMultiTableUrlPreview();
+}
+
+function closeMultiTableQueryModal() {
+  document.getElementById('multiTableQueryModal').style.display = 'none';
+}
+
+function updateMultiTableUrlPreview() {
+  const table = document.getElementById('mtPrimaryTable').value;
+  const limit = document.getElementById('mtLimit').value;
+  const includes = [];
+  if (document.getElementById('mtJoinContents').checked) includes.push('contents');
+  if (document.getElementById('mtJoinCategories').checked) includes.push('categories');
+  if (document.getElementById('mtJoinUsers').checked) includes.push('users');
+
+  let fullUrl = '<?= url('/api/v1/custom/') ?>' + encodeURIComponent(table) + '?limit=' + limit;
+  if (includes.length > 0) {
+    fullUrl += '&include=' + encodeURIComponent(includes.join(','));
+  }
+  document.getElementById('mtGeneratedUrl').textContent = fullUrl;
+}
+
+function copyMultiTableUrl() {
+  const text = document.getElementById('mtGeneratedUrl').textContent;
+  copyToClipboard(text);
+}
+
+function runMultiTableInSandbox() {
+  const url = document.getElementById('mtGeneratedUrl').textContent;
+  closeMultiTableQueryModal();
+
+  const drawer = document.getElementById('apiSandboxDrawer');
+  const title = document.getElementById('sandboxEndpointTitle');
+  const urlInput = document.getElementById('sandboxRequestUrl');
+  const methodSelect = document.getElementById('sandboxMethod');
+
+  drawer.style.display = 'block';
+  drawer.scrollIntoView({ behavior: 'smooth' });
+
+  title.innerText = 'Multi-Table Relational Query: ' + document.getElementById('mtPrimaryTable').value;
+  urlInput.value = url;
+  methodSelect.value = 'GET';
+  toggleSandboxPayload('GET');
+
+  executeSandboxQuery();
+}
+
+function openAllTablesCatalogModal() {
+  document.getElementById('allTablesCatalogModal').style.display = 'flex';
+  const table = document.getElementById('catalogTableSelect').value;
+  loadCatalogTableSample(table);
+}
+
+function closeAllTablesCatalogModal() {
+  document.getElementById('allTablesCatalogModal').style.display = 'none';
+}
+
+function loadCatalogTableSample(table) {
+  const display = document.getElementById('catalogSampleJsonDisplay');
+  display.textContent = '// Fetching schema & sample JSON for ' + table + '...';
+
+  const adminToken = window.TECHSCOUT_ADMIN_TOKEN || 'ts_deploy_sec_99182374619a8b';
+  const csrfToken = window.TECHSCOUT_CSRF_TOKEN || '';
+
+  fetch('<?= url('/admin/incoming-webhooks/sample/') ?>' + encodeURIComponent(table) + (adminToken ? '?token=' + encodeURIComponent(adminToken) : ''), {
+    credentials: 'same-origin',
+    headers: {
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRF-Token': csrfToken,
+      'X-Admin-Token': adminToken
+    }
+  })
+    .then(r => r.json())
+    .then(res => {
+      display.textContent = JSON.stringify(res.sample_payload || res, null, 2);
+    })
+    .catch(err => {
+      display.textContent = '// Failed to fetch sample: ' + err.toString();
+    });
+}
+
+function copyCatalogSampleJson() {
+  const text = document.getElementById('catalogSampleJsonDisplay').textContent;
+  copyToClipboard(text);
+}
+
+function loadCatalogToSandbox() {
+  const table = document.getElementById('catalogTableSelect').value;
+  closeAllTablesCatalogModal();
+  testTableEndpoint('query');
 }
 
 function toggleEndpointTypeFields(type) {

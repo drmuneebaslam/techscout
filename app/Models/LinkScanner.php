@@ -22,7 +22,8 @@ class LinkScanner {
         if ($articleId > 0) {
             $articles = Database::query("SELECT id, title, slug, body_html, summary FROM contents WHERE id = ?", [$articleId]);
         } else {
-            $articles = Database::query("SELECT id, title, slug, body_html, summary FROM contents WHERE content_type = 'article' AND status = 'published' ORDER BY updated_at DESC LIMIT ?", [$limit]);
+            $limitInt = max(1, (int)$limit);
+            $articles = Database::query("SELECT id, title, slug, body_html, summary FROM contents WHERE content_type = 'article' AND status = 'published' ORDER BY updated_at DESC LIMIT {$limitInt}");
         }
 
         $allLinks = [];

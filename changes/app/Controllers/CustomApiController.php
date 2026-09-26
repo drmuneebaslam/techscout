@@ -479,8 +479,29 @@ class CustomApiController {
             $limit = max(1, min(200, (int)$request->query('limit', $defaultLimit)));
             $offset = ($page - 1) * $limit;
 
-            // 6. Data Query Execution
-            $dataSql = "SELECT {$selectClause} FROM `{$table}` {$whereSql} ORDER BY `{$orderCol}` {$orderDir} LIMIT {$limit} OFFSET {$offset}";
+            // 6. Data Query Execution with Multi-Table Relational Support
+            $hasContentId = in_array('content_id', $validCols, true);
+            $includeRel = strtolower((string)($request->query('include', '') ?: ($request->query('with', '') ?: '')));
+            $shouldJoinContents = $hasContentId || str_contains($includeRel, 'content');
+
+            if ($shouldJoinContents && $hasContentId) {
+                // Multi-Table Relational Query: joins parent contents, categories, and author
+                $dataSql = "SELECT t.*, 
+                                   c.title as content_title, c.slug as content_slug, c.summary as content_summary, 
+                                   c.featured_image_url, c.content_type, c.status as content_status, 
+                                   c.view_count, c.like_count, c.published_at,
+                                   cat.name as category_name, cat.slug as category_slug,
+                                   u.username as author_username, u.email as author_email
+                            FROM `{$table}` t
+                            LEFT JOIN contents c ON t.content_id = c.id
+                            LEFT JOIN categories cat ON c.category_id = cat.id
+                            LEFT JOIN users u ON c.author_id = u.id
+                            {$whereSql} 
+                            ORDER BY t.`{$orderCol}` {$orderDir} 
+                            LIMIT {$limit} OFFSET {$offset}";
+            } else {
+                $dataSql = "SELECT {$selectClause} FROM `{$table}` {$whereSql} ORDER BY `{$orderCol}` {$orderDir} LIMIT {$limit} OFFSET {$offset}";
+            }
             $stmt = $pdo->prepare($dataSql);
             $stmt->execute($bindings);
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];

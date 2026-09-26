@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. [TS-AUT-70] Global Code Snippet Copy Enhancer
   document.querySelectorAll('pre code, .article-body-content pre').forEach(target => {
     const pre = target.tagName === 'PRE' ? target : target.closest('pre');
-    if (!pre || pre.querySelector('.ts-code-copy-btn')) return;
+    if (!pre || pre.querySelector('.ts-code-copy-btn') || pre.closest('#prompt-preview-container') || pre.classList.contains('no-copy-inject') || pre.closest('.no-copy-inject')) return;
     pre.style.position = 'relative';
     const codeEl = pre.querySelector('code') || pre;
 

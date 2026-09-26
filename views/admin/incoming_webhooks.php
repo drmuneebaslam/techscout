@@ -5,18 +5,24 @@
   <div class="admin-topbar">
     <div>
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-        <span class="ts-badge ts-badge-cyan">INCOMING DATA GATEWAY &bull; LIVE JSON LISTENER</span>
-        <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Database Field Mapper &amp; Ingestion Pipelines</span>
+        <span class="ts-badge ts-badge-cyan">100X INGESTION GATEWAY &bull; MULTI-TABLE SYNC</span>
+        <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Database Field Mapper, Schema Blueprints &amp; Live Ingestion Pipelines</span>
       </div>
       <h1 style="font-size: 1.6rem; color: var(--admin-text-primary); margin: 0; font-family: var(--admin-font-heading); font-weight: 800;">
-        Incoming Webhooks &amp; Live JSON Listener
+        Incoming Webhooks &amp; Live Ingestion Gateway
       </h1>
     </div>
 
-    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
       <a href="<?= url('/admin/webhooks') ?>" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600;">
         <i data-lucide="arrow-up-right"></i> Outbound Webhooks
       </a>
+      <button type="button" onclick="openTutorialModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #38bdf8; border-color: rgba(56,189,248,0.4);">
+        <i data-lucide="book-open"></i> Ingestion Tutorial 📘
+      </button>
+      <button type="button" onclick="openSampleGeneratorModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #a855f7; border-color: rgba(168,85,247,0.4);">
+        <i data-lucide="sparkles"></i> All Tables Sample Data ⚡
+      </button>
       <button type="button" onclick="openNewIncomingModal()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
         <i data-lucide="plus"></i> New Ingestion Webhook 🚀
       </button>
@@ -24,7 +30,7 @@
   </div>
 
   <!-- Endpoints Overview Cards -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
     <?php if (!empty($incomingWebhooks)): ?>
       <?php foreach ($incomingWebhooks as $wh): 
         $endpointUrl = url('/api/v1/webhook/' . $wh['slug']);
@@ -51,6 +57,9 @@
               <span class="ts-badge" style="font-size: 0.7rem; background: rgba(99,102,241,0.15); color: #818cf8;">
                 <?= count($rules) ?> Mapped Fields
               </span>
+              <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">
+                Multi-Table Ready
+              </span>
             </div>
 
             <!-- Endpoint URL with Copy -->
@@ -68,18 +77,24 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.75rem;">
-            <button type="button" onclick="openLiveListener(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-weight: 700; font-size: 0.78rem;">
-              <i data-lucide="radio"></i> Live Listener &amp; Mapper
+          <div style="display: flex; gap: 0.4rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.75rem; flex-wrap: wrap;">
+            <button type="button" onclick="openLiveListener(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-weight: 700; font-size: 0.76rem;">
+              <i data-lucide="radio"></i> Live Listener
+            </button>
+            <button type="button" onclick="openEditIncomingModal(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #38bdf8;" title="Edit Webhook Settings">
+              <i data-lucide="edit-3" style="width: 13px; height: 13px;"></i> Edit
+            </button>
+            <button type="button" onclick="quickLoadTableSample('<?= htmlspecialchars(addslashes($wh['target_table'])) ?>')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #a855f7;" title="Load Sample Payload for <?= htmlspecialchars($wh['target_table']) ?>">
+              <i data-lucide="code" style="width: 13px; height: 13px;"></i> Sample
             </button>
             <form action="<?= url('/admin/incoming-webhooks/toggle/' . $wh['id']) ?>" method="POST" style="margin: 0;">
               <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Active Status">
-                <i data-lucide="<?= !empty($wh['is_active']) ? 'pause' : 'play' ?>" style="width: 14px; height: 14px;"></i>
+                <i data-lucide="<?= !empty($wh['is_active']) ? 'pause' : 'play' ?>" style="width: 13px; height: 13px;"></i>
               </button>
             </form>
             <form action="<?= url('/admin/incoming-webhooks/delete/' . $wh['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this incoming webhook endpoint?');" style="margin: 0;">
               <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;" title="Delete Webhook">
-                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
               </button>
             </form>
           </div>
@@ -108,9 +123,12 @@
         </div>
       </div>
 
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
         <button type="button" onclick="pollLatestLogs()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem;">
           <i data-lucide="refresh-cw"></i> Refresh Stream
+        </button>
+        <button type="button" onclick="openTutorialModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem; color: #38bdf8;">
+          <i data-lucide="help-circle"></i> Ingestion Guide
         </button>
         <button type="button" onclick="closeLiveListener()" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;">
           &times; Close Studio
@@ -118,8 +136,8 @@
       </div>
     </div>
 
-    <!-- Dual Pane Studio Grid: Left = Live Ingestion Stream / Test Simulator | Right = Interactive Field Mapper -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <!-- Dual Pane Studio Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
       <!-- Left Column: Live JSON Payload Stream & Simulator -->
       <div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -137,21 +155,16 @@
 
         <!-- Simulator Form -->
         <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem;">
-          <div style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+          <div style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <span>⚡ Send Test Simulation Payload</span>
-            <a href="javascript:void(0)" onclick="loadSamplePayload()" style="font-size: 0.75rem; color: #38bdf8; text-decoration: none;">Load Sample Data</a>
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="javascript:void(0)" onclick="loadTableSampleIntoSimulator()" style="font-size: 0.75rem; color: #38bdf8; text-decoration: none;">Load Table Sample</a>
+              <span style="color: var(--admin-text-secondary);">&bull;</span>
+              <a href="javascript:void(0)" onclick="loadMultiTableSampleIntoSimulator()" style="font-size: 0.75rem; color: #a855f7; text-decoration: none;">Multi-Table Sample</a>
+            </div>
           </div>
-          <textarea id="simPayloadInput" rows="5" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem; width: 100%; margin-bottom: 0.6rem;"><?= htmlspecialchars(json_encode([
-            "title" => "Autonomous AI Agent Hub",
-            "summary" => "State-of-the-art framework for orchestrating multi-agent systems.",
-            "content_type" => "ai_tool",
-            "status" => "published",
-            "metadata" => [
-              "author" => "Engineering Lab",
-              "stars" => 4500
-            ]
-          ], JSON_PRETTY_PRINT)) ?></textarea>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          <textarea id="simPayloadInput" rows="6" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem; width: 100%; margin-bottom: 0.6rem;"></textarea>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <button type="button" onclick="sendTestSimulation()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
               🚀 Execute Test Dispatch
             </button>
@@ -172,7 +185,7 @@
         </div>
 
         <p style="font-size: 0.78rem; color: var(--admin-text-secondary); margin: 0 0 0.85rem 0;">
-          Map incoming JSON keys (supports dotted nesting like <code>metadata.author</code>) to target table columns.
+          Map incoming JSON keys (supports dotted nesting like <code>metadata.author</code>) to target table columns. Unmapped matching keys automatically map.
         </p>
 
         <form id="mappingForm" onsubmit="saveFieldMappings(event)">
@@ -228,7 +241,7 @@
                 </span>
               </td>
               <td>
-                <span class="ts-badge <?= $log['status'] === 'success' ? 'ts-badge-green' : 'ts-badge-pink' ?>">
+                <span class="ts-badge <?= in_array(strtolower($log['status']), ['success', 'processed']) ? 'ts-badge-green' : 'ts-badge-pink' ?>">
                   <?= strtoupper(htmlspecialchars($log['status'])) ?>
                 </span>
               </td>
@@ -262,37 +275,46 @@
   </div>
 </div>
 
-<!-- Modal: Create New Incoming Webhook -->
+<!-- ========================================================================= -->
+<!-- MODAL 1: CREATE NEW INGESTION WEBHOOK                                     -->
+<!-- ========================================================================= -->
 <div id="newIncomingModal" class="admin-modal" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeNewIncomingModal()"></div>
-  <div class="admin-modal-content" style="max-width: 540px;">
+  <div class="admin-modal-content" style="max-width: 580px;">
     <div class="admin-modal-header">
-      <h3 style="margin: 0; color: var(--admin-text-primary);">Create Ingestion Webhook Endpoint</h3>
+      <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="plus-circle" style="color: #38bdf8;"></i> Create Ingestion Webhook Endpoint
+      </h3>
       <button type="button" onclick="closeNewIncomingModal()" class="admin-modal-close">&times;</button>
     </div>
     <form action="<?= url('/admin/incoming-webhooks/save') ?>" method="POST" style="padding: 1.25rem;">
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Webhook Name</label>
-        <input type="text" name="name" placeholder="e.g. Stripe Donations Sync, GitHub Release Bot" class="admin-input" required>
+        <input type="text" name="name" id="new_wh_name" placeholder="e.g. Midjourney Prompts Ingest, Stripe Donations Sync" class="admin-input" required oninput="autoSuggestSlug(this.value, 'new_wh_slug')">
       </div>
 
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
         <div style="display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
-          <input type="text" name="slug" placeholder="zapier-tools" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+          <input type="text" name="slug" id="new_wh_slug" placeholder="midjourney-prompts" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
         </div>
       </div>
 
       <div style="margin-bottom: 1rem;">
-        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Target Database Table</label>
-        <select name="target_table" class="admin-input" required>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <label style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin: 0;">Target Database Table</label>
+          <a href="javascript:void(0)" onclick="quickLoadTableSample(document.getElementById('new_wh_table').value)" style="font-size: 0.72rem; color: #38bdf8; text-decoration: none;">View Sample JSON</a>
+        </div>
+        <select name="target_table" id="new_wh_table" class="admin-input" required>
           <?php foreach ($permittedTables as $tblName => $tblMeta): 
-            $colSlice = array_slice($tblMeta['columns'] ?? [], 0, 6);
+            $colSlice = array_slice($tblMeta['columns'] ?? [], 0, 5);
             $colPreview = implode(', ', $colSlice);
-            if (count($tblMeta['columns'] ?? []) > 6) $colPreview .= '...';
+            if (count($tblMeta['columns'] ?? []) > 5) $colPreview .= '...';
           ?>
-            <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?> (<?= htmlspecialchars($colPreview) ?> &bull; <?= (int)($tblMeta['total_rows'] ?? 0) ?> rows)</option>
+            <option value="<?= htmlspecialchars($tblName) ?>" <?= $tblName === 'prompts' ? 'selected' : '' ?>>
+              <?= htmlspecialchars($tblName) ?> (<?= htmlspecialchars($colPreview) ?> &bull; <?= (int)($tblMeta['total_rows'] ?? 0) ?> rows)
+            </option>
           <?php endforeach; ?>
         </select>
       </div>
@@ -302,7 +324,7 @@
           <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Authentication Type</label>
           <select name="auth_type" class="admin-input">
             <option value="none">None (Public Open Ingest)</option>
-            <option value="bearer">Bearer Token (Authorization Header)</option>
+            <option value="bearer" selected>Bearer Token (Authorization Header)</option>
             <option value="signature">HMAC-SHA256 (X-Ts-Signature Header)</option>
           </select>
         </div>
@@ -312,11 +334,271 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div class="admin-modal-footer">
         <button type="button" onclick="closeNewIncomingModal()" class="admin-btn admin-btn-outline">Cancel</button>
         <button type="submit" class="admin-btn admin-btn-primary" style="font-weight: 700;">Create Ingestion Webhook 🚀</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL 2: EDIT INGESTION WEBHOOK (MODAL UPDATING)                          -->
+<!-- ========================================================================= -->
+<div id="editIncomingModal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop" onclick="closeEditIncomingModal()"></div>
+  <div class="admin-modal-content" style="max-width: 580px;">
+    <div class="admin-modal-header">
+      <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="edit-3" style="color: #38bdf8;"></i> Edit Ingestion Webhook
+      </h3>
+      <button type="button" onclick="closeEditIncomingModal()" class="admin-modal-close">&times;</button>
+    </div>
+    <form action="<?= url('/admin/incoming-webhooks/save') ?>" method="POST" id="editWebhookForm" onsubmit="submitEditWebhookForm(event)" style="padding: 1.25rem;">
+      <input type="hidden" name="id" id="edit_wh_id">
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Webhook Name</label>
+        <input type="text" name="name" id="edit_wh_name" class="admin-input" required>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
+          <input type="text" name="slug" id="edit_wh_slug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Target Database Table</label>
+        <select name="target_table" id="edit_wh_table" class="admin-input" required>
+          <?php foreach ($permittedTables as $tblName => $tblMeta): ?>
+            <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Authentication Type</label>
+          <select name="auth_type" id="edit_wh_auth" class="admin-input">
+            <option value="none">None (Public Open Ingest)</option>
+            <option value="bearer">Bearer Token (Authorization Header)</option>
+            <option value="signature">HMAC-SHA256 (X-Ts-Signature Header)</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Secret / Bearer Key</label>
+          <input type="text" name="secret_key" id="edit_wh_secret" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--admin-text-primary);">
+          <input type="checkbox" name="is_active" id="edit_wh_active" value="1">
+          Active Endpoint (Accept and process incoming payloads)
+        </label>
+      </div>
+
+      <div class="admin-modal-footer">
+        <button type="button" onclick="closeEditIncomingModal()" class="admin-btn admin-btn-outline">Cancel</button>
+        <button type="submit" class="admin-btn admin-btn-primary" style="font-weight: 700;">Save Changes 💾</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL 3: INTERACTIVE INGESTION TUTORIAL & BLUEPRINTS                      -->
+<!-- ========================================================================= -->
+<div id="tutorialModal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop" onclick="closeTutorialModal()"></div>
+  <div class="admin-modal-content" style="max-width: 820px; max-height: 85vh; display: flex; flex-direction: column;">
+    <div class="admin-modal-header">
+      <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="book-open" style="color: #38bdf8;"></i> Ingestion Tutorial &amp; Architecture Blueprint
+      </h3>
+      <button type="button" onclick="closeTutorialModal()" class="admin-modal-close">&times;</button>
+    </div>
+
+    <!-- Tabs Header -->
+    <div style="display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--admin-border-main); background: var(--admin-card-bg-elevated); overflow-x: auto;">
+      <button type="button" onclick="switchTutorialTab('prompts')" id="tut-tab-prompts" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
+        🖼️ Prompts Ingestion
+      </button>
+      <button type="button" onclick="switchTutorialTab('multitable')" id="tut-tab-multitable" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
+        🗄️ Multi-Table Ingest
+      </button>
+      <button type="button" onclick="switchTutorialTab('tools')" id="tut-tab-tools" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
+        ⚙️ AI Tools &amp; Articles
+      </button>
+      <button type="button" onclick="switchTutorialTab('integrations')" id="tut-tab-integrations" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
+        ⚡ Zapier / Make / cURL
+      </button>
+    </div>
+
+    <!-- Tab Contents Container -->
+    <div style="padding: 1.25rem; overflow-y: auto; flex: 1;">
+      <!-- TAB 1: Prompts -->
+      <div id="tut-pane-prompts">
+        <h4 style="color: #38bdf8; margin: 0 0 0.5rem 0;">How to Ingest AI Prompts &amp; Image Prompts</h4>
+        <p style="font-size: 0.85rem; color: var(--admin-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+          TechScout’s unified architecture links parent <code>contents</code> (for search, taxonomy, and authoring) with child <code>prompts</code> (for generation parameters). You do NOT need to write complex SQL: sending the payload below to <code>/api/v1/webhook/{slug}</code> automatically creates the content record, prompts row, tags, and category relations!
+        </p>
+
+        <div style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #34d399;">PROMPT INGESTION PAYLOAD (JSON)</span>
+            <button type="button" onclick="copySnippet('tut-prompt-json')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">Copy JSON</button>
+          </div>
+          <pre id="tut-prompt-json" style="margin: 0; color: #f8fafc; font-family: var(--admin-font-mono); font-size: 0.78rem; white-space: pre-wrap;"><?= htmlspecialchars(json_encode(\App\Core\IncomingWebhookEngine::getSamplePayloadForTable('prompts'), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></pre>
+        </div>
+
+        <ul style="font-size: 0.82rem; color: var(--admin-text-secondary); line-height: 1.6; margin: 0; padding-left: 1.2rem;">
+          <li><code>prompt_type</code>: Set to <code>image</code> (Midjourney/Flux/DALL-E) or <code>text</code> (ChatGPT/Claude system prompts).</li>
+          <li><code>category</code>: Enter category name e.g. <code>Generative Art</code>; the engine automatically links or creates it.</li>
+          <li><code>tags</code>: Pass an array of strings e.g. <code>["midjourney", "architecture"]</code>. The engine automatically creates tags in <code>tags</code> and links them in <code>content_tags</code>.</li>
+        </ul>
+      </div>
+
+      <!-- TAB 2: Multi-Table -->
+      <div id="tut-pane-multitable" style="display: none;">
+        <h4 style="color: #a855f7; margin: 0 0 0.5rem 0;">Multi-Table Atomic Ingestion Architecture</h4>
+        <p style="font-size: 0.85rem; color: var(--admin-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+          Need to insert or update across multiple tables in a single HTTP request? Use the top-level <code>tables</code> key. The engine wraps the entire execution in a MySQL database transaction with atomic rollback if any constraint fails.
+        </p>
+
+        <div style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #a855f7;">MULTI-TABLE TRANSACTION SCHEMA</span>
+            <button type="button" onclick="copySnippet('tut-multi-json')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">Copy JSON</button>
+          </div>
+          <pre id="tut-multi-json" style="margin: 0; color: #f8fafc; font-family: var(--admin-font-mono); font-size: 0.78rem; white-space: pre-wrap;"><?= htmlspecialchars(json_encode(\App\Core\IncomingWebhookEngine::getMultiTableSamplePayload(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></pre>
+        </div>
+      </div>
+
+      <!-- TAB 3: Tools & Articles -->
+      <div id="tut-pane-tools" style="display: none;">
+        <h4 style="color: #10b981; margin: 0 0 0.5rem 0;">Ingesting AI Tools &amp; Editorial Articles</h4>
+        <p style="font-size: 0.85rem; color: var(--admin-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+          Ingesting AI tools creates entries in the directory catalog with outbound affiliate links, pricing tiers, and badges. Ingesting articles publishes content to the TechScout Blog with HTML markdown and reading time calculation.
+        </p>
+
+        <div style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #10b981;">AI TOOL INGESTION PAYLOAD (JSON)</span>
+            <button type="button" onclick="copySnippet('tut-tools-json')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">Copy JSON</button>
+          </div>
+          <pre id="tut-tools-json" style="margin: 0; color: #f8fafc; font-family: var(--admin-font-mono); font-size: 0.78rem; white-space: pre-wrap;"><?= htmlspecialchars(json_encode(\App\Core\IncomingWebhookEngine::getSamplePayloadForTable('ai_tools'), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></pre>
+        </div>
+      </div>
+
+      <!-- TAB 4: Integrations -->
+      <div id="tut-pane-integrations" style="display: none;">
+        <h4 style="color: #f59e0b; margin: 0 0 0.5rem 0;">Developer &amp; No-Code Integration Snippets</h4>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-primary);">cURL Command:</span>
+            <pre style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 6px; padding: 0.75rem; color: #38bdf8; font-size: 0.75rem; margin-top: 0.35rem; overflow-x: auto;">curl -X POST "<?= url('/api/v1/webhook/your-webhook-slug') ?>" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_WEBHOOK_SECRET_KEY" \
+  -d '{"title": "Sample Item", "summary": "Sample summary", "table": "prompts"}'</pre>
+          </div>
+
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-primary);">Python (requests):</span>
+            <pre style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 6px; padding: 0.75rem; color: #34d399; font-size: 0.75rem; margin-top: 0.35rem; overflow-x: auto;">import requests
+
+url = "<?= url('/api/v1/webhook/your-webhook-slug') ?>"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_WEBHOOK_SECRET_KEY"
+}
+payload = {
+    "title": "Autonomous Agent Tool",
+    "table": "prompts",
+    "prompt_template": "System instructions here..."
+}
+response = requests.post(url, json=payload, headers=headers)
+print(response.status_code, response.json())</pre>
+          </div>
+
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-primary);">Node.js (fetch):</span>
+            <pre style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 6px; padding: 0.75rem; color: #a855f7; font-size: 0.75rem; margin-top: 0.35rem; overflow-x: auto;">const res = await fetch("<?= url('/api/v1/webhook/your-webhook-slug') ?>", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_WEBHOOK_SECRET_KEY"
+  },
+  body: JSON.stringify({
+    title: "Autonomous Agent Tool",
+    table: "prompts",
+    prompt_template: "System instructions here..."
+  })
+});
+const data = await res.json();
+console.log(data);</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL 4: ALL TABLES SAMPLE DATA GENERATOR & SIMULATOR                     -->
+<!-- ========================================================================= -->
+<div id="sampleGeneratorModal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop" onclick="closeSampleGeneratorModal()"></div>
+  <div class="admin-modal-content" style="max-width: 760px; max-height: 85vh; display: flex; flex-direction: column;">
+    <div class="admin-modal-header">
+      <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="sparkles" style="color: #a855f7;"></i> All Tables Sample Data Generator
+      </h3>
+      <button type="button" onclick="closeSampleGeneratorModal()" class="admin-modal-close">&times;</button>
+    </div>
+    
+    <div style="padding: 1.25rem; overflow-y: auto; flex: 1;">
+      <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary);">Select Target Table:</label>
+        <select id="sampleModalTableSelect" onchange="fetchTableSample(this.value)" class="admin-input" style="flex: 1; min-width: 220px; font-weight: 600;">
+          <option value="prompts">prompts &bull; AI Prompts &amp; Generation Blueprints</option>
+          <option value="multi">tables (Multi-Table Ingest Transaction)</option>
+          <option value="ai_tools">ai_tools &bull; Directory AI Software &amp; Models</option>
+          <option value="articles">articles &bull; Blog &amp; Editorial Posts</option>
+          <option value="gpt_listings">gpt_listings &bull; Custom GPT Directory</option>
+          <option value="jobs">jobs &bull; Tech Jobs Board</option>
+          <option value="categories">categories &bull; Taxonomy Categories</option>
+          <option value="announcements">announcements &bull; Top Broadcast Ribbons</option>
+          <?php foreach ($permittedTables as $tblName => $tblMeta): 
+            if (in_array($tblName, ['prompts', 'ai_tools', 'articles', 'gpt_listings', 'jobs', 'categories', 'announcements'], true)) continue;
+          ?>
+            <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <button type="button" onclick="fetchTableSample(document.getElementById('sampleModalTableSelect').value)" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #38bdf8;">
+          <i data-lucide="refresh-cw"></i> Refresh
+        </button>
+      </div>
+
+      <!-- JSON Preview Box -->
+      <div style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span id="samplePayloadHeading" style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #34d399;">SAMPLE PAYLOAD: prompts</span>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" onclick="copySnippet('sampleModalPayloadBox')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">
+              📋 Copy JSON
+            </button>
+            <button type="button" onclick="loadSampleModalIntoSimulator()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; font-weight: 700;">
+              ⚡ Load into Simulator
+            </button>
+          </div>
+        </div>
+        <pre id="sampleModalPayloadBox" style="height: 300px; overflow-y: auto; margin: 0; color: #f8fafc; font-family: var(--admin-font-mono); font-size: 0.78rem; white-space: pre-wrap;"><?= htmlspecialchars(json_encode(\App\Core\IncomingWebhookEngine::getSamplePayloadForTable('prompts'), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></pre>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -341,6 +623,110 @@ function closeNewIncomingModal() {
   document.getElementById('newIncomingModal').style.display = 'none';
 }
 
+function openEditIncomingModal(wh) {
+  document.getElementById('edit_wh_id').value = wh.id;
+  document.getElementById('edit_wh_name').value = wh.name;
+  document.getElementById('edit_wh_slug').value = wh.slug;
+  document.getElementById('edit_wh_table').value = wh.target_table;
+  document.getElementById('edit_wh_auth').value = wh.auth_type;
+  document.getElementById('edit_wh_secret').value = wh.secret_key;
+  document.getElementById('edit_wh_active').checked = (parseInt(wh.is_active, 10) === 1);
+  document.getElementById('editIncomingModal').style.display = 'flex';
+}
+function closeEditIncomingModal() {
+  document.getElementById('editIncomingModal').style.display = 'none';
+}
+
+async function submitEditWebhookForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': window.TECHSCOUT_CSRF_TOKEN || ''
+      },
+      body: fd
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('✓ Webhook updated successfully!');
+      location.reload();
+    } else {
+      alert('Error updating webhook: ' + (data.error || 'Failed'));
+    }
+  } catch(err) {
+    alert('Error saving webhook: ' + err.message);
+  }
+}
+
+function openTutorialModal() {
+  document.getElementById('tutorialModal').style.display = 'flex';
+}
+function closeTutorialModal() {
+  document.getElementById('tutorialModal').style.display = 'none';
+}
+
+function switchTutorialTab(tab) {
+  const tabs = ['prompts', 'multitable', 'tools', 'integrations'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('tut-tab-' + t);
+    const pane = document.getElementById('tut-pane-' + t);
+    if (t === tab) {
+      btn.className = 'admin-btn admin-btn-primary admin-btn-sm';
+      pane.style.display = 'block';
+    } else {
+      btn.className = 'admin-btn admin-btn-outline admin-btn-sm';
+      pane.style.display = 'none';
+    }
+  });
+}
+
+function openSampleGeneratorModal() {
+  document.getElementById('sampleGeneratorModal').style.display = 'flex';
+}
+function closeSampleGeneratorModal() {
+  document.getElementById('sampleGeneratorModal').style.display = 'none';
+}
+
+async function fetchTableSample(table) {
+  try {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/sample/') ?>' + table, {
+      headers: { 'Accept': 'application/json', 'X-Admin-Token': window.TECHSCOUT_ADMIN_TOKEN || '' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('sampleModalPayloadBox').textContent = JSON.stringify(data, null, 2);
+      document.getElementById('samplePayloadHeading').textContent = 'SAMPLE PAYLOAD: ' + table.toUpperCase();
+    }
+  } catch(e) {}
+}
+
+function loadSampleModalIntoSimulator() {
+  const payload = document.getElementById('sampleModalPayloadBox').textContent;
+  closeSampleGeneratorModal();
+  if (!document.getElementById('listenerStudio') || document.getElementById('listenerStudio').style.display === 'none') {
+    const firstWh = <?= !empty($incomingWebhooks) ? json_encode($incomingWebhooks[0], JSON_HEX_TAG | JSON_HEX_AMP) : 'null' ?>;
+    if (firstWh) openLiveListener(firstWh);
+  }
+  document.getElementById('simPayloadInput').value = payload;
+}
+
+function quickLoadTableSample(table) {
+  openSampleGeneratorModal();
+  document.getElementById('sampleModalTableSelect').value = table;
+  fetchTableSample(table);
+}
+
+function autoSuggestSlug(val, targetInputId) {
+  const slug = val.toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  const el = document.getElementById(targetInputId);
+  if (el) el.value = slug;
+}
+
 function openLiveListener(wh) {
   currentActiveWebhook = wh;
   document.getElementById('studioWebhookName').textContent = wh.name;
@@ -348,115 +734,137 @@ function openLiveListener(wh) {
   document.getElementById('studioEndpointUrl').textContent = '<?= url('/api/v1/webhook/') ?>' + wh.slug;
   document.getElementById('mappingWebhookId').value = wh.id;
   document.getElementById('listenerStudio').style.display = 'block';
-  document.getElementById('listenerStudio').scrollIntoView({ behavior: 'smooth' });
 
-  // Render Existing Mapping Rules
-  renderMappingRows(wh.mapping_rules_json, wh.target_table);
+  // Load appropriate sample for this webhook's target table
+  loadTableSampleIntoSimulator();
 
-  // Poll for logs
+  // Populate Field Mappings
+  renderFieldMappings(wh);
+
+  // Start Realtime Poller
   lastLogId = 0;
   pollLatestLogs();
   if (pollInterval) clearInterval(pollInterval);
   pollInterval = setInterval(pollLatestLogs, 3000);
+
+  document.getElementById('listenerStudio').scrollIntoView({ behavior: 'smooth' });
 }
 
 function closeLiveListener() {
   document.getElementById('listenerStudio').style.display = 'none';
-  if (pollInterval) clearInterval(pollInterval);
+  if (pollInterval) {
+    clearInterval(pollInterval);
+    pollInterval = null;
+  }
   currentActiveWebhook = null;
 }
 
-function renderMappingRows(rulesJson, targetTable) {
+async function loadTableSampleIntoSimulator() {
+  if (!currentActiveWebhook) return;
+  const table = currentActiveWebhook.target_table || 'prompts';
+  try {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/sample/') ?>' + table, {
+      headers: { 'Accept': 'application/json', 'X-Admin-Token': window.TECHSCOUT_ADMIN_TOKEN || '' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('simPayloadInput').value = JSON.stringify(data, null, 2);
+    }
+  } catch(e) {}
+}
+
+async function loadMultiTableSampleIntoSimulator() {
+  try {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/sample/multi') ?>', {
+      headers: { 'Accept': 'application/json', 'X-Admin-Token': window.TECHSCOUT_ADMIN_TOKEN || '' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('simPayloadInput').value = JSON.stringify(data, null, 2);
+    }
+  } catch(e) {}
+}
+
+function renderFieldMappings(wh) {
   const container = document.getElementById('mappingRowsContainer');
   container.innerHTML = '';
 
-  let rules = [];
-  try {
-    rules = typeof rulesJson === 'string' ? JSON.parse(rulesJson) : rulesJson;
-  } catch(e) {}
-  if (!Array.isArray(rules) || !rules.length) {
-    rules = [{ json_key: 'title', target_column: 'title' }];
+  const rules = JSON.parse(wh.mapping_rules_json || '[]');
+  const table = wh.target_table;
+  const tableMeta = PERMITTED_TABLES[table] || { columns: [] };
+
+  if (rules.length === 0) {
+    // Inject default initial row
+    addMappingRow('', '');
+  } else {
+    rules.forEach(r => addMappingRow(r.json_key, r.target_column));
   }
-
-  const tableDef = PERMITTED_TABLES[targetTable] || { columns: ['title', 'slug', 'summary'] };
-
-  rules.forEach((r, idx) => {
-    container.appendChild(createRowElement(r.json_key || '', r.target_column || '', tableDef.columns));
-  });
 }
 
-function addMappingRow() {
+function addMappingRow(jsonKey = '', targetCol = '') {
   const container = document.getElementById('mappingRowsContainer');
-  const targetTable = currentActiveWebhook ? currentActiveWebhook.target_table : 'contents';
-  const tableDef = PERMITTED_TABLES[targetTable] || { columns: ['title', 'slug', 'summary'] };
-  container.appendChild(createRowElement('', '', tableDef.columns));
-}
+  const table = currentActiveWebhook ? currentActiveWebhook.target_table : 'prompts';
+  const tableMeta = PERMITTED_TABLES[table] || { columns: [] };
 
-function createRowElement(jsonKey, targetCol, columns) {
-  const div = document.createElement('div');
-  div.style.cssText = 'display: flex; gap: 0.5rem; align-items: center; background: var(--admin-card-bg-elevated); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--admin-border-main);';
+  const row = document.createElement('div');
+  row.style.cssText = 'display: flex; gap: 0.5rem; align-items: center; background: var(--admin-card-bg-elevated); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--admin-border-main);';
 
-  let optionsHtml = '';
-  columns.forEach(col => {
-    optionsHtml += `<option value="${col}" ${col === targetCol ? 'selected' : ''}>${col}</option>`;
+  let colOptions = '';
+  tableMeta.columns.forEach(c => {
+    const sel = (c === targetCol) ? 'selected' : '';
+    colOptions += `<option value="${escapeHtml(c)}" ${sel}>${escapeHtml(c)}</option>`;
   });
 
-  div.innerHTML = `
-    <input type="text" name="json_keys[]" value="${escapeHtml(jsonKey)}" placeholder="e.g. data.title" class="admin-input" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;" required>
-    <span style="color: #64748b;">&rarr;</span>
-    <select name="target_cols[]" class="admin-input" style="flex: 1; font-size: 0.78rem;">
-      ${optionsHtml}
+  row.innerHTML = `
+    <input type="text" class="admin-input map-json-key" placeholder="JSON Key (e.g. data.title)" value="${escapeHtml(jsonKey)}" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
+    <span style="color: var(--admin-text-secondary);">&rarr;</span>
+    <select class="admin-input map-target-col" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
+      ${colOptions}
     </select>
-    <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 0.2rem 0.4rem; font-size: 1rem;">&times;</button>
+    <button type="button" onclick="this.parentElement.remove()" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; padding: 0.2rem 0.4rem;" title="Remove Row">&times;</button>
   `;
-  return div;
-}
 
-function escapeHtml(text) {
-  if (text === null || text === undefined) return '';
-  return String(text).replace(/[&<>"']/g, function(m) {
-    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-  });
+  container.appendChild(row);
 }
 
 async function saveFieldMappings(e) {
   e.preventDefault();
   if (!currentActiveWebhook) return;
 
-  const form = document.getElementById('mappingForm');
-  const fd = new FormData(form);
-  const jsonKeys = fd.getAll('json_keys[]');
-  const targetCols = fd.getAll('target_cols[]');
-
+  const rows = document.querySelectorAll('#mappingRowsContainer > div');
   const rules = [];
-  for (let i = 0; i < jsonKeys.length; i++) {
-    if (jsonKeys[i].trim() !== '') {
-      rules.push({ json_key: jsonKeys[i].trim(), target_column: targetCols[i] });
-    }
-  }
 
-  const res = await fetch('<?= url('/admin/incoming-webhooks/save-mappings') ?>', {
-    method: 'POST',
-    credentials: 'same-origin',
-    headers: { 
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      'Accept': 'application/json',
-      'X-CSRF-Token': window.TECHSCOUT_CSRF_TOKEN || '',
-      'X-Admin-Token': window.TECHSCOUT_ADMIN_TOKEN || ''
-    },
-    body: JSON.stringify({
-      id: currentActiveWebhook.id,
-      mapping_rules_json: JSON.stringify(rules),
-      csrf_token: window.TECHSCOUT_CSRF_TOKEN || ''
-    })
+  rows.forEach(r => {
+    const key = r.querySelector('.map-json-key').value.trim();
+    const col = r.querySelector('.map-target-col').value.trim();
+    if (key && col) {
+      rules.push({ json_key: key, target_column: col });
+    }
   });
-  const data = await res.json();
-  if (data.success) {
-    currentActiveWebhook.mapping_rules_json = JSON.stringify(rules);
-    alert('✓ Mapping rules saved successfully!');
-  } else {
-    alert('Error saving mappings: ' + (data.error || 'Unknown error'));
+
+  try {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/save-mappings') ?>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': window.TECHSCOUT_CSRF_TOKEN || ''
+      },
+      body: JSON.stringify({
+        id: currentActiveWebhook.id,
+        mapping_rules_json: JSON.stringify(rules)
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentActiveWebhook.mapping_rules_json = JSON.stringify(rules);
+      alert('✓ Field mapping rules updated successfully!');
+    } else {
+      alert('Error updating field rules: ' + data.error);
+    }
+  } catch(err) {
+    alert('Error: ' + err.message);
   }
 }
 
@@ -464,8 +872,7 @@ async function pollLatestLogs() {
   if (!currentActiveWebhook) return;
   try {
     const adminToken = window.TECHSCOUT_ADMIN_TOKEN || '';
-    const res = await fetch('<?= url('/admin/incoming-webhooks/live-stream/') ?>' + currentActiveWebhook.slug + '?since_id=' + lastLogId + (adminToken ? '&token=' + encodeURIComponent(adminToken) : ''), {
-      credentials: 'same-origin',
+    const res = await fetch('<?= url('/admin/incoming-webhooks/live-stream/') ?>' + currentActiveWebhook.slug + '?since_id=' + lastLogId + '&token=' + adminToken, {
       headers: {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
@@ -533,21 +940,25 @@ async function sendTestSimulation() {
   }
 }
 
-function loadSamplePayload() {
-  document.getElementById('simPayloadInput').value = JSON.stringify({
-    "title": "State-of-the-Art Deep Learning Framework",
-    "summary": "Accelerated neural network inference engine with dynamic quantization.",
-    "content_type": "ai_tool",
-    "status": "published",
-    "website_url": "https://github.com/techscout/inference-core",
-    "pricing_type": "free"
-  }, null, 2);
+function copySnippet(id) {
+  const text = document.getElementById(id).innerText;
+  copyToClipboard(text);
 }
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
-    alert('✓ Webhook endpoint copied to clipboard:\n' + text);
+    alert('✓ Copied to clipboard:\n' + (text.length > 100 ? text.substring(0, 100) + '...' : text));
   });
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 </script>
 

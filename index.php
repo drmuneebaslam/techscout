@@ -636,6 +636,7 @@ $router->post('/admin/db-manager/apply-index', [AdminController::class, 'applyIn
 $router->get('/admin/system-logs', [AdminController::class, 'systemLogs'], ['admin']);
 $router->get('/admin/error-logs', [AdminController::class, 'systemLogs'], ['admin']);
 $router->post('/admin/system-logs/resolve/{id}', [AdminController::class, 'resolveSystemLog'], ['admin']);
+$router->post('/admin/system-logs/resolve-all', [AdminController::class, 'resolveAllSystemLogs'], ['admin']);
 $router->post('/admin/system-logs/delete/{id}', [AdminController::class, 'deleteSystemLog'], ['admin']);
 $router->post('/admin/system-logs/clear', [AdminController::class, 'clearSystemLogs'], ['admin']);
 
@@ -788,6 +789,8 @@ $router->post('/admin/support/categories/{id}/subcategory/delete', [SupportContr
 // ----------------------------------------------------------------------------
 // Enterprise Incoming Webhooks Engine (Admin endpoints & Universal Omni-Webhook)
 $router->get('/admin/incoming-webhooks/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream'], ['admin']);
+$router->get('/admin/incoming-webhooks/sample/{table}', [\App\Controllers\IncomingWebhookController::class, 'samplePayload'], ['admin']);
+$router->get('/api/v1/webhook/sample/{table}', [\App\Controllers\IncomingWebhookController::class, 'samplePayload']);
 $router->post('/admin/incoming-webhooks/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate'], ['admin']);
 $router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate']);
 $router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream']);

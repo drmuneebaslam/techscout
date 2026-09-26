@@ -21,6 +21,11 @@ require __DIR__ . '/../layouts/admin_header.php';
       <button type="button" onclick="exportErrorsCsv()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
         📥 Export Telemetry CSV
       </button>
+      <form action="<?= url('/admin/system-logs/resolve-all') ?>" method="POST" onsubmit="return confirm('Mark all unresolved system error logs as resolved?');" style="display: inline;">
+        <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.3);">
+          ✓ Mark All Resolved
+        </button>
+      </form>
       <form action="<?= url('/admin/system-logs/clear') ?>" method="POST" onsubmit="return confirm('Purge and clear all system error logs?');" style="display: inline;">
         <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">
           🗑 Clear All Logs
