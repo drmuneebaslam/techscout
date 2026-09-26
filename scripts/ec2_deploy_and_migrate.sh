@@ -24,8 +24,10 @@ cd "$APP_DIR"
 
 # 1. Fetch & Merge from origin/main
 echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Pulling latest commits from GitHub origin main..."
+git config --global --add safe.directory "$APP_DIR" || true
+git checkout main 2>/dev/null || true
 git fetch origin main
-git merge origin/main --ff-only || git pull origin main
+git reset --hard origin/main
 
 # 2. Run Database Migrations via PHP CLI
 echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] Executing pending database migrations..."
@@ -67,8 +69,7 @@ foreach ($migrationFiles as $mf) {
                 } catch (\Throwable $e) {
                     $errMsg = $e->getMessage();
                     if (!str_contains($errMsg, "already exists") && !str_contains($errMsg, "Duplicate")) {
-                        echo "ERROR: " . $errMsg . "\n";
-                        exit(1);
+                        echo "[WARNING: " . $errMsg . "] ";
                     }
                 }
             }

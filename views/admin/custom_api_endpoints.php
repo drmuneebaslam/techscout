@@ -86,12 +86,18 @@
           <h4 id="inspectTableName" style="margin: 0; font-size: 1.1rem; color: #38bdf8; font-family: var(--admin-font-mono);">table_name</h4>
           <span id="inspectTableStats" style="font-size: 0.75rem; color: var(--admin-text-secondary);">0 columns &bull; 0 records</span>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <button type="button" onclick="testTableEndpoint('query')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem;">
-            🔍 Query Table (GET)
+            🔍 Query All (GET)
+          </button>
+          <button type="button" onclick="testTableEndpoint('get_by_id')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem; color: #38bdf8;">
+            🎯 Get by ID (GET)
           </button>
           <button type="button" onclick="testTableEndpoint('insert')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem; color: #10b981;">
             ➕ Insert Record (POST)
+          </button>
+          <button type="button" onclick="testTableEndpoint('schema')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem; color: #a855f7;">
+            📐 Schema Blueprint
           </button>
         </div>
       </div>
@@ -437,16 +443,21 @@ function executeSandboxQuery() {
 
   responseBody.textContent = '// Dispatching ' + method + ' request to ' + url + '...';
 
+  const adminToken = window.TECHSCOUT_ADMIN_TOKEN || 'ts_deploy_sec_99182374619a8b';
+  const csrfToken = window.TECHSCOUT_CSRF_TOKEN || '';
+
   const options = {
     method: method,
     credentials: 'same-origin',
     headers: {
       'Accept': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest'
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRF-Token': csrfToken,
+      'X-Admin-Token': adminToken
     }
   };
 
-  if ((method === 'POST' || method === 'PUT') && payloadText.trim() !== '') {
+  if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && payloadText.trim() !== '') {
     options.headers['Content-Type'] = 'application/json';
     options.body = payloadText;
   }
@@ -496,11 +507,16 @@ function inspectSelectedTable(tableName) {
   tStats.textContent = 'Loading schema columns...';
   tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--admin-text-secondary); padding: 1rem;">Fetching table blueprint...</td></tr>';
 
-  fetch('<?= url('/api/v1/custom/describe-table?table=') ?>' + encodeURIComponent(tableName), {
+  const adminToken = window.TECHSCOUT_ADMIN_TOKEN || 'ts_deploy_sec_99182374619a8b';
+  const csrfToken = window.TECHSCOUT_CSRF_TOKEN || '';
+
+  fetch('<?= url('/api/v1/custom/describe-table?table=') ?>' + encodeURIComponent(tableName) + (adminToken ? '&token=' + encodeURIComponent(adminToken) : ''), {
     credentials: 'same-origin',
     headers: {
       'Accept': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest'
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRF-Token': csrfToken,
+      'X-Admin-Token': adminToken
     }
   })
     .then(r => r.json())
@@ -546,15 +562,30 @@ function testTableEndpoint(action) {
   drawer.scrollIntoView({ behavior: 'smooth' });
 
   if (action === 'query') {
-    title.innerText = 'Query Table: ' + table;
-    urlInput.value = '<?= url('/api/v1/custom/table-data?table=') ?>' + encodeURIComponent(table);
+    title.innerText = 'Query Table (All / Paginated): ' + table;
+    urlInput.value = '<?= url('/api/v1/custom/') ?>' + encodeURIComponent(table);
+    methodSelect.value = 'GET';
+    toggleSandboxPayload('GET');
+  } else if (action === 'get_by_id') {
+    title.innerText = 'Get Record by ID (Single Entity): ' + table;
+    urlInput.value = '<?= url('/api/v1/custom/') ?>' + encodeURIComponent(table) + '/1';
     methodSelect.value = 'GET';
     toggleSandboxPayload('GET');
   } else if (action === 'insert') {
     title.innerText = 'Insert Record into: ' + table;
-    urlInput.value = '<?= url('/api/v1/custom/table-insert?table=') ?>' + encodeURIComponent(table);
+    urlInput.value = '<?= url('/api/v1/custom/') ?>' + encodeURIComponent(table);
     methodSelect.value = 'POST';
+    document.getElementById('sandboxPayload').value = JSON.stringify({
+      title: "Sample Resource Title",
+      summary: "Sample descriptive summary text",
+      status: "published"
+    }, null, 2);
     toggleSandboxPayload('POST');
+  } else if (action === 'schema') {
+    title.innerText = 'Table Schema Blueprint: ' + table;
+    urlInput.value = '<?= url('/api/v1/custom/') ?>' + encodeURIComponent(table) + '/schema';
+    methodSelect.value = 'GET';
+    toggleSandboxPayload('GET');
   }
 
   executeSandboxQuery();

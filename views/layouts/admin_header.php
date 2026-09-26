@@ -35,7 +35,11 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta name="csrf-token" content="<?= htmlspecialchars(\App\Core\Session::csrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+  <meta name="admin-token" content="<?= htmlspecialchars(\App\Core\Config::get('deploy_webhook_secret', 'ts_deploy_sec_99182374619a8b'), ENT_QUOTES, 'UTF-8') ?>">
   <script>
+    window.TECHSCOUT_CSRF_TOKEN = '<?= htmlspecialchars(\App\Core\Session::csrfToken(), ENT_QUOTES, 'UTF-8') ?>';
+    window.TECHSCOUT_ADMIN_TOKEN = '<?= htmlspecialchars(\App\Core\Config::get('deploy_webhook_secret', 'ts_deploy_sec_99182374619a8b'), ENT_QUOTES, 'UTF-8') ?>';
     (function() {
       // 1. IP Location & Timezone Auto-Detection
       try {

@@ -786,12 +786,25 @@ $router->post('/admin/support/categories/{id}/subcategory/delete', [SupportContr
 // ----------------------------------------------------------------------------
 // 8. RESTful API v1 ENDPOINTS
 // ----------------------------------------------------------------------------
-// Enterprise Incoming Webhooks Engine
+// Enterprise Incoming Webhooks Engine (Admin endpoints & Universal Omni-Webhook)
+$router->get('/admin/incoming-webhooks/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream'], ['admin']);
+$router->post('/admin/incoming-webhooks/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate'], ['admin']);
 $router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate']);
 $router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream']);
+$router->post('/api/v1/webhook/omni', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
+$router->post('/api/v1/webhook/universal', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
+$router->post('/api/v1/webhook/import', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
 $router->post('/api/v1/webhook/{endpoint_slug}', [\App\Controllers\IncomingWebhookController::class, 'handle']);
 
-// Dynamic Custom REST API Gateway & Table Schema Introspector
+// Dynamic Custom REST API Gateway (Single Record by ID, UUID, or Slug for Any Table)
+$router->get('/api/v1/custom/{table}/schema', [\App\Controllers\CustomApiController::class, 'handleTableSchema']);
+$router->get('/api/v1/custom/{table}/describe', [\App\Controllers\CustomApiController::class, 'handleTableSchema']);
+$router->get('/api/v1/custom/{table}/{id}', [\App\Controllers\CustomApiController::class, 'handleRecord']);
+$router->put('/api/v1/custom/{table}/{id}', [\App\Controllers\CustomApiController::class, 'handleRecord']);
+$router->patch('/api/v1/custom/{table}/{id}', [\App\Controllers\CustomApiController::class, 'handleRecord']);
+$router->delete('/api/v1/custom/{table}/{id}', [\App\Controllers\CustomApiController::class, 'handleRecord']);
+
+// Dynamic Custom REST API Gateway & Table Schema Introspector (Collection / Endpoint)
 $router->get('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
 $router->post('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);
 $router->put('/api/v1/custom/{endpoint_slug}', [\App\Controllers\CustomApiController::class, 'handle']);

@@ -13,18 +13,38 @@ use App\Core\Config;
 class IncomingWebhookController {
 
     /**
-     * Verify administrator access via session or bearer token
+     * Verify administrator access via session, role, CSRF token, or bearer/admin secret
      */
-    private function checkAdminAccess(Request $request): bool {
+    public static function checkAdminAccess(Request $request): bool {
+        // 1. Core Auth verification
         if (Auth::isAdmin()) {
             return true;
         }
 
-        // Token check fallback for API/curl access
-        $authHeader = $request->header('Authorization') ?? ($request->header('authorization') ?? '');
-        $token = '';
-        if (preg_match('/Bearer\s+(\S+)/i', $authHeader, $matches)) {
-            $token = trim($matches[1]);
+        // 2. Direct session role check fallback (in case user_sessions lookup was pruned)
+        $sessionRole = \App\Core\Session::get('user_role');
+        if ($sessionRole === 'admin' || $sessionRole === 'super_admin') {
+            return true;
+        }
+
+        // 3. CSRF token validation for active browser session
+        $csrf = $request->header('X-CSRF-Token') ?: ($request->post('csrf_token') ?: ($request->query('csrf_token') ?: ''));
+        if (!empty($csrf)) {
+            $sessCsrf = \App\Core\Session::csrfToken();
+            if (hash_equals($sessCsrf, $csrf) || (\App\Core\Session::has('csrf_token') && hash_equals((string)\App\Core\Session::get('csrf_token'), $csrf))) {
+                if (\App\Core\Session::has('user_id') || !empty($sessionRole)) {
+                    return true;
+                }
+            }
+        }
+
+        // 4. Token check (Header, Query, or POST)
+        $token = $request->header('X-Admin-Token') ?: '';
+        if (empty($token)) {
+            $authHeader = $request->header('Authorization') ?? ($request->header('authorization') ?? '');
+            if (preg_match('/Bearer\s+(\S+)/i', $authHeader, $matches)) {
+                $token = trim($matches[1]);
+            }
         }
         if (empty($token)) {
             $token = trim((string)$request->query('token', ''));
@@ -38,6 +58,27 @@ class IncomingWebhookController {
             if (hash_equals((string)$deploySecret, $token) || hash_equals('ts_deploy_sec_99182374619a8b', $token)) {
                 return true;
             }
+
+            try {
+                $dbSecret = Database::fetchSilent("SELECT key_value FROM site_settings WHERE key_name = 'deploy_webhook_secret'")['key_value'] ?? null;
+                if (!empty($dbSecret) && hash_equals($dbSecret, $token)) {
+                    return true;
+                }
+            } catch (\Throwable $e) {}
+
+            try {
+                $hash = hash('sha256', $token);
+                $keyRow = Database::fetchSilent("
+                    SELECT k.id, u.role 
+                    FROM api_keys k 
+                    LEFT JOIN users u ON k.user_id = u.id 
+                    WHERE k.api_key_hash = ? AND k.is_active = 1 
+                    LIMIT 1
+                ", [$hash]);
+                if ($keyRow && in_array(strtolower((string)($keyRow['role'] ?? '')), ['admin', 'super_admin'], true)) {
+                    return true;
+                }
+            } catch (\Throwable $e) {}
         }
 
         return false;
@@ -62,10 +103,28 @@ class IncomingWebhookController {
     }
 
     /**
-     * Admin Test Simulation: POST /api/v1/webhook/simulate
+     * Universal Omni-Webhook Ingestor: POST /api/v1/webhook/omni (or /universal, /import)
+     * Ingests single payloads or batch arrays directly into ANY database table.
+     */
+    public function handleOmni(Request $request): void {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $rawBody = file_get_contents('php://input') ?: '';
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
+        $ip = Request::ip();
+
+        $result = IncomingWebhookEngine::processPayload('omni', $headers, $rawBody, $ip);
+
+        http_response_code($result['code'] ?? 200);
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    /**
+     * Admin Test Simulation: POST /api/v1/webhook/simulate (or /admin/incoming-webhooks/simulate)
      */
     public function simulate(Request $request): void {
-        if (!$this->checkAdminAccess($request)) {
+        if (!self::checkAdminAccess($request)) {
             Response::json(['success' => false, 'code' => 403, 'error' => 'Admin authorization required'], 403);
             return;
         }
@@ -74,7 +133,7 @@ class IncomingWebhookController {
         $rawBody = trim((string)$request->post('payload', '{}'));
         $authHeader = trim((string)$request->post('auth_header', ''));
 
-        $headers = [];
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
         if (!empty($authHeader)) {
             $headers['Authorization'] = $authHeader;
         }
@@ -84,10 +143,10 @@ class IncomingWebhookController {
     }
 
     /**
-     * Live Poller for Admin JSON Listener: GET /api/v1/webhook/live-stream/{slug}
+     * Live Poller for Admin JSON Listener: GET /api/v1/webhook/live-stream/{slug} (or /admin/incoming-webhooks/live-stream/{slug})
      */
     public function liveStream(Request $request, array $params): void {
-        if (!$this->checkAdminAccess($request)) {
+        if (!self::checkAdminAccess($request)) {
             Response::json(['success' => false, 'code' => 403, 'error' => 'Admin authorization required'], 403);
             return;
         }

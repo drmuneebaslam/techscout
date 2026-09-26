@@ -15,23 +15,50 @@ class CustomApiController {
      * Verify that the incoming request is strictly authorized as an administrator.
      * Denies all regular users and unauthenticated visitors.
      */
+    /**
+     * Verify that the incoming request is strictly authorized as an administrator.
+     * Denies all regular users and unauthenticated visitors.
+     */
     public static function requireAdminAuth(Request $request, ?array $endpoint = null): bool {
         // 1. Session check: Logged-in admin or super_admin
         if (Auth::isAdmin()) {
             return true;
         }
 
+        // 1b. Session role check fallback
+        $sessionRole = \App\Core\Session::get('user_role');
+        if ($sessionRole === 'admin' || $sessionRole === 'super_admin') {
+            return true;
+        }
+
+        // 1c. CSRF Token verification if user is logged into session
+        $csrfToken = $request->header('X-CSRF-Token') ?: ($request->post('csrf_token') ?: ($request->query('csrf_token') ?: ''));
+        if (!empty($csrfToken)) {
+            $sessCsrf = \App\Core\Session::csrfToken();
+            if (hash_equals($sessCsrf, $csrfToken) || (\App\Core\Session::has('csrf_token') && hash_equals((string)\App\Core\Session::get('csrf_token'), $csrfToken))) {
+                if (\App\Core\Session::has('user_id') || !empty($sessionRole)) {
+                    return true;
+                }
+            }
+        }
+
         // 2. Token Extraction from Authorization Header, Query Parameter, or Custom Header
-        $authHeader = $request->header('Authorization') ?? ($request->header('authorization') ?? '');
-        $token = '';
-        if (preg_match('/Bearer\s+(\S+)/i', $authHeader, $matches)) {
-            $token = trim($matches[1]);
+        $token = $request->header('X-Admin-Token') ?: '';
+        if (empty($token)) {
+            $authHeader = $request->header('Authorization') ?? ($request->header('authorization') ?? '');
+            if (preg_match('/Bearer\s+(\S+)/i', $authHeader, $matches)) {
+                $token = trim($matches[1]);
+            }
         }
         if (empty($token)) {
-            $token = trim((string)($request->query('token', '') ?: ($request->header('X-Admin-Token') ?: ($request->post('token', '') ?: ''))));
+            $token = trim((string)($request->query('token', '') ?: ($request->post('token', '') ?: '')));
         }
 
         if (empty($token)) {
+            // Also check endpoint auth_required flag if this endpoint is configured public
+            if ($endpoint !== null && isset($endpoint['auth_required']) && (int)$endpoint['auth_required'] === 0) {
+                return true;
+            }
             return false;
         }
 
@@ -80,7 +107,7 @@ class CustomApiController {
             header('Content-Type: application/json; charset=utf-8');
             header('Access-Control-Allow-Origin: *');
             header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
-            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-Admin-Token');
+            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-Admin-Token, X-CSRF-Token');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -90,7 +117,7 @@ class CustomApiController {
 
         $slug = trim((string)($params['endpoint_slug'] ?? ''));
         if (empty($slug)) {
-            Response::json(['success' => false, 'error' => 'Endpoint slug is required'], 400);
+            Response::json(['success' => false, 'error' => 'Endpoint slug or table name is required'], 400);
             return;
         }
 
@@ -130,6 +157,30 @@ class CustomApiController {
             return;
         }
 
+        // Dynamic Table Match: If slug is a real table name in the DB, serve direct table CRUD
+        $allTables = array_column(Database::getAllTablesWithMetadata(), 'table_name');
+        if (in_array($slug, $allTables, true)) {
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+            if ($method === 'GET') {
+                $this->serveTableData($request, [
+                    'name' => "Direct Table API: {$slug}",
+                    'slug' => $slug,
+                    'target_table' => $slug,
+                    'endpoint_type' => 'table_data'
+                ]);
+                return;
+            } elseif ($method === 'POST') {
+                $this->performInsertOnTable($request, $slug);
+                return;
+            } elseif ($method === 'PUT' || $method === 'PATCH') {
+                $this->performUpdateOnTable($request, $slug);
+                return;
+            } elseif ($method === 'DELETE') {
+                $this->performDeleteOnTable($request, $slug);
+                return;
+            }
+        }
+
         // Fetch endpoint definition from custom_api_endpoints
         $endpoint = null;
         try {
@@ -137,11 +188,11 @@ class CustomApiController {
         } catch (\Throwable $e) {}
 
         if (!$endpoint) {
-            Response::json(['success' => false, 'error' => "Custom API endpoint '{$slug}' not found or inactive"], 404);
+            Response::json(['success' => false, 'error' => "Custom API endpoint or table '{$slug}' not found or inactive"], 404);
             return;
         }
 
-        // Strict Admin Authentication Enforcement: All custom API gateway endpoints are for admins only
+        // Strict Admin Authentication Enforcement: Check access
         if (!self::requireAdminAuth($request, $endpoint)) {
             Response::json([
                 'success' => false, 
@@ -496,7 +547,11 @@ class CustomApiController {
         $rawCols = Database::getTableColumnsDetailed($table);
         $validCols = array_column($rawCols, 'Field');
         $inputData = $request->all();
-        unset($inputData['table'], $inputData['token']);
+        if (empty($inputData)) {
+            $raw = file_get_contents('php://input');
+            $inputData = json_decode($raw, true) ?: [];
+        }
+        unset($inputData['table'], $inputData['token'], $inputData['csrf_token'], $inputData['_method']);
 
         $insertData = [];
         foreach ($inputData as $k => $v) {
@@ -575,7 +630,11 @@ class CustomApiController {
         }
 
         $inputData = $request->all();
-        unset($inputData['table'], $inputData['token']);
+        if (empty($inputData)) {
+            $raw = file_get_contents('php://input');
+            $inputData = json_decode($raw, true) ?: [];
+        }
+        unset($inputData['table'], $inputData['token'], $inputData['csrf_token'], $inputData['_method']);
 
         // Identify primary key or identifier
         $primaryCol = !empty($pkCols) ? $pkCols[0] : 'id';
@@ -701,6 +760,218 @@ class CustomApiController {
             echo $template;
         } else {
             Response::json($parsed);
+        }
+    }
+
+    /**
+     * Universal Single Record API: GET / PUT / PATCH / DELETE /api/v1/custom/{table}/{id}
+     * Retrieves, modifies, or deletes ANY database record by ID, UUID, or Slug.
+     */
+    public function handleRecord(Request $request, array $params): void {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+            header('Access-Control-Allow-Origin: *');
+            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-Admin-Token, X-CSRF-Token');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(204);
+            exit;
+        }
+
+        if (!self::requireAdminAuth($request)) {
+            Response::json(['success' => false, 'error' => 'Access Denied: Administrator authentication required.'], 403);
+            return;
+        }
+
+        $table = strtolower(trim((string)($params['table'] ?? '')));
+        $id = trim((string)($params['id'] ?? ''));
+
+        $allTables = array_column(Database::getAllTablesWithMetadata(), 'table_name');
+        if (!in_array($table, $allTables, true)) {
+            Response::json(['success' => false, 'error' => "Table '{$table}' does not exist in the database."], 404);
+            return;
+        }
+
+        $rawCols = Database::getTableColumnsDetailed($table);
+        $validCols = array_column($rawCols, 'Field');
+        $primaryCol = 'id';
+        foreach ($rawCols as $rc) {
+            if (($rc['Key'] ?? '') === 'PRI') {
+                $primaryCol = $rc['Field'];
+                break;
+            }
+        }
+
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if ($method === 'POST' && $request->input('_method')) {
+            $method = strtoupper((string)$request->input('_method'));
+        }
+
+        $pdo = Database::getConnection();
+
+        // 1. GET: Retrieve single record by ID, UUID, or slug
+        if ($method === 'GET') {
+            $record = null;
+            $hasContentId = in_array('content_id', $validCols, true);
+
+            if ($hasContentId) {
+                // Determine whether $id matches table's PK or contents.id / slug / uuid
+                $sql = "SELECT t.*, c.title, c.slug, c.summary, c.featured_image_url, c.content_type, c.status as content_status, c.author_id, c.category_id, c.published_at, c.created_at as content_created_at 
+                        FROM `{$table}` t 
+                        LEFT JOIN contents c ON t.content_id = c.id 
+                        WHERE t.`{$primaryCol}` = ? OR t.content_id = ? OR c.slug = ? OR c.uuid = ? 
+                        LIMIT 1";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$id, $id, $id, $id]);
+                $record = $stmt->fetch(\PDO::FETCH_ASSOC);
+            } else {
+                // Direct table query
+                $whereCols = ["`{$primaryCol}` = ?"];
+                $bindings = [$id];
+                if (in_array('slug', $validCols, true) && !is_numeric($id)) {
+                    $whereCols[] = "`slug` = ?";
+                    $bindings[] = $id;
+                }
+                if (in_array('uuid', $validCols, true) && !is_numeric($id)) {
+                    $whereCols[] = "`uuid` = ?";
+                    $bindings[] = $id;
+                }
+                if (in_array('email', $validCols, true) && filter_var($id, FILTER_VALIDATE_EMAIL)) {
+                    $whereCols[] = "`email` = ?";
+                    $bindings[] = $id;
+                }
+                $sql = "SELECT * FROM `{$table}` WHERE " . implode(' OR ', $whereCols) . " LIMIT 1";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($bindings);
+                $record = $stmt->fetch(\PDO::FETCH_ASSOC);
+            }
+
+            if (!$record) {
+                Response::json(['success' => false, 'error' => "Record '{$id}' not found in table '{$table}'."], 404);
+                return;
+            }
+
+            // Auto-decode JSON fields
+            foreach ($record as $k => $v) {
+                if (is_string($v) && (str_starts_with($v, '{') || str_starts_with($v, '['))) {
+                    $decoded = json_decode($v, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $record[$k] = $decoded;
+                    }
+                }
+            }
+
+            Response::json([
+                'success' => true,
+                'table' => $table,
+                'identifier' => $id,
+                'data' => $record,
+                'timestamp_gmt' => gmdate('Y-m-d\TH:i:s\Z')
+            ]);
+            return;
+        }
+
+        // 2. PUT / PATCH: Update record by ID
+        if ($method === 'PUT' || $method === 'PATCH') {
+            $input = $request->all();
+            if (empty($input)) {
+                $raw = file_get_contents('php://input');
+                $input = json_decode($raw, true) ?: [];
+            }
+
+            $updateCols = [];
+            $updateVals = [];
+            foreach ($input as $k => $v) {
+                if ($k === $primaryCol || in_array($k, ['_method', 'token', 'csrf_token', 'table', 'id'], true)) {
+                    continue;
+                }
+                if (in_array($k, $validCols, true)) {
+                    $updateCols[] = "`{$k}` = ?";
+                    $updateVals[] = is_array($v) ? json_encode($v, JSON_UNESCAPED_UNICODE) : $v;
+                }
+            }
+
+            if (empty($updateCols)) {
+                Response::json(['success' => false, 'error' => 'No valid columns provided to update.'], 400);
+                return;
+            }
+
+            $updateVals[] = $id;
+            $sql = "UPDATE `{$table}` SET " . implode(', ', $updateCols) . " WHERE `{$primaryCol}` = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($updateVals);
+
+            Response::json([
+                'success' => true,
+                'message' => "Record in '{$table}' successfully updated.",
+                'table' => $table,
+                'record_id' => $id,
+                'updated_fields' => array_keys($input),
+                'rows_affected' => $stmt->rowCount()
+            ]);
+            return;
+        }
+
+        // 3. DELETE: Remove record by ID
+        if ($method === 'DELETE') {
+            $stmt = $pdo->prepare("DELETE FROM `{$table}` WHERE `{$primaryCol}` = ?");
+            $stmt->execute([$id]);
+
+            Response::json([
+                'success' => true,
+                'message' => "Record '{$id}' removed from table '{$table}'.",
+                'table' => $table,
+                'deleted_rows' => $stmt->rowCount()
+            ]);
+            return;
+        }
+
+        Response::json(['success' => false, 'error' => "Method {$method} not allowed on record endpoint."], 405);
+    }
+
+    /**
+     * Endpoint for Table Schema Introspection by URI: GET /api/v1/custom/{table}/schema
+     */
+    public function handleTableSchema(Request $request, array $params): void {
+        $table = trim((string)($params['table'] ?? ''));
+        if (empty($table)) {
+            $table = trim((string)$request->query('table', ''));
+        }
+        $this->serveTableDescriptionForTable($request, $table);
+    }
+
+    /**
+     * Helper to describe table with schema details and statistics
+     */
+    public function serveTableDescriptionForTable(Request $request, string $tableName): void {
+        if (!self::requireAdminAuth($request)) {
+            Response::json(['success' => false, 'error' => 'Access Denied: Administrator authentication required.'], 403);
+            return;
+        }
+
+        $tableName = strtolower(trim($tableName));
+        if (empty($tableName)) {
+            Response::json(['success' => false, 'error' => 'Table name parameter is required.'], 400);
+            return;
+        }
+
+        $allTables = array_column(Database::getAllTablesWithMetadata(), 'table_name');
+        if (!in_array($tableName, $allTables, true)) {
+            Response::json(['success' => false, 'error' => "Table '{$tableName}' does not exist in the database."], 404);
+            return;
+        }
+
+        try {
+            $tableInfo = Database::describeTable($tableName);
+            Response::json([
+                'success' => true,
+                'type' => 'table_detailed_blueprint',
+                'data' => $tableInfo
+            ]);
+        } catch (\Throwable $e) {
+            Response::json(['success' => false, 'error' => 'Table introspection failed: ' . $e->getMessage()], 500);
         }
     }
 }

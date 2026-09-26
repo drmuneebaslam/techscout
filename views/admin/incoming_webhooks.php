@@ -441,11 +441,14 @@ async function saveFieldMappings(e) {
     headers: { 
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'X-CSRF-Token': window.TECHSCOUT_CSRF_TOKEN || '',
+      'X-Admin-Token': window.TECHSCOUT_ADMIN_TOKEN || ''
     },
     body: JSON.stringify({
       id: currentActiveWebhook.id,
-      mapping_rules_json: JSON.stringify(rules)
+      mapping_rules_json: JSON.stringify(rules),
+      csrf_token: window.TECHSCOUT_CSRF_TOKEN || ''
     })
   });
   const data = await res.json();
@@ -460,11 +463,14 @@ async function saveFieldMappings(e) {
 async function pollLatestLogs() {
   if (!currentActiveWebhook) return;
   try {
-    const res = await fetch('<?= url('/api/v1/webhook/live-stream/') ?>' + currentActiveWebhook.slug + '?since_id=' + lastLogId, {
+    const adminToken = window.TECHSCOUT_ADMIN_TOKEN || '';
+    const res = await fetch('<?= url('/admin/incoming-webhooks/live-stream/') ?>' + currentActiveWebhook.slug + '?since_id=' + lastLogId + (adminToken ? '&token=' + encodeURIComponent(adminToken) : ''), {
       credentials: 'same-origin',
       headers: {
         'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': window.TECHSCOUT_CSRF_TOKEN || '',
+        'X-Admin-Token': adminToken
       }
     });
     if (!res.ok) return;
@@ -493,19 +499,25 @@ async function sendTestSimulation() {
   statusEl.textContent = 'Sending payload...';
 
   try {
+    const adminToken = window.TECHSCOUT_ADMIN_TOKEN || '';
+    const csrfToken = window.TECHSCOUT_CSRF_TOKEN || '';
     const fd = new FormData();
     fd.append('slug', currentActiveWebhook.slug);
     fd.append('payload', rawBody);
+    fd.append('token', adminToken);
+    fd.append('csrf_token', csrfToken);
     if (currentActiveWebhook.auth_type === 'bearer') {
       fd.append('auth_header', 'Bearer ' + currentActiveWebhook.secret_key);
     }
 
-    const res = await fetch('<?= url('/api/v1/webhook/simulate') ?>', {
+    const res = await fetch('<?= url('/admin/incoming-webhooks/simulate') ?>', {
       method: 'POST',
       credentials: 'same-origin',
       headers: {
         'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': csrfToken,
+        'X-Admin-Token': adminToken
       },
       body: fd
     });
