@@ -51,47 +51,42 @@ JOIN `categories` cat ON cat.slug IN (
 )
 WHERE c.`slug` = 'bw-cinematic-reflective-sunglasses-ai-prompt';
 
--- 4. Robust Insert/Update for prompts child table
+-- 4. Ensure prompts schema columns exist
+ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `aspect_ratio` VARCHAR(20) DEFAULT '16:9';
+ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `negative_prompt` TEXT NULL;
+ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `model_version` VARCHAR(100) NULL;
+ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `difficulty_level` VARCHAR(50) NOT NULL DEFAULT 'beginner';
+ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `parameters_json` LONGTEXT NULL;
+
+-- 5. Robust Insert/Update for prompts child table
 INSERT INTO `prompts` (
   `content_id`,
   `prompt_type`,
   `prompt_template`,
-  `aspect_ratio`,
   `target_models`,
-  `model_version`,
-  `cfg_scale`,
-  `steps`,
-  `sampler`,
-  `style_preset`,
-  `difficulty_level`,
-  `parameters_json`,
   `copy_count`
 )
 SELECT 
   c.id,
   'image',
   'Create a dramatic, high-end fashion editorial black-and-white medium close-up portrait of the provided face image, with sharp facial features, wearing round reflective sunglasses. He gazes upward confidently into a dark void. The lighting is high-contrast and chiaroscuro, highlighting the contours of his face and his black t-shirt. The sunglasses reflect a tall city skyline. The mood is mysterious and cinematic, with a minimalist black background. 8k, 1:1 aspect-ratio.',
-  '1:1',
   '[\"Gemini\", \"Gemini Watermark Remover\"]',
-  'Gemini',
-  7.00,
-  30,
-  'Euler a',
-  'Photorealistic',
-  'production',
-  '{\"models\":[\"Gemini\",\"Gemini Watermark Remover\"],\"aspect_ratio\":\"1:1\",\"difficulty\":\"Production\",\"show_parameters\":true,\"show_models\":true,\"show_aspect_ratio\":true}',
   0
 FROM `contents` c
 WHERE c.`slug` = 'bw-cinematic-reflective-sunglasses-ai-prompt'
 ON DUPLICATE KEY UPDATE
   `prompt_type` = VALUES(`prompt_type`),
   `prompt_template` = VALUES(`prompt_template`),
-  `aspect_ratio` = VALUES(`aspect_ratio`),
-  `target_models` = VALUES(`target_models`),
-  `model_version` = VALUES(`model_version`),
-  `parameters_json` = VALUES(`parameters_json`);
+  `target_models` = VALUES(`target_models`);
 
--- 5. Robust Insert into prompt_images
+UPDATE `prompts` p
+JOIN `contents` c ON p.content_id = c.id
+SET 
+  p.aspect_ratio = '1:1',
+  p.parameters_json = '{\"models\":[\"Gemini\",\"Gemini Watermark Remover\"],\"aspect_ratio\":\"1:1\",\"difficulty\":\"Production\",\"show_parameters\":true,\"show_models\":true,\"show_aspect_ratio\":true}'
+WHERE c.`slug` = 'bw-cinematic-reflective-sunglasses-ai-prompt';
+
+-- 6. Robust Insert into prompt_images
 DELETE pi FROM `prompt_images` pi
 JOIN `contents` c ON pi.prompt_id = c.id
 WHERE c.`slug` = 'bw-cinematic-reflective-sunglasses-ai-prompt';
