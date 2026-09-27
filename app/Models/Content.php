@@ -135,8 +135,9 @@ class Content {
                        art.reading_time_mins, art.difficulty_level, art.table_of_contents, art.citation_sources,
                        tool.*, tool.rating_avg as tool_rating, tool.rating_count as tool_reviews,
                        gpt.openai_url, gpt.model_base, gpt.prompt_starters,
-                       p.prompt_type, p.prompt_template, p.template_variables, p.target_models, p.copy_count, p.sample_output,
-                       camp.campaign_type, camp.start_date, camp.end_date, camp.prize_pool, camp.rules_markdown
+                       p.prompt_type, p.prompt_template, p.aspect_ratio, p.difficulty_level, p.parameters_json, p.negative_prompt, p.template_variables, p.target_models, p.copy_count, p.sample_output,
+                       camp.campaign_type, camp.start_date, camp.end_date, camp.prize_pool, camp.rules_markdown,
+                       c.slug as slug, c.id as id
                 FROM contents c
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 LEFT JOIN categories pcat ON cat.parent_id = pcat.id

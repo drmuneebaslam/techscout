@@ -425,11 +425,8 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
 
       <!-- Half-Visible Teaser Wrapper -->
       <div id="prompt-preview-container" class="prompt-half-visible no-copy-inject" style="position: relative; max-height: 140px; overflow: hidden; border-radius: 10px; border: 1px solid var(--ts-border-main); background: #080c16; transition: max-height 0.4s ease;">
-        <button type="button" id="prompt-box-top-copy-btn" onclick="copyUnlockedPrompt()" title="Copy prompt blueprint" style="display: none; position: absolute; top: 10px; right: 10px; z-index: 20; padding: 6px 14px; background: rgba(15,23,42,0.85); color: #34d399; border: 1px solid rgba(52,211,153,0.4); border-radius: 6px; cursor: pointer; font-family: monospace; font-size: 0.78rem; font-weight: 700; align-items: center; gap: 0.35rem; backdrop-filter: blur(6px); transition: 0.2s;">
-          📋 Copy Prompt
-        </button>
-
-        <pre class="no-copy-inject" style="margin: 0; padding: 1.25rem; font-family: var(--ts-font-mono); font-size: 0.88rem; white-space: pre-wrap; word-break: break-word; color: #34d399; line-height: 1.6;"><code id="rendered-prompt-output" class="language-markdown"></code></pre>
+        <textarea id="raw-prompt-template" style="display: none;"><?= htmlspecialchars($prompt['prompt_template'] ?? '') ?></textarea>
+        <pre class="no-copy-inject" style="margin: 0; padding: 1.25rem; font-family: var(--ts-font-mono); font-size: 0.88rem; white-space: pre-wrap; word-break: break-word; color: #34d399; line-height: 1.6;"><code id="rendered-prompt-output" class="language-markdown"><?= htmlspecialchars($prompt['prompt_template'] ?? '') ?></code></pre>
         
         <!-- Gradient Blurred Fade Mask -->
         <div id="prompt-fade-overlay" style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 15%, rgba(8,12,22,0.75) 60%, rgba(8,12,22,0.98) 100%); pointer-events: none; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.75rem;">
@@ -995,28 +992,6 @@ document.querySelectorAll('.prompt-var-input').forEach(inp => {
 });
 updateRenderedPrompt();
 
-function copyUnlockedPrompt() {
-    const rawTemplateEl = document.getElementById('raw-prompt-template');
-    const renderedPromptEl = document.getElementById('rendered-prompt-output');
-    const textToCopy = renderedPromptEl ? (renderedPromptEl.innerText || renderedPromptEl.textContent) : (rawTemplateEl ? rawTemplateEl.value : '');
-    const topBtn = document.getElementById('prompt-box-top-copy-btn');
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            if (topBtn) {
-                topBtn.innerHTML = '✅ Copied!';
-                topBtn.style.color = '#34d399';
-                setTimeout(() => { 
-                    if (topBtn) {
-                        topBtn.innerHTML = '📋 Copy Prompt'; 
-                        topBtn.style.color = '#34d399'; 
-                    }
-                }, 2000);
-            }
-            if (typeof showToast === 'function') showToast('Prompt copied to clipboard! 📋', 'success');
-        });
-    }
-}
-
 // Hook Unlock & Copy Prompt Button with Popunder / Direct Link Ad
 document.addEventListener('DOMContentLoaded', () => {
     const copyBtn = document.getElementById('btn-copy-prompt');
@@ -1044,13 +1019,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (fadeOverlay) fadeOverlay.style.display = 'none';
             }
 
-            // 3. Show top-right copy button on prompt box
-            const topBoxBtn = document.getElementById('prompt-box-top-copy-btn');
-            if (topBoxBtn) {
-                topBoxBtn.style.display = 'inline-flex';
-            }
-
-            // 4. Update large button status
+            // 3. Update large button status
             const iconEl = document.getElementById('copy-btn-icon');
             const labelEl = document.getElementById('copy-btn-label');
             if (iconEl) iconEl.setAttribute('data-lucide', 'check');
