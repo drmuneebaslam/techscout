@@ -264,7 +264,8 @@ class PersonaFollowerEngine {
             LEFT JOIN authors a ON a.user_id = u.id
             WHERE af.author_id = ?
             ORDER BY af.created_at DESC
-            LIMIT ?
-        ", [$authorId, $limit]);
+            LIMIT " . max(1, (int)$limit), 
+            [$authorId]
+        );
     }
 }

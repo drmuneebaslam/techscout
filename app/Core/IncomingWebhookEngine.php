@@ -438,15 +438,63 @@ class IncomingWebhookEngine {
                     }
                 }
 
-                // Common aliases
-                if (empty($extractedData['title']) && !empty($itemData['name']) && in_array('title', $allowedColumns, true)) {
+                // Common aliases and smart field normalizations
+                if (empty($extractedData['title']) && !empty($itemData['title'])) {
+                    $extractedData['title'] = (string)$itemData['title'];
+                } elseif (empty($extractedData['title']) && !empty($itemData['name']) && in_array('title', $allowedColumns, true)) {
                     $extractedData['title'] = (string)$itemData['name'];
+                } elseif (empty($extractedData['title']) && !empty($itemData['prompt_title']) && in_array('title', $allowedColumns, true)) {
+                    $extractedData['title'] = (string)$itemData['prompt_title'];
                 }
+
                 if (empty($extractedData['summary']) && !empty($itemData['description']) && in_array('summary', $allowedColumns, true)) {
                     $extractedData['summary'] = (string)$itemData['description'];
+                } elseif (empty($extractedData['summary']) && !empty($itemData['caption']) && in_array('summary', $allowedColumns, true)) {
+                    $extractedData['summary'] = (string)$itemData['caption'];
                 }
-                if (empty($extractedData['featured_image_url']) && !empty($itemData['image_url']) && in_array('featured_image_url', $allowedColumns, true)) {
-                    $extractedData['featured_image_url'] = (string)$itemData['image_url'];
+
+                // Image / media field aliases (field, image, photo, thumbnail)
+                $detectedImg = $itemData['featured_image_url'] ?? ($itemData['image_url'] ?? ($itemData['field'] ?? ($itemData['image'] ?? ($itemData['photo'] ?? ($itemData['thumbnail'] ?? null)))));
+                if (!empty($detectedImg) && in_array('featured_image_url', $allowedColumns, true)) {
+                    $extractedData['featured_image_url'] = (string)$detectedImg;
+                }
+
+                // Prompt template aliases
+                $detectedPromptText = $itemData['prompt_template'] ?? ($itemData['prompt_text'] ?? ($itemData['prompt'] ?? ($itemData['template'] ?? ($itemData['prompt_body'] ?? null))));
+                if (!empty($detectedPromptText) && in_array('prompt_template', $allowedColumns, true)) {
+                    $extractedData['prompt_template'] = (string)$detectedPromptText;
+                }
+
+                // Model / Engine aliases
+                $detectedModel = $itemData['target_models'] ?? ($itemData['model'] ?? ($itemData['models'] ?? ($itemData['engine'] ?? null)));
+                if (!empty($detectedModel) && in_array('target_models', $allowedColumns, true)) {
+                    if (is_string($detectedModel)) {
+                        $modelArray = array_values(array_filter(array_map('trim', explode(',', $detectedModel))));
+                        $extractedData['target_models'] = json_encode($modelArray, JSON_UNESCAPED_SLASHES);
+                    } elseif (is_array($detectedModel)) {
+                        $extractedData['target_models'] = json_encode(array_values($detectedModel), JSON_UNESCAPED_SLASHES);
+                    }
+                }
+
+                // Aspect ratio alias
+                if (!empty($itemData['aspect_ratio']) && in_array('aspect_ratio', $allowedColumns, true)) {
+                    $extractedData['aspect_ratio'] = (string)$itemData['aspect_ratio'];
+                }
+
+                // Parameters JSON
+                if (empty($extractedData['parameters_json']) && in_array('parameters_json', $allowedColumns, true)) {
+                    $paramArr = [];
+                    if (!empty($detectedModel)) {
+                        $paramArr['models'] = is_array($detectedModel) ? $detectedModel : array_values(array_filter(array_map('trim', explode(',', (string)$detectedModel))));
+                    }
+                    if (!empty($itemData['aspect_ratio'])) $paramArr['aspect_ratio'] = (string)$itemData['aspect_ratio'];
+                    if (!empty($itemData['temperature'])) $paramArr['temperature'] = (float)$itemData['temperature'];
+                    if (!empty($itemData['top_p'])) $paramArr['top_p'] = (float)$itemData['top_p'];
+                    if (!empty($itemData['difficulty'])) $paramArr['difficulty'] = (string)$itemData['difficulty'];
+                    $paramArr['show_parameters'] = true;
+                    $paramArr['show_models'] = true;
+                    $paramArr['show_aspect_ratio'] = true;
+                    $extractedData['parameters_json'] = json_encode($paramArr, JSON_UNESCAPED_SLASHES);
                 }
             }
 
@@ -464,10 +512,13 @@ class IncomingWebhookEngine {
                     // Unified Ingestion for Prompts, AI Tools, Articles, GPT Listings
                     $slugVal = $extractedData['slug'] ?? ('item-' . time() . '-' . mt_rand(100, 999));
                     $titleVal = $extractedData['title'] ?? ($itemData['title'] ?? 'Untitled Entity');
-                    $summaryVal = $extractedData['summary'] ?? ($itemData['summary'] ?? (isset($extractedData['prompt_template']) ? substr($extractedData['prompt_template'], 0, 160) : ''));
+                    $summaryVal = $extractedData['summary'] ?? ($itemData['summary'] ?? ($itemData['description'] ?? (isset($extractedData['prompt_template']) ? substr($extractedData['prompt_template'], 0, 160) : '')));
                     $parentType = $tableDef['parent_content_type'] ?? 'prompt';
-                    $imgUrl = $extractedData['featured_image_url'] ?? ($itemData['featured_image_url'] ?? null);
-                    $catId = isset($extractedData['category_id']) ? (int)$extractedData['category_id'] : self::resolveCategoryId($itemData['category'] ?? ($itemData['category_name'] ?? null));
+                    $imgUrl = $extractedData['featured_image_url'] ?? ($itemData['featured_image_url'] ?? ($itemData['field'] ?? ($itemData['image_url'] ?? null)));
+                    
+                    // Category resolution with aliases (category_main, category, category_name, topic)
+                    $rawCatInput = $itemData['category_main'] ?? ($itemData['category'] ?? ($itemData['category_name'] ?? ($itemData['topic'] ?? null)));
+                    $catId = isset($extractedData['category_id']) ? (int)$extractedData['category_id'] : self::resolveCategoryId($rawCatInput);
 
                     // 1. Upsert parent contents record
                     $existingStmt = $pdo->prepare("SELECT id FROM contents WHERE slug = ? LIMIT 1");
@@ -499,6 +550,9 @@ class IncomingWebhookEngine {
                     if (in_array('content_id', $childCols, true)) {
                         $childData['content_id'] = $contentId;
                     }
+                    if (in_array('slug', $childCols, true) && !isset($childData['slug'])) {
+                        $childData['slug'] = $slugVal;
+                    }
 
                     if ($targetTable === 'prompts' && in_array('prompt_template', $childCols, true) && empty($childData['prompt_template'])) {
                         $childData['prompt_template'] = !empty($summaryVal) ? $summaryVal : ($titleVal ?: 'Prompt Blueprint');
@@ -522,10 +576,24 @@ class IncomingWebhookEngine {
                         $tablesModified[$targetTable] = ($tablesModified[$targetTable] ?? 0) + 1;
                         $tablesModified['contents'] = ($tablesModified['contents'] ?? 0) + 1;
 
-                        // 3. Sync Tags if passed
-                        $tagsInput = $itemData['tags'] ?? ($itemData['tag_list'] ?? null);
+                        // 3. Auto-sync Prompt Images if image is present
+                        if ($targetTable === 'prompts' && !empty($imgUrl) && $contentId) {
+                            try {
+                                $imgCheck = $pdo->prepare("SELECT id FROM prompt_images WHERE prompt_id = ? AND image_url = ? LIMIT 1");
+                                $imgCheck->execute([$contentId, $imgUrl]);
+                                if (!$imgCheck->fetch()) {
+                                    $insImg = $pdo->prepare("INSERT INTO prompt_images (prompt_id, image_url, caption, sort_order, created_at) VALUES (?, ?, ?, 0, NOW())");
+                                    $insImg->execute([$contentId, $imgUrl, $titleVal ?: 'Visual Generation Sample']);
+                                    $tablesModified['prompt_images'] = ($tablesModified['prompt_images'] ?? 0) + 1;
+                                }
+                            } catch (\Throwable $ie) {}
+                        }
+
+                        // 4. Sync Tags if passed
+                        $tagsInput = $itemData['tags'] ?? ($itemData['tag_list'] ?? ($itemData['keywords'] ?? null));
                         if (!empty($tagsInput) && $contentId) {
                             self::syncContentTags($contentId, is_array($tagsInput) ? $tagsInput : explode(',', (string)$tagsInput));
+                            $tablesModified['tags'] = ($tablesModified['tags'] ?? 0) + 1;
                         }
 
                         $processedResults[] = [
@@ -595,12 +663,13 @@ class IncomingWebhookEngine {
      * Inspect recent captured payloads for an endpoint to show actual incoming keys
      */
     public static function getRecentCapturedPayloads(string $slug, int $limit = 5): array {
+        $limit = max(1, (int)$limit);
         $rows = Database::query(
             "SELECT id, payload_json, status, response_code, records_affected, created_at, ip_address 
              FROM incoming_webhook_logs 
              WHERE endpoint_slug = ? 
-             ORDER BY id DESC LIMIT ?",
-            [$slug, $limit]
+             ORDER BY id DESC LIMIT {$limit}",
+            [$slug]
         );
 
         $detectedKeys = [];
@@ -739,12 +808,13 @@ class IncomingWebhookEngine {
     }
 
     /**
-     * Log execution to incoming_webhook_logs with normalized status
+     * Log execution to incoming_webhook_logs with normalized status (Safe VARCHAR-32)
      */
     public static function logExecution(?int $webhookId, string $slug, array $headers, string $payload, string $status, int $responseCode, int $affectedRows, ?string $errorMessage, string $ip): void {
         try {
-            $allowedStatuses = ['success', 'failed', 'ignored'];
-            $normalizedStatus = in_array(strtolower($status), $allowedStatuses, true) ? strtolower($status) : 'failed';
+            $allowedStatuses = ['success', 'failed', 'ignored', 'simulated', 'pending', 'partial'];
+            $cleanStatus = strtolower(trim($status));
+            $normalizedStatus = in_array($cleanStatus, $allowedStatuses, true) ? $cleanStatus : substr($cleanStatus, 0, 32);
 
             Database::execute(
                 "INSERT INTO incoming_webhook_logs 
@@ -768,9 +838,112 @@ class IncomingWebhookEngine {
     }
 
     /**
-     * Comprehensive sample payload for any table in database
+     * Comprehensive high-fidelity sample payload for any table in database
      */
     public static function getSamplePayloadForTable(string $table): array {
+        $table = strtolower(trim($table));
+
+        // High-fidelity handcrafted sample templates for primary platform entities
+        if ($table === 'prompts') {
+            return [
+                "title" => "B&W Cinematic Reflective Sunglasses AI Prompt",
+                "category_main" => "Black & White",
+                "description" => "Copy this AI prompt to generate dramatic black-and-white cinematic portraits featuring high-contrast lighting and round sunglasses reflecting a city skyline.",
+                "field" => "https://img.promptplum.com/cdn-cgi/image/q=78,scq=50,width=1400,height=1400,fit=contain,f=auto/promptImages/736df081-6641-45fd-9fd6-9651fe7e9cb1.webp",
+                "prompt_type" => "image",
+                "prompt_text" => "Create a dramatic, high-end fashion editorial black-and-white medium close-up portrait of the provided face image, with sharp facial features, wearing round reflective sunglasses. He gazes upward confidently into a dark void. The lighting is high-contrast and chiaroscuro, highlighting the contours of his face and his black t-shirt. The sunglasses reflect a tall city skyline. The mood is mysterious and cinematic, with a minimalist black background. 8k, 1:1 aspect-ratio.",
+                "model" => "Gemini, Gemini Watermark Remover",
+                "aspect_ratio" => "1:1",
+                "difficulty" => "Production",
+                "tags" => ["Black & White", "Cinematic Portrait", "Fashion & Editorial", "Men", "Moody", "Portraits", "Urban", "Dark Aesthetic", "Gemini", "Studio Portrait"]
+            ];
+        }
+
+        if ($table === 'prompt_images') {
+            return [
+                "table" => "prompt_images",
+                "prompt_id" => 1,
+                "image_url" => "https://img.promptplum.com/cdn-cgi/image/q=78,scq=50,width=1400,height=1400,fit=contain,f=auto/promptImages/736df081-6641-45fd-9fd6-9651fe7e9cb1.webp",
+                "caption" => "High-contrast B&W portrait with skyline reflections in round sunglasses",
+                "sort_order" => 0
+            ];
+        }
+
+        if ($table === 'ai_tools') {
+            return [
+                "title" => "ElevenLabs Voice AI Studio",
+                "slug" => "elevenlabs-voice-studio",
+                "category" => "Voice & Speech AI",
+                "summary" => "Industry-leading generative AI voice generator with realistic human speech, emotion control, and real-time voice cloning in 29+ languages.",
+                "featured_image_url" => "https://images.unsplash.com/photo-1589254065878-42c9da997008?w=1200&auto=format&fit=crop&q=80",
+                "website_url" => "https://elevenlabs.io",
+                "docs_url" => "https://docs.elevenlabs.io",
+                "pricing_model" => "freemium",
+                "pricing_starting_at" => "$5.00/mo",
+                "free_trial_available" => 1,
+                "free_trial_days" => 14,
+                "verified_by_techscout" => 1,
+                "rating_avg" => 4.95,
+                "features_list" => ["Voice Cloning", "Text to Speech", "Dubbing Studio", "Sound Effects Generator", "Low Latency API"],
+                "tags" => ["Voice AI", "TTS", "Audio Generation", "Productivity", "Speech Synthesis"]
+            ];
+        }
+
+        if ($table === 'articles') {
+            return [
+                "title" => "Building Resilient AI Agent Pipelines in 2026",
+                "slug" => "building-resilient-ai-agent-pipelines-2026",
+                "category" => "Engineering",
+                "summary" => "A deep dive into distributed LLM orchestration, semantic state machines, and autonomous reasoning loops with real-world enterprise benchmarks.",
+                "featured_image_url" => "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80",
+                "body_markdown" => "## Architectural Principles of Autonomous Agents\n\nModern agentic workflows require deterministic state transitions alongside stochastic model completions...\n\n### 1. Dual-Layer Memory Architecture\nUsing vector databases alongside relational state ensures sub-millisecond retrieval...",
+                "reading_time_minutes" => 7,
+                "is_featured" => 1,
+                "tags" => ["AI Agents", "LLM", "Python", "Architecture", "Engineering"]
+            ];
+        }
+
+        if ($table === 'gpt_listings' || $table === 'custom_gpts') {
+            return [
+                "title" => "Code Architect Pro GPT",
+                "slug" => "code-architect-pro-gpt",
+                "category" => "Developer Tools",
+                "summary" => "Senior system architect and clean code mentor that reviews pull requests, optimizes SQL schemas, and designs microservice boundaries.",
+                "featured_image_url" => "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80",
+                "openai_url" => "https://chatgpt.com/g/g-code-architect-pro",
+                "creator_name" => "TechScout Lab",
+                "conversation_starters" => ["Review my MySQL indexing plan", "Draft a Redis caching architecture", "Debug my async worker queue"],
+                "tags" => ["Custom GPT", "ChatGPT", "Code Review", "Architecture", "DevOps"]
+            ];
+        }
+
+        if ($table === 'jobs') {
+            return [
+                "title" => "Senior Generative AI Platform Engineer",
+                "slug" => "senior-generative-ai-platform-engineer",
+                "company_name" => "Synthetix Labs",
+                "location" => "Remote (US / Europe / Asia)",
+                "job_type" => "Full-time",
+                "salary_range" => "$160,000 - $220,000 USD",
+                "apply_url" => "https://synthetix.io/careers/senior-ai-engineer",
+                "description" => "We are seeking an experienced platform engineer to build high-throughput LLM inference gateways, fine-tuning pipelines, and distributed vector caching.",
+                "tags" => ["AI Jobs", "Remote", "Python", "PyTorch", "Kubernetes"]
+            ];
+        }
+
+        if ($table === 'categories') {
+            return [
+                "name" => "Black & White",
+                "slug" => "black-and-white",
+                "applicable_to" => "prompt",
+                "description" => "Black & White fine-art and high-contrast photography prompts.",
+                "icon_name" => "camera",
+                "color_hex" => "#0f172a",
+                "is_featured_home" => 1
+            ];
+        }
+
+        // Generic dynamic introspection fallback for other database tables
         $defs = self::getTableDefinitions();
         $def = $defs[$table] ?? null;
 
@@ -831,29 +1004,38 @@ class IncomingWebhookEngine {
             "mode" => "multi_table_transaction",
             "tables" => [
                 "contents" => [
-                    "title" => "Cinematic Cyberpunk Urban Exploration",
-                    "slug" => "cinematic-cyberpunk-urban-exploration",
+                    "title" => "B&W Cinematic Reflective Sunglasses AI Prompt",
+                    "slug" => "bw-cinematic-reflective-sunglasses-ai-prompt",
                     "content_type" => "prompt",
-                    "category" => "ai-image-prompts",
-                    "summary" => "Ultra-detailed Midjourney v6 architectural prompt capturing high-tech neon cities at dusk.",
-                    "featured_image_url" => "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1200&auto=format&fit=crop&q=80",
+                    "category" => "Black & White",
+                    "summary" => "Copy this AI prompt to generate dramatic black-and-white cinematic portraits featuring high-contrast lighting and round sunglasses reflecting a city skyline.",
+                    "featured_image_url" => "https://img.promptplum.com/cdn-cgi/image/q=78,scq=50,width=1400,height=1400,fit=contain,f=auto/promptImages/736df081-6641-45fd-9fd6-9651fe7e9cb1.webp",
                     "status" => "published"
                 ],
                 "prompts" => [
                     "prompt_type" => "image",
-                    "prompt_template" => "Hyperrealistic urban cyberpunk cityscape, towering neon holographic billboards, wet asphalt reflections, atmospheric fog, dusk lighting, 8k resolution, shot on Hasselblad --ar 16:9 --v 6.0",
-                    "aspect_ratio" => "16:9",
-                    "model_version" => "Midjourney v6.0",
-                    "cfg_scale" => 7.00,
-                    "steps" => 30,
-                    "difficulty_level" => "intermediate"
+                    "prompt_template" => "Create a dramatic, high-end fashion editorial black-and-white medium close-up portrait of the provided face image, with sharp facial features, wearing round reflective sunglasses. He gazes upward confidently into a dark void. The lighting is high-contrast and chiaroscuro, highlighting the contours of his face and his black t-shirt. The sunglasses reflect a tall city skyline. The mood is mysterious and cinematic, with a minimalist black background. 8k, 1:1 aspect-ratio.",
+                    "aspect_ratio" => "1:1",
+                    "model_version" => "Gemini, Gemini Watermark Remover",
+                    "target_models" => ["Gemini", "Gemini Watermark Remover"],
+                    "difficulty_level" => "production"
+                ],
+                "prompt_images" => [
+                    "image_url" => "https://img.promptplum.com/cdn-cgi/image/q=78,scq=50,width=1400,height=1400,fit=contain,f=auto/promptImages/736df081-6641-45fd-9fd6-9651fe7e9cb1.webp",
+                    "caption" => "High-contrast B&W portrait with skyline reflections in round sunglasses",
+                    "sort_order" => 0
                 ],
                 "tags" => [
-                    "Midjourney",
-                    "Cyberpunk",
-                    "Architecture",
-                    "Neon",
-                    "Photorealism"
+                    "Black & White",
+                    "Cinematic Portrait",
+                    "Fashion & Editorial",
+                    "Men",
+                    "Moody",
+                    "Portraits",
+                    "Urban",
+                    "Dark Aesthetic",
+                    "Gemini",
+                    "Studio Portrait"
                 ]
             ]
         ];

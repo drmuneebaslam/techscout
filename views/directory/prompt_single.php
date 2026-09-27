@@ -157,12 +157,33 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
         </div>
 
         <style>
+        .main-gallery-viewport {
+          position: relative;
+          border-radius: 14px;
+          overflow: hidden;
+          max-height: 520px;
+          background: #090d16;
+          border: 1px solid rgba(148, 163, 184, 0.15);
+          text-align: center;
+          cursor: pointer;
+          transition: background-color 0.25s ease, border-color 0.25s ease;
+        }
+        [data-theme="light"] .main-gallery-viewport,
+        .theme-light .main-gallery-viewport,
+        html[data-theme="light"] .main-gallery-viewport,
+        body.theme-light .main-gallery-viewport {
+          background: #f1f5f9 !important;
+          border-color: rgba(203, 213, 225, 0.9) !important;
+        }
         .main-gallery-caption-bar {
           position: absolute;
           bottom: 0;
-          inset-x: 0;
-          background: linear-gradient(to top, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.65) 60%, transparent 100%);
-          padding: 1.25rem 1rem 0.85rem 1rem;
+          left: 0;
+          right: 0;
+          background: linear-gradient(to top, rgba(7, 10, 18, 0.96) 0%, rgba(7, 10, 18, 0.72) 65%, transparent 100%);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          padding: 1.25rem 1.15rem 0.95rem 1.15rem;
           text-align: left;
           display: flex;
           justify-content: space-between;
@@ -171,30 +192,35 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
           transition: all 0.3s ease;
         }
         [data-theme="light"] .main-gallery-caption-bar,
-        .theme-light .main-gallery-caption-bar {
-          background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.8) 60%, transparent 100%);
-          border-top: 1px solid rgba(226, 232, 240, 0.7);
+        .theme-light .main-gallery-caption-bar,
+        html[data-theme="light"] .main-gallery-caption-bar,
+        body.theme-light .main-gallery-caption-bar {
+          background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.88) 65%, transparent 100%) !important;
+          border-top: 1px solid rgba(203, 213, 225, 0.85) !important;
         }
         #main-gallery-caption {
-          font-size: 0.88rem;
+          font-size: 0.9rem;
           font-weight: 600;
-          color: #f8fafc;
-          line-height: 1.4;
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+          color: #f8fafc !important;
+          line-height: 1.45;
+          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
         }
         [data-theme="light"] #main-gallery-caption,
-        .theme-light #main-gallery-caption {
-          color: #0f172a;
-          text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+        .theme-light #main-gallery-caption,
+        html[data-theme="light"] #main-gallery-caption,
+        body.theme-light #main-gallery-caption {
+          color: #0f172a !important;
+          font-weight: 700 !important;
+          text-shadow: none !important;
         }
         </style>
 
         <!-- Hero Primary Image Viewport: Clicking triggers Popunder Ad AND Lightbox -->
-        <div style="position: relative; border-radius: 12px; overflow: hidden; max-height: 520px; background: #070a12; text-align: center; cursor: pointer;" onclick="handleShowcaseImageClick(0)">
+        <div class="main-gallery-viewport" onclick="handleShowcaseImageClick(0)">
           <img id="main-gallery-img" src="<?= htmlspecialchars($allImages[0]['image_url']) ?>" alt="<?= htmlspecialchars($prompt['title']) ?>" style="max-height: 520px; width: 100%; object-fit: contain; transition: transform 0.35s ease;">
           <div class="main-gallery-caption-bar">
             <span id="main-gallery-caption">
-              <?= htmlspecialchars($allImages[0]['caption']) ?>
+              <?= htmlspecialchars($allImages[0]['caption'] ?? $prompt['title']) ?>
             </span>
             <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; backdrop-filter: blur(8px); flex-shrink: 0;">
               🔍 Click to Enlarge (HD)
@@ -215,16 +241,31 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
       </div>
     <?php endif; ?>
 
-    <!-- 2. Generation & Hyperparameters HUD (Optional & Conditionally Rendered) -->
+    <!-- 2. Generation & Hyperparameters HUD (Optional & Fully Customizable) -->
     <?php 
-    $hasModels = !empty($models) && count($models) > 0;
-    $hasAspectRatio = $isImageEngine && !empty($notes['aspect_ratio']);
-    $hasNegativePrompt = $isImageEngine && !empty($notes['negative_prompt']);
-    $hasTemperature = !$isImageEngine && !empty($notes['temperature']);
-    $hasTopP = !$isImageEngine && !empty($notes['top_p']);
-    $hasDifficulty = !$isImageEngine && !empty($notes['difficulty']);
-    $hasCustomLinks = !empty($notes['custom_links']) && is_array($notes['custom_links']);
-    $hasAnyParams = $hasModels || $hasAspectRatio || $hasNegativePrompt || $hasTemperature || $hasTopP || $hasDifficulty || $hasCustomLinks;
+    $paramsConfig = [];
+    if (!empty($prompt['parameters_json'])) {
+        $paramsConfig = json_decode($prompt['parameters_json'], true) ?: [];
+    }
+    $mergedNotes = array_merge($notes, $paramsConfig);
+
+    $showParamsBlock = !isset($mergedNotes['show_parameters']) || ($mergedNotes['show_parameters'] !== false && $mergedNotes['show_parameters'] !== '0' && $mergedNotes['show_parameters'] !== 0);
+    $showModels = (!isset($mergedNotes['show_models']) || ($mergedNotes['show_models'] !== false && $mergedNotes['show_models'] !== '0')) && !empty($models) && count($models) > 0;
+    
+    $aspectRatioVal = !empty($mergedNotes['aspect_ratio']) ? $mergedNotes['aspect_ratio'] : ($prompt['aspect_ratio'] ?? '');
+    $showAspectRatio = (!isset($mergedNotes['show_aspect_ratio']) || ($mergedNotes['show_aspect_ratio'] !== false && $mergedNotes['show_aspect_ratio'] !== '0')) && !empty($aspectRatioVal);
+
+    $negativePromptVal = !empty($mergedNotes['negative_prompt']) ? $mergedNotes['negative_prompt'] : ($prompt['negative_prompt'] ?? '');
+    $showNegativePrompt = (!isset($mergedNotes['show_negative_prompt']) || ($mergedNotes['show_negative_prompt'] !== false && $mergedNotes['show_negative_prompt'] !== '0')) && $isImageEngine && !empty($negativePromptVal);
+
+    $showTemperature = (!isset($mergedNotes['show_temperature']) || ($mergedNotes['show_temperature'] !== false && $mergedNotes['show_temperature'] !== '0')) && !$isImageEngine && !empty($mergedNotes['temperature']);
+    $showTopP = (!isset($mergedNotes['show_top_p']) || ($mergedNotes['show_top_p'] !== false && $mergedNotes['show_top_p'] !== '0')) && !$isImageEngine && !empty($mergedNotes['top_p']);
+    
+    $difficultyVal = !empty($mergedNotes['difficulty']) ? $mergedNotes['difficulty'] : ($prompt['difficulty_level'] ?? '');
+    $showDifficulty = (!isset($mergedNotes['show_difficulty']) || ($mergedNotes['show_difficulty'] !== false && $mergedNotes['show_difficulty'] !== '0')) && !empty($difficultyVal);
+
+    $hasCustomLinks = !empty($mergedNotes['custom_links']) && is_array($mergedNotes['custom_links']);
+    $hasAnyParams = $showParamsBlock && ($showModels || $showAspectRatio || $showNegativePrompt || $showTemperature || $showTopP || $showDifficulty || $hasCustomLinks);
     ?>
     <?php if ($hasAnyParams): ?>
     <div class="ts-card" style="margin-bottom: 2rem; border-radius: 14px; padding: 1.25rem 1.5rem; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main);">
@@ -234,7 +275,7 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
-        <?php if ($hasModels): ?>
+        <?php if ($showModels): ?>
         <div>
           <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Target Engine(s)</span>
           <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
@@ -246,48 +287,48 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
         <?php endif; ?>
 
         <?php if ($isImageEngine): ?>
-          <?php if ($hasAspectRatio): ?>
+          <?php if ($showAspectRatio): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Aspect Ratio</span>
             <span class="ts-badge ts-badge-indigo" style="font-family: var(--ts-font-mono); font-size: 0.8rem;">
-              --ar <?= htmlspecialchars($notes['aspect_ratio']) ?>
+              --ar <?= htmlspecialchars($aspectRatioVal) ?>
             </span>
           </div>
           <?php endif; ?>
 
-          <?php if ($hasNegativePrompt): ?>
+          <?php if ($showNegativePrompt): ?>
             <div style="grid-column: 1 / -1; background: var(--ts-bg-surface-elevated); border: 1px solid var(--ts-border-main); padding: 0.75rem 1rem; border-radius: 8px;">
               <div style="margin-bottom: 0.35rem;">
                 <span style="font-size: 0.75rem; color: #ec4899; font-weight: 700;">Negative Prompt (--no parameters):</span>
               </div>
-              <code style="color: var(--ts-text-secondary); font-size: 0.82rem; word-break: break-all;"><?= htmlspecialchars($notes['negative_prompt']) ?></code>
+              <code style="color: var(--ts-text-secondary); font-size: 0.82rem; word-break: break-all;"><?= htmlspecialchars($negativePromptVal) ?></code>
             </div>
           <?php endif; ?>
 
         <?php else: ?>
-          <?php if ($hasTemperature): ?>
+          <?php if ($showTemperature): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Sampling Temperature</span>
             <span style="font-family: var(--ts-font-mono); font-weight: 700; color: #38bdf8; font-size: 0.88rem;">
-              <?= number_format((float)$notes['temperature'], 2) ?>
+              <?= number_format((float)$mergedNotes['temperature'], 2) ?>
             </span>
           </div>
           <?php endif; ?>
 
-          <?php if ($hasTopP): ?>
+          <?php if ($showTopP): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Top_P Sampling</span>
             <span style="font-family: var(--ts-font-mono); font-weight: 700; color: #10b981; font-size: 0.88rem;">
-              <?= number_format((float)$notes['top_p'], 2) ?>
+              <?= number_format((float)$mergedNotes['top_p'], 2) ?>
             </span>
           </div>
           <?php endif; ?>
 
-          <?php if ($hasDifficulty): ?>
+          <?php if ($showDifficulty): ?>
           <div>
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.35rem;">Complexity Tier</span>
             <span class="ts-badge ts-badge-green" style="font-size: 0.78rem;">
-              <?= htmlspecialchars($notes['difficulty']) ?>
+              <?= htmlspecialchars($difficultyVal) ?>
             </span>
           </div>
           <?php endif; ?>
@@ -296,7 +337,7 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
         <?php if ($hasCustomLinks): ?>
           <div style="grid-column: 1 / -1; padding-top: 0.75rem; border-top: 1px solid var(--ts-border-subtle); display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
             <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); text-transform: uppercase; font-weight: 700;">Additional Links:</span>
-            <?php foreach ($notes['custom_links'] as $cLink): ?>
+            <?php foreach ($mergedNotes['custom_links'] as $cLink): ?>
               <?php if (!empty($cLink['name']) && !empty($cLink['url'])): ?>
                 <a href="<?= htmlspecialchars($cLink['url']) ?>" target="_blank" rel="noopener noreferrer" class="ts-badge ts-badge-cyan" style="text-decoration: none; font-size: 0.78rem;">
                   <i data-lucide="link-2" style="width: 11px; height: 11px; display: inline-block; vertical-align: -1px;"></i> <?= htmlspecialchars($cLink['name']) ?> ↗
@@ -312,8 +353,12 @@ if (!$primaryCategory && !empty($prompt['category_name'])) {
     <!-- Hidden Raw Template for JS Injector -->
     <textarea id="raw-prompt-template" style="display: none;"><?= htmlspecialchars($prompt['prompt_template'] ?? '') ?></textarea>
 
-    <!-- 3. Dynamic Variable Customizer Box (Only if variables present & template has {{...}}) -->
-    <?php if (!empty($variables) && count($variables) > 0 && str_contains($prompt['prompt_template'] ?? '', '{{')): ?>
+    <!-- 3. Dynamic Variable Customizer Box (Only if variables enabled & present & template has {{...}}) -->
+    <?php 
+    $showVarFlag = $mergedNotes['show_variable_injector'] ?? ($mergedNotes['show_variables'] ?? true);
+    $showVariablesBlock = ($showVarFlag !== false && $showVarFlag !== '0' && $showVarFlag !== 0) && !empty($variables) && count($variables) > 0 && str_contains($prompt['prompt_template'] ?? '', '{{');
+    ?>
+    <?php if ($showVariablesBlock): ?>
       <div class="ts-card" style="margin-bottom: 2rem; border-color: rgba(16, 185, 129, 0.4); border-radius: 14px;">
         <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; color: #34d399;">
           <i data-lucide="sliders" style="width: 18px;"></i> Dynamic Variable Injector

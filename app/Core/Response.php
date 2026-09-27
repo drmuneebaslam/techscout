@@ -13,6 +13,29 @@ class Response {
         exit;
     }
 
+    public static function setPublicCache(int $maxAge = 60, int $sMaxAge = 300, array $tags = []): void {
+        if (!headers_sent()) {
+            $isLoggedIn = !empty($_SESSION['user_id']) || !empty($_SESSION['admin_logged_in']);
+            if (!$isLoggedIn && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+                header("Cache-Control: public, max-age={$maxAge}, s-maxage={$sMaxAge}, stale-while-revalidate=60");
+                if (!empty($tags)) {
+                    header("X-Cache-Tags: " . implode(',', $tags));
+                }
+            } else {
+                header("Cache-Control: private, no-cache, no-store, must-revalidate");
+                header("Pragma: no-cache");
+            }
+        }
+    }
+
+    public static function setPrivateCache(): void {
+        if (!headers_sent()) {
+            header("Cache-Control: private, no-cache, no-store, must-revalidate");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+        }
+    }
+
     public static function view(string $viewPath, array $data = []): void {
         extract($data);
         $fullPath = __DIR__ . '/../../views/' . ltrim($viewPath, '/') . '.php';

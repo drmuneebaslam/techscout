@@ -587,7 +587,14 @@ class AdminController {
             'aspect_ratio' => (string)$request->post('param_aspect_ratio', '16:9'),
             'rating' => (float)$request->post('param_rating', 4.9),
             'difficulty' => (string)$request->post('param_difficulty', 'Intermediate'),
-            'author_handle' => (string)$request->post('param_author_handle', '@techscout')
+            'author_handle' => (string)$request->post('param_author_handle', '@techscout'),
+            'show_parameters' => ($request->post('param_show_parameters') !== null) ? (!empty($request->post('param_show_parameters')) ? 1 : 0) : 1,
+            'show_models' => ($request->post('param_show_models') !== null) ? (!empty($request->post('param_show_models')) ? 1 : 0) : 1,
+            'show_aspect_ratio' => ($request->post('param_show_aspect_ratio') !== null) ? (!empty($request->post('param_show_aspect_ratio')) ? 1 : 0) : 1,
+            'show_negative_prompt' => ($request->post('param_show_negative_prompt') !== null) ? (!empty($request->post('param_show_negative_prompt')) ? 1 : 0) : 1,
+            'show_temperature' => ($request->post('param_show_temperature') !== null) ? (!empty($request->post('param_show_temperature')) ? 1 : 0) : 1,
+            'show_difficulty' => ($request->post('param_show_difficulty') !== null) ? (!empty($request->post('param_show_difficulty')) ? 1 : 0) : 1,
+            'show_variable_injector' => ($request->post('param_show_variable_injector') !== null) ? (!empty($request->post('param_show_variable_injector')) ? 1 : 0) : 1
         ];
 
         // Parse Dynamic Additional Custom Links
@@ -719,8 +726,8 @@ class AdminController {
             Database::execute("UPDATE contents SET title = ?, slug = ?, category_id = ?, summary = ?, body_html = ?, featured_image_url = ?, custom_badge = ?, is_featured = ?, is_trending = ?, quality_score = ?, status = ?, internal_notes = ?, updated_at = NOW() WHERE id = ?", [
                 $title, $slug, $categoryId, $summary, $bodyHtml, $imageUrl, $customBadge, $isFeatured, $isTrending, $qualityScore, $status, $internalNotes, $id
             ]);
-            Database::execute("UPDATE prompts SET prompt_type = ?, prompt_template = ?, template_variables = ?, target_models = ?, sample_output = ? WHERE content_id = ?", [
-                $promptType, $template, $variablesJson, $targetModelsJson, $sampleOutput, $id
+            Database::execute("UPDATE prompts SET prompt_type = ?, prompt_template = ?, template_variables = ?, target_models = ?, sample_output = ?, parameters_json = ? WHERE content_id = ?", [
+                $promptType, $template, $variablesJson, $targetModelsJson, $sampleOutput, $internalNotes, $id
             ]);
             AuditLog::log('admin.prompt_update', 'prompt', (int)$id, ['title' => $title, 'prompt_type' => $promptType]);
             Session::flash('success', "Prompt blueprint '{$title}' updated successfully.");
@@ -730,8 +737,8 @@ class AdminController {
                 $uuid, $authorId, $categoryId, $title, $slug, $summary, $bodyHtml, $imageUrl, $customBadge, $isFeatured, $isTrending, $qualityScore, $status, $internalNotes
             ]);
             $newId = (int)Database::lastInsertId();
-            Database::execute("INSERT INTO prompts (content_id, prompt_type, prompt_template, template_variables, target_models, sample_output) VALUES (?, ?, ?, ?, ?, ?)", [
-                $newId, $promptType, $template, $variablesJson, $targetModelsJson, $sampleOutput
+            Database::execute("INSERT INTO prompts (content_id, prompt_type, prompt_template, template_variables, target_models, sample_output, parameters_json) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+                $newId, $promptType, $template, $variablesJson, $targetModelsJson, $sampleOutput, $internalNotes
             ]);
             AuditLog::log('admin.prompt_create', 'prompt', $newId, ['title' => $title, 'prompt_type' => $promptType]);
             Session::flash('success', "Prompt blueprint created successfully.");

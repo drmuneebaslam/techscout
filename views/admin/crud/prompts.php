@@ -447,6 +447,48 @@
           </div>
         </div>
 
+        <!-- Frontend Display & Customization Controls (Show/Hide Metadata on Single Prompt Page) -->
+        <div style="background: var(--admin-card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <i data-lucide="eye" style="width: 16px; height: 16px; color: #10b981;"></i>
+            <strong style="color: var(--admin-text-primary, #f8fafc); font-size: 0.92rem;">Frontend Single Page Metadata Visibility</strong>
+            <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">Customizable</span>
+          </div>
+          <p style="font-size: 0.76rem; color: var(--admin-text-secondary, #94a3b8); margin: 0 0 0.85rem 0;">
+            Choose which parameters and metadata modules are visible to visitors on this prompt's single page.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: var(--admin-text-primary, #f8fafc);">
+              <input type="checkbox" name="param_show_parameters" id="prompt_show_parameters" value="1" checked>
+              <span>Show Blueprint Parameters Bar</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: var(--admin-text-primary, #f8fafc);">
+              <input type="checkbox" name="param_show_models" id="prompt_show_models" value="1" checked>
+              <span>Show Target Model(s)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: var(--admin-text-primary, #f8fafc);">
+              <input type="checkbox" name="param_show_aspect_ratio" id="prompt_show_aspect_ratio" value="1" checked>
+              <span>Show Aspect Ratio (--ar)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: var(--admin-text-primary, #f8fafc);">
+              <input type="checkbox" name="param_show_negative_prompt" id="prompt_show_negative_prompt" value="1" checked>
+              <span>Show Negative Prompt</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: var(--admin-text-primary, #f8fafc);">
+              <input type="checkbox" name="param_show_temperature" id="prompt_show_temperature" value="1" checked>
+              <span>Show Temperature &amp; Top_P</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: var(--admin-text-primary, #f8fafc);">
+              <input type="checkbox" name="param_show_difficulty" id="prompt_show_difficulty" value="1" checked>
+              <span>Show Complexity Tier</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: var(--admin-text-primary, #f8fafc);">
+              <input type="checkbox" name="param_show_variable_injector" id="prompt_show_variable_injector" value="1" checked>
+              <span>Show Dynamic Variable Injector</span>
+            </label>
+          </div>
+        </div>
+
         <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
           <button type="button" onclick="switchPromptTab('prompt-tab-architecture')" class="ts-btn ts-btn-outline">
             ← Back: Variables
@@ -1207,6 +1249,13 @@ function openNewPromptModal() {
   document.getElementById('prompt_max_tokens').value = '4096';
   document.getElementById('prompt_quality_score').value = '96.5';
   document.getElementById('prompt_status').value = 'published';
+  document.getElementById('prompt_show_parameters').checked = true;
+  document.getElementById('prompt_show_models').checked = true;
+  document.getElementById('prompt_show_aspect_ratio').checked = true;
+  document.getElementById('prompt_show_negative_prompt').checked = true;
+  document.getElementById('prompt_show_temperature').checked = true;
+  document.getElementById('prompt_show_difficulty').checked = true;
+  document.getElementById('prompt_show_variable_injector').checked = true;
   renderPromptCustomLinks([]);
 
   switchPromptTab('prompt-tab-identity');
@@ -1288,8 +1337,25 @@ function editPrompt(p) {
     if (notes.author_handle !== undefined) document.getElementById('prompt_author_handle').value = notes.author_handle;
     if (notes.negative_prompt !== undefined) document.getElementById('prompt_negative_prompt').value = notes.negative_prompt;
     if (notes.aspect_ratio !== undefined) document.getElementById('prompt_aspect_ratio').value = notes.aspect_ratio;
+    
+    // Visibility flags (default to true if not set)
+    document.getElementById('prompt_show_parameters').checked = (notes.show_parameters === undefined || notes.show_parameters === 1 || notes.show_parameters === true || notes.show_parameters === '1');
+    document.getElementById('prompt_show_models').checked = (notes.show_models === undefined || notes.show_models === 1 || notes.show_models === true || notes.show_models === '1');
+    document.getElementById('prompt_show_aspect_ratio').checked = (notes.show_aspect_ratio === undefined || notes.show_aspect_ratio === 1 || notes.show_aspect_ratio === true || notes.show_aspect_ratio === '1');
+    document.getElementById('prompt_show_negative_prompt').checked = (notes.show_negative_prompt === undefined || notes.show_negative_prompt === 1 || notes.show_negative_prompt === true || notes.show_negative_prompt === '1');
+    document.getElementById('prompt_show_temperature').checked = (notes.show_temperature === undefined || notes.show_temperature === 1 || notes.show_temperature === true || notes.show_temperature === '1');
+    document.getElementById('prompt_show_difficulty').checked = (notes.show_difficulty === undefined || notes.show_difficulty === 1 || notes.show_difficulty === true || notes.show_difficulty === '1');
+    document.getElementById('prompt_show_variable_injector').checked = (notes.show_variable_injector === undefined || notes.show_variable_injector === 1 || notes.show_variable_injector === true || notes.show_variable_injector === '1');
+
     renderPromptCustomLinks(notes.custom_links || []);
   } catch(e) {
+    document.getElementById('prompt_show_parameters').checked = true;
+    document.getElementById('prompt_show_models').checked = true;
+    document.getElementById('prompt_show_aspect_ratio').checked = true;
+    document.getElementById('prompt_show_negative_prompt').checked = true;
+    document.getElementById('prompt_show_temperature').checked = true;
+    document.getElementById('prompt_show_difficulty').checked = true;
+    document.getElementById('prompt_show_variable_injector').checked = true;
     renderPromptCustomLinks([]);
   }
 
