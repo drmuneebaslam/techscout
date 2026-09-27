@@ -2195,6 +2195,9 @@ class ApiController {
         $newBatch = $maxBatch + 1;
         $migRan = 0;
         $pdo = Database::getConnection();
+        try {
+            $pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+        } catch (\Throwable $e) {}
 
         foreach ($migrationFiles as $mf) {
             $baseName = basename($mf, '.sql');
@@ -2205,11 +2208,24 @@ class ApiController {
                     $sClean = trim(preg_replace('/^\s*--[^\n]*/m', '', $s));
                     if (!empty($sClean)) {
                         try {
-                            $pdo->exec($sClean);
-                        } catch (\Throwable $e) {}
+                            $stmt = $pdo->query($sClean);
+                            if ($stmt instanceof \PDOStatement) {
+                                $stmt->closeCursor();
+                            }
+                        } catch (\Throwable $e) {
+                            try {
+                                $pdo->exec($sClean);
+                            } catch (\Throwable $e2) {}
+                        }
                     }
                 }
-                $pdo->prepare("INSERT INTO migrations (migration_name, batch, applied_at) VALUES (?, ?, NOW())")->execute([$baseName, $newBatch]);
+                try {
+                    $ins = $pdo->prepare("INSERT INTO migrations (migration_name, batch, applied_at) VALUES (?, ?, NOW())");
+                    $ins->execute([$baseName, $newBatch]);
+                    if ($ins instanceof \PDOStatement) {
+                        $ins->closeCursor();
+                    }
+                } catch (\Throwable $e) {}
                 $migRan++;
             }
         }
