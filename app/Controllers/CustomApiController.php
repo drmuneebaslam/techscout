@@ -489,7 +489,7 @@ class CustomApiController {
                 $dataSql = "SELECT t.*, 
                                    c.title as content_title, c.slug as content_slug, c.summary as content_summary, 
                                    c.featured_image_url, c.content_type, c.status as content_status, 
-                                   c.view_count, c.like_count, c.published_at,
+                                   c.view_count, c.reaction_count as like_count, c.published_at,
                                    cat.name as category_name, cat.slug as category_slug,
                                    u.username as author_username, u.email as author_email
                             FROM `{$table}` t
