@@ -1,8 +1,7 @@
 <?php require __DIR__ . '/../layouts/admin_header.php'; ?>
 
-<div class="admin-main">
-  <!-- Topbar -->
-  <div class="admin-topbar">
+<!-- Topbar -->
+<div class="admin-topbar">
     <div>
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-indigo">ENTERPRISE API BUILDER &bull; DATA GATEWAY</span>
@@ -229,9 +228,9 @@
   </div>
 
   <!-- LIVE SANDBOX & RESPONSE INSPECTOR MODAL -->
-  <div id="apiSandboxModal" class="admin-modal" style="display: none;">
+  <div id="apiSandboxModal" class="admin-modal-overlay" style="display: none;">
     <div class="admin-modal-backdrop" onclick="closeApiTester()"></div>
-    <div class="admin-modal-content" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
+    <div class="admin-modal-box modal-cyan" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
       <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
         <div style="display: flex; align-items: center; gap: 0.65rem;">
           <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE API SANDBOX &amp; C.R.U.D. RUNNER</span>
@@ -279,12 +278,11 @@
       </div>
     </div>
   </div>
-</div>
 
 <!-- Modal: Create New API Endpoint -->
-<div id="newEndpointModal" class="admin-modal" style="display: none;">
+<div id="newEndpointModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeNewEndpointModal()"></div>
-  <div class="admin-modal-content" style="max-width: 620px;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 620px;">
     <div class="admin-modal-header">
       <h3 style="margin: 0; color: var(--admin-text-primary);">Create Custom API Endpoint</h3>
       <button type="button" onclick="closeNewEndpointModal()" class="admin-modal-close">&times;</button>
@@ -371,9 +369,9 @@
 </div>
 
 <!-- Modal: Edit API Endpoint (100x Enhanced) -->
-<div id="editEndpointModal" class="admin-modal" style="display: none;">
+<div id="editEndpointModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeEditEndpointModal()"></div>
-  <div class="admin-modal-content" style="max-width: 640px;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 640px;">
     <div class="admin-modal-header">
       <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span class="ts-badge ts-badge-indigo">ENDPOINT CONFIG</span>
@@ -460,9 +458,9 @@
 </div>
 
 <!-- Modal: Multi-Table Relational Query Builder (100x Enhanced) -->
-<div id="multiTableQueryModal" class="admin-modal" style="display: none;">
+<div id="multiTableQueryModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeMultiTableQueryModal()"></div>
-  <div class="admin-modal-content" style="max-width: 760px;">
+  <div class="admin-modal-box modal-indigo" style="max-width: 760px;">
     <div class="admin-modal-header">
       <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span class="ts-badge ts-badge-indigo">MULTI-TABLE GATEWAY</span>
@@ -535,9 +533,9 @@
 </div>
 
 <!-- Modal: All Tables Sample Data & Schema Catalog (100x Enhanced) -->
-<div id="allTablesCatalogModal" class="admin-modal" style="display: none;">
+<div id="allTablesCatalogModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeAllTablesCatalogModal()"></div>
-  <div class="admin-modal-content" style="max-width: 820px;">
+  <div class="admin-modal-box modal-amber" style="max-width: 820px;">
     <div class="admin-modal-header">
       <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span class="ts-badge ts-badge-green">ALL TABLES CATALOG</span>

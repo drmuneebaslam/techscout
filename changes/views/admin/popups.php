@@ -1,117 +1,115 @@
 <?php require __DIR__ . '/../layouts/admin_header.php'; ?>
 
-<div class="admin-main">
-  <!-- Topbar -->
-  <div class="admin-topbar">
-    <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-        <span class="ts-badge ts-badge-pink">ENGAGEMENT &bull; TARGETED CONVERSIONS</span>
-        <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Exit-Intent Modals, Lead Magnets &amp; Broadcast Overlays</span>
-      </div>
-      <h1 style="font-size: 1.6rem; color: var(--admin-text-primary); margin: 0; font-family: var(--admin-font-heading); font-weight: 800;">
-        Custom Popup &amp; Conversion Studio
-      </h1>
+<!-- Topbar -->
+<div class="admin-topbar">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <span class="ts-badge ts-badge-pink">ENGAGEMENT &bull; TARGETED CONVERSIONS</span>
+      <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Exit-Intent Modals, Lead Magnets &amp; Broadcast Overlays</span>
     </div>
-
-    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
-      <button type="button" onclick="openNewPopupModal()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
-        <i data-lucide="plus"></i> Create New Popup 🚀
-      </button>
-    </div>
+    <h1 style="font-size: 1.6rem; color: var(--admin-text-primary); margin: 0; font-family: var(--admin-font-heading); font-weight: 800;">
+      Custom Popup &amp; Conversion Studio
+    </h1>
   </div>
 
-  <!-- Popups Roster Grid -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
-    <?php if (!empty($popups)): ?>
-      <?php foreach ($popups as $p): 
-        $views = (int)($p['views_count'] ?? 0);
-        $clicks = (int)($p['clicks_count'] ?? 0);
-        $ctr = ($views > 0) ? round(($clicks / $views) * 100, 1) : 0;
-      ?>
-        <div class="admin-card" style="padding: 1.5rem; border-radius: 14px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg); display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.12); transition: transform 0.2s ease, border-color 0.2s ease;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.65rem; gap: 0.5rem; flex-wrap: wrap;">
-              <span class="ts-badge ts-badge-pink" style="font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px;">
-                <?= htmlspecialchars($p['badge_text'] ?? 'ANNOUNCEMENT') ?>
-              </span>
-              <div style="display: flex; gap: 0.35rem; align-items: center;">
-                <span class="ts-badge <?= !empty($p['is_active']) ? 'ts-badge-green' : 'ts-badge-pink' ?>" style="font-size: 0.68rem; font-weight: 800;">
-                  <?= !empty($p['is_active']) ? 'ACTIVE' : 'PAUSED' ?>
-                </span>
-                <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem;">
-                  CTR: <?= $ctr ?>%
-                </span>
-              </div>
-            </div>
-
-            <h3 style="font-size: 1.15rem; color: var(--admin-text-primary); margin: 0 0 0.35rem 0; font-weight: 800; font-family: var(--admin-font-heading);">
-              <?= htmlspecialchars($p['title']) ?>
-            </h3>
-
-            <h4 style="font-size: 0.92rem; color: var(--admin-text-secondary); margin: 0 0 0.85rem 0; font-weight: 600; line-height: 1.4;">
-              <?= htmlspecialchars($p['headline']) ?>
-            </h4>
-
-            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem;">
-              <span class="ts-badge ts-badge-cyan" style="font-size: 0.7rem;">
-                Audience: <?= strtoupper(htmlspecialchars($p['target_audience'])) ?>
-              </span>
-              <span class="ts-badge ts-badge-amber" style="font-size: 0.7rem;">
-                Trigger: <?= strtoupper(htmlspecialchars($p['display_trigger'])) ?> (<?= (int)$p['trigger_delay_seconds'] ?>s)
-              </span>
-              <span class="ts-badge" style="font-size: 0.7rem; background: rgba(99,102,241,0.15); color: #818cf8; font-weight: 600;">
-                Freq: <?= htmlspecialchars($p['frequency']) ?>
-              </span>
-              <span class="ts-badge" style="font-size: 0.7rem; background: rgba(16,185,129,0.15); color: #10b981; font-weight: 600;">
-                Theme: <?= htmlspecialchars($p['popup_theme']) ?>
-              </span>
-            </div>
-
-            <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.78rem; color: var(--admin-text-secondary); margin-bottom: 1rem;">
-              CTA: <strong style="color: #38bdf8;"><?= htmlspecialchars($p['cta_button_text']) ?></strong> &rarr; <span style="font-family: var(--admin-font-mono); word-break: break-all;"><?= htmlspecialchars($p['cta_button_url']) ?></span>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--admin-text-secondary); margin-bottom: 0.75rem; border-top: 1px solid var(--admin-border-subtle); padding-top: 0.6rem;">
-              <span>Impressions: <strong style="color: var(--admin-text-primary);"><?= number_format($views) ?></strong></span>
-              <span>Clicks: <strong style="color: #10b981;"><?= number_format($clicks) ?></strong></span>
-            </div>
-          </div>
-
-          <div style="display: flex; gap: 0.4rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.85rem; flex-wrap: wrap;">
-            <button type="button" onclick='previewPopup(<?= json_encode($p, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="admin-btn admin-btn-outline admin-btn-sm" style="flex: 1; font-size: 0.76rem; font-weight: 700;">
-              <i data-lucide="eye"></i> Live Preview
-            </button>
-            <button type="button" onclick='editPopup(<?= json_encode($p, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="admin-btn admin-btn-outline admin-btn-sm" style="color: #38bdf8; font-size: 0.76rem;" title="Edit Popup">
-              <i data-lucide="edit-3" style="width: 13px; height: 13px;"></i> Edit
-            </button>
-            <form action="<?= url('/admin/popups/toggle/' . $p['id']) ?>" method="POST" style="margin: 0;">
-              <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Active Status">
-                <i data-lucide="<?= !empty($p['is_active']) ? 'pause' : 'play' ?>" style="width: 13px; height: 13px;"></i>
-              </button>
-            </form>
-            <form action="<?= url('/admin/popups/delete/' . $p['id']) ?>" method="POST" onsubmit="return confirm('Permanently remove this popup?');" style="margin: 0;">
-              <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;" title="Delete Popup">
-                <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
-              </button>
-            </form>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    <?php else: ?>
-      <div class="admin-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-        <i data-lucide="bell" style="width: 44px; height: 44px; color: var(--admin-text-secondary); margin-bottom: 0.75rem;"></i>
-        <h3 style="color: var(--admin-text-primary); margin: 0 0 0.5rem 0;">No Custom Popups Created</h3>
-        <p style="color: var(--admin-text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">Deploy high-converting modals and announcements targeted to guests, logged-in members, or supporters.</p>
-        <button type="button" onclick="openNewPopupModal()" class="admin-btn admin-btn-primary">Create First Popup</button>
-      </div>
-    <?php endif; ?>
+  <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+    <button type="button" onclick="openNewPopupModal()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
+      <i data-lucide="plus"></i> Create New Popup 🚀
+    </button>
   </div>
 </div>
 
+<!-- Popups Roster Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+  <?php if (!empty($popups)): ?>
+    <?php foreach ($popups as $p): 
+      $views = (int)($p['views_count'] ?? 0);
+      $clicks = (int)($p['clicks_count'] ?? 0);
+      $ctr = ($views > 0) ? round(($clicks / $views) * 100, 1) : 0;
+    ?>
+      <div class="admin-card" style="padding: 1.5rem; border-radius: 14px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg); display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.12); transition: transform 0.2s ease, border-color 0.2s ease;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.65rem; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="ts-badge ts-badge-pink" style="font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px;">
+              <?= htmlspecialchars($p['badge_text'] ?? 'ANNOUNCEMENT') ?>
+            </span>
+            <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <span class="ts-badge <?= !empty($p['is_active']) ? 'ts-badge-green' : 'ts-badge-pink' ?>" style="font-size: 0.68rem; font-weight: 800;">
+                <?= !empty($p['is_active']) ? 'ACTIVE' : 'PAUSED' ?>
+              </span>
+              <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem;">
+                CTR: <?= $ctr ?>%
+              </span>
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.15rem; color: var(--admin-text-primary); margin: 0 0 0.35rem 0; font-weight: 800; font-family: var(--admin-font-heading);">
+            <?= htmlspecialchars($p['title']) ?>
+          </h3>
+
+          <h4 style="font-size: 0.92rem; color: var(--admin-text-secondary); margin: 0 0 0.85rem 0; font-weight: 600; line-height: 1.4;">
+            <?= htmlspecialchars($p['headline']) ?>
+          </h4>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem;">
+            <span class="ts-badge ts-badge-cyan" style="font-size: 0.7rem;">
+              Audience: <?= strtoupper(htmlspecialchars($p['target_audience'])) ?>
+            </span>
+            <span class="ts-badge ts-badge-amber" style="font-size: 0.7rem;">
+              Trigger: <?= strtoupper(htmlspecialchars($p['display_trigger'])) ?> (<?= (int)$p['trigger_delay_seconds'] ?>s)
+            </span>
+            <span class="ts-badge" style="font-size: 0.7rem; background: rgba(99,102,241,0.15); color: #818cf8; font-weight: 600;">
+              Freq: <?= htmlspecialchars($p['frequency']) ?>
+            </span>
+            <span class="ts-badge" style="font-size: 0.7rem; background: rgba(16,185,129,0.15); color: #10b981; font-weight: 600;">
+              Theme: <?= htmlspecialchars($p['popup_theme']) ?>
+            </span>
+          </div>
+
+          <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.78rem; color: var(--admin-text-secondary); margin-bottom: 1rem;">
+            CTA: <strong style="color: #38bdf8;"><?= htmlspecialchars($p['cta_button_text']) ?></strong> &rarr; <span style="font-family: var(--admin-font-mono); word-break: break-all;"><?= htmlspecialchars($p['cta_button_url']) ?></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--admin-text-secondary); margin-bottom: 0.75rem; border-top: 1px solid var(--admin-border-subtle); padding-top: 0.6rem;">
+            <span>Impressions: <strong style="color: var(--admin-text-primary);"><?= number_format($views) ?></strong></span>
+            <span>Clicks: <strong style="color: #10b981;"><?= number_format($clicks) ?></strong></span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.4rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.85rem; flex-wrap: wrap;">
+          <button type="button" onclick='previewPopup(<?= json_encode($p, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="admin-btn admin-btn-outline admin-btn-sm" style="flex: 1; font-size: 0.76rem; font-weight: 700;">
+            <i data-lucide="eye"></i> Live Preview
+          </button>
+          <button type="button" onclick='editPopup(<?= json_encode($p, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="admin-btn admin-btn-outline admin-btn-sm" style="color: #38bdf8; font-size: 0.76rem;" title="Edit Popup">
+            <i data-lucide="edit-3" style="width: 13px; height: 13px;"></i> Edit
+          </button>
+          <form action="<?= url('/admin/popups/toggle/' . $p['id']) ?>" method="POST" style="margin: 0;">
+            <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Active Status">
+              <i data-lucide="<?= !empty($p['is_active']) ? 'pause' : 'play' ?>" style="width: 13px; height: 13px;"></i>
+            </button>
+          </form>
+          <form action="<?= url('/admin/popups/delete/' . $p['id']) ?>" method="POST" onsubmit="return confirm('Permanently remove this popup?');" style="margin: 0;">
+            <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;" title="Delete Popup">
+              <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  <?php else: ?>
+    <div class="admin-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+      <i data-lucide="bell" style="width: 44px; height: 44px; color: var(--admin-text-secondary); margin-bottom: 0.75rem;"></i>
+      <h3 style="color: var(--admin-text-primary); margin: 0 0 0.5rem 0;">No Custom Popups Created</h3>
+      <p style="color: var(--admin-text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">Deploy high-converting modals and announcements targeted to guests, logged-in members, or supporters.</p>
+      <button type="button" onclick="openNewPopupModal()" class="admin-btn admin-btn-primary">Create First Popup</button>
+    </div>
+  <?php endif; ?>
+</div>
+
 <!-- Modal: Create / Edit Popup with Split-Pane Live Simulator -->
-<div id="popupModal" class="admin-modal" style="display: none; z-index: 99999;">
+<div id="popupModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closePopupModal()"></div>
-  <div class="admin-modal-content" style="max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+  <div class="admin-modal-box modal-indigo" style="max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
     <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center;">
       <h3 id="popupModalTitle" style="margin: 0; color: var(--admin-text-primary); font-size: 1.2rem; font-family: var(--admin-font-heading); font-weight: 800;">Create Custom Popup</h3>
       <button type="button" onclick="closePopupModal()" class="admin-modal-close" style="background: none; border: none; font-size: 1.5rem; color: var(--admin-text-secondary); cursor: pointer;">&times;</button>
@@ -250,9 +248,9 @@
 </div>
 
 <!-- Standalone Live Interactive Popup Simulator Modal -->
-<div id="popupSimulatorModal" class="admin-modal" style="display: none; z-index: 99999;">
+<div id="popupSimulatorModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closePopupSimulator()"></div>
-  <div class="admin-modal-content" style="max-width: 540px; padding: 0; background: transparent; border: none; box-shadow: none;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 540px; padding: 0; background: transparent; border: none; box-shadow: none;">
     <div id="simPopupContainer" style="border-radius: 16px; padding: 2.25rem; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); overflow: hidden;">
       <button type="button" onclick="closePopupSimulator()" style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.15); border: none; color: inherit; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
       

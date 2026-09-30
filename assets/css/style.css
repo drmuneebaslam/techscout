@@ -2417,18 +2417,19 @@ pre {
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  animation: tsModalFadeIn 0.2s ease-out forwards;
+  transform: none !important;
+  animation: tsModalFadeIn 0.15s ease-out forwards;
 }
 
 .admin-modal-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 1;
 }
 
 @keyframes tsModalFadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .admin-modal-content,
@@ -2443,6 +2444,7 @@ pre {
   position: relative;
   z-index: 2;
   overflow: hidden;
+  animation: adminModalBoxPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   max-height: 90vh;
   overflow-y: auto;
   color: var(--ts-text-primary);

@@ -1,8 +1,7 @@
 <?php require __DIR__ . '/../layouts/admin_header.php'; ?>
 
-<div class="admin-main">
-  <!-- Topbar -->
-  <div class="admin-topbar">
+<!-- Topbar -->
+<div class="admin-topbar">
     <div>
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">100X INGESTION GATEWAY &bull; MULTI-TABLE SYNC</span>
@@ -192,14 +191,13 @@
       </tbody>
     </table>
   </div>
-</div>
 
 <!-- ========================================================================= -->
 <!-- MODAL 1: FLOATING LIVE LISTENER & DYNAMIC FIELD MAPPER STUDIO MODAL       -->
 <!-- ========================================================================= -->
-<div id="listenerStudioModal" class="admin-modal" style="display: none;">
+<div id="listenerStudioModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeLiveListener()"></div>
-  <div class="admin-modal-content" style="max-width: 1040px; max-height: 92vh; display: flex; flex-direction: column; padding: 0;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 1040px; max-height: 92vh; display: flex; flex-direction: column; padding: 0;">
     
     <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
       <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -290,9 +288,9 @@
 <!-- ========================================================================= -->
 <!-- MODAL 2: CREATE NEW INGESTION WEBHOOK                                     -->
 <!-- ========================================================================= -->
-<div id="newIncomingModal" class="admin-modal" style="display: none;">
+<div id="newIncomingModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeNewIncomingModal()"></div>
-  <div class="admin-modal-content" style="max-width: 580px;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 580px;">
     <div class="admin-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
       <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 800;">
         <i data-lucide="plus-circle" style="color: #38bdf8;"></i> Create Ingestion Webhook Endpoint
@@ -365,9 +363,9 @@
 <!-- ========================================================================= -->
 <!-- MODAL 3: TABBED WEBHOOK EDIT & STRICT VALIDATION STUDIO                   -->
 <!-- ========================================================================= -->
-<div id="editIncomingModal" class="admin-modal" style="display: none;">
+<div id="editIncomingModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeEditIncomingModal()"></div>
-  <div class="admin-modal-content" style="max-width: 880px; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
+  <div class="admin-modal-box modal-cyan" style="max-width: 880px; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
     
     <!-- Modal Header -->
     <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
@@ -456,9 +454,9 @@
 <!-- ========================================================================= -->
 <!-- MODAL 4: INGESTION ARCHITECTURE TUTORIAL & BLUEPRINTS                     -->
 <!-- ========================================================================= -->
-<div id="tutorialModal" class="admin-modal" style="display: none;">
+<div id="tutorialModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeTutorialModal()"></div>
-  <div class="admin-modal-content" style="max-width: 840px; max-height: 88vh; display: flex; flex-direction: column; padding: 0;">
+  <div class="admin-modal-box modal-indigo" style="max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
     <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
       <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 800;">
         <i data-lucide="book-open" style="color: #38bdf8;"></i> Ingestion Tutorial &amp; Architecture Blueprint
@@ -570,9 +568,9 @@ print(response.status_code, response.json())</pre>
 <!-- ========================================================================= -->
 <!-- MODAL 5: ALL TABLES SAMPLE DATA GENERATOR                                 -->
 <!-- ========================================================================= -->
-<div id="sampleGeneratorModal" class="admin-modal" style="display: none;">
+<div id="sampleGeneratorModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-backdrop" onclick="closeSampleGeneratorModal()"></div>
-  <div class="admin-modal-content" style="max-width: 780px; max-height: 88vh; display: flex; flex-direction: column; padding: 0;">
+  <div class="admin-modal-box modal-amber" style="max-width: 780px; max-height: 88vh; display: flex; flex-direction: column; padding: 0;">
     <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
       <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 800;">
         <i data-lucide="sparkles" style="color: #a855f7;"></i> All Tables Sample Data Generator
