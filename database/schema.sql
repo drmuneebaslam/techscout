@@ -1067,6 +1067,8 @@ CREATE TABLE `prompts` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`content_id`),
   CONSTRAINT `fk_prompts_content` FOREIGN KEY (`content_id`) REFERENCES `contents` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS `custom_api_endpoints`;
 CREATE TABLE `custom_api_endpoints` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

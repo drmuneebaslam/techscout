@@ -693,49 +693,6 @@ class IncomingWebhookEngine {
         ];
     }
 
-    /**
-     * Inspect recent captured payloads for an endpoint to show actual incoming keys
-     */
-    public static function getRecentCapturedPayloads(string $slug, int $limit = 5): array {
-        $limit = max(1, (int)$limit);
-        $rows = Database::query(
-            "SELECT id, payload_json, status, response_code, records_affected, created_at, ip_address 
-             FROM incoming_webhook_logs 
-             WHERE endpoint_slug = ? 
-             ORDER BY id DESC LIMIT {$limit}",
-            [$slug]
-        );
-
-        $detectedKeys = [];
-        foreach ($rows as &$r) {
-            $parsed = json_decode($r['payload_json'] ?? '', true);
-            $r['parsed_payload'] = $parsed;
-            if (is_array($parsed)) {
-                $keys = self::extractAllKeys($parsed);
-                $detectedKeys = array_unique(array_merge($detectedKeys, $keys));
-            }
-        }
-
-        return [
-            'logs' => $rows,
-            'detected_keys' => array_values($detectedKeys)
-        ];
-    }
-
-    /**
-     * Flatten nested JSON keys for inspection (e.g. ['title', 'data.prompt', 'author.name'])
-     */
-    private static function extractAllKeys(array $arr, string $prefix = ''): array {
-        $keys = [];
-        foreach ($arr as $k => $v) {
-            $fullKey = $prefix === '' ? (string)$k : "{$prefix}.{$k}";
-            $keys[] = $fullKey;
-            if (is_array($v) && !isset($v[0])) { // Associative array
-                $keys = array_merge($keys, self::extractAllKeys($v, $fullKey));
-            }
-        }
-        return array_unique($keys);
-    }
 
     /**
      * Helper to upsert a row into any database table

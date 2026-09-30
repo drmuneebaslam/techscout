@@ -12,20 +12,17 @@ class PopupManager
     public static function renderActivePopup(): string
     {
         try {
-            $db = Database::getConnection();
             $now = date('Y-m-d H:i:s');
             
-            // Fetch enabled popups within schedule
-            $stmt = $db->prepare("
+            // Fetch enabled popups within schedule using resilient Database helper
+            $popups = Database::query("
                 SELECT * FROM custom_popups 
                 WHERE is_active = 1 
-                  AND (start_date IS NULL OR start_date <= :now1)
-                  AND (end_date IS NULL OR end_date >= :now2)
+                  AND (start_date IS NULL OR start_date = '' OR start_date = '0000-00-00 00:00:00' OR start_date <= ?)
+                  AND (end_date IS NULL OR end_date = '' OR end_date = '0000-00-00 00:00:00' OR end_date >= ?)
                 ORDER BY id DESC
-                LIMIT 5
-            ");
-            $stmt->execute([':now1' => $now, ':now2' => $now]);
-            $popups = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                LIMIT 10
+            ", [$now, $now]);
 
             if (empty($popups)) {
                 return '';
@@ -61,22 +58,21 @@ class PopupManager
             }
 
             $id = (int)$matchingPopup['id'];
-            $badgeText = htmlspecialchars($matchingPopup['badge_text'] ?? 'ANNOUNCEMENT', ENT_QUOTES, 'UTF-8');
+            $badgeText = htmlspecialchars($matchingPopup['badge_text'] ?? 'FEATURED ANNOUNCEMENT', ENT_QUOTES, 'UTF-8');
             $title = htmlspecialchars($matchingPopup['title'] ?? '', ENT_QUOTES, 'UTF-8');
             $headline = htmlspecialchars($matchingPopup['headline'] ?? '', ENT_QUOTES, 'UTF-8');
             $contentHtml = $matchingPopup['content_html'] ?? '';
-            $ctaText = htmlspecialchars($matchingPopup['cta_button_text'] ?? '', ENT_QUOTES, 'UTF-8');
-            $ctaUrl = htmlspecialchars($matchingPopup['cta_button_url'] ?? '', ENT_QUOTES, 'UTF-8');
+            $ctaText = htmlspecialchars($matchingPopup['cta_button_text'] ?? 'Explore Platform ↗', ENT_QUOTES, 'UTF-8');
+            $ctaUrl = htmlspecialchars($matchingPopup['cta_button_url'] ?? '/', ENT_QUOTES, 'UTF-8');
             $secondaryText = htmlspecialchars($matchingPopup['secondary_button_text'] ?? '', ENT_QUOTES, 'UTF-8');
             $secondaryUrl = htmlspecialchars($matchingPopup['secondary_button_url'] ?? '', ENT_QUOTES, 'UTF-8');
             
             $trigger = htmlspecialchars($matchingPopup['display_trigger'] ?? 'delay', ENT_QUOTES, 'UTF-8');
-            $delay = (int)($matchingPopup['trigger_delay_seconds'] ?? 3);
-            $scrollPct = (int)($matchingPopup['trigger_scroll_percentage'] ?? 50);
+            $delay = max(0, (int)($matchingPopup['trigger_delay_seconds'] ?? 3));
+            $scrollPct = max(5, min(95, (int)($matchingPopup['trigger_scroll_percentage'] ?? 50)));
             $freq = htmlspecialchars($matchingPopup['frequency'] ?? 'once_per_session', ENT_QUOTES, 'UTF-8');
             $theme = htmlspecialchars($matchingPopup['popup_theme'] ?? 'modern_gradient', ENT_QUOTES, 'UTF-8');
 
-            // Theme class mapping
             $themeClass = 'popup-theme-' . preg_replace('/[^a-z0-9_-]/', '', $theme);
 
             ob_start();
@@ -89,9 +85,9 @@ class PopupManager
                  data-scroll="<?= $scrollPct ?>"
                  data-frequency="<?= $freq ?>"
                  style="display: none;">
-                <div class="ts-popup-backdrop" onclick="window.TechScoutPopup.close()"></div>
-                <div class="ts-popup-card" role="dialog" aria-modal="true" aria-labelledby="tsPopupTitle">
-                    <button type="button" class="ts-popup-close-btn" onclick="window.TechScoutPopup.close()" aria-label="Close dialog">
+                <div class="ts-popup-backdrop" onclick="window.TechScoutPopup && window.TechScoutPopup.close()"></div>
+                <div class="ts-popup-card" role="dialog" aria-modal="true" aria-labelledby="tsPopupHeadline">
+                    <button type="button" class="ts-popup-close-btn" onclick="window.TechScoutPopup && window.TechScoutPopup.close()" aria-label="Close dialog">
                         &times;
                     </button>
 
@@ -99,11 +95,11 @@ class PopupManager
                         <?php if (!empty($badgeText)): ?>
                             <span class="ts-popup-badge"><?= $badgeText ?></span>
                         <?php endif; ?>
-                        <?php if (!empty($title)): ?>
-                            <h3 id="tsPopupTitle" class="ts-popup-title"><?= $title ?></h3>
-                        <?php endif; ?>
                         <?php if (!empty($headline)): ?>
-                            <p class="ts-popup-headline"><?= $headline ?></p>
+                            <h3 id="tsPopupHeadline" class="ts-popup-headline"><?= $headline ?></h3>
+                        <?php endif; ?>
+                        <?php if (!empty($title) && $title !== $headline): ?>
+                            <div class="ts-popup-subtitle"><?= $title ?></div>
                         <?php endif; ?>
                     </div>
 
@@ -112,13 +108,13 @@ class PopupManager
                     </div>
 
                     <div class="ts-popup-actions">
-                        <?php if (!empty($secondaryText) && !empty($secondaryUrl)): ?>
-                            <a href="<?= $secondaryUrl ?>" class="ts-popup-btn ts-popup-btn-secondary" onclick="window.TechScoutPopup.close()">
+                        <?php if (!empty($secondaryText)): ?>
+                            <a href="<?= !empty($secondaryUrl) ? $secondaryUrl : 'javascript:void(0)' ?>" class="ts-popup-btn ts-popup-btn-secondary" onclick="window.TechScoutPopup && window.TechScoutPopup.close()">
                                 <?= $secondaryText ?>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($ctaText) && !empty($ctaUrl)): ?>
-                            <a href="<?= $ctaUrl ?>" class="ts-popup-btn ts-popup-btn-primary" onclick="window.TechScoutPopup.trackClick(<?= $id ?>)">
+                            <a href="<?= $ctaUrl ?>" class="ts-popup-btn ts-popup-btn-primary" onclick="window.TechScoutPopup && window.TechScoutPopup.trackClick(<?= $id ?>)">
                                 <span><?= $ctaText ?></span>
                             </a>
                         <?php endif; ?>
@@ -132,23 +128,25 @@ class PopupManager
                 inset: 0;
                 width: 100vw;
                 height: 100vh;
-                z-index: 999999;
+                z-index: 9999999;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 padding: 1.25rem;
                 opacity: 0;
                 visibility: hidden;
+                pointer-events: none;
                 transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             }
             .ts-popup-overlay.active {
                 opacity: 1;
                 visibility: visible;
+                pointer-events: auto;
             }
             .ts-popup-backdrop {
                 position: absolute;
                 inset: 0;
-                background: rgba(15, 23, 42, 0.65);
+                background: rgba(10, 15, 29, 0.75);
                 backdrop-filter: blur(8px);
                 -webkit-backdrop-filter: blur(8px);
             }
@@ -157,14 +155,11 @@ class PopupManager
                 z-index: 2;
                 max-width: 520px;
                 width: 100%;
-                background: var(--bg-card, #ffffff);
-                border: 1px solid var(--border, rgba(0,0,0,0.12));
                 border-radius: 20px;
-                box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
                 padding: 2.25rem;
-                transform: scale(0.92) translateY(12px);
+                transform: scale(0.92) translateY(16px);
                 transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-                color: var(--text-main, #1e293b);
                 box-sizing: border-box;
             }
             .ts-popup-overlay.active .ts-popup-card {
@@ -174,8 +169,8 @@ class PopupManager
                 position: absolute;
                 top: 1.25rem;
                 right: 1.25rem;
-                background: var(--bg-subtle, rgba(0,0,0,0.06));
-                border: 1px solid var(--border, rgba(0,0,0,0.08));
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.15);
                 width: 34px;
                 height: 34px;
                 border-radius: 50%;
@@ -183,7 +178,7 @@ class PopupManager
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                color: var(--text-muted, #64748b);
+                color: inherit;
                 font-size: 1.4rem;
                 line-height: 1;
                 transition: all 0.2s ease;
@@ -202,31 +197,27 @@ class PopupManager
                 letter-spacing: 0.05em;
                 text-transform: uppercase;
                 border-radius: 9999px;
-                background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
-                color: #6366f1;
-                border: 1px solid rgba(99,102,241,0.3);
                 margin-bottom: 0.75rem;
             }
-            .ts-popup-title {
-                font-size: 1.45rem;
+            .ts-popup-headline {
+                font-size: 1.4rem;
                 font-weight: 800;
                 margin: 0 0 0.4rem 0;
                 padding-right: 2rem;
                 letter-spacing: -0.02em;
-                line-height: 1.25;
+                line-height: 1.3;
             }
-            .ts-popup-headline {
-                font-size: 0.96rem;
-                color: var(--text-muted, #64748b);
-                margin: 0 0 1.25rem 0;
-                line-height: 1.5;
-                font-weight: 500;
+            .ts-popup-subtitle {
+                font-size: 0.88rem;
+                opacity: 0.8;
+                margin: 0 0 1rem 0;
+                font-weight: 600;
             }
             .ts-popup-body {
                 font-size: 0.95rem;
                 line-height: 1.6;
-                color: var(--text-secondary, #334155);
                 margin-bottom: 1.75rem;
+                opacity: 0.95;
             }
             .ts-popup-body img {
                 max-width: 100%;
@@ -257,33 +248,92 @@ class PopupManager
                 background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
                 color: #ffffff !important;
                 box-shadow: 0 8px 20px -4px rgba(67, 97, 238, 0.45);
+                border: none;
             }
             .ts-popup-btn-primary:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 12px 25px -4px rgba(67, 97, 238, 0.6);
             }
             .ts-popup-btn-secondary {
-                background: var(--bg-subtle, rgba(0,0,0,0.05));
-                color: var(--text-secondary, #475569) !important;
-                border: 1px solid var(--border, rgba(0,0,0,0.1));
+                background: rgba(255, 255, 255, 0.08);
+                color: inherit !important;
+                border: 1px solid rgba(255, 255, 255, 0.15);
             }
             .ts-popup-btn-secondary:hover {
-                background: var(--bg-hover, rgba(0,0,0,0.08));
+                background: rgba(255, 255, 255, 0.15);
                 transform: translateY(-1px);
             }
-            /* Theme variations */
+
+            /* Theme: Modern Indigo Gradient (Default) */
+            .popup-theme-modern_gradient .ts-popup-card {
+                background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+                border: 1px solid rgba(165, 180, 252, 0.3);
+                color: #ffffff;
+            }
+            .popup-theme-modern_gradient .ts-popup-badge {
+                background: rgba(255, 255, 255, 0.15);
+                color: #ffffff;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+            }
+
+            /* Theme: Sleek Obsidian Glass */
             .popup-theme-dark_glass .ts-popup-card {
                 background: rgba(15, 23, 42, 0.94);
-                backdrop-filter: blur(16px);
-                border-color: rgba(255, 255, 255, 0.12);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(56, 189, 248, 0.3);
                 color: #f8fafc;
             }
-            .popup-theme-cyber_amber .ts-popup-card {
-                border-top: 4px solid #f59e0b;
+            .popup-theme-dark_glass .ts-popup-badge {
+                background: rgba(56, 189, 248, 0.15);
+                color: #38bdf8;
+                border: 1px solid rgba(56, 189, 248, 0.35);
             }
+
+            /* Theme: Cyber Amber Alert */
+            .popup-theme-cyber_amber .ts-popup-card {
+                background: #0f172a;
+                border: 2px solid #f59e0b;
+                color: #fef3c7;
+            }
+            .popup-theme-cyber_amber .ts-popup-badge {
+                background: rgba(245, 158, 11, 0.2);
+                color: #f59e0b;
+                border: 1px solid rgba(245, 158, 11, 0.4);
+            }
+            .popup-theme-cyber_amber .ts-popup-btn-primary {
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                color: #0f172a !important;
+                font-weight: 800;
+            }
+
+            /* Theme: Crisp Minimal Card (Light / Dark Adaptive) */
             .popup-theme-minimal_card .ts-popup-card {
-                border-radius: 12px;
-                box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                color: #0f172a;
+            }
+            .popup-theme-minimal_card .ts-popup-close-btn {
+                background: rgba(0, 0, 0, 0.05);
+                border-color: rgba(0, 0, 0, 0.1);
+                color: #64748b;
+            }
+            .popup-theme-minimal_card .ts-popup-badge {
+                background: rgba(99, 102, 241, 0.1);
+                color: #6366f1;
+                border: 1px solid rgba(99, 102, 241, 0.25);
+            }
+            .popup-theme-minimal_card .ts-popup-btn-secondary {
+                background: #f1f5f9;
+                color: #334155 !important;
+                border-color: #cbd5e1;
+            }
+
+            [data-theme="light"] .popup-theme-minimal_card .ts-popup-card,
+            .theme-light .popup-theme-minimal_card .ts-popup-card {
+                background: #ffffff;
+                color: #0f172a;
+                border: 1px solid #e2e8f0;
             }
             </style>
 
@@ -293,29 +343,35 @@ class PopupManager
                 if (!modal) return;
 
                 var popupId = modal.getAttribute('data-popup-id');
-                var freq = modal.getAttribute('data-frequency');
-                var trigger = modal.getAttribute('data-trigger');
+                var freq = modal.getAttribute('data-frequency') || 'once_per_session';
+                var trigger = modal.getAttribute('data-trigger') || 'delay';
                 var delay = parseInt(modal.getAttribute('data-delay') || '3', 10);
                 var scrollPct = parseInt(modal.getAttribute('data-scroll') || '50', 10);
 
                 var storageKey = 'ts_popup_shown_' + popupId;
+                var urlParams = new URLSearchParams(window.location.search);
+                var isForced = urlParams.has('test_popup') || urlParams.has('preview_popup') || urlParams.has('force_popup') || urlParams.has('popup');
+                var isReset = urlParams.has('reset_popup');
 
-                // Frequency checks
-                if (freq === 'once_ever' && localStorage.getItem(storageKey)) {
-                    return;
-                }
-                if (freq === 'once_per_session' && sessionStorage.getItem(storageKey)) {
-                    return;
+                if (isReset) {
+                    try {
+                        localStorage.removeItem(storageKey);
+                        sessionStorage.removeItem(storageKey);
+                    } catch(e) {}
                 }
 
                 window.TechScoutPopup = {
-                    show: function() {
+                    show: function(force) {
                         modal.style.display = 'flex';
                         setTimeout(function() {
                             modal.classList.add('active');
                         }, 20);
-                        if (freq === 'once_ever') localStorage.setItem(storageKey, '1');
-                        if (freq === 'once_per_session') sessionStorage.setItem(storageKey, '1');
+                        if (!force && freq === 'once_ever') {
+                            try { localStorage.setItem(storageKey, '1'); } catch(e) {}
+                        }
+                        if (!force && freq === 'once_per_session') {
+                            try { sessionStorage.setItem(storageKey, '1'); } catch(e) {}
+                        }
                         try {
                             if (navigator.sendBeacon) {
                                 navigator.sendBeacon('/api/v1/popup-impression?id=' + popupId);
@@ -326,7 +382,17 @@ class PopupManager
                         modal.classList.remove('active');
                         setTimeout(function() {
                             modal.style.display = 'none';
-                        }, 300);
+                        }, 320);
+                    },
+                    reset: function() {
+                        try {
+                            localStorage.removeItem(storageKey);
+                            sessionStorage.removeItem(storageKey);
+                            console.log('TechScout popup frequency cooldown reset for ID #' + popupId);
+                        } catch(e) {}
+                    },
+                    test: function() {
+                        this.show(true);
                     },
                     trackClick: function(id) {
                         try {
@@ -337,12 +403,33 @@ class PopupManager
                     }
                 };
 
+                // Automated trigger evaluation
+                if (isForced) {
+                    setTimeout(function() {
+                        window.TechScoutPopup.show(true);
+                    }, 400);
+                    return;
+                }
+
+                // Check frequency restrictions
+                if (freq === 'once_ever') {
+                    try {
+                        if (localStorage.getItem(storageKey)) return;
+                    } catch(e) {}
+                } else if (freq === 'once_per_session') {
+                    try {
+                        if (sessionStorage.getItem(storageKey)) return;
+                    } catch(e) {}
+                }
+
                 if (trigger === 'immediate') {
-                    window.TechScoutPopup.show();
+                    setTimeout(function() {
+                        window.TechScoutPopup.show(false);
+                    }, 500);
                 } else if (trigger === 'delay') {
                     setTimeout(function() {
-                        window.TechScoutPopup.show();
-                    }, Math.max(500, delay * 1000));
+                        window.TechScoutPopup.show(false);
+                    }, Math.max(800, delay * 1000));
                 } else if (trigger === 'scroll_depth') {
                     var scrollHandled = false;
                     window.addEventListener('scroll', function() {
@@ -352,7 +439,7 @@ class PopupManager
                         var currentPct = (window.scrollY / totalDocHeight) * 100;
                         if (currentPct >= scrollPct) {
                             scrollHandled = true;
-                            window.TechScoutPopup.show();
+                            window.TechScoutPopup.show(false);
                         }
                     }, { passive: true });
                 } else if (trigger === 'exit_intent') {
@@ -361,7 +448,7 @@ class PopupManager
                         if (exitTriggered) return;
                         if (e.clientY <= 10) {
                             exitTriggered = true;
-                            window.TechScoutPopup.show();
+                            window.TechScoutPopup.show(false);
                         }
                     });
                 }
