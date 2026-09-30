@@ -4,5 +4,7 @@ scratch/
 node_modules/
 *.pem
 cintu.txt
+storage/cache/
+
 
 
