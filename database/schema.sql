@@ -1533,6 +1533,7 @@ CREATE TABLE `incoming_webhooks` (
   `mapping_rules_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `auth_type` enum('none','bearer','signature') NOT NULL DEFAULT 'none',
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `ingestion_mode` enum('live_ingest','listen_only') NOT NULL DEFAULT 'live_ingest',
   `received_count` bigint(20) unsigned NOT NULL DEFAULT 0,
   `last_received_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),

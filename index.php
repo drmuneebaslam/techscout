@@ -575,6 +575,7 @@ $router->post('/admin/incoming-webhooks/save', [AdminController::class, 'saveInc
 $router->post('/admin/incoming-webhooks/save-mappings', [AdminController::class, 'saveIncomingWebhookMappings'], ['admin']);
 $router->post('/admin/incoming-webhooks/delete/{id}', [AdminController::class, 'deleteIncomingWebhook'], ['admin']);
 $router->post('/admin/incoming-webhooks/toggle/{id}', [AdminController::class, 'toggleIncomingWebhook'], ['admin']);
+$router->post('/admin/incoming-webhooks/toggle-mode/{id}', [AdminController::class, 'toggleIncomingWebhookMode'], ['admin']);
 $router->post('/admin/incoming-webhooks/clear-logs', [AdminController::class, 'clearIncomingWebhookLogs'], ['admin']);
 
 // Custom API Endpoints Builder & Database Schema Introspector

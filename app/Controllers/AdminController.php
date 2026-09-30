@@ -9146,29 +9146,33 @@ class AdminController {
             $secretKey = 'whsec_ts_live_' . bin2hex(random_bytes(16));
         }
         $mappingRulesJson = trim((string)($request->post('mapping_rules_json', '') ?: ($request->json('mapping_rules_json', '') ?: '')));
+        $ingestionMode = trim((string)($request->post('ingestion_mode', '') ?: ($request->json('ingestion_mode', '') ?: 'live_ingest')));
+        if (!in_array($ingestionMode, ['live_ingest', 'listen_only'], true)) {
+            $ingestionMode = 'live_ingest';
+        }
 
         try {
             if ($id > 0) {
                 if ($mappingRulesJson !== '') {
                     Database::execute(
-                        "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, mapping_rules_json = ?, auth_type = ?, is_active = ? WHERE id = ?",
-                        [$name, $slug, $secretKey, $targetTable, $mappingRulesJson, $authType, $isActive, $id]
+                        "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, mapping_rules_json = ?, auth_type = ?, is_active = ?, ingestion_mode = ? WHERE id = ?",
+                        [$name, $slug, $secretKey, $targetTable, $mappingRulesJson, $authType, $isActive, $ingestionMode, $id]
                     );
                 } else {
                     Database::execute(
-                        "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, auth_type = ?, is_active = ? WHERE id = ?",
-                        [$name, $slug, $secretKey, $targetTable, $authType, $isActive, $id]
+                        "UPDATE incoming_webhooks SET name = ?, slug = ?, secret_key = ?, target_table = ?, auth_type = ?, is_active = ?, ingestion_mode = ? WHERE id = ?",
+                        [$name, $slug, $secretKey, $targetTable, $authType, $isActive, $ingestionMode, $id]
                     );
                 }
-                $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' updated successfully.";
+                $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' updated successfully ({$ingestionMode}).";
             } else {
                 Database::execute(
-                    "INSERT INTO incoming_webhooks (name, slug, secret_key, target_table, mapping_rules_json, auth_type, is_active) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?) 
-                     ON DUPLICATE KEY UPDATE name = VALUES(name), target_table = VALUES(target_table), mapping_rules_json = VALUES(mapping_rules_json), auth_type = VALUES(auth_type), secret_key = VALUES(secret_key), is_active = VALUES(is_active)",
-                    [$name, $slug, $secretKey, $targetTable, $mappingRulesJson ?: '[]', $authType, $isActive]
+                    "INSERT INTO incoming_webhooks (name, slug, secret_key, target_table, mapping_rules_json, auth_type, is_active, ingestion_mode) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?) 
+                     ON DUPLICATE KEY UPDATE name = VALUES(name), target_table = VALUES(target_table), mapping_rules_json = VALUES(mapping_rules_json), auth_type = VALUES(auth_type), secret_key = VALUES(secret_key), is_active = VALUES(is_active), ingestion_mode = VALUES(ingestion_mode)",
+                    [$name, $slug, $secretKey, $targetTable, $mappingRulesJson ?: '[]', $authType, $isActive, $ingestionMode]
                 );
-                $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' created successfully.";
+                $msg = "Ingestion webhook endpoint '/api/v1/webhook/{$slug}' created successfully ({$ingestionMode}).";
             }
             if ($isAjax) {
                 Response::json(['success' => true, 'message' => $msg, 'slug' => $slug]);
@@ -9223,6 +9227,17 @@ class AdminController {
             Session::flash('success', 'Webhook status toggled successfully.');
         } catch (\Throwable $e) {
             Session::flash('error', 'Error toggling webhook: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/incoming-webhooks');
+    }
+
+    public function toggleIncomingWebhookMode(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        try {
+            Database::execute("UPDATE incoming_webhooks SET ingestion_mode = IF(ingestion_mode = 'live_ingest', 'listen_only', 'live_ingest') WHERE id = ?", [$id]);
+            Session::flash('success', 'Webhook ingestion mode toggled successfully.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error toggling webhook mode: ' . $e->getMessage());
         }
         Response::redirect('/admin/incoming-webhooks');
     }

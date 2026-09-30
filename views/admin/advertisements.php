@@ -892,13 +892,28 @@ async function testLivePricingApi() {
       msgEl.innerHTML = '✅ <strong style="color: #10b981;">API Connected Successfully!</strong> Provider: ' + (data.provider || 'CoinGecko') + ' &bull; Latency: ' + (data.latency_ms || 0) + 'ms';
       if (data.rates) {
         let pills = '';
-        for (const [coin, price] of Object.entries(data.rates)) {
-          pills += '<div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); padding: 0.35rem 0.75rem; border-radius: 6px; font-family: var(--admin-font-mono); font-size: 0.8rem; color: var(--admin-text-primary);"><strong style="color: #10b981;">' + coin + ':</strong> $' + Number(price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4}) + '</div>';
+        for (const [coin, val] of Object.entries(data.rates)) {
+          const numPrice = (typeof val === 'object' && val !== null) ? (val.price ?? 0) : Number(val);
+          const change = (typeof val === 'object' && val !== null && val.change_24h !== undefined) ? Number(val.change_24h) : null;
+          const changeBadge = (change !== null) 
+            ? `<span style="font-size: 0.72rem; margin-left: 0.35rem; font-weight: 700; color: ${change >= 0 ? '#10b981' : '#ef4444'};">(${change >= 0 ? '+' : ''}${change.toFixed(2)}%)</span>` 
+            : '';
+          const formatted = isNaN(numPrice) ? '0.00' : Number(numPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+          pills += `<div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); padding: 0.45rem 0.85rem; border-radius: 8px; font-family: var(--admin-font-mono); font-size: 0.82rem; color: var(--admin-text-primary); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;"><strong style="color: #10b981;">${coin}:</strong> <span>$${formatted}${changeBadge}</span></div>`;
         }
         gridEl.innerHTML = pills;
       }
     } else {
       msgEl.innerHTML = '⚠️ <strong style="color: #f59e0b;">' + (data.message || 'Provider warning') + '</strong>';
+      if (data.rates) {
+        let pills = '';
+        for (const [coin, val] of Object.entries(data.rates)) {
+          const numPrice = (typeof val === 'object' && val !== null) ? (val.price ?? 0) : Number(val);
+          const formatted = isNaN(numPrice) ? '0.00' : Number(numPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+          pills += `<div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); padding: 0.45rem 0.85rem; border-radius: 8px; font-family: var(--admin-font-mono); font-size: 0.82rem; color: var(--admin-text-primary);"><strong style="color: #f59e0b;">${coin} (Cached):</strong> $${formatted}</div>`;
+        }
+        gridEl.innerHTML = pills;
+      }
     }
   } catch (err) {
     msgEl.innerHTML = '❌ <strong style="color: #ef4444;">Ping failed: ' + err.message + '</strong>';

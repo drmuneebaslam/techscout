@@ -229,6 +229,40 @@ class IncomingWebhookEngine {
         $defaultConfiguredTable = $webhook['target_table'] ?? 'contents';
         $headerTable = $headers['x-target-table'] ?? ($headers['X-Target-Table'] ?? ($_GET['table'] ?? null));
 
+        // Ingestion Mode: 'listen_only' (Schema Discovery & Mapping) vs 'live_ingest' (Active Database Writes)
+        $isListenOnlyMode = (($webhook['ingestion_mode'] ?? 'live_ingest') === 'listen_only') 
+            || (!empty($_GET['mode']) && strtolower((string)$_GET['mode']) === 'listen')
+            || (!empty($_GET['listen']) && $_GET['listen'] !== '0')
+            || (!empty($_GET['simulate']) && $_GET['simulate'] !== '0')
+            || (isset($payload['mode']) && in_array(strtolower((string)$payload['mode']), ['listen', 'simulate', 'dry_run', 'discovery'], true));
+
+        // If in Listener / Schema Discovery Mode, record log as 'simulated' and return detected structure WITHOUT modifying DB
+        if ($isListenOnlyMode) {
+            $detectedKeys = self::extractKeysRecursive($payload);
+            self::logExecution($webhookId, $slug, $headers, $rawBody, 'simulated', 200, 0, 'Payload captured in Listener Mode. No database records modified.', $ip);
+            if ($webhookId) {
+                try {
+                    Database::execute("UPDATE incoming_webhooks SET received_count = received_count + 1, last_received_at = NOW() WHERE id = ?", [$webhookId]);
+                } catch (\Throwable $e) {}
+            }
+
+            return [
+                'success' => true,
+                'code' => 200,
+                'mode' => 'listen_only',
+                'status' => 'simulated',
+                'message' => 'Payload captured in Schema Listener mode. No database records modified.',
+                'endpoint_slug' => $slug,
+                'detected_keys' => $detectedKeys,
+                'detected_keys_count' => count($detectedKeys),
+                'payload_preview' => $payload,
+                'target_table' => $defaultConfiguredTable,
+                'mapped_rules_count' => count($rules),
+                'ready_to_switch_live' => count($detectedKeys) > 0,
+                'instruction' => 'Review the detected keys in the Field Mapping matrix. Once configured, switch endpoint mode to Live Ingestion to begin saving records.'
+            ];
+        }
+
         $totalAffected = 0;
         $processedResults = [];
         $tablesModified = [];
@@ -1039,5 +1073,69 @@ class IncomingWebhookEngine {
                 ]
             ]
         ];
+    }
+
+    /**
+     * Recursively extract all keys from an arbitrary JSON payload (including dot notation for nested objects)
+     */
+    public static function extractKeysRecursive(mixed $data, string $prefix = ''): array {
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $keys = [];
+        foreach ($data as $key => $value) {
+            $currentKey = $prefix === '' ? (string)$key : "{$prefix}.{$key}";
+            if (!is_numeric($key)) {
+                $keys[] = $currentKey;
+            }
+            if (is_array($value)) {
+                $nested = self::extractKeysRecursive($value, is_numeric($key) ? $prefix : $currentKey);
+                $keys = array_merge($keys, $nested);
+            }
+        }
+
+        return array_values(array_unique(array_filter($keys, fn($k) => !empty($k))));
+    }
+
+    /**
+     * Fetch recent captured logs and extract aggregate detected keys for inspector
+     */
+    public static function getRecentCapturedPayloads(string $slug, int $limit = 10): array {
+        try {
+            $logs = Database::query(
+                "SELECT * FROM incoming_webhook_logs WHERE endpoint_slug = ? ORDER BY id DESC LIMIT " . (int)$limit,
+                [$slug]
+            );
+
+            $allKeys = [];
+            $latestPayload = null;
+
+            foreach ($logs as $log) {
+                if (!empty($log['payload_json'])) {
+                    $decoded = json_decode($log['payload_json'], true);
+                    if (is_array($decoded)) {
+                        if ($latestPayload === null) {
+                            $latestPayload = $decoded;
+                        }
+                        $extracted = self::extractKeysRecursive($decoded);
+                        $allKeys = array_merge($allKeys, $extracted);
+                    }
+                }
+            }
+
+            return [
+                'logs' => $logs,
+                'detected_keys' => array_values(array_unique($allKeys)),
+                'latest_payload' => $latestPayload
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'logs' => [],
+                'detected_keys' => [],
+                'latest_payload' => null,
+                'error' => $e->getMessage()
+            ];
+        }
     }
 }
