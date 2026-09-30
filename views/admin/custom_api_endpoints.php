@@ -228,51 +228,56 @@
     <?php endif; ?>
   </div>
 
-  <!-- LIVE SANDBOX & RESPONSE INSPECTOR DRAWER -->
-  <div id="apiSandboxDrawer" class="admin-table-wrap" style="display: none; padding: 1.5rem; margin-bottom: 2.5rem; border: 2px solid var(--ts-primary, #6366f1); border-radius: 14px; background: var(--admin-card-bg);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE API SANDBOX &amp; C.R.U.D. RUNNER</span>
-        <h3 style="margin: 0; color: var(--admin-text-primary);" id="sandboxEndpointTitle">API Sandbox</h3>
-      </div>
-      <button type="button" onclick="closeApiTester()" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;">
-        &times; Close Sandbox
-      </button>
-    </div>
-
-    <!-- Request Builder Bar -->
-    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 0.5rem; margin-bottom: 0.75rem;">
-      <select id="sandboxMethod" onchange="toggleSandboxPayload(this.value)" class="admin-input" style="font-weight: 800;">
-        <option value="GET">GET (Query)</option>
-        <option value="POST">POST (Insert)</option>
-        <option value="PUT">PUT (Update)</option>
-        <option value="DELETE">DELETE (Remove)</option>
-      </select>
-      <input type="text" id="sandboxRequestUrl" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.82rem;">
-      <button type="button" onclick="executeSandboxQuery()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
-        🚀 Send Request
-      </button>
-    </div>
-
-    <!-- Payload Box for POST / PUT -->
-    <div id="sandboxPayloadBox" style="display: none; margin-bottom: 0.75rem;">
-      <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--admin-text-secondary);">
-        Request Body (JSON Payload for Insert / Update):
-      </label>
-      <textarea id="sandboxPayload" rows="4" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.8rem;" placeholder='{"title": "Sample Item", "status": "active"}'></textarea>
-    </div>
-
-    <!-- Response Preview Pane -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-      <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-secondary);">Live Response Body</span>
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
-        <span id="sandboxStatusBadge" class="ts-badge" style="font-size: 0.7rem; display: none;"></span>
-        <button type="button" onclick="copySandboxResponse()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
-          📋 Copy JSON
+  <!-- LIVE SANDBOX & RESPONSE INSPECTOR MODAL -->
+  <div id="apiSandboxModal" class="admin-modal" style="display: none;">
+    <div class="admin-modal-backdrop" onclick="closeApiTester()"></div>
+    <div class="admin-modal-content" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
+      <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE API SANDBOX &amp; C.R.U.D. RUNNER</span>
+          <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.2rem; font-weight: 800;" id="sandboxEndpointTitle">API Sandbox</h3>
+        </div>
+        <button type="button" onclick="closeApiTester()" class="admin-modal-close" style="background: none; border: none; font-size: 1.6rem; color: var(--admin-text-secondary); cursor: pointer; line-height: 1;">
+          &times;
         </button>
       </div>
+
+      <div style="padding: 1.5rem; overflow-y: auto; flex: 1;">
+        <!-- Request Builder Bar -->
+        <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <select id="sandboxMethod" onchange="toggleSandboxPayload(this.value)" class="admin-input" style="font-weight: 800;">
+            <option value="GET">GET (Query)</option>
+            <option value="POST">POST (Insert)</option>
+            <option value="PUT">PUT (Update)</option>
+            <option value="DELETE">DELETE (Remove)</option>
+          </select>
+          <input type="text" id="sandboxRequestUrl" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.82rem;">
+          <button type="button" onclick="executeSandboxQuery()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
+            🚀 Send Request
+          </button>
+        </div>
+
+        <!-- Payload Box for POST / PUT -->
+        <div id="sandboxPayloadBox" style="display: none; margin-bottom: 0.75rem;">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--admin-text-secondary);">
+            Request Body (JSON Payload for Insert / Update):
+          </label>
+          <textarea id="sandboxPayload" rows="4" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.8rem;" placeholder='{"title": "Sample Item", "status": "active"}'></textarea>
+        </div>
+
+        <!-- Response Preview Pane -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-secondary);">Live Response Body</span>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span id="sandboxStatusBadge" class="ts-badge" style="font-size: 0.7rem; display: none;"></span>
+            <button type="button" onclick="copySandboxResponse()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              📋 Copy JSON
+            </button>
+          </div>
+        </div>
+        <pre id="sandboxResponseBody" style="height: 320px; overflow-y: auto; background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem; font-family: var(--admin-font-mono); font-size: 0.82rem; color: #34d399; margin: 0;"></pre>
+      </div>
     </div>
-    <pre id="sandboxResponseBody" style="height: 320px; overflow-y: auto; background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem; font-family: var(--admin-font-mono); font-size: 0.82rem; color: #34d399; margin: 0;"></pre>
   </div>
 </div>
 
@@ -793,13 +798,13 @@ function copyToClipboard(text) {
 }
 
 function openApiTester(endpoint) {
-  const drawer = document.getElementById('apiSandboxDrawer');
+  const modal = document.getElementById('apiSandboxModal');
   const title = document.getElementById('sandboxEndpointTitle');
   const urlInput = document.getElementById('sandboxRequestUrl');
   const responseBody = document.getElementById('sandboxResponseBody');
 
-  drawer.style.display = 'block';
-  drawer.scrollIntoView({ behavior: 'smooth' });
+  document.body.classList.add('ts-modal-open');
+  modal.style.display = 'flex';
 
   title.innerText = endpoint.name + ' (' + endpoint.endpoint_type + ')';
   activeSandboxUrl = '<?= url('/api/v1/custom/') ?>' + endpoint.slug;
@@ -813,7 +818,8 @@ function openApiTester(endpoint) {
 }
 
 function closeApiTester() {
-  document.getElementById('apiSandboxDrawer').style.display = 'none';
+  document.getElementById('apiSandboxModal').style.display = 'none';
+  document.body.classList.remove('ts-modal-open');
 }
 
 function toggleSandboxPayload(method) {
@@ -944,13 +950,13 @@ function testTableEndpoint(action) {
   const table = document.getElementById('inspectTableName').textContent;
   if (!table) return;
 
-  const drawer = document.getElementById('apiSandboxDrawer');
+  const modal = document.getElementById('apiSandboxModal');
   const title = document.getElementById('sandboxEndpointTitle');
   const urlInput = document.getElementById('sandboxRequestUrl');
   const methodSelect = document.getElementById('sandboxMethod');
 
-  drawer.style.display = 'block';
-  drawer.scrollIntoView({ behavior: 'smooth' });
+  document.body.classList.add('ts-modal-open');
+  modal.style.display = 'flex';
 
   if (action === 'query') {
     title.innerText = 'Query Table (All / Paginated): ' + table;
@@ -983,13 +989,13 @@ function testTableEndpoint(action) {
 }
 
 function loadWholeDatabaseBlueprint() {
-  const drawer = document.getElementById('apiSandboxDrawer');
+  const modal = document.getElementById('apiSandboxModal');
   const title = document.getElementById('sandboxEndpointTitle');
   const urlInput = document.getElementById('sandboxRequestUrl');
   const methodSelect = document.getElementById('sandboxMethod');
 
-  drawer.style.display = 'block';
-  drawer.scrollIntoView({ behavior: 'smooth' });
+  document.body.classList.add('ts-modal-open');
+  modal.style.display = 'flex';
 
   title.innerText = 'Full Database Blueprint & Schema Architecture';
   urlInput.value = '<?= url('/api/v1/custom/describe-db') ?>';
@@ -998,6 +1004,17 @@ function loadWholeDatabaseBlueprint() {
 
   executeSandboxQuery();
 }
+
+// Global Escape Key Listener for Modals
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeApiTester();
+    closeNewEndpointModal();
+    closeEditEndpointModal();
+    closeTableListModal();
+    closeJoinBuilderModal();
+  }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();

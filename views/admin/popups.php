@@ -278,6 +278,14 @@
 </div>
 
 <script>
+// Global Escape Key Listener
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closePopupModal();
+    closePopupSimulator();
+  }
+});
+
 function openNewPopupModal() {
   document.getElementById('popup_id').value = '0';
   document.getElementById('popupModalTitle').textContent = 'Create Custom Popup';
@@ -296,11 +304,13 @@ function openNewPopupModal() {
   document.getElementById('popup_theme').value = 'modern_gradient';
   document.getElementById('popup_active').checked = true;
   updateLivePreviewFromInputs();
+  document.body.classList.add('ts-modal-open');
   document.getElementById('popupModal').style.display = 'flex';
 }
 
 function closePopupModal() {
   document.getElementById('popupModal').style.display = 'none';
+  document.body.classList.remove('ts-modal-open');
 }
 
 function editPopup(p) {
@@ -321,6 +331,7 @@ function editPopup(p) {
   document.getElementById('popup_theme').value = p.popup_theme || 'modern_gradient';
   document.getElementById('popup_active').checked = (parseInt(p.is_active, 10) === 1);
   updateLivePreviewFromInputs();
+  document.body.classList.add('ts-modal-open');
   document.getElementById('popupModal').style.display = 'flex';
 }
 
@@ -410,11 +421,13 @@ function previewPopup(p) {
     container.style.border = '1px solid rgba(99,102,241,0.4)';
   }
 
+  document.body.classList.add('ts-modal-open');
   document.getElementById('popupSimulatorModal').style.display = 'flex';
 }
 
 function closePopupSimulator() {
   document.getElementById('popupSimulatorModal').style.display = 'none';
+  document.body.classList.remove('ts-modal-open');
 }
 </script>
 
