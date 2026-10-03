@@ -845,6 +845,19 @@ $router->get('/api/v1/deploy/sync', [ApiController::class, 'v1DeploySync']);
 
 $router->get('/api/v1/force-migrate', function() {
     $pdo = \App\Core\Database::getConnection();
+    
+    // Explicitly fix author_feedbacks table if missing
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `author_feedbacks` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `author_id` int(11) NOT NULL,
+      `rating` tinyint(1) NOT NULL DEFAULT 5,
+      `message` text DEFAULT NULL,
+      `created_at` timestamp NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`),
+      KEY `author_id` (`author_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+    // Re-run unapplied migrations
     $pdo->exec("CREATE TABLE IF NOT EXISTS `migrations` (
       `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
       `migration_name` varchar(255) NOT NULL,
@@ -853,6 +866,7 @@ $router->get('/api/v1/force-migrate', function() {
       PRIMARY KEY (`id`),
       UNIQUE KEY `idx_migration_name` (`migration_name`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    
     $applied = $pdo->query("SELECT migration_name FROM migrations")->fetchAll(PDO::FETCH_COLUMN) ?: [];
     $migrationFiles = glob(__DIR__ . "/database/migrations/*.sql") ?: [];
     sort($migrationFiles);
@@ -875,7 +889,7 @@ $router->get('/api/v1/force-migrate', function() {
             $executed++;
         }
     }
-    echo json_encode(["status" => "ok", "executed" => $executed]);
+    echo json_encode(["status" => "ok", "executed" => $executed, "fixed_author_feedbacks" => true]);
 });
 
 
