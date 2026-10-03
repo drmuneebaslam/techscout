@@ -69,7 +69,7 @@ class ErrorLogger {
                         `request_uri`, `request_method`, `request_data`, `request_headers`, 
                         `user_id`, `user_details`, `ip_address`, `location_details`, 
                         `device_details`, `created_at`
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
                     $normalizedType,
@@ -85,7 +85,8 @@ class ErrorLogger {
                     $userDetailsJson,
                     $ip,
                     $locationDetailsJson,
-                    $deviceDetailsJson
+                    $deviceDetailsJson,
+                    date('Y-m-d H:i:s')
                 ]);
             } catch (Throwable $dbEx) {
                 // If table doesn't have new columns yet, execute emergency alter and retry
@@ -98,7 +99,7 @@ class ErrorLogger {
                                 `request_uri`, `request_method`, `request_data`, `request_headers`, 
                                 `user_id`, `user_details`, `ip_address`, `location_details`, 
                                 `device_details`, `created_at`
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         ");
                         $stmt->execute([
                             $normalizedType,
@@ -114,7 +115,8 @@ class ErrorLogger {
                             $userDetailsJson,
                             $ip,
                             $locationDetailsJson,
-                            $deviceDetailsJson
+                            $deviceDetailsJson,
+                            date('Y-m-d H:i:s')
                         ]);
                         return;
                     } catch (Throwable $dbEx2) {}
@@ -126,9 +128,9 @@ class ErrorLogger {
                         INSERT INTO `system_error_logs` (
                             `error_type`, `message`, `file`, `line`, `stack_trace`, 
                             `request_uri`, `request_method`, `user_id`, `ip_address`, `created_at`
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ");
-                    $stmtLegacy->execute([$normalizedType, $message, $file, $line, $trace, $uri, $method, $userId, $ip]);
+                    $stmtLegacy->execute([$normalizedType, $message, $file, $line, $trace, $uri, $method, $userId, $ip, date('Y-m-d H:i:s')]);
                 } catch (Throwable $innerEx) {
                     @error_log("[SystemErrorLogger Fallback] " . $normalizedType . ": " . $message);
                 }
