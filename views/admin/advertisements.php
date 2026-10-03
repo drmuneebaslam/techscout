@@ -552,18 +552,49 @@
                 </span>
               </td>
               <td style="text-align: right;">
-                <?php if ($isPending): ?>
-                  <div style="display: inline-flex; gap: 0.35rem;">
-                    <form action="<?= url('/admin/advertisements/tips/verify/' . $tip['id']) ?>" method="POST" style="margin: 0;">
-                      <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.3); font-size: 0.72rem;">Credit Author ✓</button>
-                    </form>
-                    <form action="<?= url('/admin/advertisements/tips/reject/' . $tip['id']) ?>" method="POST" style="margin: 0;">
-                      <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; border-color: rgba(239,68,68,0.3); font-size: 0.72rem;">Reject</button>
-                    </form>
+                <button type="button" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.72rem;" onclick="document.getElementById('tipModal_<?= $tip['id'] ?>').style.display='flex'">
+                  <i data-lucide="eye" style="width: 14px; height: 14px; margin-right: 4px;"></i> View Details
+                </button>
+                
+                <!-- Tip Details Modal -->
+                <div id="tipModal_<?= $tip['id'] ?>" class="admin-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+                  <div class="admin-modal-content" style="background: var(--admin-bg-elevated); border: 1px solid var(--admin-border-color); border-radius: 12px; width: 100%; max-width: 600px; padding: 2rem; position: relative;">
+                    <button type="button" onclick="this.closest('.admin-modal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: var(--admin-text-secondary); cursor: pointer;"><i data-lucide="x"></i></button>
+                    
+                    <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--admin-text-primary); font-size: 1.25rem;">Tip Transaction Details #<?= $tip['id'] ?></h3>
+                    
+                    <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--admin-text-secondary);">
+                      <div style="margin-bottom: 0.75rem;"><strong>Recipient Author:</strong> <span style="color: var(--admin-text-primary);"><?= htmlspecialchars($tip['author_name'] ?? $tip['author_username'] ?? 'Author') ?></span></div>
+                      <div style="margin-bottom: 0.75rem;"><strong>Sender Name:</strong> <span style="color: var(--admin-text-primary);"><?= htmlspecialchars($tip['tipper_name'] ?? 'Anonymous') ?></span></div>
+                      <div style="margin-bottom: 0.75rem;"><strong>Gross Amount:</strong> <span style="color: #38bdf8; font-weight: bold;">$<?= number_format($grossVal, 2) ?> <?= htmlspecialchars($currVal) ?></span></div>
+                      <div style="margin-bottom: 0.75rem;"><strong>Platform Fee:</strong> <span style="color: #f59e0b;">-$<?= number_format($feeVal, 2) ?></span></div>
+                      <div style="margin-bottom: 0.75rem;"><strong>Net to Author:</strong> <span style="color: #10b981; font-weight: bold;">+$<?= number_format($netVal, 2) ?></span></div>
+                      <div style="margin-bottom: 0.75rem;"><strong>TXID / Ref:</strong> <code style="color: #818cf8;"><?= htmlspecialchars($tip['txid'] ?? $tip['reference_no'] ?? 'N/A') ?></code></div>
+                      <div style="margin-bottom: 0.75rem;"><strong>Status:</strong> <strong style="color: <?= $isCompleted ? '#10b981' : ($isRejected ? '#ef4444' : '#f59e0b') ?>;"><?= strtoupper($tip['status']) ?></strong></div>
+                      <?php if (!empty($tip['created_at'])): ?>
+                        <div><strong>Logged At:</strong> <span style="color: var(--admin-text-primary);"><?= htmlspecialchars($tip['created_at']) ?></span></div>
+                      <?php endif; ?>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; border-top: 1px solid var(--admin-border-color); padding-top: 1.5rem;">
+                      <?php if (!$isCompleted): ?>
+                        <form action="<?= url('/admin/advertisements/tips/verify/' . $tip['id']) ?>" method="POST" style="margin: 0;">
+                          <button type="submit" class="admin-btn" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.4); padding: 0.6rem 1.25rem;">
+                            <i data-lucide="check-circle" style="width: 16px; height: 16px; margin-right: 6px;"></i> Verify & Credit Author
+                          </button>
+                        </form>
+                      <?php endif; ?>
+                      
+                      <?php if (!$isRejected): ?>
+                        <form action="<?= url('/admin/advertisements/tips/reject/' . $tip['id']) ?>" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to reject this tip?');">
+                          <button type="submit" class="admin-btn admin-btn-outline" style="color: #ef4444; border-color: rgba(239,68,68,0.3); padding: 0.6rem 1.25rem;">
+                            <i data-lucide="x-circle" style="width: 16px; height: 16px; margin-right: 6px;"></i> Reject / Refund
+                          </button>
+                        </form>
+                      <?php endif; ?>
+                    </div>
                   </div>
-                <?php else: ?>
-                  <span style="font-size: 0.75rem; color: var(--admin-text-secondary);">&mdash;</span>
-                <?php endif; ?>
+                </div>
               </td>
             </tr>
           <?php endforeach; ?>

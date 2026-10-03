@@ -836,7 +836,7 @@ class AuthorStudioController {
                     'ref_no' => (string)$refNo,
                     'method_type' => strtoupper(str_replace('_', ' ', $methodType)),
                     'destination' => (string)$destination,
-                    'action_url' => url('/author/rewards')
+                    'action_url' => url('/author/dashboard?tab=payouts')
                 ]);
             }
         } catch (\Throwable $e) {}
@@ -1299,5 +1299,33 @@ class AuthorStudioController {
 
         Session::flash('success', "Co-author invitation marked as " . ucfirst($newStatus) . ".");
         Response::redirect('/author/dashboard');
+    }
+    /**
+     * Submit platform feedback from Author Dashboard
+     */
+    public function submitFeedback(Request $request): void {
+        $user = Auth::user();
+        if (!$user) {
+            Session::flash('error', 'Authentication required.');
+            Response::redirect('/auth/login');
+            return;
+        }
+
+        $subject = trim((string)$request->input('subject'));
+        $message = trim((string)$request->input('message'));
+
+        if (empty($subject) || empty($message)) {
+            Session::flash('error', 'Subject and Message are required.');
+            Response::redirect('/author/dashboard?tab=feedback');
+            return;
+        }
+
+        Database::execute(
+            "INSERT INTO author_feedbacks (author_id, subject, message, status) VALUES (?, ?, ?, 'pending')",
+            [$user['id'], $subject, $message]
+        );
+
+        Session::flash('success', 'Your feedback has been submitted successfully to the administration team.');
+        Response::redirect('/author/dashboard?tab=feedback');
     }
 }

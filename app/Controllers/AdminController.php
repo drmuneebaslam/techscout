@@ -3342,7 +3342,7 @@ class AdminController {
                 'payout',
                 "Creator Tip Verified & Credited (+${$net} USD)",
                 "You received a confirmed tip of \${$gross} ({$currency}). After the 5% platform fee, \${$net} has been added to your withdrawable balance!",
-                url('/author/dashboard')
+                url('/author/dashboard?tab=tipjar')
             );
         }
 
@@ -3382,7 +3382,7 @@ class AdminController {
                     'tip',
                     "Creator Tip #{$tipId} Unverified",
                     "A submitted reader tip #{$tipId} could not be confirmed on-chain and was marked as unverified.",
-                    url('/author/dashboard')
+                    url('/author/dashboard?tab=tipjar')
                 );
             }
         }
@@ -3410,7 +3410,7 @@ class AdminController {
                 'payout',
                 "Payout Request Completed (${$payout['amount']} {$payout['payout_currency']})",
                 "Your withdrawal request of ${$payout['amount']} has been sent! Blockchain TXID: {$txid}",
-                url('/author/dashboard')
+                url('/author/dashboard?tab=payouts')
             );
             Session::flash('success', "Payout #{$payoutId} marked as completed.");
         }
@@ -7386,7 +7386,7 @@ class AdminController {
                         'revenue',
                         "🎉 Royalty Pool Payout Received: \${$amount} USD",
                         "You received a \${$amount} USD royalty payout for your readership during {$periodLabel}! New balance: \${$res['balance_after']} USD.",
-                        "/author/rewards"
+                        "/author/dashboard?tab=payouts"
                     );
                 }
             }
@@ -7503,7 +7503,7 @@ class AdminController {
                 'reward',
                 "💳 Payout #{$payoutId} {$statusEmoji} " . strtoupper($action),
                 "Your withdrawal request of \${$amountUsd} USD is marked as " . strtoupper($action) . ".{$notesMsg}{$refundMsg}" . ($txRef ? " Reference: {$txRef}." : "") . $receiptMsg,
-                '/author/dashboard#payouts'
+                '/author/dashboard?tab=payouts'
             );
 
             // Send Official Transactional Email to Creator with physical receipt attachment
@@ -7534,7 +7534,7 @@ class AdminController {
                             'transaction_ref' => (string)($txRef ?: 'TXN-' . strtoupper(bin2hex(random_bytes(4)))),
                             'receipt_url' => (string)($receiptUrl ? \App\Core\Config::url($receiptUrl) : ''),
                             'destination' => (string)($payout['payout_address'] ?? 'Verified Destination Account'),
-                            'action_url' => url('/author/rewards')
+                            'action_url' => url('/author/dashboard?tab=payouts')
                         ], $mailAttachments);
                     } elseif ($action === 'rejected') {
                         \App\Core\Mailer::sendTemplate('payout_rejected', $authorUser['email'], $recipientName, [
@@ -7542,7 +7542,7 @@ class AdminController {
                             'amount' => number_format($amountUsd, 2),
                             'payout_id' => (string)$payoutId,
                             'admin_notes' => (string)($adminNotes ?: 'Compliance verification requirements not met. Deducted credits have been 100% restored to your balance.'),
-                            'action_url' => url('/author/rewards')
+                            'action_url' => url('/author/dashboard?tab=payouts')
                         ], $mailAttachments);
                     } elseif ($action === 'processing' || $action === 'pending') {
                         \App\Core\Mailer::sendTemplate('payout_requested', $authorUser['email'], $recipientName, [
@@ -7554,7 +7554,7 @@ class AdminController {
                             'ref_no' => (string)($txRef ?: 'PAY-' . strtoupper(bin2hex(random_bytes(4)))),
                             'method_type' => (string)($payout['payout_method'] ?? 'Bank Wire / Wallet'),
                             'destination' => (string)($payout['payout_address'] ?? 'Verified Account'),
-                            'action_url' => url('/author/rewards')
+                            'action_url' => url('/author/dashboard?tab=payouts')
                         ], $mailAttachments);
                     }
                 }
@@ -9439,9 +9439,38 @@ class AdminController {
         }
         Response::redirect('/admin/custom-api');
     }
+    public function authorFeedbacks(Request $request): void {
+        $feedbacks = [];
+        try {
+            $feedbacks = Database::query("
+                SELECT f.*, a.display_name as author_name, u.username as author_username 
+                FROM author_feedbacks f 
+                JOIN users u ON f.author_id = u.id 
+                LEFT JOIN authors a ON a.user_id = u.id 
+                ORDER BY f.created_at DESC
+            ");
+        } catch (\Throwable $e) {}
+
+        Response::view('admin/author_feedbacks', [
+            'title' => 'Author Feedbacks | Admin Hub',
+            'feedbacks' => $feedbacks
+        ]);
+    }
+
+    public function updateAuthorFeedback(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        $status = trim((string)$request->post('status'));
+        $notes = trim((string)$request->post('admin_notes'));
+
+        try {
+            Database::execute("UPDATE author_feedbacks SET status = ?, admin_notes = ? WHERE id = ?", [$status, $notes, $id]);
+            Session::flash('success', 'Feedback status updated.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Error updating feedback: ' . $e->getMessage());
+        }
+        Response::redirect('/admin/author-feedbacks');
+    }
 }
-
-
 
 
 

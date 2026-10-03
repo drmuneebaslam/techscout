@@ -90,7 +90,7 @@ class CreatorTipping {
                     'net_amount' => number_format($netAmount, 2),
                     'article_title' => $article ? $article['title'] : 'Platform Creator Profile',
                     'message' => $message ?: 'Thank you for your high-quality engineering contributions on TechScout!',
-                    'action_url' => url('/author/rewards')
+                    'action_url' => url('/author/dashboard?tab=payouts')
                 ]);
             }
         } catch (\Throwable $e) {}

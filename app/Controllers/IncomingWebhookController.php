@@ -92,6 +92,10 @@ class IncomingWebhookController {
 
         $slug = trim((string)($params['endpoint_slug'] ?? ''));
         $rawBody = file_get_contents('php://input') ?: '';
+        if (empty($rawBody) && !empty($_GET)) {
+            // Support simple GET browser requests by converting query parameters to JSON payload
+            $rawBody = json_encode($_GET, JSON_UNESCAPED_UNICODE);
+        }
         $headers = function_exists('getallheaders') ? getallheaders() : [];
         $ip = Request::ip();
 
@@ -110,6 +114,10 @@ class IncomingWebhookController {
         header('Content-Type: application/json; charset=utf-8');
 
         $rawBody = file_get_contents('php://input') ?: '';
+        if (empty($rawBody) && !empty($_GET)) {
+            // Support simple GET browser requests by converting query parameters to JSON payload
+            $rawBody = json_encode($_GET, JSON_UNESCAPED_UNICODE);
+        }
         $headers = function_exists('getallheaders') ? getallheaders() : [];
         $ip = Request::ip();
 

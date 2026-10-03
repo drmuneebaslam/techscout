@@ -498,6 +498,9 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/users') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/users') ? 'active' : '' ?>" data-tooltip="Users & Creators">
                 <i data-lucide="users"></i> <span>Users &amp; Creators</span>
               </a>
+              <a href="<?= url('/admin/author-feedbacks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/author-feedbacks') ? 'active' : '' ?>" data-tooltip="Creator Feedbacks">
+                <i data-lucide="message-square"></i> <span>Author Feedbacks</span>
+              </a>
               <a href="<?= url('/admin/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/applications') ? 'active' : '' ?>" data-tooltip="Author Applications">
                 <i data-lucide="award"></i> <span>Author Applications</span>
                 <?php if (!empty($pendingAppsCount)): ?>

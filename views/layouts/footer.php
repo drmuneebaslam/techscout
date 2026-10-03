@@ -109,7 +109,7 @@
           <h4>Creators</h4>
           <ul class="footer-links">
             <li><a href="<?= url('/author/dashboard') ?>">Author Studio</a></li>
-            <li><a href="<?= url('/author/rewards') ?>">Creator Rewards</a></li>
+            
             <li><a href="<?= url('/campaigns') ?>">Developer Challenges</a></li>
             <li><a href="<?= url('/author/apply') ?>">Become an Author</a></li>
           </ul>

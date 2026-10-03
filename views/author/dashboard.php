@@ -1921,6 +1921,26 @@ $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin(
         </div>
       </div>
 
+      <div style="background: var(--admin-bg-elevated); border: 1px solid var(--admin-border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h4 style="margin-top: 0; color: #f8fafc; margin-bottom: 1rem;">Direct Platform Feedback</h4>
+        <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 1rem;">Have a suggestion for the platform or need administrative assistance? Submit your feedback directly to the TechScout team.</p>
+        
+        <form action="<?= url('/author/feedback/submit') ?>" method="POST">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; color: var(--admin-text-secondary); font-size: 0.85rem; margin-bottom: 0.4rem;">Subject / Topic</label>
+            <input type="text" name="subject" required class="ts-input" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(148,163,184,0.15); color: #f8fafc; padding: 0.65rem; border-radius: 6px;" placeholder="e.g., Feature Request: Video Embeds">
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; color: var(--admin-text-secondary); font-size: 0.85rem; margin-bottom: 0.4rem;">Your Message</label>
+            <textarea name="message" required rows="4" class="ts-input" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(148,163,184,0.15); color: #f8fafc; padding: 0.65rem; border-radius: 6px;" placeholder="Describe your feedback or request in detail..."></textarea>
+          </div>
+          <button type="submit" class="ts-btn ts-btn-primary">
+            <i data-lucide="send" style="width: 16px; height: 16px; margin-right: 6px;"></i> Send Feedback
+          </button>
+        </form>
+      </div>
+
+      <h4 style="color: #f8fafc; font-size: 1.15rem; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--admin-border-color); padding-bottom: 0.5rem;">Reader Comments & Discussions</h4>
       <?php if (!empty($recentComments)): ?>
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           <?php foreach ($recentComments as $cm): ?>

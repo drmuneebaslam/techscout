@@ -345,7 +345,6 @@ $router->post('/author/editor/save', [AuthorStudioController::class, 'save'], ['
 $router->post('/author/editor/import-docx', [AuthorStudioController::class, 'importDocx'], ['author']);
 $router->get('/author/analytics', [AuthorStudioController::class, 'analytics'], ['author']);
 $router->get('/author/analytics/content/{id}', [AuthorStudioController::class, 'contentAnalytics'], ['author']);
-$router->get('/author/rewards', [AuthorStudioController::class, 'rewards'], ['author']);
 $router->post('/author/profile/update', [AuthorStudioController::class, 'updateProfile'], ['author']);
 $router->post('/author/tip-wallets/save', [AuthorStudioController::class, 'saveTipWallets'], ['author']);
 $router->post('/author/payouts/request', [AuthorStudioController::class, 'requestPayout'], ['author']);
@@ -355,6 +354,7 @@ $router->post('/author/payout-methods/set-default/{id}', [AuthorStudioController
 $router->post('/author/collaborations/respond', [AuthorStudioController::class, 'respondCoAuthorInvite'], ['author']);
 $router->post('/author/monetization/apply', [AuthorStudioController::class, 'applyMonetization'], ['author']);
 $router->post('/author/content/delete/{id}', [AuthorStudioController::class, 'deleteDraft'], ['author']);
+$router->post('/author/feedback/submit', [AuthorStudioController::class, 'submitFeedback'], ['author']);
 
 // ----------------------------------------------------------------------------
 // 6.1 PUBLIC AUTHOR & CREATOR PROFILES
@@ -465,6 +465,10 @@ $router->post('/admin/moderation/message/{id}', [AdminController::class, 'messag
 
 // Support Tickets (Admin Queue)
 $router->get('/admin/tickets', [AdminController::class, 'tickets'], ['admin']);
+
+// Author Feedbacks
+$router->get('/admin/author-feedbacks', [AdminController::class, 'authorFeedbacks'], ['admin']);
+$router->post('/admin/author-feedbacks/update/{id}', [AdminController::class, 'updateAuthorFeedback'], ['admin']);
 
 // Advertisements CRUD & Quick Status Toggle
 $router->get('/admin/advertisements', [AdminController::class, 'advertisements'], ['admin']);
@@ -801,9 +805,13 @@ $router->post('/admin/incoming-webhooks/simulate', [\App\Controllers\IncomingWeb
 $router->post('/api/v1/webhook/simulate', [\App\Controllers\IncomingWebhookController::class, 'simulate']);
 $router->get('/api/v1/webhook/live-stream/{slug}', [\App\Controllers\IncomingWebhookController::class, 'liveStream']);
 $router->post('/api/v1/webhook/omni', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
+$router->get('/api/v1/webhook/omni', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
 $router->post('/api/v1/webhook/universal', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
+$router->get('/api/v1/webhook/universal', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
 $router->post('/api/v1/webhook/import', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
+$router->get('/api/v1/webhook/import', [\App\Controllers\IncomingWebhookController::class, 'handleOmni']);
 $router->post('/api/v1/webhook/{endpoint_slug}', [\App\Controllers\IncomingWebhookController::class, 'handle']);
+$router->get('/api/v1/webhook/{endpoint_slug}', [\App\Controllers\IncomingWebhookController::class, 'handle']);
 
 // Dynamic Custom REST API Gateway (Single Record by ID, UUID, or Slug for Any Table)
 $router->get('/api/v1/custom/{table}/schema', [\App\Controllers\CustomApiController::class, 'handleTableSchema']);

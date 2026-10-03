@@ -116,9 +116,12 @@ class Content {
             case 'reading_time':
                 $sql .= " ORDER BY c.is_pinned DESC, art.reading_time_mins ASC, c.published_at DESC";
                 break;
+            case 'algorithmic':
             case 'latest':
             default:
-                $sql .= " ORDER BY c.is_pinned DESC, c.published_at DESC";
+                // Advanced Engagement & Freshness Algorithm with Hourly Rotation
+                // Prevents static feeds by combining views, reactions, and an hourly random seed
+                $sql .= " ORDER BY c.is_pinned DESC, ((COALESCE(c.reaction_count, 0) * 10) + COALESCE(c.view_count, 0) + 1) * RAND(UNIX_TIMESTAMP(NOW()) DIV 3600) DESC, c.published_at DESC";
                 break;
         }
 

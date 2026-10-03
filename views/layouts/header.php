@@ -134,8 +134,8 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   
   <?php 
-    $cssV = filemtime(__DIR__ . '/../../assets/css/style.css'); 
-    if (!empty($user) && $user['role'] === 'admin') $cssV = time(); 
+    // Force cache bust during active iterative development
+    $cssV = time(); 
   ?>
   <link rel="stylesheet" href="<?= url('/assets/css/style.css?v=' . $cssV) ?>">
   

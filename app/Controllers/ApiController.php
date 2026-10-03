@@ -447,7 +447,7 @@ class ApiController {
                     'tip',
                     "Crypto Tip Received: \${$grossAmount} ({$currency})",
                     "A reader tipped you \${$grossAmount} USD in {$currency}. TXID: {$txid}. Pending platform verification.",
-                    url('/author/dashboard')
+                    url('/author/dashboard?tab=tipjar')
                 );
             } catch (\Throwable $e) {}
         }
