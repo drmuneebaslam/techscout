@@ -56,7 +56,7 @@
 
   <!-- Optional Footer Banner Ad Slot -->
   <?php if (!empty($siteSettings['ad_slot_footer'])): ?>
-    <div class="container ts-auto-style-1">
+    <div class="container" style="margin-top: 2rem; margin-bottom: 2rem; text-align: center; overflow: hidden;">
       <?= $siteSettings['ad_slot_footer'] ?>
     </div>
   <?php endif; ?>
@@ -66,29 +66,29 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <a href="<?= url('/') ?>" class="ts-logo ts-auto-style-2">
+          <a href="<?= url('/') ?>" class="ts-logo" style="margin-bottom: 1rem;">
             <div class="logo-icon"><i data-lucide="radar"></i></div>
-            <span>Tech<span class="ts-auto-style-3">Scout</span></span>
+            <span>Tech<span style="color: var(--ts-primary-light);">Scout</span></span>
           </a>
-          <p class="ts-auto-style-4">
+          <p style="font-size: 0.9rem; color: var(--ts-text-secondary); max-width: 320px; line-height: 1.55;">
             The frontier of modern technology, system design, and AI resources scouted and curated for builders worldwide.
           </p>
 
           <!-- Dynamic Social Media Channels with Authentic Site Favicons -->
-          <div class="footer-social-bar ts-auto-style-5">
+          <div class="footer-social-bar" style="display: flex; gap: 0.65rem; margin-top: 1.25rem; flex-wrap: wrap; align-items: center;">
             <?php foreach ($renderedSocials as $soc): ?>
               <?php $favUrl = \App\Core\SocialHelper::getFaviconUrl($soc['url']); ?>
-              <a href="<?= htmlspecialchars($soc['url']) ?>" target="_blank" rel="noopener noreferrer" class="ts-social-icon-btn" title="<?= htmlspecialchars($soc['name']) ?>" class="ts-auto-style-6">
-                <img src="<?= htmlspecialchars($favUrl) ?>" alt="<?= htmlspecialchars($soc['name']) ?>" class="ts-auto-style-7" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                <span class="ts-auto-style-8"><?= \App\Core\SvgHelper::render($soc['icon'] ?? 'globe', 17) ?></span>
+              <a href="<?= htmlspecialchars($soc['url']) ?>" target="_blank" rel="noopener noreferrer" class="ts-social-icon-btn" title="<?= htmlspecialchars($soc['name']) ?>" style="--soc-hover-color: <?= htmlspecialchars($soc['color']) ?>; display: inline-flex; align-items: center; justify-content: center;">
+                <img src="<?= htmlspecialchars($favUrl) ?>" alt="<?= htmlspecialchars($soc['name']) ?>" style="width: 17px; height: 17px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <span style="display: none;"><?= \App\Core\SvgHelper::render($soc['icon'] ?? 'globe', 17) ?></span>
               </a>
             <?php endforeach; ?>
 
             <?php foreach ($customFooterLinks as $cfl): ?>
               <?php $favUrl = \App\Core\SocialHelper::getFaviconUrl($cfl['url'] ?? ''); ?>
-              <a href="<?= htmlspecialchars($cfl['url'] ?? '#') ?>" target="_blank" rel="noopener noreferrer" class="ts-social-icon-btn" title="<?= htmlspecialchars($cfl['label'] ?? 'Link') ?>" class="ts-auto-style-9">
-                <img src="<?= htmlspecialchars($favUrl) ?>" alt="<?= htmlspecialchars($cfl['label'] ?? 'Link') ?>" class="ts-auto-style-7" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                <span class="ts-auto-style-8"><?= \App\Core\SvgHelper::render($cfl['icon'] ?? 'globe', 17) ?></span>
+              <a href="<?= htmlspecialchars($cfl['url'] ?? '#') ?>" target="_blank" rel="noopener noreferrer" class="ts-social-icon-btn" title="<?= htmlspecialchars($cfl['label'] ?? 'Link') ?>" style="--soc-hover-color: <?= htmlspecialchars($cfl['color'] ?? 'var(--ts-accent-light)') ?>; display: inline-flex; align-items: center; justify-content: center;">
+                <img src="<?= htmlspecialchars($favUrl) ?>" alt="<?= htmlspecialchars($cfl['label'] ?? 'Link') ?>" style="width: 17px; height: 17px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <span style="display: none;"><?= \App\Core\SvgHelper::render($cfl['icon'] ?? 'globe', 17) ?></span>
               </a>
             <?php endforeach; ?>
           </div>
@@ -125,23 +125,23 @@
             <li><a href="<?= url('/editorial') ?>">Editorial Standards</a></li>
             <li><a href="<?= url('/privacy') ?>">Privacy Policy</a></li>
             <li><a href="<?= url('/terms') ?>">Terms of Service</a></li>
-            <li><a href="<?= url('/legal') ?>" class="ts-auto-style-10">Legal &amp; Compliance Hub &rarr;</a></li>
+            <li><a href="<?= url('/legal') ?>" style="color: #38bdf8; font-weight: 600;">Legal &amp; Compliance Hub &rarr;</a></li>
           </ul>
         </div>
       </div>
 
-      <div class="ts-auto-style-11">
+      <div style="border-top: 1px solid var(--ts-border-main); padding-top: 1.75rem; margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--ts-text-tertiary); flex-wrap: wrap; gap: 1rem;">
         <div>&copy; <?= date('Y') ?> TechScout. Built for builders, engineers, and creators.</div>
-        <div class="ts-auto-style-12">
-          <a href="<?= url('/privacy') ?>" class="ts-auto-style-13">Privacy Policy</a>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+          <a href="<?= url('/privacy') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">Privacy Policy</a>
           <span>&bull;</span>
-          <a href="<?= url('/terms') ?>" class="ts-auto-style-13">Terms of Service</a>
+          <a href="<?= url('/terms') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">Terms of Service</a>
           <span>&bull;</span>
-          <a href="<?= url('/help') ?>" class="ts-auto-style-13">Help Center</a>
+          <a href="<?= url('/help') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">Help Center</a>
           <span>&bull;</span>
-          <a href="<?= url('/legal') ?>" class="ts-auto-style-13">All Legal Policies</a>
+          <a href="<?= url('/legal') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">All Legal Policies</a>
           <span>&bull;</span>
-          <a href="<?= url('/security') ?>" class="ts-auto-style-13">Security</a>
+          <a href="<?= url('/security') ?>" style="color: var(--ts-text-tertiary); text-decoration: none;">Security</a>
         </div>
       </div>
     </div>

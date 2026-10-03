@@ -9,96 +9,96 @@
   <div id="adminCommandPaletteModal" class="admin-command-palette-overlay" onclick="handleCpOverlayClick(event)">
     <div class="admin-command-palette-box">
       <div class="cp-search-header">
-        <i data-lucide="search" class="ts-auto-style-1"></i>
+        <i data-lucide="search" style="width: 18px; height: 18px; color: #38bdf8; flex-shrink: 0;"></i>
         <input type="text" id="adminCpSearchInput" onkeyup="filterCommandPalette(event)" placeholder="Type a command or jump to page (e.g. users, mail, gpts, audit, database)..." class="cp-search-input" autocomplete="off">
-        <button type="button" onclick="closeAdminCommandPalette()" class="admin-modal-close ts-auto-style-2">&times;</button>
+        <button type="button" onclick="closeAdminCommandPalette()" class="admin-modal-close" style="font-size: 1.25rem;">&times;</button>
       </div>
 
       <div class="cp-results-list" id="adminCpResultsList">
         <!-- 1. Navigation Actions -->
         <a href="<?= url('/admin/dashboard') ?>" class="cp-item cp-selected">
-          <span class="ts-auto-style-3"><i data-lucide="layout-dashboard" class="ts-auto-style-4"></i> Dashboard Command HUD</span>
-          <span class="ts-badge ts-badge-cyan ts-auto-style-5">CORE</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="layout-dashboard" style="width: 15px; height: 15px; color: #6366f1;"></i> Dashboard Command HUD</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">CORE</span>
         </a>
         <a href="<?= url('/admin/articles') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="file-text" class="ts-auto-style-6"></i> Articles &amp; News Reviews</span>
-          <span class="ts-badge ts-auto-style-5">CONTENT</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="file-text" style="width: 15px; height: 15px; color: #38bdf8;"></i> Articles &amp; News Reviews</span>
+          <span class="ts-badge" style="font-size: 0.65rem;">CONTENT</span>
         </a>
         <a href="<?= url('/admin/tools') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="wrench" class="ts-auto-style-7"></i> AI Tools Directory</span>
-          <span class="ts-badge ts-badge-green ts-auto-style-5">TOOLS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="wrench" style="width: 15px; height: 15px; color: #10b981;"></i> AI Tools Directory</span>
+          <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">TOOLS</span>
         </a>
         <a href="<?= url('/admin/gpts') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="bot" class="ts-auto-style-8"></i> Custom GPTs Index</span>
-          <span class="ts-badge ts-badge-pink ts-auto-style-5">GPTS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="bot" style="width: 15px; height: 15px; color: #a855f7;"></i> Custom GPTs Index</span>
+          <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">GPTS</span>
         </a>
         <a href="<?= url('/admin/prompts') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="terminal" class="ts-auto-style-9"></i> Prompt Starters</span>
-          <span class="ts-badge ts-auto-style-5">PROMPTS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="terminal" style="width: 15px; height: 15px; color: #f59e0b;"></i> Prompt Starters</span>
+          <span class="ts-badge" style="font-size: 0.65rem;">PROMPTS</span>
         </a>
         <a href="<?= url('/admin/content') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="check-square" class="ts-auto-style-10"></i> Content Moderation Queue</span>
-          <span class="ts-badge ts-badge-pink ts-auto-style-5">QUEUE</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check-square" style="width: 15px; height: 15px; color: #ec4899;"></i> Content Moderation Queue</span>
+          <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">QUEUE</span>
         </a>
         <a href="<?= url('/admin/users') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="users" class="ts-auto-style-6"></i> User Management &amp; Permissions</span>
-          <span class="ts-badge ts-badge-cyan ts-auto-style-5">USERS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="users" style="width: 15px; height: 15px; color: #38bdf8;"></i> User Management &amp; Permissions</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">USERS</span>
         </a>
         <a href="<?= url('/admin/applications') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="user-check" class="ts-auto-style-7"></i> Author Applications</span>
-          <span class="ts-badge ts-badge-green ts-auto-style-5">CREATORS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="user-check" style="width: 15px; height: 15px; color: #10b981;"></i> Author Applications</span>
+          <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">CREATORS</span>
         </a>
         <a href="<?= url('/admin/tickets') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="life-buoy" class="ts-auto-style-11"></i> Support Desk &amp; Tickets</span>
-          <span class="ts-badge ts-auto-style-12">SUPPORT</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="life-buoy" style="width: 15px; height: 15px; color: #ef4444;"></i> Support Desk &amp; Tickets</span>
+          <span class="ts-badge" style="background: rgba(239,68,68,0.2); color: #ef4444; font-size: 0.65rem;">SUPPORT</span>
         </a>
         <a href="<?= url('/admin/contact-messages') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="inbox" class="ts-auto-style-6"></i> Contact Inquiries</span>
-          <span class="ts-badge ts-badge-cyan ts-auto-style-5">INBOX</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="inbox" style="width: 15px; height: 15px; color: #38bdf8;"></i> Contact Inquiries</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">INBOX</span>
         </a>
         <a href="<?= url('/admin/mail') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="mail" class="ts-auto-style-8"></i> Mail Studio &amp; Template Center</span>
-          <span class="ts-badge ts-badge-pink ts-auto-style-5">MAIL</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="mail" style="width: 15px; height: 15px; color: #a855f7;"></i> Mail Studio &amp; Template Center</span>
+          <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">MAIL</span>
         </a>
         <a href="<?= url('/admin/announcements') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="megaphone" class="ts-auto-style-9"></i> Broadcast Ribbons &amp; Banners</span>
-          <span class="ts-badge ts-auto-style-5">RIBBONS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="megaphone" style="width: 15px; height: 15px; color: #f59e0b;"></i> Broadcast Ribbons &amp; Banners</span>
+          <span class="ts-badge" style="font-size: 0.65rem;">RIBBONS</span>
         </a>
         <a href="<?= url('/admin/ad-manager') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="badge-dollar-sign" class="ts-auto-style-7"></i> Ad Manager &amp; Sponsors</span>
-          <span class="ts-badge ts-badge-green ts-auto-style-5">ADS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="badge-dollar-sign" style="width: 15px; height: 15px; color: #10b981;"></i> Ad Manager &amp; Sponsors</span>
+          <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">ADS</span>
         </a>
         <a href="<?= url('/admin/security') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="shield-check" class="ts-auto-style-11"></i> Cyber Firewall &amp; WAF Rules</span>
-          <span class="ts-badge ts-auto-style-12">SECURITY</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="shield-check" style="width: 15px; height: 15px; color: #ef4444;"></i> Cyber Firewall &amp; WAF Rules</span>
+          <span class="ts-badge" style="background: rgba(239,68,68,0.2); color: #ef4444; font-size: 0.65rem;">SECURITY</span>
         </a>
         <a href="<?= url('/admin/webhooks') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="webhook" class="ts-auto-style-6"></i> Webhook Event Integrations</span>
-          <span class="ts-badge ts-badge-cyan ts-auto-style-5">API</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="webhook" style="width: 15px; height: 15px; color: #38bdf8;"></i> Webhook Event Integrations</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">API</span>
         </a>
         <a href="<?= url('/admin/api-keys') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="key" class="ts-auto-style-9"></i> Developer REST API Keys</span>
-          <span class="ts-badge ts-auto-style-5">KEYS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="key" style="width: 15px; height: 15px; color: #f59e0b;"></i> Developer REST API Keys</span>
+          <span class="ts-badge" style="font-size: 0.65rem;">KEYS</span>
         </a>
         <a href="<?= url('/admin/db-manager') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="database" class="ts-auto-style-4"></i> Database Health &amp; Table Optimizer</span>
-          <span class="ts-badge ts-badge-cyan ts-auto-style-5">SQL</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="database" style="width: 15px; height: 15px; color: #6366f1;"></i> Database Health &amp; Table Optimizer</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">SQL</span>
         </a>
         <a href="<?= url('/admin/audit-logs') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="shield" class="ts-auto-style-6"></i> Forensic Audit Telemetry</span>
-          <span class="ts-badge ts-badge-cyan ts-auto-style-5">AUDIT</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="shield" style="width: 15px; height: 15px; color: #38bdf8;"></i> Forensic Audit Telemetry</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">AUDIT</span>
         </a>
         <a href="<?= url('/admin/system-logs') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="alert-octagon" class="ts-auto-style-13"></i> System Error Logs &amp; Crash Forensics</span>
-          <span class="ts-badge ts-badge-pink ts-auto-style-5">ERRORS</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="alert-octagon" style="width: 15px; height: 15px; color: #f87171;"></i> System Error Logs &amp; Crash Forensics</span>
+          <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">ERRORS</span>
         </a>
         <a href="<?= url('/admin/settings') ?>" class="cp-item">
-          <span class="ts-auto-style-3"><i data-lucide="server" class="ts-auto-style-7"></i> System Settings &amp; Diagnostics</span>
-          <span class="ts-badge ts-badge-green ts-auto-style-5">SYSTEM</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="server" style="width: 15px; height: 15px; color: #10b981;"></i> System Settings &amp; Diagnostics</span>
+          <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">SYSTEM</span>
         </a>
         <a href="<?= url('/') ?>" class="cp-item" target="_blank">
-          <span class="ts-auto-style-3"><i data-lucide="external-link" class="ts-auto-style-6"></i> Launch Public Site ↗</span>
-          <span class="ts-badge ts-badge-cyan ts-auto-style-5">FRONTEND</span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="external-link" style="width: 15px; height: 15px; color: #38bdf8;"></i> Launch Public Site ↗</span>
+          <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">FRONTEND</span>
         </a>
       </div>
 
