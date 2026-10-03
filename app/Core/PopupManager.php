@@ -18,8 +18,8 @@ class PopupManager
             $popups = Database::query("
                 SELECT * FROM custom_popups 
                 WHERE is_active = 1 
-                  AND (start_date IS NULL OR start_date = '0000-00-00 00:00:00' OR start_date <= ?)
-                  AND (end_date IS NULL OR end_date = '0000-00-00 00:00:00' OR end_date >= ?)
+                  AND (start_date IS NULL OR start_date <= ?)
+                  AND (end_date IS NULL OR end_date >= ?)
                 ORDER BY id DESC
                 LIMIT 10
             ", [$now, $now]);

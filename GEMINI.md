@@ -41,3 +41,7 @@ Always follow this mandatory workflow for every prompt and code modification in 
    - All database migrations in `database/migrations/*.sql` must be executed sequentially on EC2 MySQL (`techscout_db`) so all new tables, columns, indexes, and seeded data are immediately active on production `https://techscout.online`.
 
 
+9. **No Automated Script Generation for Code or Documentation Modifications**:
+   - You MUST NOT write and execute temporary PHP or shell scripts (e.g., `scratch/extract_styles.php` or `scratch/generate_docs.php`) to automatically parse, overwrite, or generate project files.
+   - Script-based DOM/regex manipulation causes unforeseen syntax breakage (e.g., destroying inline PHP conditionals inside `style="..."` tags) and injects repetitive dummy data into documentation.
+   - You must manually analyze the files yourself, map the features and functions using your own intelligence, and directly use your designated agent tools (`replace_file_content` or `write_to_file`) to perform high-quality, handcrafted modifications. Think carefully before you edit so mistakes are minimized.
