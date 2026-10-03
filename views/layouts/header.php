@@ -69,7 +69,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       var isToggling = false;
       window.syncAllThemeButtons = function(theme) {
         document.querySelectorAll('#theme-toggle, #adminThemeToggleBtn, .ts-theme-toggle').forEach(function(btn) {
-          btn.innerHTML = '<i data-lucide="' + (theme === 'light' ? 'sun' : 'moon') + '" style="width: 15px; height: 15px;"></i>';
+          btn.innerHTML = '<i data-lucide="' + (theme === 'light' ? 'sun' : 'moon') + '" class="ts-auto-style-1"></i>';
         });
         if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
           lucide.createIcons();
@@ -164,23 +164,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <!-- Dynamic Base Url for JS -->
   <script>window.TS_BASE_URL = "<?= $appUrl ?>";</script>
 
-  <style>
-    .maint-admin-indicator-banner {
-      background: #7f1d1d;
-      color: #fee2e2;
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-      position: relative;
-      z-index: 1000;
-      border-bottom: 1px solid rgba(239, 68, 68, 0.4);
-    }
-    [data-theme="light"] .maint-admin-indicator-banner,
-    .theme-light .maint-admin-indicator-banner {
-      background: #fee2e2;
-      color: #991b1b;
-      border-bottom: 1px solid rgba(239, 68, 68, 0.2);
-    }
-  </style>
+  
 </head><body data-theme="<?= $activeTheme ?>" class="<?= $activeTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($siteSettings['enable_bg_grid_lines']) && $siteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
 <script>
   (function() {
@@ -199,17 +183,17 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       $impAdmin = \App\Core\Auth::getImpersonatorAdmin(); 
       $impersonatedUser = \App\Core\Auth::user();
     ?>
-    <div id="ts-impersonation-sticky-bar" style="position: sticky; top: 0; left: 0; right: 0; z-index: 999999; background: linear-gradient(90deg, #ea580c, #f97316); color: #ffffff; padding: 0.65rem 1.5rem; display: flex; align-items: center; justify-content: space-between; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; box-shadow: 0 4px 20px rgba(234, 88, 12, 0.45); border-bottom: 2px solid #c2410c;">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span style="font-size: 1.25rem; line-height: 1;">⚠️</span>
+    <div id="ts-impersonation-sticky-bar" class="ts-auto-style-2">
+      <div class="ts-auto-style-3">
+        <span class="ts-auto-style-4">⚠️</span>
         <span>
           <strong>ADMIN IMPERSONATION MODE:</strong> Viewing platform as 
-          <strong style="text-decoration: underline;"><?= htmlspecialchars($impersonatedUser['display_name'] ?? $impersonatedUser['username'] ?? '') ?></strong> 
+          <strong class="ts-auto-style-5"><?= htmlspecialchars($impersonatedUser['display_name'] ?? $impersonatedUser['username'] ?? '') ?></strong> 
           (@<?= htmlspecialchars($impersonatedUser['username'] ?? '') ?> &bull; <?= strtoupper($impersonatedUser['role'] ?? 'MEMBER') ?>).
-          <span style="opacity: 0.9; font-size: 0.78rem; margin-left: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.15rem 0.45rem; border-radius: 4px;">Original Admin: @<?= htmlspecialchars($impAdmin['username'] ?? 'Admin') ?></span>
+          <span class="ts-auto-style-6">Original Admin: @<?= htmlspecialchars($impAdmin['username'] ?? 'Admin') ?></span>
         </span>
       </div>
-      <a href="<?= url('/auth/impersonate/exit') ?>" style="background: #ffffff; color: #c2410c; padding: 0.4rem 1.1rem; border-radius: 6px; text-decoration: none; font-weight: 800; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.2s ease;">
+      <a href="<?= url('/auth/impersonate/exit') ?>" class="ts-auto-style-7">
         <span>Exit Impersonation Mode &rarr;</span>
       </a>
     </div>
@@ -217,15 +201,15 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
 
   <?php if (!empty($siteSettings['site_maintenance_mode']) && $siteSettings['site_maintenance_mode'] === '1' && (Auth::isAdmin() || !empty($_SESSION['maintenance_bypass']))): ?>
     <div class="maint-admin-indicator-banner">
-      <div class="container" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-        <span style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700;">
-          <i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: #f59e0b;"></i>
+      <div class="container ts-auto-style-8">
+        <span class="ts-auto-style-9">
+          <i data-lucide="alert-triangle" class="ts-auto-style-10"></i>
           <span><strong>MAINTENANCE MODE ACTIVE:</strong> Public visitors receive HTTP 503. You are bypassing this as Administrator.</span>
         </span>
-        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-          <a href="<?= url('/admin/settings?tab=general') ?>" class="ts-btn ts-btn-xs ts-btn-outline" style="border-color: currentColor;">⚙️ Settings</a>
+        <div class="ts-auto-style-11">
+          <a href="<?= url('/admin/settings?tab=general') ?>" class="ts-btn ts-btn-xs ts-btn-outline ts-auto-style-12">⚙️ Settings</a>
           <a href="<?= url('/?preview_503=1') ?>" target="_blank" class="ts-btn ts-btn-xs ts-btn-primary">👁️ Preview 503 Screen ↗</a>
-          <a href="<?= url('/?simulate_guest=1') ?>" class="ts-btn ts-btn-xs ts-btn-outline" style="background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.5); color: #fca5a5;">🔒 Test As Visitor (Lockout)</a>
+          <a href="<?= url('/?simulate_guest=1') ?>" class="ts-btn ts-btn-xs ts-btn-outline ts-auto-style-13">🔒 Test As Visitor (Lockout)</a>
         </div>
       </div>
     </div>
@@ -239,30 +223,30 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
     $activeBanners = \App\Core\BannerHelper::getActiveBanners();
     foreach ($activeBanners as $banner):
   ?>
-    <div id="site-announcement-<?= $banner['id'] ?>" class="ts-announcement-banner" style="background: <?= htmlspecialchars($banner['banner_color']) ?>; color: <?= htmlspecialchars($banner['text_color']) ?>; padding: 0.55rem 1rem; font-size: 0.85rem; text-align: center; position: relative; z-index: 100; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+    <div id="site-announcement-<?= $banner['id'] ?>" class="ts-announcement-banner ts-auto-style-14">
       <span><?= htmlspecialchars($banner['message']) ?></span>
       <?php if (!empty($banner['action_url'])): ?>
-        <a href="<?= htmlspecialchars($banner['action_url']) ?>" style="background: rgba(0,0,0,0.25); color: #ffffff; padding: 0.2rem 0.65rem; border-radius: 9999px; text-decoration: none; font-size: 0.78rem; border: 1px solid rgba(255,255,255,0.3);">
+        <a href="<?= htmlspecialchars($banner['action_url']) ?>" class="ts-auto-style-15">
           <?= htmlspecialchars($banner['action_label'] ?: 'Learn More') ?> &rarr;
         </a>
       <?php endif; ?>
-      <button type="button" onclick="dismissBanner(<?= (int)$banner['id'] ?>)" style="background: rgba(0,0,0,0.2); border: none; color: <?= htmlspecialchars($banner['text_color']) ?>; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; opacity: 0.85; cursor: pointer; font-size: 0.95rem; line-height: 1; padding: 0; margin-left: 0.5rem; transition: all 0.2s ease;" title="Dismiss announcement">&times;</button>
+      <button type="button" onclick="dismissBanner(<?= (int)$banner['id'] ?>)" class="ts-auto-style-16" title="Dismiss announcement">&times;</button>
     </div>
   <?php endforeach; ?>
 
   <!-- Top Navigation Bar -->
   <header class="ts-navbar">
-    <div class="nav-inner" style="width: 100%; max-width: 100%; padding: 0 2rem;">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <div class="nav-inner ts-auto-style-17">
+      <div class="ts-auto-style-3">
         <!-- Mobile Sidebar Toggle -->
         <button id="mobile-menu-toggle" class="ts-mobile-menu-btn" aria-label="Toggle Mobile Navigation">
-          <i data-lucide="menu" style="width: 22px; height: 22px;"></i>
+          <i data-lucide="menu" class="ts-auto-style-18"></i>
         </button>
 
         <!-- Brand Logo -->
         <a href="<?= url('/') ?>" class="ts-logo">
           <div class="logo-icon"><i data-lucide="radar"></i></div>
-          <span>Tech<span style="color: var(--ts-primary-light);">Scout</span></span>
+          <span>Tech<span class="ts-auto-style-19">Scout</span></span>
         </a>
       </div>
 
@@ -315,7 +299,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
             <a href="<?= htmlspecialchars($navUrl) ?>" target="<?= htmlspecialchars($nav['target'] ?? '_self') ?>" class="<?= $isActive ? 'active' : '' ?>">
               <?= htmlspecialchars($nav['label']) ?>
               <?php if (!empty($nav['badge_text'])): ?>
-                <span class="ts-badge ts-badge-<?= htmlspecialchars($nav['badge_color'] ?? 'cyan') ?>" style="font-size:0.6rem; padding:0.05rem 0.35rem; margin-left:0.25rem;">
+                <span class="ts-badge ts-badge-<?= htmlspecialchars($nav['badge_color'] ?? 'cyan') ?> ts-auto-style-20">
                   <?= htmlspecialchars($nav['badge_text']) ?>
                 </span>
               <?php endif; ?>
@@ -325,16 +309,16 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       </ul>
 
       <!-- Right Action Items -->
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="ts-auto-style-3">
         <!-- Instant Search Trigger (Cmd+K) -->
         <button class="ts-btn ts-btn-outline ts-btn-sm trigger-search-modal" title="Search (Cmd+K)">
-          <i data-lucide="search" style="width: 15px; height: 15px;"></i>
-          <span class="desktop-only-text" style="color: var(--ts-text-tertiary); font-size: 0.78rem; margin-left: 0.2rem;">⌘K</span>
+          <i data-lucide="search" class="ts-auto-style-1"></i>
+          <span class="desktop-only-text ts-auto-style-21">⌘K</span>
         </button>
 
         <!-- Theme Toggle -->
         <button id="theme-toggle" type="button" onclick="toggleTheme()" class="ts-btn ts-btn-outline ts-btn-sm" title="Toggle Theme">
-          <i data-lucide="moon" style="width: 15px; height: 15px;"></i>
+          <i data-lucide="moon" class="ts-auto-style-1"></i>
         </button>
 
 
@@ -342,56 +326,56 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
         <?php if ($user): ?>
           <?php $unreadNotifCount = \App\Core\NotificationHelper::getUnreadCount((int)$user['id']); ?>
           <!-- In-App Notification Center Trigger -->
-          <div class="ts-profile-menu-wrap" id="notif-center-wrap" style="position: relative;">
-            <button class="ts-btn ts-btn-outline ts-btn-sm" id="notif-bell-btn" onclick="toggleNotifDropdown()" title="Notifications" style="position: relative; padding: 0.4rem 0.6rem;">
-              <i data-lucide="bell" style="width: 16px; height: 16px;"></i>
-              <span id="notif-badge" class="notif-badge-pill" style="<?= $unreadNotifCount > 0 ? 'display: flex;' : 'display: none;' ?> position: absolute; top: -5px; right: -5px; background: #ec4899; color: #fff; font-size: 0.65rem; font-weight: 800; border-radius: 999px; min-width: 18px; height: 18px; align-items: center; justify-content: center; padding: 0 4px; box-shadow: 0 0 10px rgba(236,72,153,0.6);">
+          <div class="ts-profile-menu-wrap" id="notif-center-wrap" class="ts-auto-style-22">
+            <button class="ts-btn ts-btn-outline ts-btn-sm" id="notif-bell-btn" onclick="toggleNotifDropdown()" title="Notifications" class="ts-auto-style-23">
+              <i data-lucide="bell" class="ts-auto-style-24"></i>
+              <span id="notif-badge" class="notif-badge-pill ts-auto-style-25">
                 <?= $unreadNotifCount > 99 ? '99+' : $unreadNotifCount ?>
               </span>
             </button>
 
             <!-- Notifications Dropdown Popup with True Glassmorphism -->
-            <div id="notif-dropdown" class="ts-glassmorphism-panel" style="display: none; position: absolute; top: calc(100% + 12px); right: 0; width: 400px; max-width: 90vw; border-radius: 16px; z-index: 99999; overflow: hidden; animation: tsDropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div id="notif-dropdown" class="ts-glassmorphism-panel ts-auto-style-26">
               
               <!-- Header Bar -->
-              <div class="notif-dropdown-header" style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.15rem; border-bottom: 1px solid var(--ts-border-subtle);">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <div style="width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #6366f1, #38bdf8); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 2px 8px rgba(56,189,248,0.3);">
-                    <i data-lucide="bell" style="width: 14px; height: 14px;"></i>
+              <div class="notif-dropdown-header ts-auto-style-27">
+                <div class="ts-auto-style-28">
+                  <div class="ts-auto-style-29">
+                    <i data-lucide="bell" class="ts-auto-style-30"></i>
                   </div>
                   <div>
-                    <strong style="font-size: 0.92rem; font-family: 'Outfit', sans-serif;">Notifications</strong>
-                    <span id="notif-dropdown-unread-pill" style="font-size: 0.68rem; color: #38bdf8; margin-left: 0.35rem; font-weight: 700;"></span>
+                    <strong class="ts-auto-style-31">Notifications</strong>
+                    <span id="notif-dropdown-unread-pill" class="ts-auto-style-32"></span>
                   </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <button type="button" onclick="markAllNotifsRead()" class="ts-glass-btn-sm" title="Mark all read" style="background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; font-size: 0.72rem; padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.25rem;">
-                    <i data-lucide="check-check" style="width: 12px; height: 12px;"></i> Mark all read
+                <div class="ts-auto-style-28">
+                  <button type="button" onclick="markAllNotifsRead()" class="ts-glass-btn-sm" title="Mark all read" class="ts-auto-style-33">
+                    <i data-lucide="check-check" class="ts-auto-style-34"></i> Mark all read
                   </button>
                 </div>
               </div>
 
               <!-- Filter Tabs Strip -->
-              <div class="notif-dropdown-filter-strip" style="display: flex; gap: 0.35rem; padding: 0.5rem 0.85rem; border-bottom: 1px solid var(--ts-border-subtle); overflow-x: auto; scrollbar-width: none;">
-                <button type="button" onclick="switchDropdownFilter('all', this)" class="notif-dd-tab active" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; border-radius: 999px; cursor: pointer; font-weight: 600; white-space: nowrap;">All</button>
-                <button type="button" onclick="switchDropdownFilter('unread', this)" class="notif-dd-tab" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; border-radius: 999px; cursor: pointer; font-weight: 600; white-space: nowrap;">Unread</button>
-                <button type="button" onclick="switchDropdownFilter('replies', this)" class="notif-dd-tab" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; border-radius: 999px; cursor: pointer; font-weight: 600; white-space: nowrap;">Replies</button>
-                <button type="button" onclick="switchDropdownFilter('system', this)" class="notif-dd-tab" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; border-radius: 999px; cursor: pointer; font-weight: 600; white-space: nowrap;">System</button>
-                <button type="button" onclick="switchDropdownFilter('rewards', this)" class="notif-dd-tab" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; border-radius: 999px; cursor: pointer; font-weight: 600; white-space: nowrap;">Rewards</button>
+              <div class="notif-dropdown-filter-strip ts-auto-style-35">
+                <button type="button" onclick="switchDropdownFilter('all', this)" class="notif-dd-tab active ts-auto-style-36">All</button>
+                <button type="button" onclick="switchDropdownFilter('unread', this)" class="notif-dd-tab ts-auto-style-36">Unread</button>
+                <button type="button" onclick="switchDropdownFilter('replies', this)" class="notif-dd-tab ts-auto-style-36">Replies</button>
+                <button type="button" onclick="switchDropdownFilter('system', this)" class="notif-dd-tab ts-auto-style-36">System</button>
+                <button type="button" onclick="switchDropdownFilter('rewards', this)" class="notif-dd-tab ts-auto-style-36">Rewards</button>
               </div>
 
               <!-- Notifications Items Container -->
-              <div id="notif-items-container" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; scrollbar-width: thin;">
-                <div style="text-align: center; padding: 2.5rem 1rem; color: #94a3b8; font-size: 0.85rem;">
-                  <div style="display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(56,189,248,0.3); border-top-color: #38bdf8; border-radius: 50%; animation: tsSpin 0.8s linear infinite; margin-bottom: 0.5rem;"></div>
+              <div id="notif-items-container" class="ts-auto-style-37">
+                <div class="ts-auto-style-38">
+                  <div class="ts-auto-style-39"></div>
                   <div>Loading live alerts...</div>
                 </div>
               </div>
 
               <!-- Footer Bar -->
-              <div class="notif-dropdown-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.15rem; border-top: 1px solid var(--ts-border-subtle);">
-                <span id="notif-dd-total-count" style="font-size: 0.74rem; color: #64748b;">Live Stream</span>
-                <a href="<?= url('/notifications') ?>" style="font-size: 0.8rem; color: #38bdf8; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem;">
+              <div class="notif-dropdown-footer ts-auto-style-40">
+                <span id="notif-dd-total-count" class="ts-auto-style-41">Live Stream</span>
+                <a href="<?= url('/notifications') ?>" class="ts-auto-style-42">
                   Full Notification Roster &rarr;
                 </a>
               </div>
@@ -409,7 +393,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
                 </span>
               <?php endif; ?>
               <span class="ts-avatar-badge-dot"></span>
-              <i data-lucide="chevron-down" class="ts-avatar-chevron" style="width: 14px; height: 14px; margin-left: 2px;"></i>
+              <i data-lucide="chevron-down" class="ts-avatar-chevron ts-auto-style-43"></i>
             </button>
 
             <!-- Profile Dropdown Popup -->
@@ -419,7 +403,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
                   <strong><?= htmlspecialchars($user['display_name'] ?? $user['username'] ?? 'User') ?></strong>
                   <span>@<?= htmlspecialchars($user['username'] ?? 'user') ?></span>
                 </div>
-                <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">
+                <span class="ts-badge ts-badge-cyan ts-auto-style-44">
                   <?= strtoupper($user['role'] ?? 'MEMBER') ?>
                 </span>
               </div>
@@ -443,8 +427,8 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <?php endif; ?>
 
               <?php if (Auth::isAuthor()): ?>
-                <a href="<?= url('/author/editor') ?>" class="ts-dropdown-item" style="color: #38bdf8; font-weight: 700;">
-                  <i data-lucide="pen-tool" style="color: #38bdf8;"></i>
+                <a href="<?= url('/author/editor') ?>" class="ts-dropdown-item ts-auto-style-45">
+                  <i data-lucide="pen-tool" class="ts-auto-style-46"></i>
                   <span>New Technical Post</span>
                 </a>
                 <a href="<?= url('/author/dashboard') ?>" class="ts-dropdown-item">
@@ -459,26 +443,26 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <?php else: ?>
                 <?php $appStat = Auth::authorApplicationStatus(); ?>
                 <?php if ($appStat === 'rejected'): ?>
-                  <a href="<?= url('/author/apply') ?>" class="ts-dropdown-item" style="color: #f59e0b; background: rgba(245,158,11,0.08);">
-                    <i data-lucide="alert-triangle" style="color: #f59e0b;"></i>
+                  <a href="<?= url('/author/apply') ?>" class="ts-dropdown-item ts-auto-style-47">
+                    <i data-lucide="alert-triangle" class="ts-auto-style-48"></i>
                     <span>Author Application: Revisions Needed ⚠️</span>
                   </a>
                 <?php elseif ($appStat === 'pending'): ?>
-                  <a href="<?= url('/author/apply') ?>" class="ts-dropdown-item" style="color: #38bdf8; background: rgba(56,189,248,0.08);">
-                    <i data-lucide="clock" style="color: #38bdf8;"></i>
+                  <a href="<?= url('/author/apply') ?>" class="ts-dropdown-item ts-auto-style-49">
+                    <i data-lucide="clock" class="ts-auto-style-46"></i>
                     <span>Application Under Review ⏳</span>
                   </a>
                 <?php else: ?>
-                  <a href="<?= url('/author/apply') ?>" class="ts-dropdown-item" style="color: #f472b6; font-weight: 700;">
-                    <i data-lucide="sparkles" style="color: #f472b6;"></i>
+                  <a href="<?= url('/author/apply') ?>" class="ts-dropdown-item ts-auto-style-50">
+                    <i data-lucide="sparkles" class="ts-auto-style-51"></i>
                     <span>Apply to Become an Author ✨</span>
                   </a>
                 <?php endif; ?>
               <?php endif; ?>
 
               <!-- User Standard Actions (Ordered from Most Used to Least Used) -->
-              <a href="<?= url('/bookmarks') ?>" class="ts-dropdown-item" style="color: #38bdf8;">
-                <i data-lucide="bookmark" style="color: #38bdf8;"></i>
+              <a href="<?= url('/bookmarks') ?>" class="ts-dropdown-item ts-auto-style-46">
+                <i data-lucide="bookmark" class="ts-auto-style-46"></i>
                 <span>Saved Bookmarks 🔖</span>
               </a>
 
@@ -503,7 +487,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               </a>
 
               <a href="<?= url('/categories') ?>" class="ts-dropdown-item">
-                <i data-lucide="sparkles" style="color: #ec4899;"></i>
+                <i data-lucide="sparkles" class="ts-auto-style-52"></i>
                 <span>Explore Categories &amp; Follow 🌟</span>
               </a>
 
@@ -519,15 +503,15 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
                 </a>
               <?php endif; ?>
 
-              <a href="<?= url('/account/settings') ?>" class="ts-dropdown-item" style="color: #38bdf8;">
-                <i data-lucide="settings" style="color: #38bdf8;"></i>
+              <a href="<?= url('/account/settings') ?>" class="ts-dropdown-item ts-auto-style-46">
+                <i data-lucide="settings" class="ts-auto-style-46"></i>
                 <span>Account Settings &amp; Devices 🛡️</span>
               </a>
 
               <div class="ts-dropdown-divider"></div>
 
-              <a href="<?= url('/auth/logout') ?>" class="ts-dropdown-item logout-link" style="color: #ef4444; font-weight: 700;">
-                <i data-lucide="log-out" style="color: #ef4444;"></i>
+              <a href="<?= url('/auth/logout') ?>" class="ts-dropdown-item logout-link ts-auto-style-53">
+                <i data-lucide="log-out" class="ts-auto-style-54"></i>
                 <span>Sign Out</span>
               </a>
             </div>
@@ -540,7 +524,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   </header>
 
   <?php if (!empty($siteSettings['ad_slot_top'])): ?>
-    <div class="container" style="margin-top: 1rem; margin-bottom: 0.5rem; text-align: center; overflow: hidden;">
+    <div class="container ts-auto-style-55">
       <?= $siteSettings['ad_slot_top'] ?>
     </div>
   <?php endif; ?>
@@ -549,19 +533,19 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <div id="mobile-drawer-backdrop" class="ts-mobile-backdrop"></div>
   <aside id="mobile-drawer" class="ts-mobile-drawer">
     <div class="mobile-drawer-header">
-      <a href="<?= url('/') ?>" class="ts-logo" style="font-size: 1.25rem;">
-        <div class="logo-icon" style="width: 32px; height: 32px;"><i data-lucide="radar"></i></div>
-        <span>Tech<span style="color: var(--ts-primary-light);">Scout</span></span>
+      <a href="<?= url('/') ?>" class="ts-logo ts-auto-style-56">
+        <div class="logo-icon ts-auto-style-57"><i data-lucide="radar"></i></div>
+        <span>Tech<span class="ts-auto-style-19">Scout</span></span>
       </a>
       <button id="mobile-drawer-close" class="ts-btn ts-btn-outline ts-btn-sm" aria-label="Close Navigation">
-        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        <i data-lucide="x" class="ts-auto-style-58"></i>
       </button>
     </div>
 
     <!-- Quick Search trigger in drawer -->
-    <div style="padding: 1rem 1.25rem 0.5rem 1.25rem;">
-      <button class="ts-btn ts-btn-outline trigger-search-modal" style="width: 100%; justify-content: flex-start; gap: 0.75rem; color: var(--ts-text-secondary); background: var(--ts-bg-surface-elevated);">
-        <i data-lucide="search" style="width: 16px; height: 16px; color: var(--ts-primary);"></i>
+    <div class="ts-auto-style-59">
+      <button class="ts-btn ts-btn-outline trigger-search-modal ts-auto-style-60">
+        <i data-lucide="search" class="ts-auto-style-61"></i>
         <span>Search anything... (⌘K)</span>
       </button>
     </div>
@@ -598,33 +582,33 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
         <span>Developer Challenges</span>
       </a>
 
-      <div class="mobile-nav-section-title" style="margin-top: 1.5rem;">User & Workspace</div>
+      <div class="mobile-nav-section-title ts-auto-style-62">User & Workspace</div>
       <?php if ($user): ?>
         <div class="mobile-user-card">
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="ts-auto-style-3">
             <?php if (!empty($user['author_avatar'] ?? $user['avatar_url'] ?? '')): ?>
-              <img src="<?= htmlspecialchars(image_url($user['author_avatar'] ?? $user['avatar_url'] ?? '')) ?>" alt="Avatar" class="ts-avatar-img" style="width: 38px; height: 38px;">
+              <img src="<?= htmlspecialchars(image_url($user['author_avatar'] ?? $user['avatar_url'] ?? '')) ?>" alt="Avatar" class="ts-avatar-img ts-auto-style-63">
             <?php else: ?>
-              <span class="ts-avatar-initials" style="width: 38px; height: 38px; font-size: 0.9rem;">
+              <span class="ts-avatar-initials ts-auto-style-64">
                 <?= strtoupper(substr($user['display_name'] ?? $user['username'] ?? 'U', 0, 2)) ?>
               </span>
             <?php endif; ?>
             <div>
-              <div style="font-weight: 700; color: var(--ts-text-primary); font-size: 0.95rem;"><?= htmlspecialchars($user['display_name'] ?? $user['username']) ?></div>
-              <div style="font-size: 0.75rem; color: var(--ts-text-tertiary);"><?= htmlspecialchars($user['email'] ?? '') ?></div>
+              <div class="ts-auto-style-65"><?= htmlspecialchars($user['display_name'] ?? $user['username']) ?></div>
+              <div class="ts-auto-style-66"><?= htmlspecialchars($user['email'] ?? '') ?></div>
             </div>
           </div>
         </div>
 
         <?php if (Auth::isAdmin()): ?>
-          <a href="<?= url('/admin/dashboard') ?>" class="mobile-nav-link" style="color: #f472b6; font-weight: 700;">
+          <a href="<?= url('/admin/dashboard') ?>" class="mobile-nav-link ts-auto-style-50">
             <i data-lucide="shield-alert"></i>
             <span>Admin Command Center</span>
           </a>
         <?php endif; ?>
 
         <?php if (Auth::isAuthor()): ?>
-          <a href="<?= url('/author/editor') ?>" class="mobile-nav-link" style="color: #38bdf8; font-weight: 700;">
+          <a href="<?= url('/author/editor') ?>" class="mobile-nav-link ts-auto-style-45">
             <i data-lucide="pen-tool"></i>
             <span>New Technical Post</span>
           </a>
@@ -640,24 +624,24 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
         <?php else: ?>
           <?php $mAppStat = Auth::authorApplicationStatus(); ?>
           <?php if ($mAppStat === 'rejected'): ?>
-            <a href="<?= url('/author/apply') ?>" class="mobile-nav-link" style="color: #f59e0b;">
+            <a href="<?= url('/author/apply') ?>" class="mobile-nav-link ts-auto-style-48">
               <i data-lucide="alert-triangle"></i>
               <span>Author Application: Revisions Needed ⚠️</span>
             </a>
           <?php elseif ($mAppStat === 'pending'): ?>
-            <a href="<?= url('/author/apply') ?>" class="mobile-nav-link" style="color: #38bdf8;">
+            <a href="<?= url('/author/apply') ?>" class="mobile-nav-link ts-auto-style-46">
               <i data-lucide="clock"></i>
               <span>Application Under Review ⏳</span>
             </a>
           <?php else: ?>
-            <a href="<?= url('/author/apply') ?>" class="mobile-nav-link" style="color: #f472b6; font-weight: 700;">
+            <a href="<?= url('/author/apply') ?>" class="mobile-nav-link ts-auto-style-50">
               <i data-lucide="sparkles"></i>
               <span>Apply to Become an Author ✨</span>
             </a>
           <?php endif; ?>
         <?php endif; ?>
 
-        <a href="<?= url('/bookmarks') ?>" class="mobile-nav-link" style="color: #38bdf8;">
+        <a href="<?= url('/bookmarks') ?>" class="mobile-nav-link ts-auto-style-46">
           <i data-lucide="bookmark"></i>
           <span>Saved Bookmarks 🔖</span>
         </a>
@@ -683,7 +667,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
         </a>
 
         <a href="<?= url('/categories') ?>" class="mobile-nav-link">
-          <i data-lucide="sparkles" style="color: #ec4899;"></i>
+          <i data-lucide="sparkles" class="ts-auto-style-52"></i>
           <span>Explore Categories &amp; Follow 🌟</span>
         </a>
 
@@ -699,23 +683,23 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
           </a>
         <?php endif; ?>
 
-        <a href="<?= url('/account/settings') ?>" class="mobile-nav-link" style="color: #38bdf8;">
+        <a href="<?= url('/account/settings') ?>" class="mobile-nav-link ts-auto-style-46">
           <i data-lucide="settings"></i>
           <span>Account Settings &amp; Devices 🛡️</span>
         </a>
 
-        <a href="<?= url('/auth/logout') ?>" class="mobile-nav-link" style="color: #ef4444; font-weight: 700; margin-top: 0.5rem;">
+        <a href="<?= url('/auth/logout') ?>" class="mobile-nav-link ts-auto-style-67">
           <i data-lucide="log-out"></i>
           <span>Sign Out</span>
         </a>
       <?php else: ?>
-        <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0.5rem 1.25rem;">
-          <a href="<?= url('/auth/login') ?>" class="ts-btn ts-btn-outline" style="width: 100%;">Sign In</a>
-          <a href="<?= url('/auth/register') ?>" class="ts-btn ts-btn-primary" style="width: 100%;">Join TechScout</a>
+        <div class="ts-auto-style-68">
+          <a href="<?= url('/auth/login') ?>" class="ts-btn ts-btn-outline ts-auto-style-69">Sign In</a>
+          <a href="<?= url('/auth/register') ?>" class="ts-btn ts-btn-primary ts-auto-style-69">Join TechScout</a>
         </div>
       <?php endif; ?>
 
-      <div class="mobile-nav-section-title" style="margin-top: 1.5rem;">Platform Info</div>
+      <div class="mobile-nav-section-title ts-auto-style-62">Platform Info</div>
       <a href="<?= url('/about') ?>" class="mobile-nav-link">
         <i data-lucide="info"></i>
         <span>About Us</span>
@@ -731,12 +715,12 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <div id="search-modal" class="ts-search-modal">
     <div class="search-box-card">
       <div class="search-input-wrap">
-        <i data-lucide="search" style="color: var(--ts-primary);"></i>
+        <i data-lucide="search" class="ts-auto-style-70"></i>
         <input type="text" id="modal-search-input" placeholder="Search technical articles, AI tools, prompts, GPTs..." autocomplete="off">
-        <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); background: var(--ts-bg-surface-elevated); padding: 0.2rem 0.5rem; border-radius: 4px;">ESC to close</span>
+        <span class="ts-auto-style-71">ESC to close</span>
       </div>
       <div id="modal-search-results" class="search-results-list">
-        <div style="padding: 1.5rem; text-align: center; color: var(--ts-text-tertiary);">
+        <div class="ts-auto-style-72">
           Type to instantly search across all TechScout modules...
         </div>
       </div>
@@ -814,12 +798,12 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
 
         if (data.notifications.length === 0) {
           container.innerHTML = `
-            <div style="text-align: center; padding: 3rem 1.5rem; color: #94a3b8;">
-              <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(148,163,184,0.08); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: #64748b;">
-                <i data-lucide="bell-off" style="width: 22px; height: 22px;"></i>
+            <div class="ts-auto-style-73">
+              <div class="ts-auto-style-74">
+                <i data-lucide="bell-off" class="ts-auto-style-18"></i>
               </div>
-              <div style="font-size: 0.9rem; font-weight: 600; color: #f8fafc; margin-bottom: 0.2rem;">All Caught Up!</div>
-              <div style="font-size: 0.78rem; color: #64748b;">No ${filter !== 'all' ? filter : ''} notifications at this time.</div>
+              <div class="ts-auto-style-75">All Caught Up!</div>
+              <div class="ts-auto-style-76">No ${filter !== 'all' ? filter : ''} notifications at this time.</div>
             </div>
           `;
         } else {
@@ -834,34 +818,34 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
             const relTime = n.relative_time || (n.created_at ? n.created_at.substring(0, 16) : '');
 
             html += `
-              <div id="dd-notif-row-${n.id}" class="notif-dropdown-item ${isUnread ? 'is-unread' : ''}" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--ts-border-subtle); background: ${isUnread ? 'rgba(56,189,248,0.06)' : 'transparent'}; border-left: 3px solid ${isUnread ? '#38bdf8' : 'transparent'}; transition: all 0.15s ease; position: relative;">
+              <div id="dd-notif-row-${n.id}" class="notif-dropdown-item ${isUnread ? 'is-unread' : ''} ts-auto-style-77">
                 
                 <!-- Icon Badge with Glow -->
-                <div class="notif-icon-box" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--ts-border-subtle); display: flex; align-items: center; justify-content: center; color: ${iconColor}; flex-shrink: 0; margin-top: 2px;">
-                  <i data-lucide="${iconName}" style="width: 16px; height: 16px;"></i>
+                <div class="notif-icon-box ts-auto-style-78">
+                  <i data-lucide="${iconName}" class="ts-auto-style-24"></i>
                 </div>
 
                 <!-- Text Content -->
-                <div style="flex: 1; min-width: 0; cursor: pointer;" onclick="clickNotif(${n.id}, '${n.action_url || ''}')">
-                  <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem; flex-wrap: wrap;">
-                    <span class="ts-badge ${badgeClass}" style="font-size: 0.6rem; padding: 0.05rem 0.35rem; font-weight: 700;">${typeLabel}</span>
-                    <strong class="notif-item-title" style="font-size: 0.84rem; font-weight: ${isUnread ? '700' : '600'}; line-height: 1.3;">${n.title}</strong>
-                    ${isUnread ? '<span style="width: 6px; height: 6px; border-radius: 50%; background: #ec4899; flex-shrink: 0;"></span>' : ''}
+                <div class="ts-auto-style-79" onclick="clickNotif(${n.id}, '${n.action_url || ''}')">
+                  <div class="ts-auto-style-80">
+                    <span class="ts-badge ${badgeClass} ts-auto-style-81">${typeLabel}</span>
+                    <strong class="notif-item-title ts-auto-style-82">${n.title}</strong>
+                    ${isUnread ? '<span class="ts-auto-style-83"></span>' : ''}
                   </div>
-                  <div class="notif-item-message" style="font-size: 0.78rem; line-height: 1.4; margin-bottom: 0.35rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.message}</div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; font-size: 0.68rem; color: #64748b;">
+                  <div class="notif-item-message ts-auto-style-84">${n.message}</div>
+                  <div class="ts-auto-style-85">
                     <span>${relTime}</span>
-                    ${n.action_url ? `<span style="color: #38bdf8; font-weight: 600;">${actionLabel}</span>` : ''}
+                    ${n.action_url ? `<span class="ts-auto-style-86">${actionLabel}</span>` : ''}
                   </div>
                 </div>
 
                 <!-- Quick Action Buttons -->
-                <div style="display: flex; flex-direction: column; gap: 0.25rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                  <button type="button" onclick="toggleDropdownSingleRead(${n.id})" title="${isUnread ? 'Mark read' : 'Mark unread'}" style="background: rgba(148,163,184,0.08); border: 1px solid var(--ts-border-subtle); border-radius: 4px; padding: 0.2rem; color: ${isUnread ? '#38bdf8' : '#64748b'}; cursor: pointer;">
-                    <i data-lucide="${isUnread ? 'check' : 'mail'}" style="width: 12px; height: 12px;"></i>
+                <div class="ts-auto-style-87" onclick="event.stopPropagation();">
+                  <button type="button" onclick="toggleDropdownSingleRead(${n.id})" title="${isUnread ? 'Mark read' : 'Mark unread'}" class="ts-auto-style-88">
+                    <i data-lucide="${isUnread ? 'check' : 'mail'}" class="ts-auto-style-34"></i>
                   </button>
-                  <button type="button" onclick="dismissDropdownNotif(${n.id})" title="Dismiss" style="background: transparent; border: none; padding: 0.2rem; color: #ef4444; cursor: pointer; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
-                    <i data-lucide="x" style="width: 12px; height: 12px;"></i>
+                  <button type="button" onclick="dismissDropdownNotif(${n.id})" title="Dismiss" class="ts-auto-style-89" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+                    <i data-lucide="x" class="ts-auto-style-34"></i>
                   </button>
                 </div>
               </div>

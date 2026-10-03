@@ -106,7 +106,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       var isToggling = false;
       window.syncAllThemeButtons = function(theme) {
         document.querySelectorAll('#theme-toggle, #adminThemeToggleBtn, .ts-theme-toggle').forEach(function(btn) {
-          btn.innerHTML = '<i data-lucide="' + (theme === 'light' ? 'sun' : 'moon') + '" style="width: 15px; height: 15px;"></i>';
+          btn.innerHTML = '<i data-lucide="' + (theme === 'light' ? 'sun' : 'moon') + '" class="ts-auto-style-1"></i>';
         });
         if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
           lucide.createIcons();
@@ -174,32 +174,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <link rel="stylesheet" href="<?= url('assets/css/admin-modals.css?v=' . $adminCssV) ?>">
 
   <!-- PJAX SPA Navigation Styles -->
-  <style>
-    #adminPjaxProgressBar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      width: 0%;
-      background: linear-gradient(90deg, #06b6d4, #6366f1, #ec4899);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.8), 0 0 20px rgba(236, 72, 153, 0.6);
-      z-index: 99999999;
-      pointer-events: none;
-      transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
-      opacity: 0;
-    }
-    .admin-content-wrapper {
-      transition: opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .admin-content-wrapper.pjax-anim-out {
-      opacity: 0.15;
-      transform: translateY(4px);
-    }
-    .admin-content-wrapper.pjax-anim-in {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  </style>
+  
 
   <!-- Network & CDN Preconnect Hints -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -277,17 +252,17 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       $impAdmin = \App\Core\Auth::getImpersonatorAdmin(); 
       $impersonatedUser = \App\Core\Auth::user();
     ?>
-    <div id="ts-impersonation-sticky-bar-admin" style="position: sticky; top: 0; left: 0; right: 0; z-index: 999999; background: linear-gradient(90deg, #ea580c, #f97316); color: #ffffff; padding: 0.65rem 1.5rem; display: flex; align-items: center; justify-content: space-between; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; box-shadow: 0 4px 20px rgba(234, 88, 12, 0.45); border-bottom: 2px solid #c2410c;">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span style="font-size: 1.25rem; line-height: 1;">⚠️</span>
+    <div id="ts-impersonation-sticky-bar-admin" class="ts-auto-style-2">
+      <div class="ts-auto-style-3">
+        <span class="ts-auto-style-4">⚠️</span>
         <span>
           <strong>ADMIN IMPERSONATION MODE:</strong> Viewing platform as 
-          <strong style="text-decoration: underline;"><?= htmlspecialchars($impersonatedUser['display_name'] ?? $impersonatedUser['username'] ?? '') ?></strong> 
+          <strong class="ts-auto-style-5"><?= htmlspecialchars($impersonatedUser['display_name'] ?? $impersonatedUser['username'] ?? '') ?></strong> 
           (@<?= htmlspecialchars($impersonatedUser['username'] ?? '') ?> &bull; <?= strtoupper($impersonatedUser['role'] ?? 'MEMBER') ?>).
-          <span style="opacity: 0.9; font-size: 0.78rem; margin-left: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.15rem 0.45rem; border-radius: 4px;">Original Admin: @<?= htmlspecialchars($impAdmin['username'] ?? 'Admin') ?></span>
+          <span class="ts-auto-style-6">Original Admin: @<?= htmlspecialchars($impAdmin['username'] ?? 'Admin') ?></span>
         </span>
       </div>
-      <a href="<?= url('/auth/impersonate/exit') ?>" style="background: #ffffff; color: #c2410c; padding: 0.4rem 1.1rem; border-radius: 6px; text-decoration: none; font-weight: 800; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.2s ease;">
+      <a href="<?= url('/auth/impersonate/exit') ?>" class="ts-auto-style-7">
         <span>Exit Impersonation Mode &rarr;</span>
       </a>
     </div>
@@ -298,12 +273,12 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
 
     <!-- Sidebar Navigation -->
     <aside class="admin-sidebar" id="adminSidebar">
-      <div class="sidebar-header-strip" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--admin-border-subtle); padding: 0.75rem 0.85rem;">
-        <a href="<?= url('/admin/dashboard') ?>" class="admin-brand" style="border: none; padding: 0.25rem 0;">
-          <div class="logo-icon" style="background: linear-gradient(135deg, #ec4899, #6366f1);"><i data-lucide="shield-alert"></i></div>
+      <div class="sidebar-header-strip ts-auto-style-8">
+        <a href="<?= url('/admin/dashboard') ?>" class="admin-brand ts-auto-style-9">
+          <div class="logo-icon ts-auto-style-10"><i data-lucide="shield-alert"></i></div>
           <div class="brand-text">
-            <div style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: #f8fafc; line-height: 1.2;">
-              TechScout <span style="color: #ec4899;">HQ</span>
+            <div class="ts-auto-style-11">
+              TechScout <span class="ts-auto-style-12">HQ</span>
             </div>
             <div class="hud-status">
               <span class="live-pulse"></span>
@@ -312,8 +287,8 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
           </div>
         </a>
 
-        <button type="button" onclick="toggleAdminSidebar()" class="ts-btn ts-btn-outline ts-btn-sm sidebar-collapse-trigger" style="padding: 0.25rem 0.45rem; border-color: rgba(148,163,184,0.15);" title="Collapse / Expand Sidebar">
-          <i data-lucide="panel-left-close" id="collapseIcon" style="width: 16px; height: 16px;"></i>
+        <button type="button" onclick="toggleAdminSidebar()" class="ts-btn ts-btn-outline ts-btn-sm sidebar-collapse-trigger ts-auto-style-13" title="Collapse / Expand Sidebar">
+          <i data-lucide="panel-left-close" id="collapseIcon" class="ts-auto-style-14"></i>
         </button>
       </div>
 
@@ -362,14 +337,14 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/content') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/content') ? 'active' : '' ?>" data-tooltip="Content Review Queue">
                 <i data-lucide="check-square"></i> <span>Content Queue</span>
                 <?php if ($pendingQueueCount > 0): ?>
-                  <span class="ts-badge ts-badge-cyan" style="margin-left: auto; font-size: 0.7rem; padding: 0.1rem 0.4rem;"><?= $pendingQueueCount ?></span>
+                  <span class="ts-badge ts-badge-cyan ts-auto-style-15"><?= $pendingQueueCount ?></span>
                 <?php endif; ?>
               </a>
             <?php endif; ?>
             <?php if ($isSuperAdmin || $canAccess('system.flags')): ?>
               <a href="<?= url('/admin/engagement-studio') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/engagement-studio') ? 'active' : '' ?>" data-tooltip="Engagement &amp; Telemetry Simulator">
                 <i data-lucide="sparkles"></i> <span>Engagement Simulator</span>
-                <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.65rem;">SIM</span>
+                <span class="ts-badge ts-badge-pink ts-auto-style-16">SIM</span>
               </a>
             <?php endif; ?>
           </div>
@@ -447,7 +422,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               </a>
               <a href="<?= url('/admin/popups') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/popups') ? 'active' : '' ?>" data-tooltip="Popup & Conversion Manager">
                 <i data-lucide="layout-panel-top"></i> <span>Popup &amp; Conversions</span>
-                <span class="ts-badge ts-badge-pink" style="margin-left: auto; font-size: 0.65rem;">NEW</span>
+                <span class="ts-badge ts-badge-pink ts-auto-style-16">NEW</span>
               </a>
             <?php endif; ?>
           </div>
@@ -501,7 +476,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/applications') ? 'active' : '' ?>" data-tooltip="Author Applications">
                 <i data-lucide="award"></i> <span>Author Applications</span>
                 <?php if (!empty($pendingAppsCount)): ?>
-                  <span class="ts-badge ts-badge-red" style="padding: 0.15rem 0.45rem; font-size: 0.68rem; margin-left: auto;"><?= $pendingAppsCount ?></span>
+                  <span class="ts-badge ts-badge-red ts-auto-style-17"><?= $pendingAppsCount ?></span>
                 <?php endif; ?>
               </a>
               <a href="<?= url('/admin/jobs/applications') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/jobs/applications') ? 'active' : '' ?>" data-tooltip="Job Candidates">
@@ -567,11 +542,11 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               </a>
               <a href="<?= url('/admin/incoming-webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/incoming-webhooks') ? 'active' : '' ?>" data-tooltip="Incoming Webhook Listener">
                 <i data-lucide="arrow-down-to-line"></i> <span>Incoming Webhooks</span>
-                <span class="ts-badge ts-badge-cyan" style="margin-left: auto; font-size: 0.65rem;">NEW</span>
+                <span class="ts-badge ts-badge-cyan ts-auto-style-16">NEW</span>
               </a>
               <a href="<?= url('/admin/custom-api') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/custom-api') ? 'active' : '' ?>" data-tooltip="Custom API Endpoints &amp; Schema Inspector">
                 <i data-lucide="code-2"></i> <span>Custom API Gateway</span>
-                <span class="ts-badge ts-badge-indigo" style="margin-left: auto; font-size: 0.65rem;">NEW</span>
+                <span class="ts-badge ts-badge-indigo ts-auto-style-16">NEW</span>
               </a>
               <a href="<?= url('/admin/mail') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/mail') ? 'active' : '' ?>" data-tooltip="Mail & Templates">
                 <i data-lucide="mail-check"></i> <span>Mail &amp; Template Studio</span>
@@ -595,7 +570,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
                 <i data-lucide="cpu"></i> <span>System Diagnostics</span>
               </a>
             <?php endif; ?>
-            <a href="<?= url('/') ?>" class="admin-nav-link" target="_blank" style="color: #38bdf8;" data-tooltip="View Live Site">
+            <a href="<?= url('/') ?>" class="admin-nav-link" target="_blank" class="ts-auto-style-18" data-tooltip="View Live Site">
               <i data-lucide="external-link"></i> <span>Live Site ↗</span>
             </a>
           </div>
@@ -608,32 +583,32 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
     <!-- Main Content Area -->
     <main class="admin-main">
       <header class="admin-topbar">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <button type="button" onclick="toggleAdminSidebar()" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.35rem 0.65rem;" title="Toggle Sidebar Width">
-            <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
+        <div class="ts-auto-style-3">
+          <button type="button" onclick="toggleAdminSidebar()" class="ts-btn ts-btn-outline ts-btn-sm ts-auto-style-19" title="Toggle Sidebar Width">
+            <i data-lucide="menu" class="ts-auto-style-14"></i>
           </button>
 
           <!-- Topbar Command Search Trigger -->
-          <button type="button" onclick="openAdminCommandPalette()" class="ts-btn ts-btn-outline ts-btn-sm" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; padding: 0.35rem 0.75rem; border-color: rgba(148,163,184,0.25);">
-            <i data-lucide="search" style="width: 14px; height: 14px; color: #38bdf8;"></i>
-            <span style="display: none; @media(min-width:768px){display:inline;}">Search admin commands &amp; tools...</span>
-            <kbd style="background: rgba(148,163,184,0.15); border: 1px solid rgba(148,163,184,0.25); border-radius: 4px; padding: 0.1rem 0.35rem; font-size: 0.65rem; color: #94a3b8; font-family: monospace;">Ctrl K</kbd>
+          <button type="button" onclick="openAdminCommandPalette()" class="ts-btn ts-btn-outline ts-btn-sm ts-auto-style-20">
+            <i data-lucide="search" class="ts-auto-style-21"></i>
+            <span class="ts-auto-style-22">Search admin commands &amp; tools...</span>
+            <kbd class="ts-auto-style-23">Ctrl K</kbd>
           </button>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="ts-auto-style-3">
           <!-- [TS-TZ-03] Admin Multi-Timezone Dual Clock Pill -->
-          <div class="admin-dual-clock-pill" style="display: flex; align-items: center; gap: 0.5rem; background: var(--admin-card-bg, rgba(15,23,42,0.8)); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.25)); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.74rem; font-family: var(--admin-font-mono, monospace);">
-            <div style="display: flex; align-items: center; gap: 0.25rem;" title="Server Time (UTC)">
-              <span class="ts-badge ts-badge-cyan" style="font-size: 0.58rem; padding: 0.05rem 0.25rem;">SRV</span>
-              <span id="adminServerClock" style="color: var(--admin-text-main, #f8fafc); font-weight: 600;">--:--:-- UTC</span>
+          <div class="admin-dual-clock-pill ts-auto-style-24">
+            <div class="ts-auto-style-25" title="Server Time (UTC)">
+              <span class="ts-badge ts-badge-cyan ts-auto-style-26">SRV</span>
+              <span id="adminServerClock" class="ts-auto-style-27">--:--:-- UTC</span>
             </div>
-            <span style="color: var(--admin-text-muted, #64748b);">|</span>
-            <div style="display: flex; align-items: center; gap: 0.25rem;" title="Visitor Local Time">
-              <span class="ts-badge ts-badge-indigo" style="font-size: 0.58rem; padding: 0.05rem 0.25rem;">LOC</span>
-              <span id="adminLocalClock" style="color: #38bdf8; font-weight: 600;">--:--:--</span>
+            <span class="ts-auto-style-28">|</span>
+            <div class="ts-auto-style-25" title="Visitor Local Time">
+              <span class="ts-badge ts-badge-indigo ts-auto-style-26">LOC</span>
+              <span id="adminLocalClock" class="ts-auto-style-29">--:--:--</span>
             </div>
-            <select id="adminTzPicker" onchange="switchAdminDisplayTimezone(this.value)" style="background: transparent; border: none; color: var(--admin-text-muted, #94a3b8); font-size: 0.68rem; outline: none; cursor: pointer;">
+            <select id="adminTzPicker" onchange="switchAdminDisplayTimezone(this.value)" class="ts-auto-style-30">
               <option value="auto">Auto</option>
               <option value="UTC">UTC</option>
               <option value="Asia/Karachi">PKT (UTC+5)</option>
@@ -670,14 +645,14 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
           </script>
 
           <!-- Theme Mode Switcher Button -->
-          <button type="button" onclick="toggleTheme()" class="ts-btn ts-btn-outline ts-btn-sm" id="adminThemeToggleBtn" style="padding: 0.35rem 0.65rem;" title="Toggle Dark / Light Theme">
-            <i data-lucide="moon" id="adminThemeIcon" style="width: 15px; height: 15px;"></i>
+          <button type="button" onclick="toggleTheme()" class="ts-btn ts-btn-outline ts-btn-sm" id="adminThemeToggleBtn" class="ts-auto-style-19" title="Toggle Dark / Light Theme">
+            <i data-lucide="moon" id="adminThemeIcon" class="ts-auto-style-1"></i>
           </button>
 
-          <a href="<?= url('/admin/content') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem;">
+          <a href="<?= url('/admin/content') ?>" class="ts-btn ts-btn-outline ts-btn-sm ts-auto-style-31">
             <i data-lucide="layers"></i> Queue (<?= $pendingQueueCount ?>)
           </a>
-          <a href="<?= url('/admin/mail') ?>" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.75rem; background: linear-gradient(135deg, #6366f1, #38bdf8);">
+          <a href="<?= url('/admin/mail') ?>" class="ts-btn ts-btn-primary ts-btn-sm ts-auto-style-32">
             <i data-lucide="send"></i> Mail Studio 🚀
           </a>
         </div>
