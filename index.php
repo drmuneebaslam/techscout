@@ -846,15 +846,20 @@ $router->get('/api/v1/deploy/sync', [ApiController::class, 'v1DeploySync']);
 $router->get('/api/v1/force-migrate', function() {
     $pdo = \App\Core\Database::getConnection();
     
-    // Explicitly fix author_feedbacks table if missing
-    $pdo->exec("CREATE TABLE IF NOT EXISTS `author_feedbacks` (
+    // Explicitly fix author_feedbacks table schema
+    $pdo->exec("DROP TABLE IF EXISTS `author_feedbacks`");
+    $pdo->exec("CREATE TABLE `author_feedbacks` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
-      `author_id` int(11) NOT NULL,
-      `rating` tinyint(1) NOT NULL DEFAULT 5,
-      `message` text DEFAULT NULL,
-      `created_at` timestamp NULL DEFAULT current_timestamp(),
+      `author_id` bigint(20) unsigned NOT NULL,
+      `subject` varchar(255) NOT NULL,
+      `message` text NOT NULL,
+      `status` enum('pending','reviewed','resolved') DEFAULT 'pending',
+      `admin_notes` text DEFAULT NULL,
+      `created_at` datetime DEFAULT current_timestamp(),
+      `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
       PRIMARY KEY (`id`),
-      KEY `author_id` (`author_id`)
+      KEY `author_id` (`author_id`),
+      CONSTRAINT `fk_author_feedbacks_user` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
 
     // Re-run unapplied migrations
