@@ -133,8 +133,11 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   
-  <!-- TechScout Design System (High Priority Stylesheet) -->
-  <link rel="stylesheet" href="<?= url('/assets/css/style.css?v=' . filemtime(__DIR__ . '/../../assets/css/style.css')) ?>">
+  <?php 
+    $cssV = filemtime(__DIR__ . '/../../assets/css/style.css'); 
+    if (!empty($user) && $user['role'] === 'admin') $cssV = time(); 
+  ?>
+  <link rel="stylesheet" href="<?= url('/assets/css/style.css?v=' . $cssV) ?>">
   
   <!-- Local High-Performance Deferred Scripts & Styles -->
   <script src="<?= url('/assets/js/lucide.min.js') ?>" defer onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js';"></script>
@@ -156,8 +159,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
   <?php endif; ?>
   
-  <meta name="theme-color" content="#0284c7">
-  <link rel="apple-touch-icon" href="<?= url('/favicon.ico') ?>">
+
   
   <!-- Dynamic Base Url for JS -->
   <script>window.TS_BASE_URL = "<?= $appUrl ?>";</script>

@@ -166,10 +166,12 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   
-  <!-- CSS Framework & Cyber-HUD Admin Style -->
-  <link rel="stylesheet" href="<?= url('assets/css/style.css?v=' . filemtime(__DIR__ . '/../../assets/css/style.css')) ?>">
-  <link rel="stylesheet" href="<?= url('assets/css/admin.css?v=' . filemtime(__DIR__ . '/../../assets/css/admin.css')) ?>">
-  <link rel="stylesheet" href="<?= url('assets/css/admin-modals.css?v=' . filemtime(__DIR__ . '/../../assets/css/admin-modals.css')) ?>">
+  <?php 
+    $adminCssV = time(); // Admin panel always bypasses Cloudfront cache
+  ?>
+  <link rel="stylesheet" href="<?= url('assets/css/style.css?v=' . $adminCssV) ?>">
+  <link rel="stylesheet" href="<?= url('assets/css/admin.css?v=' . $adminCssV) ?>">
+  <link rel="stylesheet" href="<?= url('assets/css/admin-modals.css?v=' . $adminCssV) ?>">
 
   <!-- PJAX SPA Navigation Styles -->
   <style>
