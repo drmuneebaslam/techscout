@@ -336,11 +336,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
           <i data-lucide="moon" style="width: 15px; height: 15px;"></i>
         </button>
 
-        <!-- QA Testing -->
-        <a href="<?= url('/qa-testing') ?>" class="ts-btn ts-btn-outline ts-btn-sm desktop-only-flex" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);" title="QA Testing Cases">
-          <i data-lucide="flask-conical" style="width: 15px; height: 15px;"></i>
-          <span>QA Testing</span>
-        </a>
+
 
         <?php if ($user): ?>
           <?php $unreadNotifCount = \App\Core\NotificationHelper::getUnreadCount((int)$user['id']); ?>

@@ -505,9 +505,7 @@ class Database {
               <a href="<?= Config::url('/') ?>" class="btn btn-outline">
                 🏠 Return to Homepage
               </a>
-              <a href="<?= Config::url('/admin') ?>" class="btn btn-outline">
-                ⚡ Admin Hub
-              </a>
+
             </div>
           </div>
         </body>

@@ -1,1 +1,0 @@
-ALTER TABLE `prompts` ADD COLUMN IF NOT EXISTS `aspect_ratio` VARCHAR(20) DEFAULT '16:9';
