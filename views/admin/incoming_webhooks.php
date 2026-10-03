@@ -1,124 +1,132 @@
 <?php require __DIR__ . '/../layouts/admin_header.php'; ?>
 
-<!-- Topbar -->
-<div class="admin-topbar">
-    <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-        <span class="ts-badge ts-badge-cyan">100X INGESTION GATEWAY &bull; MULTI-TABLE SYNC</span>
-        <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Database Field Mapper, Schema Blueprints &amp; Live Ingestion Pipelines</span>
-      </div>
-      <h1 style="font-size: 1.6rem; color: var(--admin-text-primary); margin: 0; font-family: var(--admin-font-heading); font-weight: 800;">
-        Incoming Webhooks &amp; Live Ingestion Gateway
-      </h1>
+<!-- HUD Topbar -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
+      <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; letter-spacing: 0.05em; font-weight: 700;">100X INGESTION GATEWAY</span>
+      <span class="ts-badge ts-badge-green" style="font-size: 0.72rem;">MULTI-TABLE SYNC</span>
     </div>
-
-    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
-      <a href="<?= url('/admin/webhooks') ?>" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600;">
-        <i data-lucide="arrow-up-right"></i> Outbound Webhooks
-      </a>
-      <button type="button" onclick="openTutorialModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #38bdf8; border-color: rgba(56,189,248,0.4);">
-        <i data-lucide="book-open"></i> Ingestion Tutorial 📘
-      </button>
-      <button type="button" onclick="openSampleGeneratorModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #a855f7; border-color: rgba(168,85,247,0.4);">
-        <i data-lucide="sparkles"></i> All Tables Sample Data ⚡
-      </button>
-      <button type="button" onclick="openNewIncomingModal()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
-        <i data-lucide="plus"></i> New Ingestion Webhook 🚀
-      </button>
-    </div>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: #f8fafc; margin: 0; line-height: 1.2; font-family: 'Outfit', sans-serif;">
+      Incoming Webhooks &amp; Live Ingestion
+    </h1>
+    <p style="color: #64748b; font-size: 0.95rem; margin-top: 0.35rem;">
+      Dynamic Database Field Mapper, Schema Blueprints &amp; Live Ingestion Pipelines.
+    </p>
   </div>
 
-  <!-- Endpoints Overview Cards Grid -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
-    <?php if (!empty($incomingWebhooks)): ?>
-        <?php foreach ($incomingWebhooks as $wh): 
-          $endpointUrl = url('/api/v1/webhook/' . $wh['slug']);
-          $rules = json_decode($wh['mapping_rules_json'] ?? '[]', true) ?: [];
-          $ingestMode = $wh['ingestion_mode'] ?? 'live_ingest';
-        ?>
-          <div class="admin-card" style="padding: 1.35rem; border-radius: 14px; border: 1px solid var(--admin-border-main); background: var(--admin-card-bg); display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.15); transition: transform 0.2s ease, border-color 0.2s ease;">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.65rem; gap: 0.5rem; flex-wrap: wrap;">
-                <h3 style="font-size: 1.1rem; margin: 0; color: var(--admin-text-primary); font-weight: 800; font-family: var(--admin-font-heading);">
-                  <?= htmlspecialchars($wh['name']) ?>
-                </h3>
-                <div style="display: flex; gap: 0.35rem; align-items: center;">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <a href="<?= url('/admin/webhooks') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+      <i data-lucide="arrow-up-right" style="width: 14px;"></i> Outbound
+    </a>
+    <button type="button" onclick="openTutorialModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #f472b6; border-color: rgba(236,72,153,0.3);">
+      <i data-lucide="book-open" style="width: 14px;"></i> Tutorial 📘
+    </button>
+    <button type="button" onclick="openSampleGeneratorModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="border-color: rgba(168,85,247,0.3); color: #a855f7;">
+      <i data-lucide="sparkles" style="width: 14px;"></i> Samples ⚡
+    </button>
+    <button type="button" onclick="openNewIncomingModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="font-weight: 700;">
+      <i data-lucide="plus-circle" style="width: 14px;"></i> New Webhook 🚀
+    </button>
+  </div>
+</div>
+
+  <!-- Endpoints Overview Table -->
+  <div class="admin-table-wrap" style="margin-bottom: 2rem;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name / Slug</th>
+          <th>Mode &amp; Status</th>
+          <th>Configuration</th>
+          <th>Activity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      <?php if (!empty($incomingWebhooks)): ?>
+          <?php foreach ($incomingWebhooks as $wh): 
+            $endpointUrl = url('/api/v1/webhook/' . $wh['slug']);
+            $rules = json_decode($wh['mapping_rules_json'] ?? '[]', true) ?: [];
+            $ingestMode = $wh['ingestion_mode'] ?? 'live_ingest';
+          ?>
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.2rem;"><?= htmlspecialchars($wh['name']) ?></div>
+                <div style="font-size: 0.72rem; color: #38bdf8; font-family: var(--admin-font-mono); display: flex; align-items: center; gap: 0.4rem;">
+                  <?= htmlspecialchars($endpointUrl) ?>
+                  <i data-lucide="copy" style="width: 12px; height: 12px; cursor: pointer; color: var(--admin-text-secondary);" onclick="copyToClipboard('<?= htmlspecialchars(addslashes($endpointUrl)) ?>')" title="Copy Endpoint URL"></i>
+                </div>
+              </td>
+              <td>
+                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
                   <span class="ts-badge <?= $ingestMode === 'listen_only' ? 'ts-badge-amber' : 'ts-badge-green' ?>" style="font-size: 0.68rem; font-weight: 800;">
-                    <?= $ingestMode === 'listen_only' ? '🎧 SCHEMA LISTENER' : '🚀 LIVE INGEST' ?>
+                    <?= $ingestMode === 'listen_only' ? '🎧 LISTENER' : '🚀 INGEST' ?>
                   </span>
                   <span class="ts-badge <?= !empty($wh['is_active']) ? 'ts-badge-cyan' : 'ts-badge-pink' ?>" style="font-size: 0.68rem;">
                     <?= !empty($wh['is_active']) ? 'ACTIVE' : 'PAUSED' ?>
                   </span>
                 </div>
-              </div>
-
-              <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
-                <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; font-family: var(--admin-font-mono);">
-                  Table: <?= htmlspecialchars($wh['target_table']) ?>
-                </span>
-                <span class="ts-badge ts-badge-amber" style="font-size: 0.72rem;">
-                  Auth: <?= strtoupper(htmlspecialchars($wh['auth_type'])) ?>
-                </span>
-                <span class="ts-badge" style="font-size: 0.72rem; background: rgba(99,102,241,0.15); color: #818cf8; font-weight: 700;">
-                  <?= count($rules) ?> Mapped Fields
-                </span>
-              </div>
-
-              <!-- Endpoint URL with Copy -->
-              <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.55rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.85rem; min-width: 0;">
-                <code style="font-size: 0.76rem; color: #38bdf8; font-family: var(--admin-font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">
-                  <?= htmlspecialchars($endpointUrl) ?>
-                </code>
-                <button type="button" onclick="copyToClipboard('<?= htmlspecialchars(addslashes($endpointUrl)) ?>')" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.72rem;" title="Copy Endpoint URL">
-                  <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
-                </button>
-              </div>
-
-              <div style="font-size: 0.76rem; color: var(--admin-text-secondary); margin-bottom: 0.85rem;">
-                Received: <strong style="color: var(--admin-text-primary);"><?= number_format((int)($wh['received_count'] ?? 0)) ?></strong> payloads &bull; Last: <?= !empty($wh['last_received_at']) ? htmlspecialchars($wh['last_received_at']) : 'Never' ?>
-              </div>
-            </div>
-
-            <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; flex: 1;">
-                <button type="button" onclick="openLiveListener(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700; font-size: 0.76rem;">
-                  <i data-lucide="radio" style="width: 14px; height: 14px;"></i> Live Studio
-                </button>
-                <button type="button" onclick="openEditIncomingModal(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #38bdf8;" title="Edit Settings">
-                  <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit
-                </button>
-                <button type="button" onclick="quickLoadTableSample('<?= htmlspecialchars(addslashes($wh['target_table'])) ?>')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #a855f7;" title="Load Sample">
-                  <i data-lucide="code" style="width: 14px; height: 14px;"></i> Sample
-                </button>
-              </div>
-              <div style="display: flex; gap: 0.4rem;">
-                <form action="<?= url('/admin/incoming-webhooks/toggle-mode/' . $wh['id']) ?>" method="POST" style="margin: 0;">
-                  <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.35rem 0.5rem;" title="Toggle Mode">
-                    <i data-lucide="<?= $ingestMode === 'listen_only' ? 'database' : 'headphones' ?>" style="width: 14px; height: 14px; color: <?= $ingestMode === 'listen_only' ? '#10b981' : '#f59e0b' ?>;"></i>
+              </td>
+              <td>
+                <div style="font-size: 0.76rem; color: var(--admin-text-secondary); margin-bottom: 0.2rem;">
+                  Target: <strong style="color: #a855f7;"><?= htmlspecialchars($wh['target_table']) ?></strong>
+                </div>
+                <div style="font-size: 0.72rem; display: flex; gap: 0.4rem; align-items: center;">
+                  <span class="ts-badge ts-badge-amber" style="padding: 0.1rem 0.4rem;">Auth: <?= strtoupper(htmlspecialchars($wh['auth_type'])) ?></span>
+                  <span class="ts-badge" style="background: rgba(99,102,241,0.15); color: #818cf8; padding: 0.1rem 0.4rem;"><?= count($rules) ?> Maps</span>
+                </div>
+              </td>
+              <td>
+                <div style="font-size: 0.76rem; color: var(--admin-text-secondary);">
+                  <strong style="color: var(--admin-text-primary);"><?= number_format((int)($wh['received_count'] ?? 0)) ?></strong> logs
+                </div>
+                <div style="font-size: 0.68rem; color: var(--admin-text-muted);">
+                  <?= !empty($wh['last_received_at']) ? htmlspecialchars($wh['last_received_at']) : 'Never' ?>
+                </div>
+              </td>
+              <td>
+                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                  <button type="button" onclick="openLiveListener(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="padding: 0.25rem 0.5rem; font-weight: 700; font-size: 0.7rem;" title="Live Studio">
+                    <i data-lucide="radio" style="width: 14px; height: 14px;"></i> Studio
                   </button>
-                </form>
-                <form action="<?= url('/admin/incoming-webhooks/toggle/' . $wh['id']) ?>" method="POST" style="margin: 0;">
-                  <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.35rem 0.5rem;" title="Toggle Active">
-                    <i data-lucide="<?= !empty($wh['is_active']) ? 'pause' : 'play' ?>" style="width: 14px; height: 14px;"></i>
+                  <button type="button" onclick="openEditIncomingModal(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #38bdf8;" title="Edit Settings">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
                   </button>
-                </form>
-                <form action="<?= url('/admin/incoming-webhooks/delete/' . $wh['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this incoming webhook endpoint?');" style="margin: 0;">
-                  <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; padding: 0.35rem 0.5rem;" title="Delete">
-                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                  <button type="button" onclick="quickLoadTableSample('<?= htmlspecialchars(addslashes($wh['target_table'])) ?>')" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; color: #a855f7;" title="Load Sample">
+                    <i data-lucide="code" style="width: 14px; height: 14px;"></i>
                   </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-      <div class="admin-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-        <i data-lucide="inbox" style="width: 44px; height: 44px; color: var(--admin-text-secondary); margin-bottom: 0.75rem;"></i>
-        <h3 style="color: var(--admin-text-primary); margin: 0 0 0.5rem 0;">No Ingestion Webhooks Configured</h3>
-        <p style="color: var(--admin-text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">Create a custom webhook URL to ingest JSON data from Zapier, Airtable, Stripe, GitHub, or custom microservices.</p>
-        <button type="button" onclick="openNewIncomingModal()" class="admin-btn admin-btn-primary">Create First Ingestion Webhook</button>
-      </div>
-    <?php endif; ?>
+                  <form action="<?= url('/admin/incoming-webhooks/toggle-mode/' . $wh['id']) ?>" method="POST" style="margin: 0;">
+                    <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.25rem 0.5rem;" title="Toggle Mode">
+                      <i data-lucide="<?= $ingestMode === 'listen_only' ? 'database' : 'headphones' ?>" style="width: 14px; height: 14px; color: <?= $ingestMode === 'listen_only' ? '#10b981' : '#f59e0b' ?>;"></i>
+                    </button>
+                  </form>
+                  <form action="<?= url('/admin/incoming-webhooks/toggle/' . $wh['id']) ?>" method="POST" style="margin: 0;">
+                    <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.25rem 0.5rem;" title="Toggle Active">
+                      <i data-lucide="<?= !empty($wh['is_active']) ? 'pause' : 'play' ?>" style="width: 14px; height: 14px;"></i>
+                    </button>
+                  </form>
+                  <form action="<?= url('/admin/incoming-webhooks/delete/' . $wh['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this webhook?');" style="margin: 0;">
+                    <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; padding: 0.25rem 0.5rem;" title="Delete">
+                      <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+      <?php else: ?>
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 3rem;">
+            <i data-lucide="inbox" style="width: 44px; height: 44px; color: var(--admin-text-secondary); margin-bottom: 0.75rem;"></i>
+            <h3 style="color: var(--admin-text-primary); margin: 0 0 0.5rem 0;">No Ingestion Webhooks Configured</h3>
+            <p style="color: var(--admin-text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">Create a custom webhook URL to ingest JSON data.</p>
+            <button type="button" onclick="openNewIncomingModal()" class="admin-btn admin-btn-primary">Create First Ingestion Webhook</button>
+          </td>
+        </tr>
+      <?php endif; ?>
+      </tbody>
+    </table>
   </div>
 
   <!-- Recent Ingestion Activity Log Table -->
