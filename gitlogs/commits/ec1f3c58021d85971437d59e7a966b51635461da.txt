@@ -1,0 +1,23 @@
+commit ec1f3c58021d85971437d59e7a966b51635461da
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 17:23:10 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 17:23:10 2026 +0500
+
+    Fix PopupManager datetime strict mode, add No Script generation rule, create MAPPING_PROMPT
+
+ GEMINI.md                              |   4 +
+ app/Core/PopupManager.php              |   4 +-
+ changes/GEMINI.md                      |  47 ++
+ changes/app/Core/PopupManager.php      | 464 ++++++++++++++++
+ changes/docs/MAPPING_PROMPT.txt        |  21 +
+ changes/views/layouts/admin_header.php | 686 -----------------------
+ changes/views/layouts/header.php       | 956 ---------------------------------
+ docs/MAPPING_PROMPT.txt                |  21 +
+ 8 files changed, 559 insertions(+), 1644 deletions(-)
+ create mode 100644 changes/GEMINI.md
+ create mode 100644 changes/app/Core/PopupManager.php
+ create mode 100644 changes/docs/MAPPING_PROMPT.txt
+ delete mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/layouts/header.php
+ create mode 100644 docs/MAPPING_PROMPT.txt

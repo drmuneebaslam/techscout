@@ -1,0 +1,12 @@
+commit 4910389545160c10f6dad3a6c84747bb2bcf3e8e
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 12:54:59 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 12:54:59 2026 +0500
+
+    feat(ftp): add FTP deployment rule and safety directive to GEMINI.md, document MISTAKE-15, and deploy changed files to /htdocs
+
+ GEMINI.md                        | 11 +++++++++++
+ changes/docs/MISTAKES_LEARNED.md | 11 +++++++++++
+ docs/MISTAKES_LEARNED.md         | 11 +++++++++++
+ 3 files changed, 33 insertions(+)

@@ -1,0 +1,11 @@
+commit 4228fcf3afa4342559b119512b41fb18f0ce91b7
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 22:00:04 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 22:00:04 2026 +0500
+
+    fix(migration): streamline schema DDL using native IF NOT EXISTS syntax
+
+ ...00001_enterprise_100x_telemetry_and_prompts.sql | 91 ++++------------------
+ ...00001_enterprise_100x_telemetry_and_prompts.sql | 91 ++++------------------
+ 2 files changed, 28 insertions(+), 154 deletions(-)

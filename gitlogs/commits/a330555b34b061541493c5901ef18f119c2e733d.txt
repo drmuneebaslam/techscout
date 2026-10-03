@@ -1,0 +1,51 @@
+commit a330555b34b061541493c5901ef18f119c2e733d
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 14:17:30 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 14:17:30 2026 +0500
+
+    feat: dedicated image prompt categories with live counts, segregated taxonomies for tools and GPTs, pure image grid, and hierarchical breadcrumbs
+    
+    - Added dedicated Image Prompt Categories hub (/prompts/images/categories) with dynamic prompt count metrics, total copy telemetry, sample previews, and popunder ad monetisation
+    - Segregated taxonomy routing across content domains:
+      * /prompts/images/categories for AI image generation categories
+      * /prompts/categories for LLM and image diffusion prompt taxonomy
+      * /tools/categories for AI tools & software categories with live tool counts
+      * /gpts/categories for custom GPT & AI agent categories with live agent counts
+    - Enhanced image prompts gallery (/prompts/images) to pure immersive image grid layout with 1-click prompt copying and popunder monetization
+    - Implemented full hierarchical breadcrumb pathing (Prompts Hub › Parent Category › Subcategory › Title) in single prompt blueprints
+    - Connected category navigation tabs and buttons across prompt, tool, and GPT directories
+    - Ensured strict dual-theme compliance (light & dark) without inline HTML color overrides
+
+ app/Controllers/DirectoryController.php            | 131 ++++
+ changes/app/Controllers/DirectoryController.php    | 131 ++++
+ changes/index.php                                  | 835 +++++++++++++++++++++
+ changes/views/directory/gpt_categories.php         |  86 +++
+ changes/views/directory/gpts.php                   | 176 +++++
+ changes/views/directory/prompt_categories.php      | 185 +++++
+ .../views/directory/prompt_image_categories.php    | 190 +++++
+ changes/views/directory/prompts.php                |   6 +
+ changes/views/directory/prompts_images.php         |  14 +-
+ changes/views/directory/tool_categories.php        |  86 +++
+ changes/views/directory/tools.php                  | 180 +++++
+ index.php                                          |   4 +
+ views/directory/gpt_categories.php                 |  86 +++
+ views/directory/gpts.php                           |   8 +
+ views/directory/prompt_categories.php              | 185 +++++
+ views/directory/prompt_image_categories.php        | 190 +++++
+ views/directory/prompts.php                        |   6 +
+ views/directory/prompts_images.php                 |  14 +-
+ views/directory/tool_categories.php                |  86 +++
+ views/directory/tools.php                          |   8 +
+ 20 files changed, 2605 insertions(+), 2 deletions(-)
+ create mode 100644 changes/index.php
+ create mode 100644 changes/views/directory/gpt_categories.php
+ create mode 100644 changes/views/directory/gpts.php
+ create mode 100644 changes/views/directory/prompt_categories.php
+ create mode 100644 changes/views/directory/prompt_image_categories.php
+ create mode 100644 changes/views/directory/tool_categories.php
+ create mode 100644 changes/views/directory/tools.php
+ create mode 100644 views/directory/gpt_categories.php
+ create mode 100644 views/directory/prompt_categories.php
+ create mode 100644 views/directory/prompt_image_categories.php
+ create mode 100644 views/directory/tool_categories.php

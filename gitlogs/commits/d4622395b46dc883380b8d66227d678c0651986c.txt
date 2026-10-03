@@ -1,0 +1,44 @@
+commit d4622395b46dc883380b8d66227d678c0651986c
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 15:18:53 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 15:18:53 2026 +0500
+
+    Fix theme toggle double-trigger inversion bug, add debounce re-entrancy guard, sync admin header head restoration, and update changes directory
+
+ assets/js/main.js                           |   43 +-
+ changes/app/Controllers/AdminController.php | 7630 ---------------------------
+ changes/app/Core/Auth.php                   |  358 --
+ changes/assets/css/admin.css                | 1938 -------
+ changes/assets/css/style.css                | 2925 ----------
+ changes/assets/js/main.js                   |  794 +++
+ changes/docs/MISTAKES_LEARNED.md            |   17 +
+ changes/views/admin/mail.php                | 4074 --------------
+ changes/views/blog/index.php                |  189 -
+ changes/views/directory/gpts.php            |  168 -
+ changes/views/directory/prompts.php         |  164 -
+ changes/views/directory/tools.php           |  172 -
+ changes/views/layouts/admin_footer.php      |  465 ++
+ changes/views/layouts/admin_header.php      |  555 ++
+ changes/views/layouts/header.php            |   45 +
+ changes/views/public/campaigns.php          |  155 -
+ changes/views/public/home.php               |  624 ---
+ docs/MISTAKES_LEARNED.md                    |   17 +
+ views/layouts/admin_footer.php              |   60 +-
+ views/layouts/admin_header.php              |   58 +
+ views/layouts/header.php                    |   45 +
+ 21 files changed, 2055 insertions(+), 18441 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Core/Auth.php
+ delete mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/assets/css/style.css
+ create mode 100644 changes/assets/js/main.js
+ delete mode 100644 changes/views/admin/mail.php
+ delete mode 100644 changes/views/blog/index.php
+ delete mode 100644 changes/views/directory/gpts.php
+ delete mode 100644 changes/views/directory/prompts.php
+ delete mode 100644 changes/views/directory/tools.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/public/campaigns.php
+ delete mode 100644 changes/views/public/home.php

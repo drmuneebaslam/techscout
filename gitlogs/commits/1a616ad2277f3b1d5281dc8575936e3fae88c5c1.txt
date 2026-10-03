@@ -1,0 +1,83 @@
+commit 1a616ad2277f3b1d5281dc8575936e3fae88c5c1
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 12:36:43 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 12:36:43 2026 +0500
+
+    Fix tip sender_name SQL error & article load; add anti-spam comment reactions, TS-AUT-68 visual link scanner & TS-AUT-70 heatmap telemetry
+    
+    - Database: Added Database::queryOne() fallback method; added safe migration step 32-33 for comment_reactions, author_tips enterprise columns, and analytics_events.
+    - Creator Tips: Updated submitCreatorTip() in ApiController with dynamic dual-schema adaptation preventing unknown column sender_name errors; enhanced author profile and article views with dual-theme crypto tip modal, QR codes, and direct URL anchor #tip auto-open.
+    - Article & Comments: Fixed single article loading; upgraded comment reactions with idempotent single-reaction-per-user/IP toggle and switch logic eliminating multi-click spam.
+    - TS-AUT-68: Integrated Automated Technical Broken Link & 404 Scanner Phase 5 into cron.php as an interactive foreground administrative control center with live progress bar, task picker, status code audit table, and direct 1-click Studio edit links.
+    - TS-AUT-70 & TS-AUT-55: Added 5-zone reader retention & scroll depth heatmap telemetry visualizer, disengagement hotspot detection with tactical AI recommendation, and interactive code snippet copy rate tracking (/api/v1/telemetry/code-copy).
+    - Features Document: Enhanced 50_enterprise_platform_features.md documenting TS-AUT-68, TS-AUT-70, TS-AUT-55, anti-spam reactions, and creator crypto tip jar architecture.
+
+ app/Controllers/ApiController.php                  |   163 +-
+ app/Core/Database.php                              |   100 +
+ app/Models/Analytics.php                           |   142 +-
+ app/Models/LinkScanner.php                         |   225 +
+ assets/js/content-engine.js                        |    48 +
+ changes/app/Controllers/AdminController.php        |  8467 -------------
+ changes/app/Controllers/ApiController.php          |  1712 +++
+ changes/app/Controllers/AuthorStudioController.php |  1218 --
+ changes/app/Core/AdRenderer.php                    |   117 -
+ changes/app/Core/Config.php                        |     5 +-
+ changes/app/Core/Database.php                      |   100 +
+ changes/app/Core/TransactionVerifier.php           |   476 -
+ changes/app/Models/Analytics.php                   |   438 +
+ changes/app/Models/LinkScanner.php                 |   225 +
+ changes/assets/images/ads/cloudmatrix_card.webp    |   Bin 3520 -> 0 bytes
+ changes/assets/js/content-engine.js                |   204 +
+ changes/cron.php                                   |   719 ++
+ changes/database/prompts_and_pricing_upgrade.sql   |    43 -
+ .../features/50_enterprise_platform_features.md    |   142 +
+ changes/features_roadmap.html                      | 12165 -------------------
+ changes/index.php                                  |     1 +
+ changes/views/admin/content_analytics.php          |   703 ++
+ changes/views/author/content_analytics.php         |   626 +
+ changes/views/author/dashboard.php                 |  3106 -----
+ changes/views/blog/article.php                     |   881 ++
+ changes/views/components/comments_section.php      |   784 ++
+ changes/views/directory/prompt_single.php          |   405 -
+ changes/views/directory/prompts.php                |   286 -
+ changes/views/errors/503.php                       |   315 -
+ changes/views/layouts/footer.php                   |   190 -
+ changes/views/layouts/header.php                   |   936 --
+ changes/views/public/author_profile.php            |   609 +
+ .../views/public/components/crypto_payment_box.php |   544 -
+ cron.php                                           |   741 +-
+ docs/features/50_enterprise_platform_features.md   |    22 +-
+ index.php                                          |     1 +
+ views/admin/content_analytics.php                  |   140 +
+ views/author/content_analytics.php                 |   142 +
+ views/blog/article.php                             |    92 +-
+ views/components/comments_section.php              |    67 +-
+ views/public/author_profile.php                    |   216 +-
+ 41 files changed, 9119 insertions(+), 28397 deletions(-)
+ create mode 100644 app/Models/LinkScanner.php
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Controllers/AuthorStudioController.php
+ delete mode 100644 changes/app/Core/AdRenderer.php
+ delete mode 100644 changes/app/Core/TransactionVerifier.php
+ create mode 100644 changes/app/Models/Analytics.php
+ create mode 100644 changes/app/Models/LinkScanner.php
+ delete mode 100644 changes/assets/images/ads/cloudmatrix_card.webp
+ create mode 100644 changes/assets/js/content-engine.js
+ create mode 100644 changes/cron.php
+ delete mode 100644 changes/database/prompts_and_pricing_upgrade.sql
+ create mode 100644 changes/docs/features/50_enterprise_platform_features.md
+ delete mode 100644 changes/features_roadmap.html
+ create mode 100644 changes/views/admin/content_analytics.php
+ create mode 100644 changes/views/author/content_analytics.php
+ delete mode 100644 changes/views/author/dashboard.php
+ create mode 100644 changes/views/blog/article.php
+ create mode 100644 changes/views/components/comments_section.php
+ delete mode 100644 changes/views/directory/prompt_single.php
+ delete mode 100644 changes/views/directory/prompts.php
+ delete mode 100644 changes/views/errors/503.php
+ delete mode 100644 changes/views/layouts/footer.php
+ delete mode 100644 changes/views/layouts/header.php
+ create mode 100644 changes/views/public/author_profile.php
+ delete mode 100644 changes/views/public/components/crypto_payment_box.php

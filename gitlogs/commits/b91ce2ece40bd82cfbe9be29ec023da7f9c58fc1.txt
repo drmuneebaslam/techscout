@@ -1,0 +1,29 @@
+commit b91ce2ece40bd82cfbe9be29ec023da7f9c58fc1
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Tue Sep 8 10:33:13 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Tue Sep 8 10:33:13 2026 +0500
+
+    fix(mail): resolve mail_logs json constraint error, fix custom_mail_templates table, and enable transactional payout approval/rejection emails
+    
+    - In app/Core/Mailer.php, initialized attachmentsJson to valid JSON array string '[]' instead of NULL to eliminate MariaDB constraint 4025 (CONSTRAINT mail_logs.attachments_json failed)
+    - In app/Core/Mailer.php, added getTemplateLibrary alias for backwards compatibility and updated payout_approved / payout_rejected template defaults with rich financial telemetry (gross, net amount, fee breakdown, transaction ref, receipt link, and 100% credit refund notice)
+    - In app/Controllers/AdminController.php, fixed processAuthorPayout to reliably dispatch transactional emails and attachments for all payout statuses (paid, approved, rejected, processing, pending)
+    - In app/Controllers/AdminController.php, fixed table reference from custom_mail_templates to mail_templates in mailTemplateEditor
+    - In app/Core/Database.php, suppressed benign duplicate column/key schema errors (1060 / 42S21 / 1061) in executeSilent from being recorded as DATABASE_SILENT_ERROR in ErrorLogger
+    - Synchronized modified files into changes/ folder (changes/app/Core/Mailer.php, changes/app/Core/Database.php, changes/app/Controllers/AdminController.php)
+
+ app/Controllers/AdminController.php         |   28 +-
+ app/Core/Database.php                       |    7 +-
+ app/Core/Mailer.php                         |   35 +-
+ changes/app/Controllers/AdminController.php | 7177 +++++++++++++++++++++++++++
+ changes/app/Core/Database.php               | 1721 +++++++
+ changes/app/Core/Mailer.php                 | 1671 +++++++
+ changes/views/admin/mail.php                | 2728 ----------
+ changes/views/admin/users.php               | 1809 -------
+ 8 files changed, 10605 insertions(+), 4571 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Core/Database.php
+ create mode 100644 changes/app/Core/Mailer.php
+ delete mode 100644 changes/views/admin/mail.php
+ delete mode 100644 changes/views/admin/users.php

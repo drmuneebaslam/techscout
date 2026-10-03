@@ -1,0 +1,23 @@
+commit 7d91db148eac6ee278e8c5d682e3d8fa393702c1
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 22:27:55 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 22:27:55 2026 +0500
+
+    Fix undefined variable lockPath warning in index.php and enforce clean bootstrap initialization
+
+ changes/app/Controllers/InstallController.php | 428 ----------------
+ changes/app/Core/Config.php                   | 229 ---------
+ changes/docs/MISTAKES_LEARNED.md              |  12 +-
+ changes/index.php                             |   8 +
+ changes/mistakes/MISTAKES_LEARNED.md          |  12 +-
+ changes/user_requests_history.html            |  25 +-
+ changes/views/install/index.php               | 702 --------------------------
+ docs/MISTAKES_LEARNED.md                      |  12 +-
+ index.php                                     |   8 +
+ mistakes/MISTAKES_LEARNED.md                  |  12 +-
+ user_requests_history.html                    |  25 +-
+ 11 files changed, 106 insertions(+), 1367 deletions(-)
+ delete mode 100644 changes/app/Controllers/InstallController.php
+ delete mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/views/install/index.php

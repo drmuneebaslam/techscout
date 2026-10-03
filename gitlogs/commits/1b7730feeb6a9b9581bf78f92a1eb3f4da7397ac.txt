@@ -1,0 +1,15 @@
+commit 1b7730feeb6a9b9581bf78f92a1eb3f4da7397ac
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Tue Sep 8 10:18:58 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Tue Sep 8 10:18:58 2026 +0500
+
+    chore: refine GEMINI.md rules to strictly copy core project files into changes directory
+    
+    - Updated GEMINI.md project rule to explicitly filter out scratch, waste, temporary, skill, and system files from changes/ folder
+    - Restrict changes/ mirroring exclusively to application code files (app/, views/, assets/, database/, public/, docs/, index.php, etc.)
+    - Cleaned changes/ directory and synced updated GEMINI.md file
+
+ GEMINI.md         | 8 +++++---
+ changes/GEMINI.md | 8 +++++---
+ 2 files changed, 10 insertions(+), 6 deletions(-)

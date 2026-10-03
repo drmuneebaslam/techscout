@@ -1,0 +1,60 @@
+commit 1f4f8aa29a55c43b1f83bc3d03cdbcf9e211edbd
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 14:56:05 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 14:56:05 2026 +0500
+
+    Enhance Single Prompt Multi-Images, Creator Tip Jar, Admin Tipping Ledger and Unlimited Category Hierarchy CRUD (Prompt #4)
+    
+    - Single Prompt Page: Un-gate media gallery so any prompt with linked images (featured or multiple prompt_images) shows interactive showcase, thumbnail carousel, and HD lightbox zoom (MISTAKE-29)
+    - Creator Crypto Tip Jar: Add dedicated inline tab & card on single prompt view featuring dynamic QR generation, multi-network crypto addresses (USDT, SOL, ETH, BTC), 1-click copy, 95/5 fee calculation simulator, and direct AJAX on-chain TXID submit to /api/v1/tips/submit
+    - Admin Tipping Verification & Ledger: Update verifyAuthorTip and rejectAuthorTip with strict schema ENUM compliance ('completed', 'refunded'), dual-schema fallbacks, atomic author balance crediting, financial_ledger credit recording, and audit logs (MISTAKE-31)
+    - Category & Taxonomies CRUD: 1000x enhanced with module scope sub-tabs (Articles, AI Tools, Custom GPTs, Prompt Blueprints, Challenges), unlimited recursive parent-child nesting with anti-cycle guards (MISTAKE-30), visual level badges, breadcrumbs, live slug auto-generation, and instant '+ Add Sub' action
+    - Mistakes Learning: Created mistakes/ directory, updated MISTAKES_LEARNED.md with MISTAKE-29, MISTAKE-30, MISTAKE-31 and updated response audit checklist
+    - Prompts Master History: Populated user_requests_history.html with verbatim prompt history and 1-click copy-to-clipboard buttons
+
+ app/Controllers/AdminController.php                |  165 +-
+ app/Controllers/DirectoryController.php            |   23 +
+ changes/app/Controllers/AdminController.php        |  165 +-
+ .../app/Controllers/AuthorProfileController.php    |  167 -
+ changes/app/Controllers/AuthorStudioController.php | 1303 --------
+ changes/app/Controllers/DirectoryController.php    |  888 +++++
+ changes/docs/MISTAKES_LEARNED.md                   |  421 +++
+ changes/index.php                                  |  836 -----
+ changes/mistakes/MISTAKES_LEARNED.md               |  421 +++
+ changes/user_requests_history.html                 |  293 ++
+ changes/views/admin/advertisements.php             |  878 +++++
+ changes/views/admin/crud/categories.php            |  561 ++++
+ changes/views/admin/crud/gpts.php                  |  798 -----
+ changes/views/admin/crud/prompts.php               | 1199 -------
+ changes/views/admin/crud/tools.php                 |  596 ----
+ changes/views/author/dashboard.php                 | 3465 --------------------
+ changes/views/directory/gpt_single.php             |  199 --
+ changes/views/directory/prompt_single.php          |  430 ++-
+ changes/views/directory/tool_single.php            |  636 ----
+ changes/views/public/author_profile.php            |  609 ----
+ docs/MISTAKES_LEARNED.md                           |   36 +
+ mistakes/MISTAKES_LEARNED.md                       |  421 +++
+ user_requests_history.html                         |  293 ++
+ views/admin/advertisements.php                     |   32 +-
+ views/admin/crud/categories.php                    |  674 +++-
+ views/directory/prompt_single.php                  |  430 ++-
+ 26 files changed, 5779 insertions(+), 10160 deletions(-)
+ delete mode 100644 changes/app/Controllers/AuthorProfileController.php
+ delete mode 100644 changes/app/Controllers/AuthorStudioController.php
+ create mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/docs/MISTAKES_LEARNED.md
+ delete mode 100644 changes/index.php
+ create mode 100644 changes/mistakes/MISTAKES_LEARNED.md
+ create mode 100644 changes/user_requests_history.html
+ create mode 100644 changes/views/admin/advertisements.php
+ create mode 100644 changes/views/admin/crud/categories.php
+ delete mode 100644 changes/views/admin/crud/gpts.php
+ delete mode 100644 changes/views/admin/crud/prompts.php
+ delete mode 100644 changes/views/admin/crud/tools.php
+ delete mode 100644 changes/views/author/dashboard.php
+ delete mode 100644 changes/views/directory/gpt_single.php
+ delete mode 100644 changes/views/directory/tool_single.php
+ delete mode 100644 changes/views/public/author_profile.php
+ create mode 100644 mistakes/MISTAKES_LEARNED.md
+ create mode 100644 user_requests_history.html

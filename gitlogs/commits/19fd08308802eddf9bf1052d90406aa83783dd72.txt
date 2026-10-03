@@ -1,0 +1,44 @@
+commit 19fd08308802eddf9bf1052d90406aa83783dd72
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 09:38:46 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 09:38:46 2026 +0500
+
+    feat(admin): zero-code visual trigger studio, table paginator scoping fix, and real-time telemetry HUD
+    
+    - Implement Visual Automation Trigger Studio in views/admin/mail.php allowing zero-code creation, visual editing, and deletion of dynamic URL and custom event triggers directly from modal dialogs
+    - Add in-modal 1-click test simulation sandbox to verify trigger dispatching and simulated variables (amount, payout_id, transaction_ref) without editing PHP files
+    - Refactor app/Core/EventTriggerEngine.php to merge system core events with dynamic site_settings triggers and synchronize event_mail_map_{event_key} mappings
+    - Fix universal table paginator footer stacking bug in assets/js/admin_table_paginator.js by strictly scoping pagination controls within table wrappers and suppressing pagination when row count <= page size without active search
+    - Add window.refreshAdminTablePaginators() trigger on tab switching across admin modules
+    - Revamp CMS Analytics & Telemetry HUD in views/admin/analytics.php and app/Controllers/AdminController.php with real-time polling endpoint /admin/analytics/realtime, live auto-refresh toggle, and selectable timeframes (30m, 1h, 24h, 7d, 30d, 90d, all)
+    - Resolve missing role names and weird count displays in User Roles Distribution table by joining admin_roles, resolving clean role names, badges, and percentage shares backed by live database metrics
+    - Preserve dual-theme support (dark mode default and light mode) across paginators and telemetry HUD cards in assets/css/admin.css
+    - Synchronize core modified files into changes/ folder per project workflow rules
+
+ app/Controllers/AdminController.php          |  213 +-
+ app/Core/EventTriggerEngine.php              |   77 +-
+ assets/css/admin.css                         |   44 +
+ assets/js/admin_table_paginator.js           |   54 +-
+ changes/GEMINI.md                            |   26 -
+ changes/app/Controllers/AdminController.php  | 7567 ++++++++++++++++++++++++++
+ changes/app/Core/EventTriggerEngine.php      |  478 ++
+ changes/assets/css/admin.css                 |   44 +
+ changes/assets/js/admin_table_paginator.js   |  295 +
+ changes/docs/MISTAKES_LEARNED.md             |  136 -
+ changes/index.php                            |  706 +++
+ changes/views/admin/analytics.php            |  704 +++
+ changes/views/admin/mail.php                 |  201 +-
+ changes/views/admin/mail_template_editor.php |  700 ---
+ index.php                                    |    1 +
+ views/admin/analytics.php                    |  219 +-
+ views/admin/mail.php                         |  201 +-
+ 17 files changed, 10662 insertions(+), 1004 deletions(-)
+ delete mode 100644 changes/GEMINI.md
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Core/EventTriggerEngine.php
+ create mode 100644 changes/assets/js/admin_table_paginator.js
+ delete mode 100644 changes/docs/MISTAKES_LEARNED.md
+ create mode 100644 changes/index.php
+ create mode 100644 changes/views/admin/analytics.php
+ delete mode 100644 changes/views/admin/mail_template_editor.php

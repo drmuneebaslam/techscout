@@ -1,0 +1,13 @@
+commit 25d0fec26c23211f504a2050e39bf1760ba2d14c
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 23:12:44 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 23:12:44 2026 +0500
+
+    Execute migration 06 for sunglasses prompt data, prompt_images, and categories
+
+ ...0006_apply_sunglasses_prompt_and_categories.sql | 87 ++++++++++++++++++++++
+ ...0006_apply_sunglasses_prompt_and_categories.sql | 87 ++++++++++++++++++++++
+ 2 files changed, 174 insertions(+)
+ create mode 100644 changes/database/migrations/2026_09_27_000006_apply_sunglasses_prompt_and_categories.sql
+ create mode 100644 database/migrations/2026_09_27_000006_apply_sunglasses_prompt_and_categories.sql

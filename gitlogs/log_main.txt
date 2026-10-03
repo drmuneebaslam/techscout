@@ -1,0 +1,916 @@
+commit 2d7a6be49951f1139efd99bdb42c7e851c598bb6
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 21:43:06 2026 +0500
+
+    feat(core): enforce UTC timezone globally and fix missing CSRF tokens in admin forms
+
+commit 1d28288c669e743b0393435328f744523ad3baab
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 21:35:15 2026 +0500
+
+    chore: ignore changes folder and remove it from tracking
+
+commit 0b022b2a65c1b67934910097d9b7a9502d01da15
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 18:12:27 2026 +0500
+
+    fix(core): fix missing ingestion_mode in incoming_webhooks and resolve UTC time-zoning issues in ErrorLogger
+
+commit 59840591f7fef947f9a3a975e7e680a8e6ee1144
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 17:55:54 2026 +0500
+
+    feat(core): massive UI/UX improvements, feedback system, webhook GET support, algorithm feeds, deep-linking, and QA docs
+
+commit ec1f3c58021d85971437d59e7a966b51635461da
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 17:23:10 2026 +0500
+
+    Fix PopupManager datetime strict mode, add No Script generation rule, create MAPPING_PROMPT
+
+commit e329bd52103c8205aa96f99b1a344f0db1dace58
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 17:21:17 2026 +0500
+
+    Revert 'Extract 140+ inline styles to CSS files for all layouts' as it broke PHP inline logic
+
+commit e54473161feabb0a70c879855257021062cd4cce
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 17:05:27 2026 +0500
+
+    Extract 140+ inline styles to CSS files for all layouts
+
+commit 3e694c87f18e309c8ccaa8f99f653a18f576d4bb
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 16:38:36 2026 +0500
+
+    Fix CSS Cache-busting for Cloudfront during development and remove legacy icons
+
+commit 03d559873fd4d2dc779364214fefc258588cd90a
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 16:31:27 2026 +0500
+
+    Fix CSS cache busting with filemtime and remove alternate icon
+
+commit cf5d8c17b24caf910f8508a5d7ff319eb585dcb0
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 12:49:44 2026 +0500
+
+    docs: Rewrite features, functions, and QA guides based on strict codebase and log analysis
+
+commit d5dc9413eae9737b05f02bb225183399ec272ccf
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 12:45:09 2026 +0500
+
+    Remove p.aspect_ratio from Content query, remove QA Testing and Admin Hub buttons, generate massive QA and Feature MD docs
+
+commit fabc4c056660f763597bd1e7a987250ca0508c36
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Oct 3 12:36:49 2026 +0500
+
+    Fix PopupManager datetime, add missing aspect_ratio column, update header to 100% width, remove rewards link, and add QA testing page
+
+commit 75efc27080b522f5cbb7fe17e997362595918225
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 30 22:52:34 2026 +0500
+
+    Fix modal overlay fixed viewport positioning, eliminate animation transform detachment, standardize dialogs in popups, incoming webhooks, and custom api views, and synthesize comprehensive historical user requests registry
+
+commit ded27b9865c8308397accdee8282ef915ab35518
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 30 22:41:42 2026 +0500
+
+    Refactor admin modals into strict floating viewport overlays with body scroll locks
+
+commit b481b37922f13b22801d5be3cd97d0088ed9183d
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 30 22:31:29 2026 +0500
+
+    Untrack runtime storage/cache and add to .gitignore
+
+commit d04b485c7aa48845c1e2dd8b84f7ac106c73c045
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 30 22:30:41 2026 +0500
+
+    Fix duplicate getRecentCapturedPayloads, enhance PopupManager resilience, add aspect_ratio in Content queries, and fix schema syntax
+
+commit 4164cdb6327cf272f651ee44b6a2aa479ed1d793
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 30 21:55:06 2026 +0500
+
+    feat(crypto-webhooks-popups): fix crypto rates NaN display, implement webhook Schema Discovery Listener mode, 1000x UI overhaul for webhooks & popups, and add master features test specification
+
+commit 25d0fec26c23211f504a2050e39bf1760ba2d14c
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 23:12:44 2026 +0500
+
+    Execute migration 06 for sunglasses prompt data, prompt_images, and categories
+
+commit 43dff303a6d93b9f13d730f233d0bd8721f57ea7
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 23:11:56 2026 +0500
+
+    Ensure prompts table columns and findBySlug stability on EC2
+
+commit 50265631426e71c4157bb23885536b6cb6a6bf68
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 23:06:51 2026 +0500
+
+    Fix prompt frontend visibility, link primary and secondary categories to content type, hide small copy button, and add migration 05
+
+commit 61595e96ee5f8dc91efc3143d73de1cdfd8c1bc4
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 22:10:04 2026 +0500
+
+    feat(migration): link 10 tags for B&W sunglasses prompt
+
+commit f3d4cfbba6468c1f5dac26a86ac45ad641b40e8d
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 22:08:01 2026 +0500
+
+    feat(migration): ingest B&W sunglasses prompt with verified users schema
+
+commit fe7799a5afea8e607ebaff988f053f8d7e7dcea5
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 22:06:30 2026 +0500
+
+    feat(migration): ingest B&W sunglasses prompt and align extension schemas
+
+commit 700902197932b56db2ce9bff4803ef3076370b73
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 22:04:28 2026 +0500
+
+    fix(custom-api): correct reaction_count mapping in multi-table join
+
+commit 4228fcf3afa4342559b119512b41fb18f0ce91b7
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 22:00:04 2026 +0500
+
+    fix(migration): streamline schema DDL using native IF NOT EXISTS syntax
+
+commit c27dfe5b34e7e02986634182f8fad947fb5fb3cf
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 21:57:28 2026 +0500
+
+    fix(deploy-sync): resolve unbuffered PDO queries during migration execution
+
+commit fb5c17c22979d5ce0cb2415e28ddb62e1b5ad404
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 27 21:54:14 2026 +0500
+
+    feat(enterprise-100x): telemetry fixes, sunglasses prompt ingestion, prompt ux unlock, api gateway & edge caching
+
+commit 5dbfd8f8d6000199cbcd2ab04c1cc6dd62f6bcf5
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 22:50:51 2026 +0500
+
+    feat(webhooks): 100x tabbed studio modal, strict payload validation & field mapping, captured keys inspector; archive old docs to waste and add exhaustive QA and AB testing specifications
+
+commit f6ddf3a30a0ce1483aa5a35c46601208c3b12290
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 22:03:04 2026 +0500
+
+    feat(perf-cursor-cache): implement site-wide Keyset Cursor Pagination, 2vCPU/2GB-optimized tag-aware caching with targeted auto-invalidation, and comprehensive dual-theme device testing checklist
+
+commit 94ff61dedfa8a9070e938967b878655c920df94e
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 19:48:47 2026 +0500
+
+    feat(api-gateway-webhooks): 100x enhance Webhooks & Custom API Gateway with modals, multi-table queries, all tables sample data, prompt copy ad unlock, resolve system logs error 1265/1364/1064, and document 10k session architecture
+
+commit c6f42e9abc35d65c1b2754d28aaeca3bbb11e857
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 12:29:52 2026 +0500
+
+    fix(webhooks, api, deployment): resolve 403 authorization in webhooks and custom api, support multi-table importing and get-by-id in custom api, fix ec2 detached head deployment
+
+commit d47d463dffd7e3c9b101072c6d8878554e98cc04
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 04:05:13 2026 +0500
+
+    chore(deploy): add systemctl daemon-reload before service reload in ec2_deploy_and_migrate.sh
+
+commit ff035295e1542aeadeeafddca67f591deb296e83
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 03:59:27 2026 +0500
+
+    fix(webhooks, api, migrations): fix 403 authorization in IncomingWebhookController, resolve MySQL 8.0 migration 1064 syntax error, fix custom api table-data route, and escape JSON attributes in admin studio
+
+commit f168db079533e977a0f03ff106fb5a9a9a0445de
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 03:30:06 2026 +0500
+
+    Fix production crash telemetry errors, implement server sudo deploy command, resolve funwithcoding blank screen, add CloudFront asset cache busting, and configure 3-environment credential profiles
+
+commit 8e73c6c2d98aba017c54ac2f8aecad0d2b71f33e
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 02:40:03 2026 +0500
+
+    Eliminate table whitelisting, enforce admin-only custom API with full DB describe and CRUD, fix mail attachment 404, resolve EC2 deploy sync token authorization, and enhance dual-theme popups simulator
+
+commit a10d05c8de32b69b36659da2cf6c82b4845e9b12
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 02:15:24 2026 +0500
+
+    fix(deploy): add deployPull handler to AdminController, improve EC2 git pull permissions in ApiController
+
+commit 83293315c8d744ed1517397323b3e6307a540772
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 26 02:11:56 2026 +0500
+
+    feat: custom REST API builder, schema introspection, prompts db enrichment, clean ad navigation, light theme default & GMT time localization
+
+commit 7f6ddc6cb34e5ecb46cf2f25c1ee5b3e3d5efd33
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 24 00:54:19 2026 +0500
+
+    feat(nav): add Incoming Webhooks and Popup Manager to admin sidebar navigation
+
+commit c0b7823c639b799017c86356ca1a74f5744f0302
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 24 00:42:02 2026 +0500
+
+    fix(critical): add missing use Config to admin_header (white screen), fix supporter_user_id->tipper_user_id in AdRenderer (DB error), add cache+OPcache clearing to deploy scripts
+
+commit 0e9cd0599fe09aed20c85c2b59afa0f6b4eb9d5b
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 24 00:29:36 2026 +0500
+
+    fix(db-manager): make escapeHtml bulletproof against numbers and nulls, prevent TypeError in query runner and dashboard, sync EC2
+
+commit 65eea42df625ebbbcf999d0770772dfdf4ab32d0
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 24 00:11:16 2026 +0500
+
+    fix(db-manager): isolate executeDbQuery from fatal error logger, add EC2 deploy & migration sync runner, and register Rule 8
+    
+    - Isolate DB Manager Query Terminal in AdminController.php so syntax errors (e.g. 'show prompt') return HTTP 400 JSON without fatal crash or error logs
+    - Add database/migrations/2026_09_23_000001_enterprise_v2_upgrade.sql for automated migration tracking
+    - Implement deployPull in AdminController.php and v1DeploySync in ApiController.php
+    - Create scripts/ec2_deploy_and_migrate.sh for EC2 production deployment and database migration sync
+    - Add 1-click 'Sync & Run Migrations' buttons in System and DB Manager UIs
+    - Add Rule 8 to GEMINI.md establishing EC2 synchronization and migration execution as mandatory workflow
+
+commit 41085b0a23e191031c8fcad99d5d4b129df40a72
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 23 23:58:17 2026 +0500
+
+    feat: enterprise v2 upgrades - light mode default, incoming webhooks live listener, rest api gateway, scalable sitemaps, popup maker, ad click guard
+    
+    - Fix missing affiliateRedirect method in DirectoryController.php with deep linking and telemetry
+    - Light Mode default implementation across style.css, header, admin_header, and Config.php
+    - Clean up prompts cards: remove redundant teaser copy buttons and single prompt top-right duplicate
+    - Ad click guard: eliminate whole-card click hijacks, throttle sponsor clicks, exempt donors & roles
+    - Incoming Webhooks Engine: live JSON listener, dynamic field-to-table mapper, and test simulator
+    - Enterprise REST API Gateway: Bearer Token auth for tools, prompts, gpts, articles, telemetry
+    - Scalable Partitioned Sitemaps: dynamic chunking for 200k+ entities with master sitemap index
+    - Custom Dynamic Popup Maker: audience targeting, trigger rules, frequency, dual themes, impressions
+    - Client-side GMT timestamp localization to user device timezones
+    - Security Directives: RedirectMatch 404 for .git, HSTS, CSP, CloudFront 7-day asset caching
+    - Automated EC2 daily database backup script with rolling 7-day retention
+    - Comprehensive AWS SES & port 25 unblocking application and Google Search Console guides
+
+commit ec9a5bb63c37d594d63d97448d9f36a0b8d96549
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 23 21:03:44 2026 +0500
+
+    fix(environment): intelligent EC2 environment auto-detection, auto-upgrade HTTPS across reverse proxies and CSP upgrade-insecure-requests
+
+commit 75f8a5aa4dd800967b4a43d21a44b5f61efb3d12
+Author: TechScout Admin <admin@techscout.online>
+Date:   Wed Sep 23 20:49:46 2026 +0500
+
+    fix(security): resolve recursive firewall abort loop, guard header sending, and prevent error log disk saturation
+
+commit 56f2225e6998ea4c586bf028f01d22f32e779c94
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 17 15:45:55 2026 +0500
+
+    feat: entity category scoping, multi-image gallery showcase for image prompts, dynamic prompt hyperparameters visibility, and duplicate slug error prevention
+
+commit be1caf676e82fa106489f9c901777d3e5092afd8
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 17 13:49:14 2026 +0500
+
+    Fix category save white screen, add user ID filtering, fix category type filtering and content_categories fallback
+
+commit adf89643c51712d2c1571aaa139dfcd16271594b
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 17 13:38:28 2026 +0500
+
+    Optimize frontend and admin performance, defer render-blocking scripts, add 0ms instant shells for admin modals, and eliminate topics navigation button
+    
+    - Defer lucide.min.js, sweetalert2, toastify-js, and telemetry-error-logger.js in header.php and admin_header.php
+    - Move chart.umd.min.js to load conditionally only on admin pages containing charts (Dashboard, Analytics, Revenue)
+    - Conditionally load Prism syntax highlighter CSS and JS only on pages containing code snippets (articles, prompts, editor)
+    - Add CDN preconnect and DNS prefetch hints for cdn.jsdelivr.net and cdnjs.cloudflare.com
+    - Replace expensive 14px backdrop blur with 5px blur and 0.88 opacity in admin.css, add will-change: transform, opacity, and streamline modal entrance animation to 0.15s
+    - Introduce high-tech glowing pulse/spinner skeleton styles (.skeleton-shimmer, .ts-modal-skeleton-spinner)
+    - Implement 0ms Instant Shell Trigger on User Detail Hub and Edit User modals in users.php, swapping skeleton for fetched data upon response
+    - Permanently purge 'Topics' navigation button in header.php filter, SQL migration, and database
+    - Append Prompt #11 to USER_REQUESTS_TODO_TRACKER.md with 100% completion
+
+commit d876bddeec058c8b6a141c4579b2ca3efb82d4b2
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 17 13:26:02 2026 +0500
+
+    feat(taxonomy): strict entity separation, parent-child scope locking, single sidebar option, topics elimination with subscriptions, many-to-many category relations, and re-runnable migrations engine
+
+commit 2e5229f21ca595d9f39c838d634482f93c521436
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 17 13:03:15 2026 +0500
+
+    Fix MariaDB LIMIT quoting syntax error via typed PDO parameter binding, replace frontend raw database error/credential leaks with secure branded error notice, unify Root Categories and Subcategories management onto a single screen with interactive main tabs and sub-tabs, document MISTAKE-35 and MISTAKE-36, and create workspace master user requests & appending TODO tracker
+
+commit c6c199c42f17c0f4822c05bf15770ede83b81b33
+Author: TechScout Admin <admin@techscout.online>
+Date:   Thu Sep 17 10:07:14 2026 +0500
+
+    Refactor taxonomy into strict Categories and Subcategories with separate CRUDs and dedicated Add tabs, eliminate runtime DDL and database seeds in favor of panel migrations, and optimize admin modals with code-splitting and hardware acceleration
+
+commit 7d91db148eac6ee278e8c5d682e3d8fa393702c1
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 22:27:55 2026 +0500
+
+    Fix undefined variable lockPath warning in index.php and enforce clean bootstrap initialization
+
+commit aa6ef2a14bbd5699c5a067644a151dbd77ccbc67
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 22:06:31 2026 +0500
+
+    Fix setup wizard authorization lock on fresh installs, auto-create database, and add custom SQL dump upload support
+
+commit fb69e4f668b31f9f47eb6e34f6368e7bffc7c6d7
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 21:53:21 2026 +0500
+
+    Optimize admin panel speed, implement zero-crash FTP backup recovery, and add dynamic white-label configuration
+    
+    - Database & Config: Added 2-second connection timeout, non-fatal hasConnection() verification, automatic localhost bridge for remote InfinityFree credentials, and Config::saveConfig file persistence.
+    - Auto-Recovery Installer: Guarded early index.php bootstrap queries to prevent fatal timeout blank screens, bypassed installer lock when database is disconnected, and added 1-click database connection recovery mode.
+    - Admin Panel Speed: Consolidated 12+ separate database queries into single aggregated index queries with 60-second in-memory caching in Analytics.php and AdminController.php.
+    - Listing Query Memory Optimization: Omitted megabytes of body_html from articles(), tools(), prompts(), and gpts() table listings.
+    - Asset & Layout Caching: Replaced timestamp CSS cache-busters with v=2.5.0 and cached admin layout site settings.
+    - White-Label Studio: Added branding presets and live theme customization.
+    - Registry: Documented MISTAKE-32 in mistakes/ and docs/ MISTAKES_LEARNED.md.
+
+commit 1f4f8aa29a55c43b1f83bc3d03cdbcf9e211edbd
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 14:56:05 2026 +0500
+
+    Enhance Single Prompt Multi-Images, Creator Tip Jar, Admin Tipping Ledger and Unlimited Category Hierarchy CRUD (Prompt #4)
+    
+    - Single Prompt Page: Un-gate media gallery so any prompt with linked images (featured or multiple prompt_images) shows interactive showcase, thumbnail carousel, and HD lightbox zoom (MISTAKE-29)
+    - Creator Crypto Tip Jar: Add dedicated inline tab & card on single prompt view featuring dynamic QR generation, multi-network crypto addresses (USDT, SOL, ETH, BTC), 1-click copy, 95/5 fee calculation simulator, and direct AJAX on-chain TXID submit to /api/v1/tips/submit
+    - Admin Tipping Verification & Ledger: Update verifyAuthorTip and rejectAuthorTip with strict schema ENUM compliance ('completed', 'refunded'), dual-schema fallbacks, atomic author balance crediting, financial_ledger credit recording, and audit logs (MISTAKE-31)
+    - Category & Taxonomies CRUD: 1000x enhanced with module scope sub-tabs (Articles, AI Tools, Custom GPTs, Prompt Blueprints, Challenges), unlimited recursive parent-child nesting with anti-cycle guards (MISTAKE-30), visual level badges, breadcrumbs, live slug auto-generation, and instant '+ Add Sub' action
+    - Mistakes Learning: Created mistakes/ directory, updated MISTAKES_LEARNED.md with MISTAKE-29, MISTAKE-30, MISTAKE-31 and updated response audit checklist
+    - Prompts Master History: Populated user_requests_history.html with verbatim prompt history and 1-click copy-to-clipboard buttons
+
+commit 13ba5c9daf5d3c12503f2a8848c516dd8986135c
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 14:34:17 2026 +0500
+
+    feat(patronage-and-links): 95% creator share & 5% platform fee, fixed crypto wallet configuration, and dynamic custom named links in Admin CRUD
+
+commit a330555b34b061541493c5901ef18f119c2e733d
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 14:17:30 2026 +0500
+
+    feat: dedicated image prompt categories with live counts, segregated taxonomies for tools and GPTs, pure image grid, and hierarchical breadcrumbs
+    
+    - Added dedicated Image Prompt Categories hub (/prompts/images/categories) with dynamic prompt count metrics, total copy telemetry, sample previews, and popunder ad monetisation
+    - Segregated taxonomy routing across content domains:
+      * /prompts/images/categories for AI image generation categories
+      * /prompts/categories for LLM and image diffusion prompt taxonomy
+      * /tools/categories for AI tools & software categories with live tool counts
+      * /gpts/categories for custom GPT & AI agent categories with live agent counts
+    - Enhanced image prompts gallery (/prompts/images) to pure immersive image grid layout with 1-click prompt copying and popunder monetization
+    - Implemented full hierarchical breadcrumb pathing (Prompts Hub › Parent Category › Subcategory › Title) in single prompt blueprints
+    - Connected category navigation tabs and buttons across prompt, tool, and GPT directories
+    - Ensured strict dual-theme compliance (light & dark) without inline HTML color overrides
+
+commit 6da5e9bc6df76804c57fd57627c3d37a1364d05d
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 14:03:08 2026 +0500
+
+    feat(prompts): AI Image prompts pure visual grid, hierarchical category breadcrumbs, and popunder ad integration on card clicks and blueprint actions
+
+commit b6d83548611cb2e02bb4fb3c59696c504318a3a6
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 12:59:23 2026 +0500
+
+    feat(admin-crud): Enterprise overhaul of Prompt Blueprints and Custom GPTs CRUD with multi-tab modal editors, variable builders, live playgrounds, and dual-theme design system
+
+commit 1a616ad2277f3b1d5281dc8575936e3fae88c5c1
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 12:36:43 2026 +0500
+
+    Fix tip sender_name SQL error & article load; add anti-spam comment reactions, TS-AUT-68 visual link scanner & TS-AUT-70 heatmap telemetry
+    
+    - Database: Added Database::queryOne() fallback method; added safe migration step 32-33 for comment_reactions, author_tips enterprise columns, and analytics_events.
+    - Creator Tips: Updated submitCreatorTip() in ApiController with dynamic dual-schema adaptation preventing unknown column sender_name errors; enhanced author profile and article views with dual-theme crypto tip modal, QR codes, and direct URL anchor #tip auto-open.
+    - Article & Comments: Fixed single article loading; upgraded comment reactions with idempotent single-reaction-per-user/IP toggle and switch logic eliminating multi-click spam.
+    - TS-AUT-68: Integrated Automated Technical Broken Link & 404 Scanner Phase 5 into cron.php as an interactive foreground administrative control center with live progress bar, task picker, status code audit table, and direct 1-click Studio edit links.
+    - TS-AUT-70 & TS-AUT-55: Added 5-zone reader retention & scroll depth heatmap telemetry visualizer, disengagement hotspot detection with tactical AI recommendation, and interactive code snippet copy rate tracking (/api/v1/telemetry/code-copy).
+    - Features Document: Enhanced 50_enterprise_platform_features.md documenting TS-AUT-68, TS-AUT-70, TS-AUT-55, anti-spam reactions, and creator crypto tip jar architecture.
+
+commit 9d48e39c13aa27ebcf0ec1ff710fb4c81662fd06
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 11:51:00 2026 +0500
+
+    Fix InfinityFree MySQL compatibility, retire PWA/manifest, resolve queryScalar & JS errors, enhance TXID verification, enforce dual-theme CSS on maintenance & author dashboard, and add 300+ roadmap features
+    
+    - Core Database & Migrations: Replaced dynamic PREPARE stmt and information_schema queries with safe SHOW COLUMNS checks compatible with InfinityFree; added Database::queryScalar(), Database::querySilent(), and Database::fetchSilent(); added Step 31 auto-migration for prompts.prompt_type; fixed SQLSTATE 42S22 column errors in AdminController::prompts and AdminController::dbManager.
+    - Production SQL: Rewrote database/prompts_and_pricing_upgrade.sql with standard MySQL DDL executable in phpMyAdmin without permission denied #1044 errors.
+    - PWA & Manifest Removal: Retired manifest.json and sw.js service workers per InfinityFree environment requirements; updated index.php to gracefully unregister existing workers and return empty JSON; removed manifest link and sw registration from header and footer.
+    - Single Article & Telemetry Fixes: Resolved fatal Call to undefined method App\Core\Database::queryScalar() in article.php:25; fixed JS SyntaxError: Identifier 'cryptoRates' has already been declared by converting to window.cryptoRates singleton; resolved 404 missing ad card by adding cloudmatrix_card.webp and graceful onerror fallback in AdRenderer.
+    - Crypto Payment Verification: Enhanced TransactionVerifier with configured platform treasury address validation across BTC, ETH, USDT (TRC-20 & ERC-20), and SOL; added matched_treasury_wallet and address feedback in crypto payment box component.
+    - Strict Text Prompts Rendering: Enforced that text prompts never display attached images; image cards only render when in image prompts tab and prompt_type === 'image'.
+    - Maintenance Mode & Dual Themes: Completely redesigned views/errors/503.php with high-contrast dual-theme CSS ensuring light mode text is never invisible; added admin maintenance preview and visitor lockout simulation controls in header banner.
+    - 100x Enhanced Author Dashboard: Added full dual-theme CSS styles preventing white-on-white text in light mode; added 4 new interactive tabs/panes: AI Prompts Studio, Crypto Tip Jar & Direct Patronage, Reader Feedback & Discussions, and Security & Active Device Sessions; updated AuthorStudioController to query prompts, comments, and sessions.
+    - Comprehensive Features Roadmap: Added 300 brand new features to features_roadmap.html (expanding roadmap from 222 to 522+ unified features) categorized across Guest Experience (75), Member Workspace (75), Author Studio (75), and Admin Governance (75).
+    - Deployment Prep: Cleaned and updated changes/ directory with all core modified files and configured InfinityFree production credentials in changes/app/Core/Config.php.
+
+commit 65ced07e150dffe98720f4e67d865a2cad269687
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 13 11:17:03 2026 +0500
+
+    feat(prompts-pricing): separate text vs image prompts, add prompt CRUD image upload, integrate real-time crypto pricing APIs, and on-chain payment verification
+    
+    - Prompt Architecture Segregation:
+      * Non-destructive migration prompts_and_pricing_upgrade.sql adding prompt_type ENUM('text', 'image')
+      * DirectoryController and Content model now segregate text prompts (/prompts) from image prompts (/prompts/images)
+      * Text prompts strictly render blueprint terminals with no image attachments (featured_image_url = NULL)
+      * Image prompts prominently display output artwork and preview modal
+    
+    - Enhanced Prompt CRUD & Author Studio:
+      * Admin prompts CRUD updated with segmented type selector, direct drag-and-drop image upload to /storage/uploads/prompts/, AI model tags, and live syntax validation
+      * Author Studio editor updated with prompt type selector and conditional showcase media upload
+    
+    - Real-Time Live Pricing APIs (PricingEngine):
+      * Built PricingEngine service with CoinGecko API integration and Binance API failover
+      * Site settings caching with configurable TTL and baseline fallback spot rates
+      * Added public API route /api/v1/pricing/crypto-rates and admin test endpoint /api/v1/pricing/test
+      * Admin Advertisements tab enhanced with live pricing engine configuration and ping diagnostic tool
+    
+    - Decentralized Payment Transaction Verification (TransactionVerifier):
+      * Built TransactionVerifier service supporting BTC (Mempool.space), ETH (Etherscan), TRON/TRC20, and SOL (Solscan/RPC)
+      * Live on-chain transaction hash format validation and ledger query
+      * Updated public Crypto Payment Box with live coin conversion rates, dynamic QR codes, and instant on-chain TXID verification badge
+      * Added Forensic On-Chain Transaction Inspector modal to Admin Advertisements & Sponsorships for 1-click approvals/rejections
+
+commit 03207834a1078bf7bc3a38abf33ee87f64766e85
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 22:38:59 2026 +0500
+
+    fix: resolve PWA manifest & sw errors, enforce admin-only diagnostic ping & status, fix maintenance mode & image prompts sub-directory, and consolidate unified master roadmap
+    
+    - Fix PWA manifest.json direct serving: intercept manifest.json and sw.js at the top of index.php before routing with explicit application/manifest+json and application/javascript headers to prevent 404 HTML rewrite fallback and eliminate 'Manifest: Line: 1, column: 1, Syntax error'.
+    - Fix Service Worker (sw.js): implement reliable Stale-While-Revalidate caching strategy with guaranteed Response fallbacks on network rejections, eliminate TypeError: Failed to convert value to 'Response', and exclude admin, auth, telemetry, and ?i=1 cookie validation routes.
+    - Fix Maintenance Mode (TS-INF-09): resolve fatal method calls by normalizing URI path with $request->getPath(), add ?preview_503=1 live simulation test hook, send HTTP 503 status code with Retry-After: 300 header, and display a dual-theme persistent admin notification banner across header.php when maintenance mode is active.
+    - Enforce Admin-Only Diagnostic Ping & Status: secure /status and /api/v1/diagnostic-ping with Auth::requireRole(['admin', 'super_admin']) check, returning latency, CPU load, and DB metrics for authorized staff while redirecting unauthorized visitors.
+    - Fix Image Prompts Sub-Directory (/prompts/images): expand prompt_kind === 'image' filtering to match visual synthesis engines (Midjourney, DALL-E, Flux, SDXL, Leonardo, photorealism, 3d-renders) and ensure non-image text prompts are excluded.
+    - Fix Runtime PHP 8.2 Errors:
+      * AdRenderer.php: extract renderBadge helper to eliminate Undefined variable $thisImageBadge warning.
+      * Request.php: convert Request::ip() to public static function to fix 'Non-static method Request::ip() cannot be called statically' in settings.php:204, and add getUri() and uri() methods.
+      * settings.php: declare switchSettingsTab early in head script to eliminate ReferenceError: switchSettingsTab is not defined.
+      * prompt_single.php: safely normalize variable array items to string/array to eliminate 'Cannot access offset of type string on string'.
+    - Consolidate Master Roadmap: merge features_roadmap.html and features_roadmap_2.html into a single comprehensive master roadmap containing 217+ deduplicated enterprise features, dual-theme styling, category filters, and 1-click specification copy buttons, while configuring features_roadmap_2.html as a seamless redirect.
+    - Document MISTAKE-25, MISTAKE-26, MISTAKE-27, and MISTAKE-28 in docs/MISTAKES_LEARNED.md.
+
+commit a92d6dfaef7e2593d80954bf6a9df84f748833a1
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 22:03:22 2026 +0500
+
+    fix: ensure FeedController joins contents table and DirectoryController uses Content::getFeed for image prompts
+
+commit 5f14e9d899f3c0680f31a8adba6c4b1f6a67034e
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 21:59:35 2026 +0500
+
+    feat: comprehensive enhancements across media uploads, sponsors, prompts, ads, security and architecture
+    
+    - Fix Image Upload URL vs. Path Bug (MISTAKE-24): Converted media input elements across admin, sponsor, author, and profile views from type="url" to type="text" to eliminate browser HTML5 URL validation errors on valid relative storage paths (/storage/uploads/...).
+    - Sponsor Monetization & Crypto Payment Upgrade: Implemented dynamic pricing tiers ($49 for 7 days, $149 for 30 days, $299 for 90 days) with real-time BIP-21 and EIP-681 QR codes embedding exact coin amounts for BTC, ETH, USDT, and SOL with 1-click amount copy buttons.
+    - Prompt Directory & Single View Overhaul: Removed prompt lightbox modal from directory cards with direct routing to /prompts/{slug}; fixed PHP 8.2 count(null) TypeError in comments section restoring single prompt footer; resolved popup blocker issues on prompt copy by triggering window.open synchronously.
+    - Active Display Banners & Background Popunder: Built AdRenderer with header_banner and footer_banner slots linked to advertisements database with impression tracking and /ad/click/{id} logging; added background popunder ad trigger on navigation clicks.
+    - Dedicated AI Image Prompts Sub-Directory: Added /prompts/images and /prompts/image-prompts views featuring visual art styles (Photorealism, 3D Renders, Cyberpunk, Anime, Architecture, Landscapes) and engine filters (Midjourney, DALL-E, Flux, SDXL).
+    - Interactive Features Roadmaps 1 & 2: Added 1-click feature specification copy buttons and status badges (Completely Built, Partially Built, Planned) to all cards.
+    - Enterprise Security & Architecture:
+      * [TS-INF-10] Automated cron orchestrator (cron.php) with job execution logging into cron_logs.
+      * [TS-SEC-03] RFC 6238 TOTP 2FA engine (app/Core/Totp.php) and verification flow.
+      * [TS-SEC-05] Disposable/burner email blocker in registration (Firewall::isDisposableEmail).
+      * [TS-SEC-010] Sliding-window rate limiter (RateLimiter::guard) on public APIs and search.
+      * [TS-SEC-04] CSP telemetry endpoint (/api/v1/telemetry/csp) and logging.
+      * [TS-UI-05] Offline PWA manifest (manifest.json) and Service Worker (sw.js).
+      * [TS-API-05, TS-API-07] Dynamic partitioned XML sitemaps and RSS/Atom feeds (FeedController).
+      * [TS-INF-04] Public system status page (/status) and healthcheck HUD.
+      * [TS-INF-09] Maintenance mode IP whitelist bypass and dynamic countdown clock timer.
+      * Added MISTAKE-24 to docs/MISTAKES_LEARNED.md.
+    - Deployed all updated files directly to /htdocs on ftpupload.net:21 preserving hosted environment credentials.
+
+commit 0e61230aa8e72c1a35f2853822a84fe14142f13f
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 20:38:50 2026 +0500
+
+    feat(enterprise): universal image uploads, prompt galleries, crypto ads, db engine & roadmap 2.0
+    
+    - [MISTAKE-23] Documented universal image upload mandate across all forms; added file inputs to ads, sponsor, prompt galleries, and author studio.
+    - [Prompt Blueprints] Added multi-image gallery showcase, thumbnail selector, lightbox zoom, half-visible teaser mask with blur, and copy button popunder/direct ad trigger.
+    - [Ad & Sponsorship CRUD] Enhanced scheduler with 4 subtabs (ads, sponsored, settings, tips), duration tiers (7, 30, 90 days with 15% & 30% bulk discounts), central treasury wallets (BTC, ETH, USDT, SOL), and author payout ledger.
+    - [Comments & Social] Anti-spam validation blocking URLs & emails, @mention autocomplete & notification dispatch, multi-emoji reaction bar with mobile expand, 60s long polling stream, and author pin badge.
+    - [Interactive Widgets] Community polls with live AJAX voting, quote share card generator, collapsed-by-default sticky TOC, 1-click PDF export, and creator tip jar.
+    - [Editorial Studio] Client-side Word (.docx) ingestion via Mammoth.js, code highlighter with 20+ languages, client-side WebP converter, peer-review bubbles; automated broken link checker placed exclusively in admin console.
+    - [Timezone Suite] Admin topbar dual clock with live ticker and switcher, localized user format preferences, 24-hr regional activity heatmap, and relative time ticker.
+    - [Database & Storage Engine] Interactive ERD visualizer tab, slow query profiler & AI index advisor, schema migration runner with rollback history, orphaned media garbage collector, live IOPS benchmark & latency monitor, portable SQLite database exporter.
+    - [Roadmap 2.0] Created features_roadmap_2.html with 108+ new hyper-advanced enterprise specifications, search, category filters, dark/light theme, and JSON export.
+    - [Deployment] Synced all core changes to changes/ with InfinityFree production credentials in app/Core/Config.php, and completed direct FTP deployment to /htdocs/ with 0 errors.
+
+commit 00cadde081b303e09d9a005f88e77df78ba87319
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 19:17:13 2026 +0500
+
+    feat: complete admin dual-theme (dark/light) CSS counterparts and build 105+ features architecture roadmap
+    
+    - Admin Theme Hardening (Rule 3 & MISTAKE-10): Added explicit dark/light mode counterpart CSS for .admin-card, .admin-stat-card, .admin-table, .admin-btn, .admin-input, .admin-pill-badge, .ts-subtab-link, .custom-export-pane, .admin-sidebar, .admin-topbar, and .admin-command-palette under [data-theme="light"] and .theme-light, strictly adhering to zero-inline tag styles.
+    - Commit Trajectory Analysis: Analyzed the 5 recent commits (6f65064, 4eabede, d026e1c, 9c0b467, 5a7b76c) tracking generative AI visual engines, IP timezone math, compact social discussions, custom DB/directory exporter, and crypto monetization.
+    - Enterprise Features Roadmap (features_roadmap.html): Created an interactive, fully responsive 111-feature architecture roadmap catalog in the project root with real-time keyword search, category filter pills, difficulty/impact tags, 1-click feature copy, JSON export, and persistent dark/light theme switcher.
+
+commit 6f650642fb91478c16e6254b61fbcbf32863d430
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 19:09:22 2026 +0500
+
+    feat: Timezone math engine fix, Image Prompts hub, compact social comments, custom DB/directory exporter, web installer & crypto ads
+    
+    - Timezone Engine: Resolved timezone discrepancy where Pakistani Standard Time (Asia/Karachi, UTC+5) was directly offset. Explicitly normalized PKT to UTC first then to target visitor timezone, rendering localized ISO-8601 timestamps in <time class="ts-time"> with browser client-side auto-detection.
+    - Image Prompts Hub: Added dedicated AI Image Prompts tab to /prompts with subcategories for Midjourney v6, DALL-E 3, Flux.1, and Stable Diffusion XL, with sample images, parameter tags, 1-click copy, and high-res lightbox zoom modal.
+    - Compact Social Comments: Overhauled discussion section to modern Instagram/Facebook speech-bubble layout with 5-at-a-time lazy loading, inline reply threads, like/helpful toggles, and dual theme support.
+    - Custom Directory & Real Schema/Seed Exporter: Built visual export studio in /admin/db-manager with folder tree selection, SHOW CREATE TABLE schema generation, and row-level interactive seed row picker creating custom .zip packages.
+    - Web Installer & White-Labeling: Built 5-step installer (/install) with pre-requisite checks, live DB connection tester, white-label branding, admin account setup, storage/installed.lock protection, and admin launcher.
+    - Article Submission & Editor System: Added prominent Word (.docx) manuscript preference notice across author studio and dashboard; enhanced visual editor with live word counter, character counter, and reading time estimator in ribbon toolbar.
+    - Sponsored Systems & Crypto Payments: Implemented public /sponsor portal for tools and articles with admin-configured crypto wallet addresses (BTC, ETH, USDT, SOL) and transaction hash (TXID) verification queue in admin.
+    - Speed Optimization: Configured mod_deflate Gzip compression, mod_expires, and Cache-Control headers in .htaccess.
+    - Admin UI/UX 100x Polish: Enhanced assets/css/admin.css with glassmorphism, micro-glow badges, hover lift states, and dark/light mode preservation without inline styles.
+
+commit 4eabede8990cb1acc5162b34e3325666f839aa38
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 18:29:46 2026 +0500
+
+    chore(git): ignore node_modules from test dependencies
+
+commit d026e1cfc3a29cf887e0378411391b69bb23c7fa
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 18:14:44 2026 +0500
+
+    feat(timezone): implement automatic timezone detection by IP location
+    
+    - Added DateHelper::detectTimezoneByIp() with session caching, Cloudflare country code lookup, ISO-2 country-to-timezone map, and fast ip-api.com lookup
+    - Implemented /api/v1/geo/timezone endpoint in ApiController for client and backend geolocation resolution
+    - Added window.detectAndSyncIpTimezone() in assets/js/main.js, admin_header.php, and admin_footer.php for background IP timezone auto-detection and dynamic DOM synchronization
+    - Updated ErrorLogger::captureLocationDetails() to log the exact IP location timezone for telemetry and forensic error inspector
+    - Updated docs/MISTAKES_LEARNED.md with IP location timezone auto-detection guidelines
+
+commit 9c0b46723f6e165a25426c721264207ed17beb3a
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 18:03:59 2026 +0500
+
+    feat(timezone): implement automatic visitor timezone detection and dynamic timestamp localization across admin console
+    
+    - Enhanced DateHelper with toDateTime(), iso8601(), render(), and renderTwoLines() converting stored Pakistan Standard Time (Asia/Karachi, UTC+5) to visitor's detected timezone
+    - Implemented client-side automatic timezone detection via Intl.DateTimeFormat().resolvedOptions().timeZone with cookie persistence and window.localizeAllTimestamps() DOM synchronization
+    - Replaced raw PHP date() calls with DateHelper::render across system logs, audit logs, users, dashboard, newsletters, revenue, firewall, media, moderation, content queue, and api keys
+    - Updated forensic error inspectors in system logs and audit logs to dynamically parse timestamps with UTC+5 offset and render in local time
+    - Preserved dual-theme support using semantic CSS classes (.ts-time-part, .ts-date-part, .ts-tz-abbr) and CSS custom properties without hardcoded tag styles
+    - Documented MISTAKE-22 in docs/MISTAKES_LEARNED.md
+
+commit 5a7b76c835bbb322af4300dafd8533e49efa0b51
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 17:40:53 2026 +0500
+
+    Fix syncAdminThemeIcon reference error, switchMailTab undefined error, Auth::requireRole undefined method error, and harden analytics telemetry database queries
+
+commit d80be8fb2bdcec9640102501e9a28b97692d6fca
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 15:31:27 2026 +0500
+
+    Route all external tool, GPT, and outbound links through /go/{slug} referral tracking gateway, add type parameter support, and update changes directory
+
+commit d4622395b46dc883380b8d66227d678c0651986c
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 15:18:53 2026 +0500
+
+    Fix theme toggle double-trigger inversion bug, add debounce re-entrancy guard, sync admin header head restoration, and update changes directory
+
+commit fe25cd86758a3fca24e8cd8fec17f533de4b5ddb
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 14:17:27 2026 +0500
+
+    Fix 500 error on /admin/mail/trigger/create, resolve public dark mode issues, eliminate hardcoded colors, and update changes directory
+
+commit 7825ceb1ec2a8745e18cfeba3a3984e52511f1eb
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 13:12:43 2026 +0500
+
+    fix: resolve audit inspector modal dark mode styling and enhance db manager sql query terminal
+
+commit 4910389545160c10f6dad3a6c84747bb2bcf3e8e
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 12:54:59 2026 +0500
+
+    feat(ftp): add FTP deployment rule and safety directive to GEMINI.md, document MISTAKE-15, and deploy changed files to /htdocs
+
+commit ec0c846434374c69bceec719e86f1fc75b41daa4
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 12:49:03 2026 +0500
+
+    fix(theme): isolate dark and light modes, resolve public page theme bleed, add symmetric toggling, and document MISTAKE-13 & MISTAKE-14
+
+commit 0c812076e489c3ac06db52c28bed5c9e6b58eedc
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 11:15:24 2026 +0500
+
+    fix(analytics): resolve prompts created_at column error, eliminate hardcoded dark badge backgrounds, and document MISTAKE-12
+    
+    - Fix SQLSTATE[42S22] 1054 Unknown column 'created_at' in prompts query in app/Controllers/AdminController.php by joining parent contents table on content_id and wrapping in resilient try/catch
+    - Provide non-destructive database upgrade script in database/prompts_telemetry_fix.sql and update database/schema.sql to add created_at and updated_at to prompts
+    - Document MISTAKE-12 (Assuming Extension Tables Mirror Parent Columns in Telemetry Queries) in docs/MISTAKES_LEARNED.md and update audit protocol checklist
+    - Fix hardcoded dark badge backgrounds in views/admin/system.php by replacing inline background rgba(0,0,0,0.5) with standard dual-theme badge classes ts-badge-green and ts-badge-gray
+    - Refactor views/admin/system.php cards and inputs to use CSS custom variables and classes defined in assets/css/admin.css (.social-net-card, .system-card-box, .system-label, .system-subtext) for complete dark and light mode fidelity
+    - Synchronize core modified files into changes/ folder per project workflow rules
+
+commit 6fdc6110d4574af137081f6a677a86c5aac6b6f8
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 10:24:26 2026 +0500
+
+    fix(admin): resolve SQL 1054 column error, remove audit table from system view, add PHP event key selector, and document MISTAKE-11
+    
+    - Fix SQLSTATE[42S22] 1054 Unknown column 'c.created_at' in app/Controllers/AdminController.php by ensuring unaliased queries on contents use created_at and joined queries use explicit c.created_at
+    - Document MISTAKE-11 (Unaliased Table Columns in Dynamic WHERE Clauses) in docs/MISTAKES_LEARNED.md and add rule 11 to the response audit protocol
+    - Remove redundant Live System Audit Records Stream table from /admin/system in views/admin/system.php and AdminController::system, adding clean launch card to dedicated /admin/audit-logs station
+    - Enhance Visual Automation Trigger Studio in views/admin/mail.php with direct selection of all 33+ platform PHP system event keys categorized into Auth & Security, Payouts & Treasury, Editorial, and Community
+    - Add 1-click auto-configuration on event selection (friendly name, event key, default template, delivery policy, and event description badge)
+    - Add HTML5 datalist auto-completion and recommended route pattern presets
+    - Synchronize core project changes into changes/ folder per workflow rules
+
+commit 19fd08308802eddf9bf1052d90406aa83783dd72
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sat Sep 12 09:38:46 2026 +0500
+
+    feat(admin): zero-code visual trigger studio, table paginator scoping fix, and real-time telemetry HUD
+    
+    - Implement Visual Automation Trigger Studio in views/admin/mail.php allowing zero-code creation, visual editing, and deletion of dynamic URL and custom event triggers directly from modal dialogs
+    - Add in-modal 1-click test simulation sandbox to verify trigger dispatching and simulated variables (amount, payout_id, transaction_ref) without editing PHP files
+    - Refactor app/Core/EventTriggerEngine.php to merge system core events with dynamic site_settings triggers and synchronize event_mail_map_{event_key} mappings
+    - Fix universal table paginator footer stacking bug in assets/js/admin_table_paginator.js by strictly scoping pagination controls within table wrappers and suppressing pagination when row count <= page size without active search
+    - Add window.refreshAdminTablePaginators() trigger on tab switching across admin modules
+    - Revamp CMS Analytics & Telemetry HUD in views/admin/analytics.php and app/Controllers/AdminController.php with real-time polling endpoint /admin/analytics/realtime, live auto-refresh toggle, and selectable timeframes (30m, 1h, 24h, 7d, 30d, 90d, all)
+    - Resolve missing role names and weird count displays in User Roles Distribution table by joining admin_roles, resolving clean role names, badges, and percentage shares backed by live database metrics
+    - Preserve dual-theme support (dark mode default and light mode) across paginators and telemetry HUD cards in assets/css/admin.css
+    - Synchronize core modified files into changes/ folder per project workflow rules
+
+commit 0b592038fad0eafc4cacc90ebc1da537374645a0
+Author: TechScout Admin <admin@techscout.online>
+Date:   Fri Sep 11 22:52:29 2026 +0500
+
+    feat(theme): preserve dark/light dual theme across mail studio, remove hardcoded inline tag styles, and add mistake verification rule
+    
+    - GEMINI.md:
+      - Added mandatory rule to review MISTAKES_LEARNED.md, analyze changed files, verify against all documented mistakes, and correct any violations before completing turns
+      - Added strict rule to preserve dual themes (dark & light) across all web components, prohibiting hardcoded inline tag styles for web UI, and restricting light backgrounds exclusively to email template document sheet preview and dispatched email bodies
+    - docs/MISTAKES_LEARNED.md:
+      - Added MISTAKE-10: Forcing Light Mode on Web UI Components & Inlining Tag Styles Instead of Dual-Theme CSS
+      - Updated Response Audit Protocol with item 10 for dual-theme UI preservation
+    - assets/css/admin.css:
+      - Added comprehensive Mail Template Studio dual-theme CSS architecture (.mail-studio-shell, .mail-studio-card, .mail-studio-palette-accordion, .mail-studio-blocks-card, .mail-studio-editor-box, .mail-studio-viewport, .mail-email-document-sheet, .mail-studio-code-editor, .mail-studio-preview-card, etc.) with complete dark mode defaults and [data-theme='light'] overrides
+    - views/admin/mail_template_editor.php:
+      - Removed all hardcoded inline light styles from outer page, top strip, metadata cards, variable accordions, blocks toolbar, and editor containers
+      - Switched to semantic CSS classes respecting active site theme
+      - Styled visual WYSIWYG editor canvas as a clean white email document sheet inside a viewport container, keeping the surrounding studio chrome in theme
+    - views/admin/mail.php:
+      - Refactored #templateEditorModal from hardcoded light inline styles to semantic classes and standard admin modal styling
+      - Preserved white email document sheet inside viewport container while allowing modal frame and controls to obey active theme
+
+commit dc386aa62dd40b2a7491e0d266b567ef0fec204d
+Author: TechScout Admin <admin@techscout.online>
+Date:   Fri Sep 11 22:37:11 2026 +0500
+
+    feat(mail-studio): enhance mail template studio, dual-mode block/tag insertion, clean light theme, and expand templates
+    
+    - mail_template_editor.php:
+      - Converted entire studio layout to a modern clean light aesthetic matching white email templates
+      - Fixed 1-click responsive blocks and variable tags to support dual-mode caret insertion (active WYSIWYG selection and raw HTML textarea sync)
+      - Added 14 responsive email component blocks (Hero Header, Gradient Banner, Featured Article Card, 2-Col Grid, 3-Col Metrics, Callouts, Buttons, Quotes, Author Bio, Social Channels, Security Notice, Receipt Box, Footer Unsubscribe)
+      - Added Starter Clean White Boilerplate generator
+      - Removed duplicate concatenated view layout to prevent ID collisions
+    - mail.php:
+      - Restyled Template Editor modal from dark to clean light studio theme, eliminating theme discrepancies
+      - Upgraded insertTmplTag and insertBlockComponent with dual-mode caret insertion and micro-toasts
+      - Added 14 responsive blocks library and clean white boilerplate button
+      - Synchronized WYSIWYG editor and raw HTML textarea across all modal opening, snippet, and template load events
+    - Mailer.php:
+      - Added 15 new email templates across Auth/Security, Editorial/Content, Creator Economy/Financials, and Marketing/Digests categories (total: 41 templates)
+      - Added responsive clean white default envelope HTML bodies for all new templates
+      - Updated category mappings for all new templates
+    - EventTriggerEngine.php:
+      - Registered trigger events corresponding to the 15 new email templates
+    - upgrade_v2_fix.sql:
+      - Appended INSERT IGNORE definitions for all 15 new email templates
+    - MISTAKES_LEARNED.md:
+      - Documented MISTAKE-09: Dual-Mode WYSIWYG & HTML Editor Insertion Failure & View Duplication
+
+commit b8eca5fd0cc5fb51f1130d6e2688749c03e385a6
+Author: TechScout Admin <admin@techscout.online>
+Date:   Fri Sep 11 22:09:05 2026 +0500
+
+    feat(errors,mail): convert static errors to branded dynamic PHP, add trigger modal with interactive tutorial tab and pre-filled samples, expand mail templates and triggers
+
+commit e83613f44b6542b65a7c1c64ae6991b468f8bbe3
+Author: TechScout Admin <admin@techscout.online>
+Date:   Fri Sep 11 21:54:04 2026 +0500
+
+    fix(mail,comments,telemetry): fix admin mail JS syntax, idempotent comment reactions toggle, client JS & 404 error telemetry, and static error pages
+
+commit 306d814a380e8e59e52549c67ed893d5011469dc
+Author: TechScout Admin <admin@techscout.online>
+Date:   Fri Sep 11 21:28:11 2026 +0500
+
+    fix(database): eliminate silent errors, remove runtime DDL, sanitize json attachments, and provide non-destructive upgrade SQL
+
+commit 5601ec771539678dbfd2b588a28edb8306b57267
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 11:56:10 2026 +0500
+
+    fix(engagement): add post_views table auto-creation and safe executeSilent queries for synthetic telemetry inserts
+
+commit 52177b1e15281593953f61a421b00b7e70c8164d
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 11:37:20 2026 +0500
+
+    feat(mail): restore System Diagnostics sidebar link, disable PJAX screen transitions for clean page reloads, add visual custom URL pattern triggers engine, and integrate rich WYSIWYG editor in template studio
+
+commit 1b17a71345540044723d5ae46be92d0e0abcaeb0
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 11:04:02 2026 +0500
+
+    feat: Full-screen 2-column mail template editor modal with live iframe preview, 10 variable categories, asset cache busting, and Event Triggers & Automations management center
+
+commit 944c0ada6837c921d13fa019b7f71259651c1fab
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 10:50:01 2026 +0500
+
+    feat(admin): high-speed PJAX navigation fast-path, 10-category mail variable engine, event trigger deduplication, and error badge fix
+    
+    - Restored System Error Logs Error Type column badges (🗄️ DATABASE_ERROR, DATABASE_SILENT_ERROR, ✓ RESOLVED) in views/admin/system_logs.php
+    - Optimized SPA/PJAX navigation speed (<100ms) by implementing header fast-path in views/layouts/admin_header.php and admin_footer.php, bypassing outer shell re-rendering on X-PJAX requests
+    - Auto-bound all view script function declarations to global window scope in executeSwappedScripts (admin_footer.php) and mail.php, eliminating 'ReferenceError: switchMailTab is not defined'
+    - Expanded template variable dictionary into 10 comprehensive categories with 60+ tokens in AdminController.php and views/admin/mail.php
+    - Built App/Core/EventTriggerEngine.php for custom event mail triggers and single-delivery duplicate email prevention
+    - Added universal responsive container rules (min-width: 640px; overflow-x: auto) in assets/css/style.css for scrollable admin tables
+    - Synchronized all modified core files into changes/ folder
+
+commit b91ce2ece40bd82cfbe9be29ec023da7f9c58fc1
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 10:33:13 2026 +0500
+
+    fix(mail): resolve mail_logs json constraint error, fix custom_mail_templates table, and enable transactional payout approval/rejection emails
+    
+    - In app/Core/Mailer.php, initialized attachmentsJson to valid JSON array string '[]' instead of NULL to eliminate MariaDB constraint 4025 (CONSTRAINT mail_logs.attachments_json failed)
+    - In app/Core/Mailer.php, added getTemplateLibrary alias for backwards compatibility and updated payout_approved / payout_rejected template defaults with rich financial telemetry (gross, net amount, fee breakdown, transaction ref, receipt link, and 100% credit refund notice)
+    - In app/Controllers/AdminController.php, fixed processAuthorPayout to reliably dispatch transactional emails and attachments for all payout statuses (paid, approved, rejected, processing, pending)
+    - In app/Controllers/AdminController.php, fixed table reference from custom_mail_templates to mail_templates in mailTemplateEditor
+    - In app/Core/Database.php, suppressed benign duplicate column/key schema errors (1060 / 42S21 / 1061) in executeSilent from being recorded as DATABASE_SILENT_ERROR in ErrorLogger
+    - Synchronized modified files into changes/ folder (changes/app/Core/Mailer.php, changes/app/Core/Database.php, changes/app/Controllers/AdminController.php)
+
+commit 963347ea7a187aaa9d8afa6fd3fb3ed3e3f47987
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 10:22:31 2026 +0500
+
+    fix(js): resolve JavaScript syntax errors and missing window function bindings in mail and users views
+    
+    - In views/admin/mail.php, fixed unclosed tab check 'if (tab)' and unclosed DOMContentLoaded event listener which caused 'SyntaxError: Unexpected end of input' line 7419 and prevented script parsing
+    - In views/admin/mail.php, exposed all interactive functions (switchMailTab, filterUserDirectory, filterMailLogsLive, filterTemplateCardsLive, onTemplateCredChanged, submitBatchTemplateCredentials, openCreateTemplateModal, resetTemplateForm, toggleProviderFields, toggleSelectAllUsers, updateSelectedUserCount, etc.) to window scope so onclick handlers work seamlessly
+    - In views/admin/users.php, added missing closing braces '});' for DOMContentLoaded listener resolving 'SyntaxError: Unexpected end of input'
+    - Cleaned changes/ folder and synchronized only modified core project view files (changes/views/admin/mail.php and changes/views/admin/users.php)
+
+commit 1b7730feeb6a9b9581bf78f92a1eb3f4da7397ac
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 10:18:58 2026 +0500
+
+    chore: refine GEMINI.md rules to strictly copy core project files into changes directory
+    
+    - Updated GEMINI.md project rule to explicitly filter out scratch, waste, temporary, skill, and system files from changes/ folder
+    - Restrict changes/ mirroring exclusively to application code files (app/, views/, assets/, database/, public/, docs/, index.php, etc.)
+    - Cleaned changes/ directory and synced updated GEMINI.md file
+
+commit aefd4071e81489062763d99a028841f447ceb3bd
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 10:17:24 2026 +0500
+
+    chore: persist project workflow rules in GEMINI.md and mirror to changes folder
+    
+    - Created GEMINI.md in root directory to persist workspace instructions across every prompt turn (clean changes/ directory first, apply edits, copy updated files to changes/, and git commit)
+    - Cleared prior contents of changes/ directory and synced GEMINI.md into changes/GEMINI.md
+
+commit cefe25bf07f513d067da063281fcb838e05ec9f1
+Author: TechScout Admin <admin@techscout.online>
+Date:   Tue Sep 8 01:12:00 2026 +0500
+
+    docs: add enterprise documentation portal and update changelog with detailed commit logging
+    
+    - Added Enterprise Web Documentation Reader & QA Portal in documentation/ with server-side markdown parsing, alert callouts, TOC, reading progress, command palette search, and dark/light mode sync
+    
+    - Updated CHANGELOG.md with comprehensive logs for [2026-09-08] and [2026-09-07] covering documentation suite, database diagnostic engine, favicon 404 stream handler, sidebar cleanup, and PJAX scope isolation
+
+commit 65c420f65988278f91221e85cb8ae25d7874ac1f
+Author: TechScout Admin <admin@techscout.online>
+Date:   Mon Sep 7 21:55:02 2026 +0500
+
+    fix(admin): eliminate 404 favicon, remove sidebar duplicates, and fix global script scope bindings for users and mail views
+    
+    - Generate high-resolution binary favicon.ico and assets/favicon.svg, declare in admin and frontend headers, and add direct 200 stream handler in index.php to prevent 404 favicon errors
+    - Remove duplicate 'Author Applications' link from Command & Intelligence group in admin_header.php so it appears strictly in Community & Support
+    - Update PJAX script evaluator in admin_footer.php to insert scripts via document.head and map root-level const/let declarations to var, preventing duplicate identifier fatal syntax errors
+    - In views/admin/mail.php, declare MAIL_TEMPLATES with var and bind switchMailTab and action functions to window
+    - In views/admin/users.php, explicitly bind openUserDetailModal, openAuditTrailDrawer, and all modal/drawer handlers to window
+    - Synchronize changes folder with only newly modified files
+
+commit b7d1a0496f4cc21a42da436ebeabb4c39c245f1c
+Author: TechScout Admin <admin@techscout.online>
+Date:   Mon Sep 7 21:30:58 2026 +0500
+
+    fix(admin): restore sidebar visibility for all admin roles and implement seamless SPA/PJAX navigation
+    
+    - Fix role matching in app/Models/RBAC.php and views/layouts/admin_header.php to properly recognize super_admin, superadmin, and unrestricted admin roles so the admin sidebar displays completely
+    - Add high-performance SPA/PJAX seamless navigation engine in views/layouts/admin_footer.php and admin_header.php with animated top progress bar, smooth DOM wrapper swapping, history pushState, scroll retention, script execution, and Lucide icon rehydration
+    - Update changes directory to contain strictly the newly modified files
+
+commit c7ac6ae6b20de22b783081992527e607ac7322a1
+Author: TechScout Admin <admin@techscout.online>
+Date:   Mon Sep 7 20:32:43 2026 +0500
+
+    feat(cms): Help articles & legal pages CMS, new-tab mail template maker, and granular RBAC navigation gating
+    
+    - Add Help Center Article Management CMS with YouTube/TikTok style step builder, FAQs, and categories
+    - Add Legal & Compliance Content Management CMS with dynamic DB loading and full-page policy editors
+    - Add dedicated full-screen scrollable Mail Template Editor (/admin/mail/template/editor) opening in new tab
+    - Add dynamic RBAC capability checks across all admin sidebar menus and groups to show only authorized items
+    - Mirror only newly updated files into changes/ folder
+    - Add database migration upgrade script (database/help_legal_upgrade.sql) and updated schema.sql
+
+commit 79d28f22d12ed84677f533f4d43517435a367c9a
+Author: TechScout Admin <admin@techscout.online>
+Date:   Mon Sep 7 17:48:33 2026 +0500
+
+    feat: deep error forensics inspector, audit log entity linking, db manager upgrade, and webhooks guide
+    
+    - Fix SQLSTATE[42S22] unknown column verification_code by updating schema.sql and adding database_upgrade_v2.sql
+    - Enhance ErrorLogger with deep telemetry: sanitized request data, headers, client IP, country/city, device/OS/browser, and user context
+    - Redesign System Error Logs Inspector with 5 dedicated sub-tabs (Trace, Request, Headers, Device & Location, User Context) and visible prominent error badges
+    - Enhance Audit Logs with clickable entity links, direct admin destination jump buttons, and unified forensic inspector modal with before/after state diffing
+    - Upgrade Database Manager into a standalone station with Schema Diagnostics, Table Optimization/Checking, Automated Schema Auto-Repair, and SQL Diagnostic Terminal
+    - Fix database backup redirects to stay on /admin/db-manager?tab=snapshots
+    - Create docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md detailing comprehensive capabilities beyond email
+    - Sync all modified files to changes/ directory
+
+commit 315bf0fee6374732ee9112596d52e5e4ad6f6b63
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 6 23:23:37 2026 +0500
+
+    Admin single-record table deletion, post-signup OTP verification, click-to-reset password link, and responsive notifications
+
+commit 32cfb112f8d3fb402cd6926b38cb2c14e54aef64
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 6 22:55:44 2026 +0500
+
+    feat: universal mail envelope, block-based component builder, light-mode sanitization and payout receipt attachments
+
+commit fccfb98f15eca3cdbd9d7d7aa02b1258b868d6f2
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 6 22:33:11 2026 +0500
+
+    feat(mail): extended mail system, light mode templates, comprehensive tracking HUD, timezone auto-detection, and notification 404 fix
+
+commit 64ff0e8e656ddb051fd65ca615ebc374701cc363
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 6 21:52:00 2026 +0500
+
+    Update: Synchronize Auth client IP handling and credentials registry
+
+commit afabb3e1848ff1573610e31788a44eeb18d52099
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 6 21:43:33 2026 +0500
+
+    Docs: Update CHANGELOG.md with full previous changes verification
+
+commit dbc65c7512a0616424e23265568307279739d26a
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 6 21:42:53 2026 +0500
+
+    Restore: Reconstructed newsletters.php, CreatorTipping.php, and AuthController.php from transcript
+
+commit 1c0c40aba9004d6129cacf18f1b59bd7f6d43a2b
+Author: TechScout Admin <admin@techscout.online>
+Date:   Sun Sep 6 21:36:12 2026 +0500
+
+    Fix: Mail logs schema auto-healing & fail-safe newsletter dispatch [from_email column fix]

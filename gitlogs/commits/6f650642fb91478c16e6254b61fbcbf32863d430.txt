@@ -1,0 +1,124 @@
+commit 6f650642fb91478c16e6254b61fbcbf32863d430
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 19:09:22 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 19:09:22 2026 +0500
+
+    feat: Timezone math engine fix, Image Prompts hub, compact social comments, custom DB/directory exporter, web installer & crypto ads
+    
+    - Timezone Engine: Resolved timezone discrepancy where Pakistani Standard Time (Asia/Karachi, UTC+5) was directly offset. Explicitly normalized PKT to UTC first then to target visitor timezone, rendering localized ISO-8601 timestamps in <time class="ts-time"> with browser client-side auto-detection.
+    - Image Prompts Hub: Added dedicated AI Image Prompts tab to /prompts with subcategories for Midjourney v6, DALL-E 3, Flux.1, and Stable Diffusion XL, with sample images, parameter tags, 1-click copy, and high-res lightbox zoom modal.
+    - Compact Social Comments: Overhauled discussion section to modern Instagram/Facebook speech-bubble layout with 5-at-a-time lazy loading, inline reply threads, like/helpful toggles, and dual theme support.
+    - Custom Directory & Real Schema/Seed Exporter: Built visual export studio in /admin/db-manager with folder tree selection, SHOW CREATE TABLE schema generation, and row-level interactive seed row picker creating custom .zip packages.
+    - Web Installer & White-Labeling: Built 5-step installer (/install) with pre-requisite checks, live DB connection tester, white-label branding, admin account setup, storage/installed.lock protection, and admin launcher.
+    - Article Submission & Editor System: Added prominent Word (.docx) manuscript preference notice across author studio and dashboard; enhanced visual editor with live word counter, character counter, and reading time estimator in ribbon toolbar.
+    - Sponsored Systems & Crypto Payments: Implemented public /sponsor portal for tools and articles with admin-configured crypto wallet addresses (BTC, ETH, USDT, SOL) and transaction hash (TXID) verification queue in admin.
+    - Speed Optimization: Configured mod_deflate Gzip compression, mod_expires, and Cache-Control headers in .htaccess.
+    - Admin UI/UX 100x Polish: Enhanced assets/css/admin.css with glassmorphism, micro-glow badges, hover lift states, and dark/light mode preservation without inline styles.
+
+ .htaccess                                          |   11 +
+ app/Controllers/AdminController.php                |   92 +-
+ app/Controllers/DirectoryController.php            |   21 +-
+ app/Controllers/HomeController.php                 |   95 +
+ app/Controllers/InstallController.php              |  324 +
+ app/Core/DateHelper.php                            |   15 +-
+ app/Models/Content.php                             |   12 +-
+ app/Models/CustomExporter.php                      |  370 +
+ assets/css/admin.css                               |   84 +
+ assets/js/main.js                                  |   16 +-
+ changes/.htaccess                                  |   62 +
+ changes/app/Controllers/AdminController.php        | 7751 ++++++++++++++++++++
+ changes/app/Controllers/ApiController.php          | 1301 ----
+ changes/app/Controllers/DirectoryController.php    |  649 ++
+ changes/app/Controllers/HomeController.php         |  341 +
+ changes/app/Controllers/InstallController.php      |  324 +
+ changes/app/Core/Config.php                        |   52 +
+ changes/app/Core/DateHelper.php                    |   15 +-
+ changes/app/Core/ErrorLogger.php                   |  579 --
+ changes/app/Models/Content.php                     |  289 +
+ changes/app/Models/CustomExporter.php              |  370 +
+ changes/assets/css/admin.css                       | 2059 ++++++
+ changes/assets/js/main.js                          |   16 +-
+ changes/database/image_prompts_upgrade.sql         |  104 +
+ changes/database/sponsored_systems_upgrade.sql     |   28 +
+ changes/docs/MISTAKES_LEARNED.md                   |  310 -
+ changes/index.php                                  |   30 +
+ changes/storage/installed.lock                     |    7 +
+ changes/views/admin/advertisements.php             |  264 +
+ changes/views/admin/db_manager.php                 | 1366 ++++
+ changes/views/admin/settings.php                   |  977 +++
+ changes/views/author/dashboard.php                 | 2452 +++++++
+ changes/views/author/editor.php                    | 1484 ++++
+ changes/views/blog/article.php                     |  479 ++
+ changes/views/components/comments_section.php      |  476 ++
+ changes/views/directory/gpt_single.php             |  175 +
+ changes/views/directory/prompt_single.php          |  100 +
+ changes/views/directory/prompts.php                |  384 +
+ changes/views/directory/tool_single.php            |  615 ++
+ changes/views/install/index.php                    |  566 ++
+ changes/views/install/locked.php                   |   52 +
+ changes/views/layouts/admin_footer.php             |  587 --
+ changes/views/layouts/admin_header.php             |  598 --
+ .../views/public/components/crypto_payment_box.php |  108 +
+ changes/views/public/sponsor.php                   |  319 +
+ database/image_prompts_upgrade.sql                 |  104 +
+ database/sponsored_systems_upgrade.sql             |   28 +
+ index.php                                          |   30 +
+ storage/installed.lock                             |    7 +
+ views/admin/advertisements.php                     |  217 +-
+ views/admin/db_manager.php                         |  559 ++
+ views/admin/settings.php                           |   69 +
+ views/author/dashboard.php                         |    3 +
+ views/author/editor.php                            |   59 +-
+ views/blog/article.php                             |    4 +-
+ views/components/comments_section.php              |  300 +-
+ views/directory/gpt_single.php                     |    4 +-
+ views/directory/prompt_single.php                  |    4 +-
+ views/directory/prompts.php                        |  282 +-
+ views/directory/tool_single.php                    |    4 +-
+ views/install/index.php                            |  566 ++
+ views/install/locked.php                           |   52 +
+ views/public/components/crypto_payment_box.php     |  108 +
+ views/public/sponsor.php                           |  319 +
+ 64 files changed, 25380 insertions(+), 3668 deletions(-)
+ create mode 100644 app/Controllers/InstallController.php
+ create mode 100644 app/Models/CustomExporter.php
+ create mode 100644 changes/.htaccess
+ create mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/ApiController.php
+ create mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Controllers/HomeController.php
+ create mode 100644 changes/app/Controllers/InstallController.php
+ create mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/app/Core/ErrorLogger.php
+ create mode 100644 changes/app/Models/Content.php
+ create mode 100644 changes/app/Models/CustomExporter.php
+ create mode 100644 changes/assets/css/admin.css
+ create mode 100644 changes/database/image_prompts_upgrade.sql
+ create mode 100644 changes/database/sponsored_systems_upgrade.sql
+ delete mode 100644 changes/docs/MISTAKES_LEARNED.md
+ create mode 100644 changes/storage/installed.lock
+ create mode 100644 changes/views/admin/advertisements.php
+ create mode 100644 changes/views/admin/db_manager.php
+ create mode 100644 changes/views/admin/settings.php
+ create mode 100644 changes/views/author/dashboard.php
+ create mode 100644 changes/views/author/editor.php
+ create mode 100644 changes/views/blog/article.php
+ create mode 100644 changes/views/components/comments_section.php
+ create mode 100644 changes/views/directory/gpt_single.php
+ create mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 changes/views/directory/prompts.php
+ create mode 100644 changes/views/directory/tool_single.php
+ create mode 100644 changes/views/install/index.php
+ create mode 100644 changes/views/install/locked.php
+ delete mode 100644 changes/views/layouts/admin_footer.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 changes/views/public/components/crypto_payment_box.php
+ create mode 100644 changes/views/public/sponsor.php
+ create mode 100644 database/image_prompts_upgrade.sql
+ create mode 100644 database/sponsored_systems_upgrade.sql
+ create mode 100644 storage/installed.lock
+ create mode 100644 views/install/index.php
+ create mode 100644 views/install/locked.php
+ create mode 100644 views/public/components/crypto_payment_box.php
+ create mode 100644 views/public/sponsor.php

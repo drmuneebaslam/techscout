@@ -1811,6 +1811,7 @@ class AdminController {
         $canPrompts = isset($_POST['can_publish_prompts']) ? 1 : 0;
         $canTools = isset($_POST['can_publish_tools']) ? 1 : 0;
         $canGpts = isset($_POST['can_publish_gpts']) ? 1 : 0;
+        $disableAds = isset($_POST['disable_ads']) ? 1 : 0;
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             Session::flash('error', 'A valid email address is required.');
@@ -1832,7 +1833,7 @@ class AdminController {
             return;
         }
 
-        Database::execute("UPDATE users SET email = ?, role = ?, status = ? WHERE id = ?", [$email, $role, $status, $id]);
+        Database::execute("UPDATE users SET email = ?, role = ?, status = ?, disable_ads = ? WHERE id = ?", [$email, $role, $status, $disableAds, $id]);
 
         $author = Database::fetch("SELECT id FROM authors WHERE user_id = ?", [$id]);
         if ($author) {
@@ -7959,6 +7960,8 @@ class AdminController {
             'unresolved' => (int)(Database::fetch("SELECT COUNT(*) as c FROM system_error_logs WHERE resolved = 0")['c'] ?? 0),
             'fatal' => (int)(Database::fetch("SELECT COUNT(*) as c FROM system_error_logs WHERE error_type IN ('FATAL_ERROR', 'E_ERROR', 'E_COMPILE_ERROR')")['c'] ?? 0),
             'db_errors' => (int)(Database::fetch("SELECT COUNT(*) as c FROM system_error_logs WHERE error_type = 'DATABASE_ERROR'")['c'] ?? 0),
+            'client_js' => (int)(Database::fetch("SELECT COUNT(*) as c FROM system_error_logs WHERE error_type = 'JAVASCRIPT_ERROR'")['c'] ?? 0),
+            'not_found' => (int)(Database::fetch("SELECT COUNT(*) as c FROM system_error_logs WHERE error_type = 'NOT_FOUND_404'")['c'] ?? 0),
         ];
 
         $distinctTypes = Database::query("SELECT DISTINCT error_type FROM system_error_logs ORDER BY error_type ASC");

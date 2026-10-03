@@ -1,0 +1,48 @@
+commit 8e73c6c2d98aba017c54ac2f8aecad0d2b71f33e
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 02:40:03 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 02:40:03 2026 +0500
+
+    Eliminate table whitelisting, enforce admin-only custom API with full DB describe and CRUD, fix mail attachment 404, resolve EC2 deploy sync token authorization, and enhance dual-theme popups simulator
+
+ app/Controllers/AdminController.php                |   59 +-
+ app/Controllers/ApiController.php                  |   35 +-
+ app/Controllers/CustomApiController.php            |  650 ++++++--
+ app/Core/Database.php                              |  200 +++
+ app/Core/IncomingWebhookEngine.php                 |  134 +-
+ changes/app/Controllers/AdminController.php        |   59 +-
+ changes/app/Controllers/ApiController.php          |   35 +-
+ changes/app/Controllers/CustomApiController.php    |  650 ++++++--
+ changes/app/Core/Database.php                      |  698 +++++++++
+ changes/app/Core/IncomingWebhookEngine.php         |  134 +-
+ changes/assets/js/main.js                          | 1072 -------------
+ ...prompts_optimization_and_custom_api_gateway.sql |   61 -
+ changes/database/schema.sql                        | 1599 --------------------
+ changes/index.php                                  |   61 +
+ changes/scripts/migrate.php                        |   94 --
+ changes/views/admin/custom_api_endpoints.php       |  303 +++-
+ changes/views/admin/incoming_webhooks.php          |  525 +++++++
+ changes/views/admin/popups.php                     |  344 +++++
+ changes/views/directory/prompt_categories.php      |  167 --
+ .../views/directory/prompt_image_categories.php    |  172 ---
+ changes/views/directory/prompt_single.php          |  985 ------------
+ changes/views/layouts/admin_footer.php             |  588 -------
+ changes/views/layouts/admin_header.php             |  681 ---------
+ index.php                                          |   61 +
+ views/admin/custom_api_endpoints.php               |  303 +++-
+ views/admin/incoming_webhooks.php                  |    8 +-
+ views/admin/popups.php                             |   78 +-
+ 27 files changed, 3692 insertions(+), 6064 deletions(-)
+ create mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/assets/js/main.js
+ delete mode 100644 changes/database/migrations/2026_09_26_000001_prompts_optimization_and_custom_api_gateway.sql
+ delete mode 100644 changes/database/schema.sql
+ delete mode 100644 changes/scripts/migrate.php
+ create mode 100644 changes/views/admin/incoming_webhooks.php
+ create mode 100644 changes/views/admin/popups.php
+ delete mode 100644 changes/views/directory/prompt_categories.php
+ delete mode 100644 changes/views/directory/prompt_image_categories.php
+ delete mode 100644 changes/views/directory/prompt_single.php
+ delete mode 100644 changes/views/layouts/admin_footer.php
+ delete mode 100644 changes/views/layouts/admin_header.php

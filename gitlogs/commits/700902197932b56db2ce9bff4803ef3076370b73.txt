@@ -1,0 +1,12 @@
+commit 700902197932b56db2ce9bff4803ef3076370b73
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 22:04:28 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 22:04:28 2026 +0500
+
+    fix(custom-api): correct reaction_count mapping in multi-table join
+
+ app/Controllers/CustomApiController.php         |   2 +-
+ changes/app/Controllers/CustomApiController.php | 998 ++++++++++++++++++++++++
+ 2 files changed, 999 insertions(+), 1 deletion(-)
+ create mode 100644 changes/app/Controllers/CustomApiController.php

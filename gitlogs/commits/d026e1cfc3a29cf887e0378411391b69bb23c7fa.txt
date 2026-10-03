@@ -1,0 +1,65 @@
+commit d026e1cfc3a29cf887e0378411391b69bb23c7fa
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 18:14:44 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 18:14:44 2026 +0500
+
+    feat(timezone): implement automatic timezone detection by IP location
+    
+    - Added DateHelper::detectTimezoneByIp() with session caching, Cloudflare country code lookup, ISO-2 country-to-timezone map, and fast ip-api.com lookup
+    - Implemented /api/v1/geo/timezone endpoint in ApiController for client and backend geolocation resolution
+    - Added window.detectAndSyncIpTimezone() in assets/js/main.js, admin_header.php, and admin_footer.php for background IP timezone auto-detection and dynamic DOM synchronization
+    - Updated ErrorLogger::captureLocationDetails() to log the exact IP location timezone for telemetry and forensic error inspector
+    - Updated docs/MISTAKES_LEARNED.md with IP location timezone auto-detection guidelines
+
+ app/Controllers/ApiController.php         |   29 +
+ app/Core/DateHelper.php                   |  199 ++-
+ app/Core/ErrorLogger.php                  |    2 +-
+ assets/js/main.js                         |   57 +-
+ changes/app/Controllers/ApiController.php | 1301 ++++++++++++++++
+ changes/app/Core/DateHelper.php           |  199 ++-
+ changes/app/Core/ErrorLogger.php          |  579 +++++++
+ changes/app/Core/helpers.php              |  131 --
+ changes/assets/css/admin.css              | 1975 ------------------------
+ changes/assets/js/main.js                 |   57 +-
+ changes/docs/MISTAKES_LEARNED.md          |    4 +-
+ changes/index.php                         |  709 +++++++++
+ changes/views/admin/api_keys.php          |  159 --
+ changes/views/admin/audit_logs.php        |  719 ---------
+ changes/views/admin/content_filters.php   |  149 --
+ changes/views/admin/content_queue.php     |  877 -----------
+ changes/views/admin/crud/campaigns.php    |  546 -------
+ changes/views/admin/dashboard.php         |  533 -------
+ changes/views/admin/firewall.php          |  551 -------
+ changes/views/admin/media.php             |  394 -----
+ changes/views/admin/moderation.php        |  388 -----
+ changes/views/admin/newsletters.php       | 1535 -------------------
+ changes/views/admin/revenue.php           | 2371 -----------------------------
+ changes/views/admin/system_logs.php       |  699 ---------
+ changes/views/admin/users.php             | 1809 ----------------------
+ changes/views/layouts/admin_footer.php    |   79 +-
+ changes/views/layouts/admin_header.php    |  598 ++++++++
+ docs/MISTAKES_LEARNED.md                  |    4 +-
+ index.php                                 |    2 +
+ views/layouts/admin_footer.php            |   79 +-
+ views/layouts/admin_header.php            |   49 +-
+ 31 files changed, 3852 insertions(+), 12931 deletions(-)
+ create mode 100644 changes/app/Controllers/ApiController.php
+ create mode 100644 changes/app/Core/ErrorLogger.php
+ delete mode 100644 changes/app/Core/helpers.php
+ delete mode 100644 changes/assets/css/admin.css
+ create mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/api_keys.php
+ delete mode 100644 changes/views/admin/audit_logs.php
+ delete mode 100644 changes/views/admin/content_filters.php
+ delete mode 100644 changes/views/admin/content_queue.php
+ delete mode 100644 changes/views/admin/crud/campaigns.php
+ delete mode 100644 changes/views/admin/dashboard.php
+ delete mode 100644 changes/views/admin/firewall.php
+ delete mode 100644 changes/views/admin/media.php
+ delete mode 100644 changes/views/admin/moderation.php
+ delete mode 100644 changes/views/admin/newsletters.php
+ delete mode 100644 changes/views/admin/revenue.php
+ delete mode 100644 changes/views/admin/system_logs.php
+ delete mode 100644 changes/views/admin/users.php
+ create mode 100644 changes/views/layouts/admin_header.php

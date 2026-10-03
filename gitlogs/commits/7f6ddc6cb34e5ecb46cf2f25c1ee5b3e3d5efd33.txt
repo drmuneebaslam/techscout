@@ -1,0 +1,15 @@
+commit 7f6ddc6cb34e5ecb46cf2f25c1ee5b3e3d5efd33
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 24 00:54:19 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 24 00:54:19 2026 +0500
+
+    feat(nav): add Incoming Webhooks and Popup Manager to admin sidebar navigation
+
+ changes/app/Core/AdRenderer.php           | 167 ------------------------------
+ changes/scripts/ec2_deploy_and_migrate.sh | 130 -----------------------
+ changes/views/layouts/admin_header.php    |  12 ++-
+ views/layouts/admin_header.php            |  12 ++-
+ 4 files changed, 20 insertions(+), 301 deletions(-)
+ delete mode 100644 changes/app/Core/AdRenderer.php
+ delete mode 100644 changes/scripts/ec2_deploy_and_migrate.sh

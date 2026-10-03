@@ -1,0 +1,114 @@
+commit 41085b0a23e191031c8fcad99d5d4b129df40a72
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Wed Sep 23 23:58:17 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Wed Sep 23 23:58:17 2026 +0500
+
+    feat: enterprise v2 upgrades - light mode default, incoming webhooks live listener, rest api gateway, scalable sitemaps, popup maker, ad click guard
+    
+    - Fix missing affiliateRedirect method in DirectoryController.php with deep linking and telemetry
+    - Light Mode default implementation across style.css, header, admin_header, and Config.php
+    - Clean up prompts cards: remove redundant teaser copy buttons and single prompt top-right duplicate
+    - Ad click guard: eliminate whole-card click hijacks, throttle sponsor clicks, exempt donors & roles
+    - Incoming Webhooks Engine: live JSON listener, dynamic field-to-table mapper, and test simulator
+    - Enterprise REST API Gateway: Bearer Token auth for tools, prompts, gpts, articles, telemetry
+    - Scalable Partitioned Sitemaps: dynamic chunking for 200k+ entities with master sitemap index
+    - Custom Dynamic Popup Maker: audience targeting, trigger rules, frequency, dual themes, impressions
+    - Client-side GMT timestamp localization to user device timezones
+    - Security Directives: RedirectMatch 404 for .git, HSTS, CSP, CloudFront 7-day asset caching
+    - Automated EC2 daily database backup script with rolling 7-day retention
+    - Comprehensive AWS SES & port 25 unblocking application and Google Search Console guides
+
+ .htaccess                                          |   28 +-
+ app/Controllers/AdminController.php                |  191 +-
+ app/Controllers/ApiController.php                  |  371 +
+ app/Controllers/DirectoryController.php            |   61 +-
+ app/Controllers/FeedController.php                 |  187 +-
+ app/Controllers/IncomingWebhookController.php      |   84 +
+ app/Core/AdRenderer.php                            |   50 +
+ app/Core/BearerAuth.php                            |  147 +
+ app/Core/Config.php                                |    2 +-
+ app/Core/IncomingWebhookEngine.php                 |  232 +
+ app/Core/PopupManager.php                          |  377 +
+ assets/css/style.css                               |  150 +-
+ assets/js/main.js                                  |   73 +-
+ changes/.htaccess                                  |   76 +
+ changes/app/Controllers/AdminController.php        | 9189 ++++++++++++++++++++
+ changes/app/Controllers/ApiController.php          | 2083 +++++
+ changes/app/Controllers/DirectoryController.php    |  937 ++
+ changes/app/Controllers/FeedController.php         |  325 +
+ .../app/Controllers/IncomingWebhookController.php  |   84 +
+ changes/app/Core/AdRenderer.php                    |  167 +
+ changes/app/Core/BearerAuth.php                    |  147 +
+ changes/app/Core/Config.php                        |    2 +-
+ changes/app/Core/IncomingWebhookEngine.php         |  232 +
+ changes/app/Core/PopupManager.php                  |  377 +
+ changes/app/Core/helpers.php                       |  137 -
+ changes/assets/css/style.css                       | 3043 +++++++
+ changes/assets/js/main.js                          | 1065 +++
+ changes/database/enterprise_v2_upgrade.sql         |  108 +
+ changes/database/schema.sql                        | 1559 ++++
+ .../AWS_SES_AND_PORT_25_UNBLOCKING_APPLICATION.md  |  154 +
+ .../GOOGLE_SEARCH_CONSOLE_AND_INDEXING_SETUP.md    |  100 +
+ changes/index.php                                  |   35 +
+ changes/scripts/ec2_db_backup.sh                   |   42 +
+ changes/views/admin/advertisements.php             |  909 ++
+ changes/views/admin/incoming_webhooks.php          |  520 ++
+ changes/views/admin/popups.php                     |  268 +
+ changes/views/directory/prompt_single.php          |  980 +++
+ changes/views/directory/prompts.php                |  366 +
+ changes/views/directory/prompts_images.php         |  199 +
+ changes/views/layouts/admin_header.php             |   14 +-
+ changes/views/layouts/footer.php                   |  214 +
+ changes/views/layouts/header.php                   |   15 +-
+ database/enterprise_v2_upgrade.sql                 |  108 +
+ database/schema.sql                                |   69 +
+ docs/AWS_SES_AND_PORT_25_UNBLOCKING_APPLICATION.md |  154 +
+ docs/GOOGLE_SEARCH_CONSOLE_AND_INDEXING_SETUP.md   |  100 +
+ index.php                                          |   35 +
+ scripts/ec2_db_backup.sh                           |   42 +
+ views/admin/advertisements.php                     |   31 +
+ views/admin/incoming_webhooks.php                  |  520 ++
+ views/admin/popups.php                             |  268 +
+ views/directory/prompt_single.php                  |   17 +-
+ views/directory/prompts.php                        |   84 +-
+ views/directory/prompts_images.php                 |   84 +-
+ views/layouts/admin_header.php                     |   14 +-
+ views/layouts/footer.php                           |   62 +-
+ views/layouts/header.php                           |   15 +-
+ 57 files changed, 26470 insertions(+), 433 deletions(-)
+ create mode 100644 app/Controllers/IncomingWebhookController.php
+ create mode 100644 app/Core/BearerAuth.php
+ create mode 100644 app/Core/IncomingWebhookEngine.php
+ create mode 100644 app/Core/PopupManager.php
+ create mode 100644 changes/.htaccess
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/ApiController.php
+ create mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Controllers/FeedController.php
+ create mode 100644 changes/app/Controllers/IncomingWebhookController.php
+ create mode 100644 changes/app/Core/AdRenderer.php
+ create mode 100644 changes/app/Core/BearerAuth.php
+ create mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ create mode 100644 changes/app/Core/PopupManager.php
+ delete mode 100644 changes/app/Core/helpers.php
+ create mode 100644 changes/assets/css/style.css
+ create mode 100644 changes/assets/js/main.js
+ create mode 100644 changes/database/enterprise_v2_upgrade.sql
+ create mode 100644 changes/database/schema.sql
+ create mode 100644 changes/docs/AWS_SES_AND_PORT_25_UNBLOCKING_APPLICATION.md
+ create mode 100644 changes/docs/GOOGLE_SEARCH_CONSOLE_AND_INDEXING_SETUP.md
+ create mode 100644 changes/scripts/ec2_db_backup.sh
+ create mode 100644 changes/views/admin/advertisements.php
+ create mode 100644 changes/views/admin/incoming_webhooks.php
+ create mode 100644 changes/views/admin/popups.php
+ create mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 changes/views/directory/prompts.php
+ create mode 100644 changes/views/directory/prompts_images.php
+ create mode 100644 changes/views/layouts/footer.php
+ create mode 100644 database/enterprise_v2_upgrade.sql
+ create mode 100644 docs/AWS_SES_AND_PORT_25_UNBLOCKING_APPLICATION.md
+ create mode 100644 docs/GOOGLE_SEARCH_CONSOLE_AND_INDEXING_SETUP.md
+ create mode 100644 scripts/ec2_db_backup.sh
+ create mode 100644 views/admin/incoming_webhooks.php
+ create mode 100644 views/admin/popups.php

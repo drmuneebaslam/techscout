@@ -1,0 +1,79 @@
+commit 9c0b46723f6e165a25426c721264207ed17beb3a
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 18:03:59 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 18:03:59 2026 +0500
+
+    feat(timezone): implement automatic visitor timezone detection and dynamic timestamp localization across admin console
+    
+    - Enhanced DateHelper with toDateTime(), iso8601(), render(), and renderTwoLines() converting stored Pakistan Standard Time (Asia/Karachi, UTC+5) to visitor's detected timezone
+    - Implemented client-side automatic timezone detection via Intl.DateTimeFormat().resolvedOptions().timeZone with cookie persistence and window.localizeAllTimestamps() DOM synchronization
+    - Replaced raw PHP date() calls with DateHelper::render across system logs, audit logs, users, dashboard, newsletters, revenue, firewall, media, moderation, content queue, and api keys
+    - Updated forensic error inspectors in system logs and audit logs to dynamically parse timestamps with UTC+5 offset and render in local time
+    - Preserved dual-theme support using semantic CSS classes (.ts-time-part, .ts-date-part, .ts-tz-abbr) and CSS custom properties without hardcoded tag styles
+    - Documented MISTAKE-22 in docs/MISTAKES_LEARNED.md
+
+ app/Core/DateHelper.php                     |   97 +-
+ app/Core/helpers.php                        |    6 +
+ assets/css/admin.css                        |   37 +
+ assets/js/main.js                           |   80 +
+ changes/app/Controllers/AdminController.php | 7663 ---------------------------
+ changes/app/Core/Auth.php                   |  368 --
+ changes/app/Core/DateHelper.php             |  136 +
+ changes/app/Core/helpers.php                |  131 +
+ changes/assets/css/admin.css                | 1975 +++++++
+ changes/assets/js/main.js                   |  874 +++
+ changes/docs/MISTAKES_LEARNED.md            |   21 +
+ changes/views/admin/api_keys.php            |  159 +
+ changes/views/admin/audit_logs.php          |  719 +++
+ changes/views/admin/content_filters.php     |  149 +
+ changes/views/admin/content_queue.php       |  877 +++
+ changes/views/admin/crud/campaigns.php      |  546 ++
+ changes/views/admin/dashboard.php           |  533 ++
+ changes/views/admin/firewall.php            |  551 ++
+ changes/views/admin/mail.php                | 4110 --------------
+ changes/views/admin/media.php               |  394 ++
+ changes/views/admin/moderation.php          |  388 ++
+ changes/views/admin/newsletters.php         | 1535 ++++++
+ changes/views/admin/revenue.php             | 2371 +++++++++
+ changes/views/admin/system_logs.php         |  699 +++
+ changes/views/admin/users.php               | 1809 +++++++
+ changes/views/layouts/admin_footer.php      |   75 +
+ changes/views/layouts/admin_header.php      |  561 --
+ docs/MISTAKES_LEARNED.md                    |   21 +
+ views/admin/api_keys.php                    |    2 +-
+ views/admin/audit_logs.php                  |   22 +-
+ views/admin/content_filters.php             |    2 +-
+ views/admin/content_queue.php               |    4 +-
+ views/admin/crud/campaigns.php              |    2 +-
+ views/admin/dashboard.php                   |   16 +-
+ views/admin/firewall.php                    |    2 +-
+ views/admin/media.php                       |    2 +-
+ views/admin/moderation.php                  |    2 +-
+ views/admin/newsletters.php                 |   14 +-
+ views/admin/revenue.php                     |    6 +-
+ views/admin/system_logs.php                 |   22 +-
+ views/admin/users.php                       |    4 +-
+ views/layouts/admin_footer.php              |   75 +
+ 42 files changed, 14302 insertions(+), 12758 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Core/Auth.php
+ create mode 100644 changes/app/Core/DateHelper.php
+ create mode 100644 changes/app/Core/helpers.php
+ create mode 100644 changes/assets/css/admin.css
+ create mode 100644 changes/assets/js/main.js
+ create mode 100644 changes/views/admin/api_keys.php
+ create mode 100644 changes/views/admin/audit_logs.php
+ create mode 100644 changes/views/admin/content_filters.php
+ create mode 100644 changes/views/admin/content_queue.php
+ create mode 100644 changes/views/admin/crud/campaigns.php
+ create mode 100644 changes/views/admin/dashboard.php
+ create mode 100644 changes/views/admin/firewall.php
+ delete mode 100644 changes/views/admin/mail.php
+ create mode 100644 changes/views/admin/media.php
+ create mode 100644 changes/views/admin/moderation.php
+ create mode 100644 changes/views/admin/newsletters.php
+ create mode 100644 changes/views/admin/revenue.php
+ create mode 100644 changes/views/admin/system_logs.php
+ create mode 100644 changes/views/admin/users.php
+ delete mode 100644 changes/views/layouts/admin_header.php

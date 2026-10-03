@@ -1,0 +1,38 @@
+commit fabc4c056660f763597bd1e7a987250ca0508c36
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 12:36:49 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 12:36:49 2026 +0500
+
+    Fix PopupManager datetime, add missing aspect_ratio column, update header to 100% width, remove rewards link, and add QA testing page
+
+ app/Core/PopupManager.php                          |    4 +-
+ changes/app/Core/Config.php                        |  254 ++
+ changes/app/Core/PopupManager.php                  |  464 +++
+ changes/assets/css/admin.css                       | 2588 -----------------
+ changes/assets/css/style.css                       | 3054 --------------------
+ ...26_10_03_000001_add_aspect_ratio_to_prompts.sql |    1 +
+ changes/index.php                                  | 1004 +++++++
+ changes/views/admin/custom_api_endpoints.php       | 1022 -------
+ changes/views/admin/incoming_webhooks.php          | 1002 -------
+ changes/views/admin/popups.php                     |  432 ---
+ changes/views/layouts/header.php                   |  959 ++++++
+ changes/views/pages/qa_testing.php                 |   76 +
+ ...26_10_03_000001_add_aspect_ratio_to_prompts.sql |    1 +
+ index.php                                          |    3 +
+ views/layouts/header.php                           |   18 +-
+ views/pages/qa_testing.php                         |   76 +
+ 16 files changed, 2849 insertions(+), 8109 deletions(-)
+ create mode 100644 changes/app/Core/Config.php
+ create mode 100644 changes/app/Core/PopupManager.php
+ delete mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/assets/css/style.css
+ create mode 100644 changes/database/migrations/2026_10_03_000001_add_aspect_ratio_to_prompts.sql
+ create mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/custom_api_endpoints.php
+ delete mode 100644 changes/views/admin/incoming_webhooks.php
+ delete mode 100644 changes/views/admin/popups.php
+ create mode 100644 changes/views/layouts/header.php
+ create mode 100644 changes/views/pages/qa_testing.php
+ create mode 100644 database/migrations/2026_10_03_000001_add_aspect_ratio_to_prompts.sql
+ create mode 100644 views/pages/qa_testing.php

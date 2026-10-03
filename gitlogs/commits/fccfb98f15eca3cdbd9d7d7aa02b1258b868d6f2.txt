@@ -1,0 +1,21 @@
+commit fccfb98f15eca3cdbd9d7d7aa02b1258b868d6f2
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 6 22:33:11 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 6 22:33:11 2026 +0500
+
+    feat(mail): extended mail system, light mode templates, comprehensive tracking HUD, timezone auto-detection, and notification 404 fix
+
+ .htaccess                           |   1 -
+ CHANGELOG.md                        |  54 +++++
+ app/Controllers/AdminController.php |  55 +++++
+ app/Core/Database.php               |  65 +++++-
+ app/Core/Mailer.php                 | 410 +++++++++++++++++++-----------------
+ database/mail_tracking_upgrade.sql  |  44 ++++
+ index.php                           |   4 +
+ views/admin/mail.php                | 293 +++++++++++++++++++++-----
+ views/layouts/admin_header.php      |  14 ++
+ views/layouts/header.php            |  18 +-
+ views/notifications/index.php       |  17 +-
+ 11 files changed, 718 insertions(+), 257 deletions(-)
+ create mode 100644 database/mail_tracking_upgrade.sql

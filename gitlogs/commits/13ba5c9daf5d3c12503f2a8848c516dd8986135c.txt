@@ -1,0 +1,63 @@
+commit 13ba5c9daf5d3c12503f2a8848c516dd8986135c
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 14:34:17 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 14:34:17 2026 +0500
+
+    feat(patronage-and-links): 95% creator share & 5% platform fee, fixed crypto wallet configuration, and dynamic custom named links in Admin CRUD
+
+ app/Controllers/AdminController.php                |   62 +-
+ app/Controllers/AuthorProfileController.php        |   15 +-
+ app/Controllers/AuthorStudioController.php         |   91 +-
+ changes/app/Controllers/AdminController.php        | 8621 ++++++++++++++++++++
+ .../app/Controllers/AuthorProfileController.php    |  167 +
+ changes/app/Controllers/AuthorStudioController.php | 1303 +++
+ changes/app/Controllers/DirectoryController.php    |  865 --
+ changes/app/Models/Content.php                     |  304 -
+ changes/index.php                                  |    1 +
+ changes/views/admin/crud/gpts.php                  |  798 ++
+ changes/views/admin/crud/prompts.php               | 1199 +++
+ changes/views/admin/crud/tools.php                 |  596 ++
+ changes/views/author/dashboard.php                 | 3465 ++++++++
+ changes/views/directory/gpt_categories.php         |   86 -
+ changes/views/directory/gpt_single.php             |  199 +
+ changes/views/directory/gpts.php                   |  176 -
+ changes/views/directory/prompt_categories.php      |  185 -
+ .../views/directory/prompt_image_categories.php    |  190 -
+ changes/views/directory/prompt_single.php          |   13 +
+ changes/views/directory/prompts.php                |  442 -
+ changes/views/directory/prompts_images.php         |  279 -
+ changes/views/directory/tool_categories.php        |   86 -
+ changes/views/directory/tool_single.php            |  636 ++
+ changes/views/directory/tools.php                  |  180 -
+ changes/views/public/author_profile.php            |  609 ++
+ index.php                                          |    1 +
+ views/admin/crud/gpts.php                          |   44 +
+ views/admin/crud/prompts.php                       |   46 +-
+ views/admin/crud/tools.php                         |   54 +
+ views/author/dashboard.php                         |  425 +-
+ views/directory/gpt_single.php                     |   24 +
+ views/directory/prompt_single.php                  |   13 +
+ views/directory/tool_single.php                    |   21 +
+ views/public/author_profile.php                    |    2 +-
+ 34 files changed, 18362 insertions(+), 2836 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/AuthorProfileController.php
+ create mode 100644 changes/app/Controllers/AuthorStudioController.php
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ delete mode 100644 changes/app/Models/Content.php
+ create mode 100644 changes/views/admin/crud/gpts.php
+ create mode 100644 changes/views/admin/crud/prompts.php
+ create mode 100644 changes/views/admin/crud/tools.php
+ create mode 100644 changes/views/author/dashboard.php
+ delete mode 100644 changes/views/directory/gpt_categories.php
+ create mode 100644 changes/views/directory/gpt_single.php
+ delete mode 100644 changes/views/directory/gpts.php
+ delete mode 100644 changes/views/directory/prompt_categories.php
+ delete mode 100644 changes/views/directory/prompt_image_categories.php
+ delete mode 100644 changes/views/directory/prompts.php
+ delete mode 100644 changes/views/directory/prompts_images.php
+ delete mode 100644 changes/views/directory/tool_categories.php
+ create mode 100644 changes/views/directory/tool_single.php
+ delete mode 100644 changes/views/directory/tools.php
+ create mode 100644 changes/views/public/author_profile.php

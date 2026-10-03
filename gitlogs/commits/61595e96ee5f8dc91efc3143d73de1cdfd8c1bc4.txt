@@ -1,0 +1,13 @@
+commit 61595e96ee5f8dc91efc3143d73de1cdfd8c1bc4
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 22:10:04 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 22:10:04 2026 +0500
+
+    feat(migration): link 10 tags for B&W sunglasses prompt
+
+ .../2026_09_27_000004_sunglasses_tags.sql          | 32 ++++++++++++++++++++++
+ .../2026_09_27_000004_sunglasses_tags.sql          | 32 ++++++++++++++++++++++
+ 2 files changed, 64 insertions(+)
+ create mode 100644 changes/database/migrations/2026_09_27_000004_sunglasses_tags.sql
+ create mode 100644 database/migrations/2026_09_27_000004_sunglasses_tags.sql

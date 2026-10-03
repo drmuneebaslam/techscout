@@ -1,0 +1,54 @@
+commit 83293315c8d744ed1517397323b3e6307a540772
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 02:11:56 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 02:11:56 2026 +0500
+
+    feat: custom REST API builder, schema introspection, prompts db enrichment, clean ad navigation, light theme default & GMT time localization
+
+ app/Controllers/AdminController.php                |   74 +
+ app/Controllers/CustomApiController.php            |  378 +
+ app/Core/IncomingWebhookEngine.php                 |  150 +-
+ assets/js/main.js                                  |    4 +-
+ changes/app/Controllers/AdminController.php        | 9333 ++++++++++++++++++++
+ changes/app/Controllers/CustomApiController.php    |  378 +
+ changes/app/Core/IncomingWebhookEngine.php         |  318 +
+ changes/assets/js/main.js                          | 1072 +++
+ ...prompts_optimization_and_custom_api_gateway.sql |   61 +
+ changes/database/schema.sql                        | 1599 ++++
+ changes/index.php                                  |  924 ++
+ changes/scripts/migrate.php                        |   94 +
+ changes/views/admin/custom_api_endpoints.php       |  374 +
+ changes/views/directory/prompt_categories.php      |  167 +
+ .../views/directory/prompt_image_categories.php    |  172 +
+ changes/views/directory/prompt_single.php          |  985 +++
+ changes/views/layouts/admin_footer.php             |  588 ++
+ changes/views/layouts/admin_header.php             |    8 +-
+ ...prompts_optimization_and_custom_api_gateway.sql |   61 +
+ database/schema.sql                                |   44 +-
+ index.php                                          |    9 +
+ scripts/migrate.php                                |   94 +
+ views/admin/custom_api_endpoints.php               |  374 +
+ views/directory/prompt_categories.php              |   22 +-
+ views/directory/prompt_image_categories.php        |   20 +-
+ views/directory/prompt_single.php                  |   41 +-
+ views/layouts/admin_footer.php                     |    4 +-
+ views/layouts/admin_header.php                     |    8 +-
+ 28 files changed, 17257 insertions(+), 99 deletions(-)
+ create mode 100644 app/Controllers/CustomApiController.php
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/CustomApiController.php
+ create mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ create mode 100644 changes/assets/js/main.js
+ create mode 100644 changes/database/migrations/2026_09_26_000001_prompts_optimization_and_custom_api_gateway.sql
+ create mode 100644 changes/database/schema.sql
+ create mode 100644 changes/index.php
+ create mode 100644 changes/scripts/migrate.php
+ create mode 100644 changes/views/admin/custom_api_endpoints.php
+ create mode 100644 changes/views/directory/prompt_categories.php
+ create mode 100644 changes/views/directory/prompt_image_categories.php
+ create mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 database/migrations/2026_09_26_000001_prompts_optimization_and_custom_api_gateway.sql
+ create mode 100644 scripts/migrate.php
+ create mode 100644 views/admin/custom_api_endpoints.php

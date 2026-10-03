@@ -1,0 +1,40 @@
+commit 56f2225e6998ea4c586bf028f01d22f32e779c94
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 17 15:45:55 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 17 15:45:55 2026 +0500
+
+    feat: entity category scoping, multi-image gallery showcase for image prompts, dynamic prompt hyperparameters visibility, and duplicate slug error prevention
+
+ app/Controllers/AdminController.php            |  192 ++-
+ changes/app/Controllers/AdminController.php    |  192 ++-
+ changes/app/Controllers/CategoryController.php |  300 ----
+ changes/app/Core/AuditLog.php                  |   32 -
+ changes/app/Core/Config.php                    |  229 ---
+ changes/docs/USER_REQUESTS_TODO_TRACKER.md     |   53 +
+ changes/index.php                              |  869 -----------
+ changes/views/admin/crud/articles.php          |  581 +++++++
+ changes/views/admin/crud/categories.php        | 1237 ---------------
+ changes/views/admin/crud/gpts.php              |  836 +++++++++++
+ changes/views/admin/crud/prompts.php           | 1507 +++++++++++++++++++
+ changes/views/admin/crud/tools.php             |  626 ++++++++
+ changes/views/admin/users.php                  | 1913 ------------------------
+ changes/views/author/editor.php                | 1857 +++++++++++++++++++++++
+ docs/USER_REQUESTS_TODO_TRACKER.md             |   53 +
+ views/admin/crud/articles.php                  |   34 +
+ views/admin/crud/gpts.php                      |   38 +
+ views/admin/crud/prompts.php                   |  446 +++++-
+ views/admin/crud/tools.php                     |   30 +
+ views/author/editor.php                        |   42 +-
+ 20 files changed, 6360 insertions(+), 4707 deletions(-)
+ delete mode 100644 changes/app/Controllers/CategoryController.php
+ delete mode 100644 changes/app/Core/AuditLog.php
+ delete mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/index.php
+ create mode 100644 changes/views/admin/crud/articles.php
+ delete mode 100644 changes/views/admin/crud/categories.php
+ create mode 100644 changes/views/admin/crud/gpts.php
+ create mode 100644 changes/views/admin/crud/prompts.php
+ create mode 100644 changes/views/admin/crud/tools.php
+ delete mode 100644 changes/views/admin/users.php
+ create mode 100644 changes/views/author/editor.php

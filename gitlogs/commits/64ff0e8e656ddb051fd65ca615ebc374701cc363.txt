@@ -1,0 +1,18 @@
+commit 64ff0e8e656ddb051fd65ca615ebc374701cc363
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 6 21:52:00 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 6 21:52:00 2026 +0500
+
+    Update: Synchronize Auth client IP handling and credentials registry
+
+ app/Core/Auth.php             |   22 +-
+ changes/app/Core/Database.php | 1643 -----------------------------------------
+ changes/app/Core/Mailer.php   | 1609 ----------------------------------------
+ credentials.txt               |   18 +
+ views/admin/credentials.txt   |   18 +
+ 5 files changed, 50 insertions(+), 3260 deletions(-)
+ delete mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Core/Mailer.php
+ create mode 100644 credentials.txt
+ create mode 100644 views/admin/credentials.txt

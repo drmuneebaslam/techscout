@@ -1,0 +1,77 @@
+commit 00cadde081b303e09d9a005f88e77df78ba87319
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 19:17:13 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 19:17:13 2026 +0500
+
+    feat: complete admin dual-theme (dark/light) CSS counterparts and build 105+ features architecture roadmap
+    
+    - Admin Theme Hardening (Rule 3 & MISTAKE-10): Added explicit dark/light mode counterpart CSS for .admin-card, .admin-stat-card, .admin-table, .admin-btn, .admin-input, .admin-pill-badge, .ts-subtab-link, .custom-export-pane, .admin-sidebar, .admin-topbar, and .admin-command-palette under [data-theme="light"] and .theme-light, strictly adhering to zero-inline tag styles.
+    - Commit Trajectory Analysis: Analyzed the 5 recent commits (6f65064, 4eabede, d026e1c, 9c0b467, 5a7b76c) tracking generative AI visual engines, IP timezone math, compact social discussions, custom DB/directory exporter, and crypto monetization.
+    - Enterprise Features Roadmap (features_roadmap.html): Created an interactive, fully responsive 111-feature architecture roadmap catalog in the project root with real-time keyword search, category filter pills, difficulty/impact tags, 1-click feature copy, JSON export, and persistent dark/light theme switcher.
+
+ assets/css/admin.css                               |  481 +-
+ changes/.htaccess                                  |   62 -
+ changes/app/Controllers/AdminController.php        | 7751 --------------------
+ changes/app/Controllers/DirectoryController.php    |  649 --
+ changes/app/Controllers/HomeController.php         |  341 -
+ changes/app/Controllers/InstallController.php      |  324 -
+ changes/app/Core/Config.php                        |   52 -
+ changes/app/Core/DateHelper.php                    |  316 -
+ changes/app/Models/Content.php                     |  289 -
+ changes/app/Models/CustomExporter.php              |  370 -
+ changes/assets/css/admin.css                       |  481 +-
+ changes/assets/js/main.js                          |  925 ---
+ changes/database/image_prompts_upgrade.sql         |  104 -
+ changes/database/sponsored_systems_upgrade.sql     |   28 -
+ changes/features_roadmap.html                      | 2556 +++++++
+ changes/index.php                                  |  739 --
+ changes/storage/installed.lock                     |    7 -
+ changes/views/admin/advertisements.php             |  264 -
+ changes/views/admin/db_manager.php                 | 1366 ----
+ changes/views/admin/settings.php                   |  977 ---
+ changes/views/author/dashboard.php                 | 2452 -------
+ changes/views/author/editor.php                    | 1484 ----
+ changes/views/blog/article.php                     |  479 --
+ changes/views/components/comments_section.php      |  476 --
+ changes/views/directory/gpt_single.php             |  175 -
+ changes/views/directory/prompt_single.php          |  100 -
+ changes/views/directory/prompts.php                |  384 -
+ changes/views/directory/tool_single.php            |  615 --
+ changes/views/install/index.php                    |  566 --
+ changes/views/install/locked.php                   |   52 -
+ .../views/public/components/crypto_payment_box.php |  108 -
+ changes/views/public/sponsor.php                   |  319 -
+ features_roadmap.html                              | 2556 +++++++
+ 33 files changed, 6044 insertions(+), 21804 deletions(-)
+ delete mode 100644 changes/.htaccess
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ delete mode 100644 changes/app/Controllers/HomeController.php
+ delete mode 100644 changes/app/Controllers/InstallController.php
+ delete mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/app/Core/DateHelper.php
+ delete mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/app/Models/CustomExporter.php
+ delete mode 100644 changes/assets/js/main.js
+ delete mode 100644 changes/database/image_prompts_upgrade.sql
+ delete mode 100644 changes/database/sponsored_systems_upgrade.sql
+ create mode 100644 changes/features_roadmap.html
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/storage/installed.lock
+ delete mode 100644 changes/views/admin/advertisements.php
+ delete mode 100644 changes/views/admin/db_manager.php
+ delete mode 100644 changes/views/admin/settings.php
+ delete mode 100644 changes/views/author/dashboard.php
+ delete mode 100644 changes/views/author/editor.php
+ delete mode 100644 changes/views/blog/article.php
+ delete mode 100644 changes/views/components/comments_section.php
+ delete mode 100644 changes/views/directory/gpt_single.php
+ delete mode 100644 changes/views/directory/prompt_single.php
+ delete mode 100644 changes/views/directory/prompts.php
+ delete mode 100644 changes/views/directory/tool_single.php
+ delete mode 100644 changes/views/install/index.php
+ delete mode 100644 changes/views/install/locked.php
+ delete mode 100644 changes/views/public/components/crypto_payment_box.php
+ delete mode 100644 changes/views/public/sponsor.php
+ create mode 100644 features_roadmap.html

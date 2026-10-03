@@ -1,0 +1,39 @@
+commit 2e5229f21ca595d9f39c838d634482f93c521436
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 17 13:03:15 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 17 13:03:15 2026 +0500
+
+    Fix MariaDB LIMIT quoting syntax error via typed PDO parameter binding, replace frontend raw database error/credential leaks with secure branded error notice, unify Root Categories and Subcategories management onto a single screen with interactive main tabs and sub-tabs, document MISTAKE-35 and MISTAKE-36, and create workspace master user requests & appending TODO tracker
+
+ app/Controllers/AdminController.php                |  128 +-
+ app/Core/Database.php                              |  255 ++--
+ app/Models/DatabaseBackupManager.php               |    3 +-
+ changes/app/Controllers/AdminController.php        |  128 +-
+ changes/app/Core/Database.php                      |  255 ++--
+ changes/app/Models/DatabaseBackupManager.php       |  200 +++
+ changes/assets/css/admin-modals.css                |  174 ---
+ changes/assets/js/admin-modals.js                  |  183 ---
+ ...000001_categories_and_subcategories_upgrade.sql |   24 -
+ changes/docs/MISTAKES_LEARNED.md                   |  470 +++++++
+ changes/docs/USER_REQUESTS_TODO_TRACKER.md         |  206 ++++
+ changes/index.php                                  |  863 -------------
+ changes/views/admin/crud/categories.php            | 1303 +++++++++++++++-----
+ changes/views/admin/crud/subcategories.php         |  663 +---------
+ changes/views/layouts/admin_footer.php             |  588 ---------
+ changes/views/layouts/admin_header.php             |  652 ----------
+ docs/MISTAKES_LEARNED.md                           |   37 +-
+ docs/USER_REQUESTS_TODO_TRACKER.md                 |  206 ++++
+ views/admin/crud/categories.php                    | 1303 +++++++++++++++-----
+ views/admin/crud/subcategories.php                 |  663 +---------
+ 20 files changed, 3521 insertions(+), 4783 deletions(-)
+ create mode 100644 changes/app/Models/DatabaseBackupManager.php
+ delete mode 100644 changes/assets/css/admin-modals.css
+ delete mode 100644 changes/assets/js/admin-modals.js
+ delete mode 100644 changes/database/migrations/2026_09_17_000001_categories_and_subcategories_upgrade.sql
+ create mode 100644 changes/docs/MISTAKES_LEARNED.md
+ create mode 100644 changes/docs/USER_REQUESTS_TODO_TRACKER.md
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/layouts/admin_footer.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 docs/USER_REQUESTS_TODO_TRACKER.md

@@ -1,0 +1,50 @@
+commit 03207834a1078bf7bc3a38abf33ee87f64766e85
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 22:38:59 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 22:38:59 2026 +0500
+
+    fix: resolve PWA manifest & sw errors, enforce admin-only diagnostic ping & status, fix maintenance mode & image prompts sub-directory, and consolidate unified master roadmap
+    
+    - Fix PWA manifest.json direct serving: intercept manifest.json and sw.js at the top of index.php before routing with explicit application/manifest+json and application/javascript headers to prevent 404 HTML rewrite fallback and eliminate 'Manifest: Line: 1, column: 1, Syntax error'.
+    - Fix Service Worker (sw.js): implement reliable Stale-While-Revalidate caching strategy with guaranteed Response fallbacks on network rejections, eliminate TypeError: Failed to convert value to 'Response', and exclude admin, auth, telemetry, and ?i=1 cookie validation routes.
+    - Fix Maintenance Mode (TS-INF-09): resolve fatal method calls by normalizing URI path with $request->getPath(), add ?preview_503=1 live simulation test hook, send HTTP 503 status code with Retry-After: 300 header, and display a dual-theme persistent admin notification banner across header.php when maintenance mode is active.
+    - Enforce Admin-Only Diagnostic Ping & Status: secure /status and /api/v1/diagnostic-ping with Auth::requireRole(['admin', 'super_admin']) check, returning latency, CPU load, and DB metrics for authorized staff while redirecting unauthorized visitors.
+    - Fix Image Prompts Sub-Directory (/prompts/images): expand prompt_kind === 'image' filtering to match visual synthesis engines (Midjourney, DALL-E, Flux, SDXL, Leonardo, photorealism, 3d-renders) and ensure non-image text prompts are excluded.
+    - Fix Runtime PHP 8.2 Errors:
+      * AdRenderer.php: extract renderBadge helper to eliminate Undefined variable $thisImageBadge warning.
+      * Request.php: convert Request::ip() to public static function to fix 'Non-static method Request::ip() cannot be called statically' in settings.php:204, and add getUri() and uri() methods.
+      * settings.php: declare switchSettingsTab early in head script to eliminate ReferenceError: switchSettingsTab is not defined.
+      * prompt_single.php: safely normalize variable array items to string/array to eliminate 'Cannot access offset of type string on string'.
+    - Consolidate Master Roadmap: merge features_roadmap.html and features_roadmap_2.html into a single comprehensive master roadmap containing 217+ deduplicated enterprise features, dual-theme styling, category filters, and 1-click specification copy buttons, while configuring features_roadmap_2.html as a seamless redirect.
+    - Document MISTAKE-25, MISTAKE-26, MISTAKE-27, and MISTAKE-28 in docs/MISTAKES_LEARNED.md.
+
+ app/Controllers/DirectoryController.php         |    3 +-
+ app/Controllers/PageController.php              |   22 +
+ app/Core/AdRenderer.php                         |   14 +-
+ app/Core/Request.php                            |   19 +-
+ app/Models/Content.php                          |   13 +-
+ changes/app/Controllers/DirectoryController.php |    3 +-
+ changes/app/Controllers/PageController.php      |   22 +
+ changes/app/Core/AdRenderer.php                 |   14 +-
+ changes/app/Core/Request.php                    |  139 +
+ changes/app/Models/Content.php                  |  298 ++
+ changes/docs/MISTAKES_LEARNED.md                |   48 +
+ changes/features_roadmap.html                   | 5944 ++++++++++++++++-------
+ changes/features_roadmap_2.html                 | 3183 +-----------
+ changes/index.php                               |   51 +-
+ changes/sw.js                                   |   80 +-
+ changes/views/admin/settings.php                |   61 +-
+ changes/views/directory/prompt_single.php       |   11 +-
+ changes/views/layouts/header.php                |   33 +
+ docs/MISTAKES_LEARNED.md                        |   48 +
+ features_roadmap.html                           | 5944 ++++++++++++++++-------
+ features_roadmap_2.html                         | 3183 +-----------
+ index.php                                       |   51 +-
+ sw.js                                           |   80 +-
+ views/admin/settings.php                        |   61 +-
+ views/directory/prompt_single.php               |   11 +-
+ views/layouts/header.php                        |   33 +
+ 26 files changed, 9561 insertions(+), 9808 deletions(-)
+ create mode 100644 changes/app/Core/Request.php
+ create mode 100644 changes/app/Models/Content.php

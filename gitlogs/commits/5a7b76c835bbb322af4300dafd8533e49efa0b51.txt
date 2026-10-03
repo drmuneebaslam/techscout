@@ -1,0 +1,42 @@
+commit 5a7b76c835bbb322af4300dafd8533e49efa0b51
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 17:40:53 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 17:40:53 2026 +0500
+
+    Fix syncAdminThemeIcon reference error, switchMailTab undefined error, Auth::requireRole undefined method error, and harden analytics telemetry database queries
+
+ app/Controllers/AdminController.php             |   51 +-
+ app/Core/Auth.php                               |   14 +-
+ changes/app/Controllers/AdminController.php     | 7663 +++++++++++++++++++++++
+ changes/app/Controllers/DirectoryController.php |  632 --
+ changes/app/Core/Auth.php                       |  368 ++
+ changes/app/Core/Config.php                     |   52 -
+ changes/docs/MISTAKES_LEARNED.md                |   17 +
+ changes/index.php                               |  707 ---
+ changes/views/admin/crud/gpts.php               |  155 -
+ changes/views/admin/crud/tools.php              |  542 --
+ changes/views/admin/mail.php                    | 4110 ++++++++++++
+ changes/views/directory/gpt_single.php          |  175 -
+ changes/views/directory/tool_single.php         |  615 --
+ changes/views/layouts/admin_footer.php          |  473 ++
+ changes/views/layouts/admin_header.php          |  561 ++
+ changes/views/public/home.php                   |  624 --
+ docs/MISTAKES_LEARNED.md                        |   17 +
+ views/admin/mail.php                            |   38 +-
+ views/layouts/admin_footer.php                  |    8 +
+ views/layouts/admin_header.php                  |    6 +
+ 20 files changed, 13314 insertions(+), 3514 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Core/Auth.php
+ delete mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/crud/gpts.php
+ delete mode 100644 changes/views/admin/crud/tools.php
+ create mode 100644 changes/views/admin/mail.php
+ delete mode 100644 changes/views/directory/gpt_single.php
+ delete mode 100644 changes/views/directory/tool_single.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/public/home.php

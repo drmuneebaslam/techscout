@@ -1,0 +1,13 @@
+commit fe7799a5afea8e607ebaff988f053f8d7e7dcea5
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 22:06:30 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 22:06:30 2026 +0500
+
+    feat(migration): ingest B&W sunglasses prompt and align extension schemas
+
+ ...ngest_sunglasses_prompt_and_telemetry_fixes.sql | 78 ++++++++++++++++++++++
+ ...ngest_sunglasses_prompt_and_telemetry_fixes.sql | 78 ++++++++++++++++++++++
+ 2 files changed, 156 insertions(+)
+ create mode 100644 changes/database/migrations/2026_09_27_000002_ingest_sunglasses_prompt_and_telemetry_fixes.sql
+ create mode 100644 database/migrations/2026_09_27_000002_ingest_sunglasses_prompt_and_telemetry_fixes.sql

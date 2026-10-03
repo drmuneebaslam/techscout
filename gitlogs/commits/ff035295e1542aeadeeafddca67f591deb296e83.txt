@@ -1,0 +1,58 @@
+commit ff035295e1542aeadeeafddca67f591deb296e83
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 03:59:27 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 03:59:27 2026 +0500
+
+    fix(webhooks, api, migrations): fix 403 authorization in IncomingWebhookController, resolve MySQL 8.0 migration 1064 syntax error, fix custom api table-data route, and escape JSON attributes in admin studio
+
+ app/Controllers/CustomApiController.php            |   18 +-
+ app/Controllers/IncomingWebhookController.php      |   42 +-
+ app/Core/IncomingWebhookEngine.php                 |    6 +
+ app/Core/Router.php                                |   24 +
+ changes/app/Controllers/ApiController.php          | 2198 --------------------
+ changes/app/Controllers/CategoryController.php     |  316 ---
+ changes/app/Controllers/CustomApiController.php    |  706 +++++++
+ changes/app/Controllers/DirectoryController.php    |  937 ---------
+ changes/app/Controllers/FeedController.php         |  325 ---
+ .../app/Controllers/IncomingWebhookController.php  |  116 ++
+ changes/app/Core/AdRenderer.php                    |  169 --
+ changes/app/Core/Config.php                        |  254 ---
+ changes/app/Core/ErrorLogger.php                   |  597 ------
+ changes/app/Core/IncomingWebhookEngine.php         |  330 +++
+ changes/app/Core/Request.php                       |  139 --
+ changes/app/Core/Router.php                        |   24 +
+ changes/app/Core/helpers.php                       |  159 --
+ changes/app/Models/SecurityAnomalyEngine.php       |  183 --
+ ...prompts_optimization_and_custom_api_gateway.sql |   61 +
+ changes/database/schema.sql                        | 1624 +++++++++++++++
+ changes/index.php                                  |   10 +-
+ changes/views/admin/custom_api_endpoints.php       |  585 ++++++
+ changes/views/admin/incoming_webhooks.php          |  542 +++++
+ changes/views/layouts/admin_header.php             |  681 ------
+ cintu.txt                                          |   74 +
+ ...prompts_optimization_and_custom_api_gateway.sql |   26 +-
+ database/schema.sql                                |   25 +
+ index.php                                          |   10 +-
+ views/admin/custom_api_endpoints.php               |   14 +-
+ views/admin/incoming_webhooks.php                  |   23 +-
+ 30 files changed, 4214 insertions(+), 6004 deletions(-)
+ delete mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Controllers/CategoryController.php
+ create mode 100644 changes/app/Controllers/CustomApiController.php
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ delete mode 100644 changes/app/Controllers/FeedController.php
+ create mode 100644 changes/app/Controllers/IncomingWebhookController.php
+ delete mode 100644 changes/app/Core/AdRenderer.php
+ delete mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/app/Core/ErrorLogger.php
+ create mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ delete mode 100644 changes/app/Core/Request.php
+ delete mode 100644 changes/app/Core/helpers.php
+ delete mode 100644 changes/app/Models/SecurityAnomalyEngine.php
+ create mode 100644 changes/database/migrations/2026_09_26_000001_prompts_optimization_and_custom_api_gateway.sql
+ create mode 100644 changes/database/schema.sql
+ create mode 100644 changes/views/admin/custom_api_endpoints.php
+ create mode 100644 changes/views/admin/incoming_webhooks.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 cintu.txt

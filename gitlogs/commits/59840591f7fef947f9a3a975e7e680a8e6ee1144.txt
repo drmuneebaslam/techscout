@@ -1,0 +1,26 @@
+commit 59840591f7fef947f9a3a975e7e680a8e6ee1144
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 17:55:54 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 17:55:54 2026 +0500
+
+    feat(core): massive UI/UX improvements, feedback system, webhook GET support, algorithm feeds, deep-linking, and QA docs
+
+ app/Controllers/AdminController.php                |  47 +++++--
+ app/Controllers/ApiController.php                  |   2 +-
+ app/Controllers/AuthorStudioController.php         |  30 ++++-
+ app/Controllers/IncomingWebhookController.php      |   8 ++
+ app/Models/Content.php                             |   5 +-
+ app/Models/CreatorTipping.php                      |   2 +-
+ ..._10_03_174140_create_author_feedbacks_table.sql |  11 ++
+ docs/QA_TESTING_GUIDE.md                           | 143 +++++++++------------
+ index.php                                          |  10 +-
+ views/admin/advertisements.php                     |  53 ++++++--
+ views/admin/author_feedbacks.php                   | 120 +++++++++++++++++
+ views/author/dashboard.php                         |  20 +++
+ views/layouts/admin_header.php                     |   3 +
+ views/layouts/footer.php                           |   2 +-
+ views/layouts/header.php                           |   4 +-
+ 15 files changed, 350 insertions(+), 110 deletions(-)
+ create mode 100644 database/migrations/2026_10_03_174140_create_author_feedbacks_table.sql
+ create mode 100644 views/admin/author_feedbacks.php

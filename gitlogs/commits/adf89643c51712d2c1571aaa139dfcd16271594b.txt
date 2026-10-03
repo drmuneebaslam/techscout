@@ -1,0 +1,63 @@
+commit adf89643c51712d2c1571aaa139dfcd16271594b
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 17 13:38:28 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 17 13:38:28 2026 +0500
+
+    Optimize frontend and admin performance, defer render-blocking scripts, add 0ms instant shells for admin modals, and eliminate topics navigation button
+    
+    - Defer lucide.min.js, sweetalert2, toastify-js, and telemetry-error-logger.js in header.php and admin_header.php
+    - Move chart.umd.min.js to load conditionally only on admin pages containing charts (Dashboard, Analytics, Revenue)
+    - Conditionally load Prism syntax highlighter CSS and JS only on pages containing code snippets (articles, prompts, editor)
+    - Add CDN preconnect and DNS prefetch hints for cdn.jsdelivr.net and cdnjs.cloudflare.com
+    - Replace expensive 14px backdrop blur with 5px blur and 0.88 opacity in admin.css, add will-change: transform, opacity, and streamline modal entrance animation to 0.15s
+    - Introduce high-tech glowing pulse/spinner skeleton styles (.skeleton-shimmer, .ts-modal-skeleton-spinner)
+    - Implement 0ms Instant Shell Trigger on User Detail Hub and Edit User modals in users.php, swapping skeleton for fetched data upon response
+    - Permanently purge 'Topics' navigation button in header.php filter, SQL migration, and database
+    - Append Prompt #11 to USER_REQUESTS_TODO_TRACKER.md with 100% completion
+
+ assets/css/admin.css                               |   53 +-
+ changes/app/Controllers/AdminController.php        | 8824 --------------------
+ changes/app/Controllers/CategoryController.php     |  251 -
+ changes/app/Core/SeoEngine.php                     |   86 -
+ changes/assets/css/admin.css                       | 2553 ++++++
+ changes/assets/js/main.js                          |  996 ---
+ ..._000002_entity_categories_and_subscriptions.sql |    4 +
+ changes/docs/USER_REQUESTS_TODO_TRACKER.md         |   57 +
+ changes/index.php                                  |  867 --
+ changes/views/admin/crud/categories.php            | 1229 ---
+ changes/views/admin/crud/topics.php                |    3 -
+ changes/views/admin/db_manager.php                 | 1937 -----
+ changes/views/admin/subscribers.php                |  459 -
+ changes/views/admin/users.php                      | 1913 +++++
+ changes/views/blog/article.php                     |  919 --
+ changes/views/components/category_explorer.php     |   81 -
+ changes/views/directory/prompt_single.php          |  995 ---
+ changes/views/layouts/admin_header.php             |   30 +-
+ changes/views/layouts/header.php                   |   39 +-
+ changes/views/public/categories.php                |  214 -
+ changes/views/public/category_single.php           |  218 -
+ changes/views/public/home.php                      |  623 --
+ ..._000002_entity_categories_and_subscriptions.sql |    4 +
+ docs/USER_REQUESTS_TODO_TRACKER.md                 |   57 +
+ views/admin/users.php                              |  130 +-
+ views/layouts/admin_header.php                     |   30 +-
+ views/layouts/header.php                           |   39 +-
+ 27 files changed, 4861 insertions(+), 17750 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/CategoryController.php
+ delete mode 100644 changes/app/Core/SeoEngine.php
+ create mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/assets/js/main.js
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/crud/categories.php
+ delete mode 100644 changes/views/admin/crud/topics.php
+ delete mode 100644 changes/views/admin/db_manager.php
+ delete mode 100644 changes/views/admin/subscribers.php
+ create mode 100644 changes/views/admin/users.php
+ delete mode 100644 changes/views/blog/article.php
+ delete mode 100644 changes/views/components/category_explorer.php
+ delete mode 100644 changes/views/directory/prompt_single.php
+ delete mode 100644 changes/views/public/categories.php
+ delete mode 100644 changes/views/public/category_single.php
+ delete mode 100644 changes/views/public/home.php

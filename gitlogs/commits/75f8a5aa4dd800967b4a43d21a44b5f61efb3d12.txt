@@ -1,0 +1,32 @@
+commit 75f8a5aa4dd800967b4a43d21a44b5f61efb3d12
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Wed Sep 23 20:49:46 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Wed Sep 23 20:49:46 2026 +0500
+
+    fix(security): resolve recursive firewall abort loop, guard header sending, and prevent error log disk saturation
+
+ app/Core/ErrorLogger.php                    |   14 +
+ app/Core/Firewall.php                       |   12 +-
+ app/Core/Response.php                       |   32 +-
+ changes/app/Controllers/AdminController.php | 9000 ---------------------------
+ changes/app/Core/ErrorLogger.php            |  593 ++
+ changes/app/Core/Firewall.php               |  110 +
+ changes/app/Core/Response.php               |   72 +
+ changes/docs/USER_REQUESTS_TODO_TRACKER.md  |  380 --
+ changes/views/admin/crud/articles.php       |  581 --
+ changes/views/admin/crud/gpts.php           |  836 ---
+ changes/views/admin/crud/prompts.php        | 1507 -----
+ changes/views/admin/crud/tools.php          |  626 --
+ changes/views/author/editor.php             | 1857 ------
+ 13 files changed, 826 insertions(+), 14794 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Core/ErrorLogger.php
+ create mode 100644 changes/app/Core/Firewall.php
+ create mode 100644 changes/app/Core/Response.php
+ delete mode 100644 changes/docs/USER_REQUESTS_TODO_TRACKER.md
+ delete mode 100644 changes/views/admin/crud/articles.php
+ delete mode 100644 changes/views/admin/crud/gpts.php
+ delete mode 100644 changes/views/admin/crud/prompts.php
+ delete mode 100644 changes/views/admin/crud/tools.php
+ delete mode 100644 changes/views/author/editor.php

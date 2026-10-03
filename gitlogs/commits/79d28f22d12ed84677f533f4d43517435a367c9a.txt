@@ -1,0 +1,60 @@
+commit 79d28f22d12ed84677f533f4d43517435a367c9a
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Mon Sep 7 17:48:33 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Mon Sep 7 17:48:33 2026 +0500
+
+    feat: deep error forensics inspector, audit log entity linking, db manager upgrade, and webhooks guide
+    
+    - Fix SQLSTATE[42S22] unknown column verification_code by updating schema.sql and adding database_upgrade_v2.sql
+    - Enhance ErrorLogger with deep telemetry: sanitized request data, headers, client IP, country/city, device/OS/browser, and user context
+    - Redesign System Error Logs Inspector with 5 dedicated sub-tabs (Trace, Request, Headers, Device & Location, User Context) and visible prominent error badges
+    - Enhance Audit Logs with clickable entity links, direct admin destination jump buttons, and unified forensic inspector modal with before/after state diffing
+    - Upgrade Database Manager into a standalone station with Schema Diagnostics, Table Optimization/Checking, Automated Schema Auto-Repair, and SQL Diagnostic Terminal
+    - Fix database backup redirects to stay on /admin/db-manager?tab=snapshots
+    - Create docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md detailing comprehensive capabilities beyond email
+    - Sync all modified files to changes/ directory
+
+ app/Controllers/AdminController.php                |  151 +-
+ app/Core/ErrorLogger.php                           |  489 +++-
+ changes/app/Controllers/AdminController.php        |  151 +-
+ changes/app/Controllers/AuthController.php         |  729 ------
+ changes/app/Core/ErrorLogger.php                   |  579 +++++
+ changes/app/Core/Mailer.php                        | 1688 ------------
+ changes/database/database_upgrade_v2.sql           |   40 +
+ changes/database/schema.sql                        | 1393 ++++++++++
+ .../docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md    |  234 ++
+ changes/index.php                                  |    5 +
+ changes/views/admin/audit_logs.php                 |  719 ++++--
+ changes/views/admin/db_manager.php                 |  454 ++++
+ changes/views/admin/job_applications.php           |  162 --
+ changes/views/admin/mail.php                       | 2680 --------------------
+ changes/views/admin/subscribers.php                |  459 ----
+ changes/views/admin/system_logs.php                |  543 +++-
+ changes/views/auth/verify_email.php                |  195 --
+ changes/views/layouts/admin_header.php             |  376 +++
+ changes/views/notifications/index.php              |  850 -------
+ database/database_upgrade_v2.sql                   |   40 +
+ database/schema.sql                                |   10 +-
+ docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md        |  234 ++
+ index.php                                          |    5 +
+ views/admin/audit_logs.php                         |  719 ++++--
+ views/admin/db_manager.php                         |  543 +++-
+ views/admin/system_logs.php                        |  543 +++-
+ views/layouts/admin_header.php                     |    8 +-
+ 27 files changed, 6590 insertions(+), 7409 deletions(-)
+ delete mode 100644 changes/app/Controllers/AuthController.php
+ create mode 100644 changes/app/Core/ErrorLogger.php
+ delete mode 100644 changes/app/Core/Mailer.php
+ create mode 100644 changes/database/database_upgrade_v2.sql
+ create mode 100644 changes/database/schema.sql
+ create mode 100644 changes/docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md
+ create mode 100644 changes/views/admin/db_manager.php
+ delete mode 100644 changes/views/admin/job_applications.php
+ delete mode 100644 changes/views/admin/mail.php
+ delete mode 100644 changes/views/admin/subscribers.php
+ delete mode 100644 changes/views/auth/verify_email.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/notifications/index.php
+ create mode 100644 database/database_upgrade_v2.sql
+ create mode 100644 docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md

@@ -1,0 +1,35 @@
+commit 7825ceb1ec2a8745e18cfeba3a3984e52511f1eb
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 13:12:43 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 13:12:43 2026 +0500
+
+    fix: resolve audit inspector modal dark mode styling and enhance db manager sql query terminal
+
+ app/Controllers/AdminController.php         |   50 +-
+ assets/css/admin.css                        |  175 +-
+ changes/app/Controllers/AdminController.php | 7609 +++++++++++++++++++++++++++
+ changes/assets/css/admin.css                | 1933 +++++++
+ changes/assets/css/style.css                | 2785 ----------
+ changes/assets/js/main.js                   |  787 ---
+ changes/docs/MISTAKES_LEARNED.md            |   26 +
+ changes/views/admin/audit_logs.php          |  707 +++
+ changes/views/admin/db_manager.php          |  807 +++
+ changes/views/admin/system_logs.php         |  687 +++
+ changes/views/layouts/admin_header.php      |  497 ++
+ changes/views/layouts/header.php            |  850 ---
+ docs/MISTAKES_LEARNED.md                    |   26 +
+ views/admin/audit_logs.php                  |   49 +-
+ views/admin/db_manager.php                  |  531 +-
+ views/admin/system_logs.php                 |   60 +-
+ views/layouts/admin_header.php              |   19 +-
+ 17 files changed, 13024 insertions(+), 4574 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/assets/css/style.css
+ delete mode 100644 changes/assets/js/main.js
+ create mode 100644 changes/views/admin/audit_logs.php
+ create mode 100644 changes/views/admin/db_manager.php
+ create mode 100644 changes/views/admin/system_logs.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/layouts/header.php

@@ -1,0 +1,92 @@
+commit e83613f44b6542b65a7c1c64ae6991b468f8bbe3
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Fri Sep 11 21:54:04 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Fri Sep 11 21:54:04 2026 +0500
+
+    fix(mail,comments,telemetry): fix admin mail JS syntax, idempotent comment reactions toggle, client JS & 404 error telemetry, and static error pages
+
+ .htaccess                                     |    7 +
+ app/Controllers/ApiController.php             |   87 +-
+ app/Core/Database.php                         |   11 +-
+ app/Core/Router.php                           |   17 +
+ assets/js/telemetry-error-logger.js           |   77 +
+ changes/.htaccess                             |   58 +
+ changes/app/Controllers/AdminController.php   | 7392 -------------------------
+ changes/app/Controllers/ApiController.php     | 1272 +++++
+ changes/app/Core/Database.php                 |   11 +-
+ changes/app/Core/Mailer.php                   | 1684 ------
+ changes/app/Core/Router.php                   |  140 +
+ changes/assets/js/telemetry-error-logger.js   |   77 +
+ changes/database/schema.sql                   |   14 +
+ changes/database/upgrade_v2_fix.sql           |   15 +
+ changes/docs/MISTAKES_LEARNED.md              |   39 +-
+ changes/errors/403.html                       |  146 +
+ changes/errors/404.html                       |  146 +
+ changes/errors/405.html                       |  145 +
+ changes/errors/429.html                       |  200 +
+ changes/errors/500.html                       |  184 +
+ changes/index.php                             |  705 +++
+ changes/public/errors/403.html                |  146 +
+ changes/public/errors/404.html                |  146 +
+ changes/public/errors/405.html                |  145 +
+ changes/public/errors/429.html                |  200 +
+ changes/public/errors/500.html                |  184 +
+ changes/views/admin/mail.php                  | 3477 ++++++++++++
+ changes/views/components/comments_section.php |  526 ++
+ changes/views/layouts/admin_footer.php        |  457 ++
+ changes/views/layouts/admin_header.php        |  482 ++
+ changes/views/layouts/header.php              |  835 +++
+ database/schema.sql                           |   14 +
+ database/upgrade_v2_fix.sql                   |   15 +
+ docs/MISTAKES_LEARNED.md                      |   39 +-
+ errors/403.html                               |  146 +
+ errors/404.html                               |  146 +
+ errors/405.html                               |  145 +
+ errors/429.html                               |  200 +
+ errors/500.html                               |  184 +
+ index.php                                     |    1 +
+ public/errors/403.html                        |  146 +
+ public/errors/404.html                        |  146 +
+ public/errors/405.html                        |  145 +
+ public/errors/429.html                        |  200 +
+ public/errors/500.html                        |  184 +
+ views/admin/mail.php                          |    3 +
+ views/components/comments_section.php         |   58 +-
+ views/layouts/admin_footer.php                |    3 -
+ views/layouts/admin_header.php                |    2 +
+ views/layouts/header.php                      |    2 +
+ 50 files changed, 11697 insertions(+), 9107 deletions(-)
+ create mode 100644 assets/js/telemetry-error-logger.js
+ create mode 100644 changes/.htaccess
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Core/Mailer.php
+ create mode 100644 changes/app/Core/Router.php
+ create mode 100644 changes/assets/js/telemetry-error-logger.js
+ create mode 100644 changes/errors/403.html
+ create mode 100644 changes/errors/404.html
+ create mode 100644 changes/errors/405.html
+ create mode 100644 changes/errors/429.html
+ create mode 100644 changes/errors/500.html
+ create mode 100644 changes/index.php
+ create mode 100644 changes/public/errors/403.html
+ create mode 100644 changes/public/errors/404.html
+ create mode 100644 changes/public/errors/405.html
+ create mode 100644 changes/public/errors/429.html
+ create mode 100644 changes/public/errors/500.html
+ create mode 100644 changes/views/admin/mail.php
+ create mode 100644 changes/views/components/comments_section.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 changes/views/layouts/header.php
+ create mode 100644 errors/403.html
+ create mode 100644 errors/404.html
+ create mode 100644 errors/405.html
+ create mode 100644 errors/429.html
+ create mode 100644 errors/500.html
+ create mode 100644 public/errors/403.html
+ create mode 100644 public/errors/404.html
+ create mode 100644 public/errors/405.html
+ create mode 100644 public/errors/429.html
+ create mode 100644 public/errors/500.html

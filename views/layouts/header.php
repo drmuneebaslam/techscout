@@ -181,6 +181,47 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       border-bottom: 1px solid rgba(239, 68, 68, 0.2);
     }
   </style>
+  <!-- Frontend Telemetry: JS Error Logging -->
+  <script>
+    (function() {
+      function sendError(data) {
+        if (data.message === 'Script error.' || data.message.includes('Extension context invalidated')) return;
+        try {
+          // Fire-and-forget telemetry beacon
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon('/api/v1/telemetry/client-error', JSON.stringify(data));
+          } else {
+            fetch('/api/v1/telemetry/client-error', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+              keepalive: true
+            }).catch(e => {});
+          }
+        } catch(e) {}
+      }
+
+      window.addEventListener('error', function(e) {
+        sendError({
+          message: e.message || 'Unknown JS Error',
+          source: e.filename || '',
+          lineno: e.lineno || 0,
+          colno: e.colno || 0,
+          stack: (e.error && e.error.stack) ? e.error.stack : '',
+          url: window.location.href
+        });
+      });
+
+      window.addEventListener('unhandledrejection', function(e) {
+        sendError({
+          message: e.reason ? (e.reason.message || e.reason.toString()) : 'Unhandled Promise Rejection',
+          source: 'PromiseRejection',
+          stack: (e.reason && e.reason.stack) ? e.reason.stack : '',
+          url: window.location.href
+        });
+      });
+    })();
+  </script>
 </head><body data-theme="<?= $activeTheme ?>" class="<?= $activeTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($siteSettings['enable_bg_grid_lines']) && $siteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
 <script>
   (function() {

@@ -1,0 +1,33 @@
+commit ec0c846434374c69bceec719e86f1fc75b41daa4
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 12:49:03 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 12:49:03 2026 +0500
+
+    fix(theme): isolate dark and light modes, resolve public page theme bleed, add symmetric toggling, and document MISTAKE-13 & MISTAKE-14
+
+ app/Core/Config.php                         |   12 +-
+ assets/css/style.css                        |  104 +-
+ assets/js/main.js                           |   47 +-
+ changes/app/Controllers/AdminController.php | 7571 ---------------------------
+ changes/app/Core/Config.php                 |   52 +
+ changes/assets/css/admin.css                | 1760 -------
+ changes/assets/css/style.css                | 2785 ++++++++++
+ changes/assets/js/main.js                   |  787 +++
+ changes/database/prompts_telemetry_fix.sql  |   20 -
+ changes/database/schema.sql                 | 1490 ------
+ changes/docs/MISTAKES_LEARNED.md            |   31 +
+ changes/views/admin/system.php              |  188 -
+ changes/views/layouts/header.php            |  850 +++
+ docs/MISTAKES_LEARNED.md                    |   31 +
+ views/layouts/header.php                    |   19 +-
+ 15 files changed, 4660 insertions(+), 11087 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/assets/css/admin.css
+ create mode 100644 changes/assets/css/style.css
+ create mode 100644 changes/assets/js/main.js
+ delete mode 100644 changes/database/prompts_telemetry_fix.sql
+ delete mode 100644 changes/database/schema.sql
+ delete mode 100644 changes/views/admin/system.php
+ create mode 100644 changes/views/layouts/header.php

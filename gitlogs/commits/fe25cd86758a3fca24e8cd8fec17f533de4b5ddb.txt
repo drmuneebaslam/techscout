@@ -1,0 +1,54 @@
+commit fe25cd86758a3fca24e8cd8fec17f533de4b5ddb
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 14:17:27 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 14:17:27 2026 +0500
+
+    Fix 500 error on /admin/mail/trigger/create, resolve public dark mode issues, eliminate hardcoded colors, and update changes directory
+
+ app/Controllers/AdminController.php         |   73 +-
+ app/Core/Auth.php                           |   12 +
+ assets/css/admin.css                        |   19 +-
+ assets/css/style.css                        |  190 +-
+ changes/app/Controllers/AdminController.php |   73 +-
+ changes/app/Core/Auth.php                   |  358 +++
+ changes/app/Core/Config.php                 |    2 +-
+ changes/assets/css/admin.css                |   19 +-
+ changes/assets/css/style.css                | 2925 +++++++++++++++++++
+ changes/docs/MISTAKES_LEARNED.md            |   15 +
+ changes/views/admin/audit_logs.php          |  707 -----
+ changes/views/admin/db_manager.php          |  807 ------
+ changes/views/admin/mail.php                | 4074 +++++++++++++++++++++++++++
+ changes/views/admin/system_logs.php         |  687 -----
+ changes/views/blog/index.php                |  189 ++
+ changes/views/directory/gpts.php            |  168 ++
+ changes/views/directory/prompts.php         |  164 ++
+ changes/views/directory/tools.php           |  172 ++
+ changes/views/layouts/admin_header.php      |  497 ----
+ changes/views/layouts/header.php            |  850 ++++++
+ changes/views/public/campaigns.php          |  155 +
+ changes/views/public/home.php               |  624 ++++
+ docs/MISTAKES_LEARNED.md                    |   15 +
+ views/admin/mail.php                        |    4 +
+ views/blog/index.php                        |   16 +-
+ views/directory/gpts.php                    |   28 +-
+ views/directory/prompts.php                 |   16 +-
+ views/directory/tools.php                   |   16 +-
+ views/layouts/header.php                    |    2 +-
+ views/public/campaigns.php                  |   18 +-
+ views/public/home.php                       |   40 +-
+ 31 files changed, 10077 insertions(+), 2858 deletions(-)
+ create mode 100644 changes/app/Core/Auth.php
+ create mode 100644 changes/assets/css/style.css
+ delete mode 100644 changes/views/admin/audit_logs.php
+ delete mode 100644 changes/views/admin/db_manager.php
+ create mode 100644 changes/views/admin/mail.php
+ delete mode 100644 changes/views/admin/system_logs.php
+ create mode 100644 changes/views/blog/index.php
+ create mode 100644 changes/views/directory/gpts.php
+ create mode 100644 changes/views/directory/prompts.php
+ create mode 100644 changes/views/directory/tools.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 changes/views/layouts/header.php
+ create mode 100644 changes/views/public/campaigns.php
+ create mode 100644 changes/views/public/home.php

@@ -1,0 +1,162 @@
+commit 5f14e9d899f3c0680f31a8adba6c4b1f6a67034e
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 21:59:35 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 21:59:35 2026 +0500
+
+    feat: comprehensive enhancements across media uploads, sponsors, prompts, ads, security and architecture
+    
+    - Fix Image Upload URL vs. Path Bug (MISTAKE-24): Converted media input elements across admin, sponsor, author, and profile views from type="url" to type="text" to eliminate browser HTML5 URL validation errors on valid relative storage paths (/storage/uploads/...).
+    - Sponsor Monetization & Crypto Payment Upgrade: Implemented dynamic pricing tiers ($49 for 7 days, $149 for 30 days, $299 for 90 days) with real-time BIP-21 and EIP-681 QR codes embedding exact coin amounts for BTC, ETH, USDT, and SOL with 1-click amount copy buttons.
+    - Prompt Directory & Single View Overhaul: Removed prompt lightbox modal from directory cards with direct routing to /prompts/{slug}; fixed PHP 8.2 count(null) TypeError in comments section restoring single prompt footer; resolved popup blocker issues on prompt copy by triggering window.open synchronously.
+    - Active Display Banners & Background Popunder: Built AdRenderer with header_banner and footer_banner slots linked to advertisements database with impression tracking and /ad/click/{id} logging; added background popunder ad trigger on navigation clicks.
+    - Dedicated AI Image Prompts Sub-Directory: Added /prompts/images and /prompts/image-prompts views featuring visual art styles (Photorealism, 3D Renders, Cyberpunk, Anime, Architecture, Landscapes) and engine filters (Midjourney, DALL-E, Flux, SDXL).
+    - Interactive Features Roadmaps 1 & 2: Added 1-click feature specification copy buttons and status badges (Completely Built, Partially Built, Planned) to all cards.
+    - Enterprise Security & Architecture:
+      * [TS-INF-10] Automated cron orchestrator (cron.php) with job execution logging into cron_logs.
+      * [TS-SEC-03] RFC 6238 TOTP 2FA engine (app/Core/Totp.php) and verification flow.
+      * [TS-SEC-05] Disposable/burner email blocker in registration (Firewall::isDisposableEmail).
+      * [TS-SEC-010] Sliding-window rate limiter (RateLimiter::guard) on public APIs and search.
+      * [TS-SEC-04] CSP telemetry endpoint (/api/v1/telemetry/csp) and logging.
+      * [TS-UI-05] Offline PWA manifest (manifest.json) and Service Worker (sw.js).
+      * [TS-API-05, TS-API-07] Dynamic partitioned XML sitemaps and RSS/Atom feeds (FeedController).
+      * [TS-INF-04] Public system status page (/status) and healthcheck HUD.
+      * [TS-INF-09] Maintenance mode IP whitelist bypass and dynamic countdown clock timer.
+      * Added MISTAKE-24 to docs/MISTAKES_LEARNED.md.
+    - Deployed all updated files directly to /htdocs on ftpupload.net:21 preserving hosted environment credentials.
+
+ app/Controllers/AdminController.php                |   36 +-
+ app/Controllers/ApiController.php                  |   20 +
+ app/Controllers/AuthController.php                 |   52 +-
+ app/Controllers/DirectoryController.php            |   43 +-
+ app/Controllers/FeedController.php                 |  171 ++
+ app/Controllers/HomeController.php                 |   72 +-
+ app/Controllers/PageController.php                 |   44 +
+ app/Core/AdRenderer.php                            |  117 +
+ app/Core/Firewall.php                              |   36 +
+ app/Core/RateLimiter.php                           |  151 +
+ app/Core/Totp.php                                  |  119 +
+ changes/app/Controllers/AdminController.php        |   36 +-
+ changes/app/Controllers/ApiController.php          |   20 +
+ changes/app/Controllers/AuthController.php         |  765 +++++
+ changes/app/Controllers/DirectoryController.php    |   43 +-
+ changes/app/Controllers/FeedController.php         |  171 ++
+ changes/app/Controllers/HomeController.php         |  401 +++
+ changes/app/Controllers/PageController.php         |  179 ++
+ changes/app/Core/AdRenderer.php                    |  117 +
+ changes/app/Core/Firewall.php                      |  100 +
+ changes/app/Core/RateLimiter.php                   |  151 +
+ changes/app/Core/Totp.php                          |  119 +
+ changes/assets/js/main.js                          |  997 -------
+ changes/cron.php                                   |  134 +
+ changes/database/enterprise_features_upgrade.sql   |  157 --
+ ...26_09_12_000001_enterprise_features_upgrade.sql |   81 -
+ ..._09_12_000002_add_social_and_crypto_indices.sql |    8 -
+ .../2026_09_12_000003_enterprise_enhancements.sql  |   30 +
+ changes/docs/MISTAKES_LEARNED.md                   |   15 +
+ changes/features_roadmap.html                      | 2917 ++++++++++++++++++++
+ changes/features_roadmap_2.html                    | 1360 ++++++---
+ changes/index.php                                  |   54 +-
+ changes/manifest.json                              |   17 +
+ changes/sw.js                                      |   56 +
+ changes/views/account/settings.php                 |    2 +-
+ changes/views/admin/advertisements.php             |    2 +-
+ changes/views/admin/analytics.php                  |  755 -----
+ changes/views/admin/content_queue.php              |  956 -------
+ changes/views/admin/crud/articles.php              |  547 ++++
+ changes/views/admin/crud/campaigns.php             |  546 ++++
+ changes/views/admin/crud/gpts.php                  |  155 ++
+ changes/views/admin/crud/tools.php                 |  542 ++++
+ changes/views/admin/db_manager.php                 | 1922 -------------
+ changes/views/admin/settings.php                   | 1105 ++++++++
+ changes/views/author/dashboard.php                 | 2452 ++++++++++++++++
+ changes/views/author/editor.php                    |    2 +-
+ changes/views/blog/article.php                     |  799 ------
+ changes/views/components/comments_section.php      |    1 +
+ changes/views/directory/prompt_single.php          |   84 +-
+ changes/views/directory/prompts.php                |  177 +-
+ changes/views/directory/prompts_images.php         |  180 ++
+ changes/views/errors/503.php                       |  129 +
+ changes/views/layouts/admin_header.php             |  645 -----
+ changes/views/layouts/footer.php                   |  197 ++
+ changes/views/layouts/header.php                   |  904 ++++++
+ changes/views/pages/status.php                     |  118 +
+ .../views/public/components/crypto_payment_box.php |  301 +-
+ changes/views/public/sponsor.php                   |    4 +-
+ changes/views/support/index.php                    |  281 ++
+ changes/views/support/ticket.php                   |  260 ++
+ cron.php                                           |  134 +
+ .../2026_09_12_000003_enterprise_enhancements.sql  |   30 +
+ docs/MISTAKES_LEARNED.md                           |   15 +
+ features_roadmap.html                              |  807 ++++--
+ features_roadmap_2.html                            | 1360 ++++++---
+ index.php                                          |   54 +-
+ manifest.json                                      |   17 +
+ sw.js                                              |   56 +
+ views/account/settings.php                         |    2 +-
+ views/admin/advertisements.php                     |    2 +-
+ views/admin/crud/articles.php                      |    2 +-
+ views/admin/crud/campaigns.php                     |    2 +-
+ views/admin/crud/gpts.php                          |    2 +-
+ views/admin/crud/tools.php                         |    2 +-
+ views/admin/settings.php                           |  138 +-
+ views/author/dashboard.php                         |    2 +-
+ views/author/editor.php                            |    2 +-
+ views/components/comments_section.php              |    1 +
+ views/directory/prompt_single.php                  |   84 +-
+ views/directory/prompts.php                        |  177 +-
+ views/directory/prompts_images.php                 |  180 ++
+ views/errors/503.php                               |    2 +-
+ views/layouts/footer.php                           |   43 +
+ views/layouts/header.php                           |    9 +
+ views/pages/status.php                             |  118 +
+ views/public/components/crypto_payment_box.php     |  301 +-
+ views/public/sponsor.php                           |    4 +-
+ views/support/index.php                            |    2 +-
+ views/support/ticket.php                           |    2 +-
+ 89 files changed, 17663 insertions(+), 7742 deletions(-)
+ create mode 100644 app/Controllers/FeedController.php
+ create mode 100644 app/Core/AdRenderer.php
+ create mode 100644 app/Core/RateLimiter.php
+ create mode 100644 app/Core/Totp.php
+ create mode 100644 changes/app/Controllers/AuthController.php
+ create mode 100644 changes/app/Controllers/FeedController.php
+ create mode 100644 changes/app/Controllers/HomeController.php
+ create mode 100644 changes/app/Controllers/PageController.php
+ create mode 100644 changes/app/Core/AdRenderer.php
+ create mode 100644 changes/app/Core/Firewall.php
+ create mode 100644 changes/app/Core/RateLimiter.php
+ create mode 100644 changes/app/Core/Totp.php
+ delete mode 100644 changes/assets/js/main.js
+ create mode 100644 changes/cron.php
+ delete mode 100644 changes/database/enterprise_features_upgrade.sql
+ delete mode 100644 changes/database/migrations/2026_09_12_000001_enterprise_features_upgrade.sql
+ delete mode 100644 changes/database/migrations/2026_09_12_000002_add_social_and_crypto_indices.sql
+ create mode 100644 changes/database/migrations/2026_09_12_000003_enterprise_enhancements.sql
+ create mode 100644 changes/features_roadmap.html
+ create mode 100644 changes/manifest.json
+ create mode 100644 changes/sw.js
+ delete mode 100644 changes/views/admin/analytics.php
+ delete mode 100644 changes/views/admin/content_queue.php
+ create mode 100644 changes/views/admin/crud/articles.php
+ create mode 100644 changes/views/admin/crud/campaigns.php
+ create mode 100644 changes/views/admin/crud/gpts.php
+ create mode 100644 changes/views/admin/crud/tools.php
+ delete mode 100644 changes/views/admin/db_manager.php
+ create mode 100644 changes/views/admin/settings.php
+ create mode 100644 changes/views/author/dashboard.php
+ delete mode 100644 changes/views/blog/article.php
+ create mode 100644 changes/views/directory/prompts_images.php
+ create mode 100644 changes/views/errors/503.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 changes/views/layouts/footer.php
+ create mode 100644 changes/views/layouts/header.php
+ create mode 100644 changes/views/pages/status.php
+ create mode 100644 changes/views/support/index.php
+ create mode 100644 changes/views/support/ticket.php
+ create mode 100644 cron.php
+ create mode 100644 database/migrations/2026_09_12_000003_enterprise_enhancements.sql
+ create mode 100644 manifest.json
+ create mode 100644 sw.js
+ create mode 100644 views/directory/prompts_images.php
+ create mode 100644 views/pages/status.php

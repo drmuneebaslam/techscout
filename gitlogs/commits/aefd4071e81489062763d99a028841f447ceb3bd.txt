@@ -1,0 +1,32 @@
+commit aefd4071e81489062763d99a028841f447ceb3bd
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Tue Sep 8 10:17:24 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Tue Sep 8 10:17:24 2026 +0500
+
+    chore: persist project workflow rules in GEMINI.md and mirror to changes folder
+    
+    - Created GEMINI.md in root directory to persist workspace instructions across every prompt turn (clean changes/ directory first, apply edits, copy updated files to changes/, and git commit)
+    - Cleared prior contents of changes/ directory and synced GEMINI.md into changes/GEMINI.md
+
+ GEMINI.md                              |   15 +
+ changes/GEMINI.md                      |   15 +
+ changes/assets/favicon.svg             |   13 -
+ changes/favicon.ico                    |  Bin 1150 -> 0 bytes
+ changes/index.php                      |  700 --------
+ changes/views/admin/mail.php           | 2716 --------------------------------
+ changes/views/admin/users.php          | 1807 ---------------------
+ changes/views/layouts/admin_footer.php |  609 -------
+ changes/views/layouts/admin_header.php |  472 ------
+ changes/views/layouts/header.php       |  833 ----------
+ 10 files changed, 30 insertions(+), 7150 deletions(-)
+ create mode 100644 GEMINI.md
+ create mode 100644 changes/GEMINI.md
+ delete mode 100644 changes/assets/favicon.svg
+ delete mode 100644 changes/favicon.ico
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/mail.php
+ delete mode 100644 changes/views/admin/users.php
+ delete mode 100644 changes/views/layouts/admin_footer.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/layouts/header.php

@@ -853,6 +853,14 @@ body.light-mode .ts-settings-content-card {
   border-color: #38bdf8;
   background: rgba(56,189,248,0.05);
 }
+[data-theme="light"] .ts-session-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+[data-theme="light"] .ts-session-card-current {
+  background: #f0f9ff;
+  border-color: #7dd3fc;
+}
 
 .ts-session-main {
   display: flex;
@@ -876,6 +884,15 @@ body.light-mode .ts-settings-content-card {
 .ts-session-icon.active {
   color: #38bdf8;
   border-color: rgba(56,189,248,0.3);
+}
+[data-theme="light"] .ts-session-icon {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+[data-theme="light"] .ts-session-icon.active {
+  color: #0284c7;
+  border-color: #bae6fd;
 }
 
 .ts-session-info {
@@ -917,9 +934,16 @@ body.light-mode .ts-settings-content-card {
 .ts-strike-card.active-orange { border-color: #ea580c; background: rgba(234,88,12,0.08); }
 .ts-strike-card.active-red { border-color: #ef4444; background: rgba(239,68,68,0.08); }
 
+[data-theme="light"] .ts-strike-card { background: #ffffff; border-color: #e2e8f0; }
+[data-theme="light"] .ts-strike-card.active-amber { background: #fffbeb; }
+[data-theme="light"] .ts-strike-card.active-orange { background: #fff7ed; }
+[data-theme="light"] .ts-strike-card.active-red { background: #fef2f2; }
+
 .ts-strike-icon { font-size: 1.2rem; line-height: 1; margin-bottom: 0.2rem; }
 .ts-strike-title { font-weight: 700; font-size: 0.78rem; color: #94a3b8; }
 .ts-strike-sub { font-size: 0.68rem; color: #64748b; margin-top: 0.15rem; }
+[data-theme="light"] .ts-strike-title { color: #334155; }
+[data-theme="light"] .ts-strike-sub { color: #64748b; }
 .c-amber { color: #f59e0b !important; }
 .c-orange { color: #ea580c !important; }
 .c-red { color: #ef4444 !important; }
@@ -933,6 +957,11 @@ body.light-mode .ts-settings-content-card {
   background: rgba(16,185,129,0.06);
   border: 1px solid rgba(16,185,129,0.2);
   border-radius: 8px;
+}
+[data-theme="light"] .ts-clean-record-card {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669;
 }
 
 /* 6. Activity Metrics */
@@ -949,12 +978,17 @@ body.light-mode .ts-settings-content-card {
   padding: 0.85rem 0.65rem;
   text-align: center;
 }
+[data-theme="light"] .ts-stat-activity-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
 .ts-stat-num { font-size: 1.4rem; font-weight: 800; font-family: monospace; line-height: 1; }
 .c-cyan { color: #38bdf8; }
 .c-purple { color: #a855f7; }
 .c-green { color: #10b981; }
 
 .ts-stat-label { color: #cbd5e1; font-size: 0.75rem; font-weight: 600; margin-top: 0.35rem; }
+[data-theme="light"] .ts-stat-label { color: #475569; }
 .ts-stat-link { font-size: 0.7rem; text-decoration: none; margin-top: 0.45rem; display: inline-block; font-weight: 600; }
 .ts-stat-badge { color: #64748b; font-size: 0.68rem; display: inline-block; margin-top: 0.45rem; }
 

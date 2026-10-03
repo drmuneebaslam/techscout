@@ -630,6 +630,12 @@
           </select>
         </div>
       </div>
+      <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+        <label class="ts-checkbox-wrapper">
+          <input type="checkbox" name="disable_ads" id="eu_disable_ads" value="1">
+          <span class="ts-checkbox-label" style="font-size: 0.82rem; font-weight: 600; color: #f8fafc;">Disable Advertisements for this User</span>
+        </label>
+      </div>
       <div style="margin-bottom: 1rem;">
         <label class="admin-modal-label">Headline</label>
         <input type="text" name="headline" id="eu_headline" class="admin-modal-input">
@@ -1102,6 +1108,7 @@ function openEditUserModal(u) {
     document.getElementById('eu_role').value = u.role || 'member';
     document.getElementById('eu_status').value = u.status || 'active';
     document.getElementById('eu_badge').value = u.verification_badge || 'none';
+    document.getElementById('eu_disable_ads').checked = parseInt(u.disable_ads) === 1;
     document.getElementById('eu_headline').value = u.headline || '';
     document.getElementById('eu_bio').value = u.bio || '';
     if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();
@@ -1122,6 +1129,7 @@ function openEditUserModal(u) {
           document.getElementById('eu_role').value = usr.role || 'member';
           document.getElementById('eu_status').value = usr.status || 'active';
           document.getElementById('eu_badge').value = usr.verification_badge || 'none';
+          document.getElementById('eu_disable_ads').checked = parseInt(usr.disable_ads) === 1;
           document.getElementById('eu_headline').value = usr.headline || '';
           document.getElementById('eu_bio').value = usr.bio || '';
           if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();

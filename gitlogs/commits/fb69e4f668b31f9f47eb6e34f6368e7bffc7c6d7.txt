@@ -1,0 +1,56 @@
+commit fb69e4f668b31f9f47eb6e34f6368e7bffc7c6d7
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 21:53:21 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 21:53:21 2026 +0500
+
+    Optimize admin panel speed, implement zero-crash FTP backup recovery, and add dynamic white-label configuration
+    
+    - Database & Config: Added 2-second connection timeout, non-fatal hasConnection() verification, automatic localhost bridge for remote InfinityFree credentials, and Config::saveConfig file persistence.
+    - Auto-Recovery Installer: Guarded early index.php bootstrap queries to prevent fatal timeout blank screens, bypassed installer lock when database is disconnected, and added 1-click database connection recovery mode.
+    - Admin Panel Speed: Consolidated 12+ separate database queries into single aggregated index queries with 60-second in-memory caching in Analytics.php and AdminController.php.
+    - Listing Query Memory Optimization: Omitted megabytes of body_html from articles(), tools(), prompts(), and gpts() table listings.
+    - Asset & Layout Caching: Replaced timestamp CSS cache-busters with v=2.5.0 and cached admin layout site settings.
+    - White-Label Studio: Added branding presets and live theme customization.
+    - Registry: Documented MISTAKE-32 in mistakes/ and docs/ MISTAKES_LEARNED.md.
+
+ app/Controllers/AdminController.php             |   25 +-
+ app/Controllers/InstallController.php           |  112 +-
+ app/Core/Config.php                             |  189 ++-
+ app/Core/Database.php                           |   84 +-
+ app/Models/Analytics.php                        |   55 +-
+ changes/app/Controllers/AdminController.php     |   25 +-
+ changes/app/Controllers/DirectoryController.php |  888 -----------
+ changes/app/Controllers/InstallController.php   |  378 +++++
+ changes/app/Core/Config.php                     |  194 ++-
+ changes/app/Core/Database.php                   | 1939 +++++++++++++++++++++++
+ changes/app/Models/Analytics.php                |  461 ++++++
+ changes/docs/MISTAKES_LEARNED.md                |   16 +
+ changes/index.php                               |  843 ++++++++++
+ changes/mistakes/MISTAKES_LEARNED.md            |   16 +
+ changes/user_requests_history.html              |   27 +-
+ changes/views/admin/advertisements.php          |  878 ----------
+ changes/views/admin/crud/categories.php         |  561 -------
+ changes/views/directory/prompt_single.php       |  919 -----------
+ changes/views/install/index.php                 |  644 ++++++++
+ changes/views/install/locked.php                |   59 +
+ changes/views/layouts/admin_header.php          |  651 ++++++++
+ docs/MISTAKES_LEARNED.md                        |   16 +
+ index.php                                       |   65 +-
+ mistakes/MISTAKES_LEARNED.md                    |   16 +
+ user_requests_history.html                      |   27 +-
+ views/install/index.php                         |   78 +
+ views/install/locked.php                        |    7 +
+ views/layouts/admin_header.php                  |   20 +-
+ 28 files changed, 5822 insertions(+), 3371 deletions(-)
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Controllers/InstallController.php
+ create mode 100644 changes/app/Core/Database.php
+ create mode 100644 changes/app/Models/Analytics.php
+ create mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/advertisements.php
+ delete mode 100644 changes/views/admin/crud/categories.php
+ delete mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 changes/views/install/index.php
+ create mode 100644 changes/views/install/locked.php
+ create mode 100644 changes/views/layouts/admin_header.php

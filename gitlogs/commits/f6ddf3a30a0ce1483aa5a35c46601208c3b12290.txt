@@ -1,0 +1,67 @@
+commit f6ddf3a30a0ce1483aa5a35c46601208c3b12290
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 22:03:04 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 22:03:04 2026 +0500
+
+    feat(perf-cursor-cache): implement site-wide Keyset Cursor Pagination, 2vCPU/2GB-optimized tag-aware caching with targeted auto-invalidation, and comprehensive dual-theme device testing checklist
+
+ app/Controllers/AdminController.php                |   15 +
+ app/Controllers/ApiController.php                  |   32 +
+ app/Core/Cache.php                                 |  248 +++
+ app/Core/CursorPaginator.php                       |  111 +
+ app/Core/Database.php                              |   20 +
+ app/Core/IncomingWebhookEngine.php                 |    9 +
+ app/Models/Comment.php                             |  137 +-
+ app/Models/Content.php                             |   15 +-
+ changes/app/Controllers/AdminController.php        |   15 +
+ changes/app/Controllers/ApiController.php          | 2230 ++++++++++++++++++++
+ changes/app/Controllers/CustomApiController.php    |  998 ---------
+ .../app/Controllers/IncomingWebhookController.php  |  195 --
+ changes/app/Core/Cache.php                         |  248 +++
+ changes/app/Core/CursorPaginator.php               |  111 +
+ changes/app/Core/Database.php                      |  718 +++++++
+ changes/app/Core/IncomingWebhookEngine.php         |    9 +
+ changes/app/Core/NotificationHelper.php            |  377 ----
+ changes/app/Models/Comment.php                     |  142 ++
+ changes/app/Models/Content.php                     |  315 +++
+ changes/app/Models/CreatorTipping.php              |  166 --
+ changes/app/Models/LinkScanner.php                 |  226 --
+ changes/assets/js/content-engine.js                |  204 --
+ ...6_09_26_000002_webhook_and_api_gateway_100x.sql |   53 -
+ ...HIGH_CONCURRENCY_AND_PAGINATION_ARCHITECTURE.md |  166 --
+ .../SYSTEM_TESTING_AND_VERIFICATION_CHECKLIST.md   |   88 +
+ changes/index.php                                  |    3 +
+ changes/views/admin/custom_api_endpoints.php       | 1007 ---------
+ changes/views/admin/incoming_webhooks.php          |  965 ---------
+ changes/views/admin/system_logs.php                |  704 ------
+ changes/views/components/comments_section.php      |  861 ++++++++
+ changes/views/directory/prompt_single.php          | 1079 ----------
+ cintu.txt                                          |   10 +-
+ .../SYSTEM_TESTING_AND_VERIFICATION_CHECKLIST.md   |   88 +
+ index.php                                          |    3 +
+ views/components/comments_section.php              |  109 +-
+ 35 files changed, 5496 insertions(+), 6181 deletions(-)
+ create mode 100644 app/Core/Cache.php
+ create mode 100644 app/Core/CursorPaginator.php
+ create mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Controllers/CustomApiController.php
+ delete mode 100644 changes/app/Controllers/IncomingWebhookController.php
+ create mode 100644 changes/app/Core/Cache.php
+ create mode 100644 changes/app/Core/CursorPaginator.php
+ create mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Core/NotificationHelper.php
+ create mode 100644 changes/app/Models/Comment.php
+ create mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/app/Models/CreatorTipping.php
+ delete mode 100644 changes/app/Models/LinkScanner.php
+ delete mode 100644 changes/assets/js/content-engine.js
+ delete mode 100644 changes/database/migrations/2026_09_26_000002_webhook_and_api_gateway_100x.sql
+ delete mode 100644 changes/docs/HIGH_CONCURRENCY_AND_PAGINATION_ARCHITECTURE.md
+ create mode 100644 changes/docs/qa/SYSTEM_TESTING_AND_VERIFICATION_CHECKLIST.md
+ delete mode 100644 changes/views/admin/custom_api_endpoints.php
+ delete mode 100644 changes/views/admin/incoming_webhooks.php
+ delete mode 100644 changes/views/admin/system_logs.php
+ create mode 100644 changes/views/components/comments_section.php
+ delete mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 docs/qa/SYSTEM_TESTING_AND_VERIFICATION_CHECKLIST.md

@@ -1,0 +1,46 @@
+commit d04b485c7aa48845c1e2dd8b84f7ac106c73c045
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Wed Sep 30 22:30:41 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Wed Sep 30 22:30:41 2026 +0500
+
+    Fix duplicate getRecentCapturedPayloads, enhance PopupManager resilience, add aspect_ratio in Content queries, and fix schema syntax
+
+ app/Core/IncomingWebhookEngine.php                 |   43 -
+ app/Core/PopupManager.php                          |  237 +-
+ app/Models/Content.php                             |    4 +-
+ changes/app/Controllers/AdminController.php        | 9447 --------------------
+ changes/app/Core/Config.php                        |  254 -
+ changes/app/Core/IncomingWebhookEngine.php         |   43 -
+ changes/app/Core/PopupManager.php                  |  464 +
+ changes/app/Core/PricingEngine.php                 |  332 -
+ changes/app/Models/Content.php                     |  316 +
+ ...001_webhook_listener_mode_and_pricing_cache.sql |   15 -
+ changes/database/schema.sql                        |    2 +
+ ...FEATURES_MASTER_SPECIFICATION_AND_TEST_CASES.md |  341 -
+ changes/index.php                                  | 1001 ---
+ changes/views/admin/advertisements.php             |  924 --
+ changes/views/admin/incoming_webhooks.php          | 1381 ---
+ changes/views/admin/popups.php                     |  421 -
+ cintu.txt                                          |  378 +-
+ database/schema.sql                                |    2 +
+ ...8ccd784b210b3617b9d472e0de198a033a357f9a6.cache |    1 +
+ ...486b43fef0d19bec1010b96f36b0b2de1ffcd89fd.cache |    1 +
+ ...e5bc1c463e76d2f54b9b285ac836e3eeac1f886dd.cache |    1 +
+ storage/cache/tags/contents.tag                    |    3 +
+ 22 files changed, 956 insertions(+), 14655 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Core/Config.php
+ create mode 100644 changes/app/Core/PopupManager.php
+ delete mode 100644 changes/app/Core/PricingEngine.php
+ create mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/database/migrations/2026_09_30_000001_webhook_listener_mode_and_pricing_cache.sql
+ delete mode 100644 changes/docs/PROJECT_FEATURES_MASTER_SPECIFICATION_AND_TEST_CASES.md
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/advertisements.php
+ delete mode 100644 changes/views/admin/incoming_webhooks.php
+ delete mode 100644 changes/views/admin/popups.php
+ create mode 100644 storage/cache/3d/3d8c2aec73fa02869c927608ccd784b210b3617b9d472e0de198a033a357f9a6.cache
+ create mode 100644 storage/cache/cf/cfb437480f0ead5b1281ecc486b43fef0d19bec1010b96f36b0b2de1ffcd89fd.cache
+ create mode 100644 storage/cache/d2/d22ccb849827d6c71bb6856e5bc1c463e76d2f54b9b285ac836e3eeac1f886dd.cache
+ create mode 100644 storage/cache/tags/contents.tag

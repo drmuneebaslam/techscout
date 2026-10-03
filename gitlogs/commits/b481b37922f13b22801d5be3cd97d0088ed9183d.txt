@@ -1,0 +1,18 @@
+commit b481b37922f13b22801d5be3cd97d0088ed9183d
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Wed Sep 30 22:31:29 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Wed Sep 30 22:31:29 2026 +0500
+
+    Untrack runtime storage/cache and add to .gitignore
+
+ .gitignore                                                             | 2 ++
+ ...c2aec73fa02869c927608ccd784b210b3617b9d472e0de198a033a357f9a6.cache | 1 -
+ ...437480f0ead5b1281ecc486b43fef0d19bec1010b96f36b0b2de1ffcd89fd.cache | 1 -
+ ...ccb849827d6c71bb6856e5bc1c463e76d2f54b9b285ac836e3eeac1f886dd.cache | 1 -
+ storage/cache/tags/contents.tag                                        | 3 ---
+ 5 files changed, 2 insertions(+), 6 deletions(-)
+ delete mode 100644 storage/cache/3d/3d8c2aec73fa02869c927608ccd784b210b3617b9d472e0de198a033a357f9a6.cache
+ delete mode 100644 storage/cache/cf/cfb437480f0ead5b1281ecc486b43fef0d19bec1010b96f36b0b2de1ffcd89fd.cache
+ delete mode 100644 storage/cache/d2/d22ccb849827d6c71bb6856e5bc1c463e76d2f54b9b285ac836e3eeac1f886dd.cache
+ delete mode 100644 storage/cache/tags/contents.tag

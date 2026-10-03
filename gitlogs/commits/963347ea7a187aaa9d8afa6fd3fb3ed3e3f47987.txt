@@ -1,0 +1,22 @@
+commit 963347ea7a187aaa9d8afa6fd3fb3ed3e3f47987
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Tue Sep 8 10:22:31 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Tue Sep 8 10:22:31 2026 +0500
+
+    fix(js): resolve JavaScript syntax errors and missing window function bindings in mail and users views
+    
+    - In views/admin/mail.php, fixed unclosed tab check 'if (tab)' and unclosed DOMContentLoaded event listener which caused 'SyntaxError: Unexpected end of input' line 7419 and prevented script parsing
+    - In views/admin/mail.php, exposed all interactive functions (switchMailTab, filterUserDirectory, filterMailLogsLive, filterTemplateCardsLive, onTemplateCredChanged, submitBatchTemplateCredentials, openCreateTemplateModal, resetTemplateForm, toggleProviderFields, toggleSelectAllUsers, updateSelectedUserCount, etc.) to window scope so onclick handlers work seamlessly
+    - In views/admin/users.php, added missing closing braces '});' for DOMContentLoaded listener resolving 'SyntaxError: Unexpected end of input'
+    - Cleaned changes/ folder and synchronized only modified core project view files (changes/views/admin/mail.php and changes/views/admin/users.php)
+
+ changes/GEMINI.md             |   17 -
+ changes/views/admin/mail.php  | 2728 +++++++++++++++++++++++++++++++++++++++++
+ changes/views/admin/users.php | 1809 +++++++++++++++++++++++++++
+ views/admin/mail.php          |   14 +-
+ views/admin/users.php         |    2 +
+ 5 files changed, 4552 insertions(+), 18 deletions(-)
+ delete mode 100644 changes/GEMINI.md
+ create mode 100644 changes/views/admin/mail.php
+ create mode 100644 changes/views/admin/users.php

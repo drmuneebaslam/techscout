@@ -1,0 +1,31 @@
+commit aa6ef2a14bbd5699c5a067644a151dbd77ccbc67
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 22:06:31 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 22:06:31 2026 +0500
+
+    Fix setup wizard authorization lock on fresh installs, auto-create database, and add custom SQL dump upload support
+
+ app/Controllers/InstallController.php         |   88 +-
+ changes/app/Controllers/AdminController.php   | 8737 -------------------------
+ changes/app/Controllers/InstallController.php |   88 +-
+ changes/app/Core/Database.php                 | 1939 ------
+ changes/app/Models/Analytics.php              |  461 --
+ changes/docs/MISTAKES_LEARNED.md              |   18 +-
+ changes/index.php                             |   25 +-
+ changes/mistakes/MISTAKES_LEARNED.md          |   18 +-
+ changes/user_requests_history.html            |   32 +-
+ changes/views/install/index.php               |   64 +-
+ changes/views/install/locked.php              |   59 -
+ changes/views/layouts/admin_header.php        |  651 --
+ docs/MISTAKES_LEARNED.md                      |   18 +-
+ index.php                                     |   25 +-
+ mistakes/MISTAKES_LEARNED.md                  |   18 +-
+ user_requests_history.html                    |   32 +-
+ views/install/index.php                       |   64 +-
+ 17 files changed, 414 insertions(+), 11923 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Models/Analytics.php
+ delete mode 100644 changes/views/install/locked.php
+ delete mode 100644 changes/views/layouts/admin_header.php

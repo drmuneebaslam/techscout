@@ -1,0 +1,87 @@
+commit 65eea42df625ebbbcf999d0770772dfdf4ab32d0
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 24 00:11:16 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 24 00:11:16 2026 +0500
+
+    fix(db-manager): isolate executeDbQuery from fatal error logger, add EC2 deploy & migration sync runner, and register Rule 8
+    
+    - Isolate DB Manager Query Terminal in AdminController.php so syntax errors (e.g. 'show prompt') return HTTP 400 JSON without fatal crash or error logs
+    - Add database/migrations/2026_09_23_000001_enterprise_v2_upgrade.sql for automated migration tracking
+    - Implement deployPull in AdminController.php and v1DeploySync in ApiController.php
+    - Create scripts/ec2_deploy_and_migrate.sh for EC2 production deployment and database migration sync
+    - Add 1-click 'Sync & Run Migrations' buttons in System and DB Manager UIs
+    - Add Rule 8 to GEMINI.md establishing EC2 synchronization and migration execution as mandatory workflow
+
+ GEMINI.md                                          |    6 +
+ app/Controllers/AdminController.php                |   78 +-
+ app/Controllers/ApiController.php                  |   60 +
+ changes/.htaccess                                  |   76 -
+ changes/GEMINI.md                                  |   43 +
+ changes/app/Controllers/AdminController.php        |   78 +-
+ changes/app/Controllers/ApiController.php          |   60 +
+ changes/app/Controllers/DirectoryController.php    |  937 ------
+ changes/app/Controllers/FeedController.php         |  325 ---
+ .../app/Controllers/IncomingWebhookController.php  |   84 -
+ changes/app/Core/AdRenderer.php                    |  167 --
+ changes/app/Core/BearerAuth.php                    |  147 -
+ changes/app/Core/Config.php                        |  248 --
+ changes/app/Core/IncomingWebhookEngine.php         |  232 --
+ changes/app/Core/PopupManager.php                  |  377 ---
+ changes/assets/css/style.css                       | 3043 --------------------
+ changes/assets/js/main.js                          | 1065 -------
+ .../2026_09_23_000001_enterprise_v2_upgrade.sql}   |    8 +-
+ changes/database/schema.sql                        | 1559 ----------
+ .../AWS_SES_AND_PORT_25_UNBLOCKING_APPLICATION.md  |  154 -
+ .../GOOGLE_SEARCH_CONSOLE_AND_INDEXING_SETUP.md    |  100 -
+ changes/index.php                                  |    6 +
+ changes/scripts/ec2_db_backup.sh                   |   42 -
+ changes/scripts/ec2_deploy_and_migrate.sh          |  107 +
+ changes/views/admin/advertisements.php             |  909 ------
+ changes/views/admin/db_manager.php                 | 1942 +++++++++++++
+ changes/views/admin/incoming_webhooks.php          |  520 ----
+ changes/views/admin/popups.php                     |  268 --
+ changes/views/admin/system.php                     |  197 ++
+ changes/views/directory/prompt_single.php          |  980 -------
+ changes/views/directory/prompts.php                |  366 ---
+ changes/views/directory/prompts_images.php         |  199 --
+ changes/views/layouts/admin_header.php             |  668 -----
+ changes/views/layouts/footer.php                   |  214 --
+ changes/views/layouts/header.php                   |  959 ------
+ .../2026_09_23_000001_enterprise_v2_upgrade.sql    |  106 +
+ index.php                                          |    6 +
+ scripts/ec2_deploy_and_migrate.sh                  |  107 +
+ views/admin/db_manager.php                         |    5 +
+ views/admin/system.php                             |   19 +-
+ 40 files changed, 2810 insertions(+), 13657 deletions(-)
+ delete mode 100644 changes/.htaccess
+ create mode 100644 changes/GEMINI.md
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ delete mode 100644 changes/app/Controllers/FeedController.php
+ delete mode 100644 changes/app/Controllers/IncomingWebhookController.php
+ delete mode 100644 changes/app/Core/AdRenderer.php
+ delete mode 100644 changes/app/Core/BearerAuth.php
+ delete mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ delete mode 100644 changes/app/Core/PopupManager.php
+ delete mode 100644 changes/assets/css/style.css
+ delete mode 100644 changes/assets/js/main.js
+ rename changes/database/{enterprise_v2_upgrade.sql => migrations/2026_09_23_000001_enterprise_v2_upgrade.sql} (97%)
+ delete mode 100644 changes/database/schema.sql
+ delete mode 100644 changes/docs/AWS_SES_AND_PORT_25_UNBLOCKING_APPLICATION.md
+ delete mode 100644 changes/docs/GOOGLE_SEARCH_CONSOLE_AND_INDEXING_SETUP.md
+ delete mode 100644 changes/scripts/ec2_db_backup.sh
+ create mode 100644 changes/scripts/ec2_deploy_and_migrate.sh
+ delete mode 100644 changes/views/admin/advertisements.php
+ create mode 100644 changes/views/admin/db_manager.php
+ delete mode 100644 changes/views/admin/incoming_webhooks.php
+ delete mode 100644 changes/views/admin/popups.php
+ create mode 100644 changes/views/admin/system.php
+ delete mode 100644 changes/views/directory/prompt_single.php
+ delete mode 100644 changes/views/directory/prompts.php
+ delete mode 100644 changes/views/directory/prompts_images.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/layouts/footer.php
+ delete mode 100644 changes/views/layouts/header.php
+ create mode 100644 database/migrations/2026_09_23_000001_enterprise_v2_upgrade.sql
+ create mode 100644 scripts/ec2_deploy_and_migrate.sh

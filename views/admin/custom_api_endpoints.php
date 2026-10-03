@@ -297,7 +297,7 @@
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
         <div style="display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/custom/') ?></span>
-          <input type="text" name="slug" placeholder="prompts-catalog" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+          <input type="text" name="slug" placeholder="prompts-catalog" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
         </div>
       </div>
 
@@ -391,7 +391,7 @@
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
         <div style="display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/custom/') ?></span>
-          <input type="text" name="slug" id="editEndpointSlug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+          <input type="text" name="slug" id="editEndpointSlug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
         </div>
       </div>
 

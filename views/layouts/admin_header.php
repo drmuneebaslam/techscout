@@ -257,6 +257,47 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       document.documentElement.classList.add('sidebar-init-collapsed');
     }
   </script>
+  <!-- Frontend Telemetry: JS Error Logging -->
+  <script>
+    (function() {
+      function sendError(data) {
+        if (data.message === 'Script error.' || data.message.includes('Extension context invalidated')) return;
+        try {
+          // Fire-and-forget telemetry beacon
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon('/api/v1/telemetry/client-error', JSON.stringify(data));
+          } else {
+            fetch('/api/v1/telemetry/client-error', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+              keepalive: true
+            }).catch(e => {});
+          }
+        } catch(e) {}
+      }
+
+      window.addEventListener('error', function(e) {
+        sendError({
+          message: e.message || 'Unknown JS Error',
+          source: e.filename || '',
+          lineno: e.lineno || 0,
+          colno: e.colno || 0,
+          stack: (e.error && e.error.stack) ? e.error.stack : '',
+          url: window.location.href
+        });
+      });
+
+      window.addEventListener('unhandledrejection', function(e) {
+        sendError({
+          message: e.reason ? (e.reason.message || e.reason.toString()) : 'Unhandled Promise Rejection',
+          source: 'PromiseRejection',
+          stack: (e.reason && e.reason.stack) ? e.reason.stack : '',
+          url: window.location.href
+        });
+      });
+    })();
+  </script>
 </head>
 <body data-theme="<?= $activeAdminTheme ?>" class="admin-body <?= $activeAdminTheme === 'light' ? 'theme-light' : '' ?> <?= (!empty($adminSiteSettings['enable_bg_grid_lines']) && $adminSiteSettings['enable_bg_grid_lines'] === '1') ? 'ts-bg-grid-lines' : '' ?>">
 <script>
@@ -565,7 +606,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/api-keys') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/api-keys') ? 'active' : '' ?>" data-tooltip="REST API Keys">
                 <i data-lucide="key"></i> <span>Developer API Keys</span>
               </a>
-              <a href="<?= url('/admin/webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/webhooks') ? 'active' : '' ?>" data-tooltip="Outbound Webhooks">
+              <a href="<?= url('/admin/webhooks') ?>" class="admin-nav-link <?= ($currentPath === '/admin/webhooks' || str_starts_with($currentPath, '/admin/webhooks/')) ? 'active' : '' ?>" data-tooltip="Outbound Webhooks">
                 <i data-lucide="webhook"></i> <span>Outbound Webhooks</span>
               </a>
               <a href="<?= url('/admin/incoming-webhooks') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/incoming-webhooks') ? 'active' : '' ?>" data-tooltip="Incoming Webhook Listener">
@@ -594,7 +635,7 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               </a>
             <?php endif; ?>
             <?php if ($isSuperAdmin || $canAccess('system.flags') || $canAccess('cms.settings')): ?>
-              <a href="<?= url('/admin/system') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/system') ? 'active' : '' ?>" data-tooltip="System Settings & Diagnostics">
+              <a href="<?= url('/admin/system') ?>" class="admin-nav-link <?= ($currentPath === '/admin/system' || str_starts_with($currentPath, '/admin/system/')) && !str_starts_with($currentPath, '/admin/system-logs') ? 'active' : '' ?>" data-tooltip="System Settings & Diagnostics">
                 <i data-lucide="cpu"></i> <span>System Diagnostics</span>
               </a>
             <?php endif; ?>

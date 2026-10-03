@@ -538,8 +538,8 @@ body.admin-body {
 .admin-stat-card {
   background: var(--admin-bg-card);
   border: 1px solid var(--admin-border-main);
-  border-radius: 14px;
-  padding: 1.5rem;
+  border-radius: 10px;
+  padding: 1rem;
   position: relative;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;

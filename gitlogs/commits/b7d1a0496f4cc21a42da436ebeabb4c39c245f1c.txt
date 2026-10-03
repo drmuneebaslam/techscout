@@ -1,0 +1,49 @@
+commit b7d1a0496f4cc21a42da436ebeabb4c39c245f1c
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Mon Sep 7 21:30:58 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Mon Sep 7 21:30:58 2026 +0500
+
+    fix(admin): restore sidebar visibility for all admin roles and implement seamless SPA/PJAX navigation
+    
+    - Fix role matching in app/Models/RBAC.php and views/layouts/admin_header.php to properly recognize super_admin, superadmin, and unrestricted admin roles so the admin sidebar displays completely
+    - Add high-performance SPA/PJAX seamless navigation engine in views/layouts/admin_footer.php and admin_header.php with animated top progress bar, smooth DOM wrapper swapping, history pushState, scroll retention, script execution, and Lucide icon rehydration
+    - Update changes directory to contain strictly the newly modified files
+
+ app/Controllers/AdminController.php          |    2 +-
+ app/Models/RBAC.php                          |   28 +-
+ changes/app/Controllers/AdminController.php  |    2 +-
+ changes/app/Controllers/PageController.php   |  135 --
+ changes/app/Core/Database.php                | 1716 ----------------
+ changes/app/Models/RBAC.php                  |  157 ++
+ changes/database/help_legal_upgrade.sql      |  338 ----
+ changes/database/schema.sql                  | 1447 --------------
+ changes/index.php                            |  688 -------
+ changes/views/admin/help_article_editor.php  |  334 ----
+ changes/views/admin/help_articles.php        |  170 --
+ changes/views/admin/legal_page_editor.php    |  134 --
+ changes/views/admin/legal_pages.php          |   76 -
+ changes/views/admin/mail.php                 | 2683 --------------------------
+ changes/views/admin/mail_template_editor.php |  299 ---
+ changes/views/layouts/admin_footer.php       |  583 ++++++
+ changes/views/layouts/admin_header.php       |   48 +-
+ changes/views/pages/help.php                 |  967 ----------
+ changes/views/pages/legal_page.php           |   46 -
+ views/layouts/admin_footer.php               |  266 ++-
+ views/layouts/admin_header.php               |   48 +-
+ 21 files changed, 1105 insertions(+), 9062 deletions(-)
+ delete mode 100644 changes/app/Controllers/PageController.php
+ delete mode 100644 changes/app/Core/Database.php
+ create mode 100644 changes/app/Models/RBAC.php
+ delete mode 100644 changes/database/help_legal_upgrade.sql
+ delete mode 100644 changes/database/schema.sql
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/help_article_editor.php
+ delete mode 100644 changes/views/admin/help_articles.php
+ delete mode 100644 changes/views/admin/legal_page_editor.php
+ delete mode 100644 changes/views/admin/legal_pages.php
+ delete mode 100644 changes/views/admin/mail.php
+ delete mode 100644 changes/views/admin/mail_template_editor.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ delete mode 100644 changes/views/pages/help.php
+ delete mode 100644 changes/views/pages/legal_page.php

@@ -1,0 +1,12 @@
+commit cf5d8c17b24caf910f8508a5d7ff319eb585dcb0
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 12:49:44 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 12:49:44 2026 +0500
+
+    docs: Rewrite features, functions, and QA guides based on strict codebase and log analysis
+
+ docs/FEATURES_LIST.md    |  7324 +----------------------------
+ docs/FUNCTIONS_LIST.md   |  7592 +-----------------------------
+ docs/QA_TESTING_GUIDE.md | 11302 +--------------------------------------------
+ 3 files changed, 256 insertions(+), 25962 deletions(-)

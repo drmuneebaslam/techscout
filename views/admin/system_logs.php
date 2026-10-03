@@ -35,7 +35,7 @@ require __DIR__ . '/../layouts/admin_header.php';
   </div>
 
   <!-- Telemetry HUD Stats Grid -->
-  <div class="admin-stats-grid" style="margin-bottom: 2rem;">
+  <div class="admin-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
     <div class="admin-stat-card" style="border-top: 3px solid #6366f1;">
       <div class="admin-stat-label">Total Error Events</div>
       <div class="admin-stat-value" style="color: #f8fafc; font-family: var(--admin-font-mono);"><?= number_format($stats['total']) ?></div>
@@ -58,6 +58,18 @@ require __DIR__ . '/../layouts/admin_header.php';
       <div class="admin-stat-label">Database Exceptions</div>
       <div class="admin-stat-value" style="color: #f59e0b; font-family: var(--admin-font-mono);"><?= number_format($stats['db_errors']) ?></div>
       <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 0.25rem;">SQLState query exceptions</div>
+    </div>
+
+    <div class="admin-stat-card" style="border-top: 3px solid #eab308;">
+      <div class="admin-stat-label">Client JS Errors</div>
+      <div class="admin-stat-value" style="color: #eab308; font-family: var(--admin-font-mono);"><?= number_format($stats['client_js']) ?></div>
+      <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 0.25rem;">Frontend scripts</div>
+    </div>
+
+    <div class="admin-stat-card" style="border-top: 3px solid #94a3b8;">
+      <div class="admin-stat-label">404 Routes</div>
+      <div class="admin-stat-value" style="color: #94a3b8; font-family: var(--admin-font-mono);"><?= number_format($stats['not_found']) ?></div>
+      <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 0.25rem;">Missing endpoints</div>
     </div>
   </div>
 

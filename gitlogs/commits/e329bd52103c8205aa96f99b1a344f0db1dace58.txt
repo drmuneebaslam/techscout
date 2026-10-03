@@ -1,0 +1,25 @@
+commit e329bd52103c8205aa96f99b1a344f0db1dace58
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 17:21:17 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 17:21:17 2026 +0500
+
+    Revert 'Extract 140+ inline styles to CSS files for all layouts' as it broke PHP inline logic
+
+ assets/css/admin.css                   |  169 --
+ assets/css/style.css                   |  331 ----
+ changes/assets/css/admin.css           | 2757 --------------------------
+ changes/assets/css/style.css           | 3385 --------------------------------
+ changes/views/layouts/admin_footer.php |  588 ------
+ changes/views/layouts/admin_header.php |  111 +-
+ changes/views/layouts/footer.php       |  214 --
+ changes/views/layouts/header.php       |  256 +--
+ views/layouts/admin_footer.php         |   88 +-
+ views/layouts/admin_header.php         |  111 +-
+ views/layouts/footer.php               |   38 +-
+ views/layouts/header.php               |  256 +--
+ 12 files changed, 471 insertions(+), 7833 deletions(-)
+ delete mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/assets/css/style.css
+ delete mode 100644 changes/views/layouts/admin_footer.php
+ delete mode 100644 changes/views/layouts/footer.php

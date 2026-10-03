@@ -307,7 +307,7 @@
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
         <div style="display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
-          <input type="text" name="slug" id="new_wh_slug" placeholder="midjourney-prompts" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+          <input type="text" name="slug" id="new_wh_slug" placeholder="midjourney-prompts" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
         </div>
       </div>
 
@@ -380,7 +380,7 @@
 
     <!-- Scrollable Form Body -->
     <div style="padding: 1.5rem; overflow-y: auto; flex: 1;">
-      <form id="editGeneralForm" onsubmit="submitEditWebhookForm(event)">
+      <form id="editGeneralForm" action="<?= url('/admin/incoming-webhooks/save') ?>" onsubmit="submitEditWebhookForm(event)">
         <input type="hidden" name="id" id="edit_wh_id">
         <input type="hidden" name="mapping_rules_json" id="edit_wh_mapping_rules_json">
 
@@ -393,7 +393,7 @@
           <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
           <div style="display: flex; align-items: center; gap: 0.4rem;">
             <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
-            <input type="text" name="slug" id="edit_wh_slug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_-]+">
+            <input type="text" name="slug" id="edit_wh_slug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
           </div>
         </div>
 
@@ -613,7 +613,7 @@ print(response.status_code, response.json())</pre>
             </button>
           </div>
         </div>
-        <pre id="sampleModalPayloadBox" style="height: 300px; overflow-y: auto; margin: 0; color: #f8fafc; font-family: var(--admin-font-mono); font-size: 0.78rem; white-space: pre-wrap;"><?= htmlspecialchars(json_encode(\App\Core\IncomingWebhookEngine::getSamplePayloadForTable('prompts'), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></pre>
+        <pre id="sampleModalPayloadBox" style="height: 300px; overflow-y: auto; margin: 0; color: #f8fafc !important; font-family: var(--admin-font-mono); font-size: 0.78rem; white-space: pre-wrap;"><?= htmlspecialchars(json_encode(\App\Core\IncomingWebhookEngine::getSamplePayloadForTable('prompts'), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></pre>
       </div>
     </div>
   </div>

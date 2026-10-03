@@ -1,0 +1,13 @@
+commit a92d6dfaef7e2593d80954bf6a9df84f748833a1
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 22:03:22 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 22:03:22 2026 +0500
+
+    fix: ensure FeedController joins contents table and DirectoryController uses Content::getFeed for image prompts
+
+ app/Controllers/DirectoryController.php         | 12 +-----
+ app/Controllers/FeedController.php              | 53 ++++++++++++++++++++++---
+ changes/app/Controllers/DirectoryController.php | 12 +-----
+ changes/app/Controllers/FeedController.php      | 53 ++++++++++++++++++++++---
+ 4 files changed, 98 insertions(+), 32 deletions(-)

@@ -1,0 +1,12 @@
+commit dbc65c7512a0616424e23265568307279739d26a
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 6 21:42:53 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 6 21:42:53 2026 +0500
+
+    Restore: Reconstructed newsletters.php, CreatorTipping.php, and AuthController.php from transcript
+
+ app/Controllers/AuthController.php |   41 +-
+ app/Models/CreatorTipping.php      |    7 +-
+ views/admin/newsletters.php        | 1266 +++++++++++++++++++++++++++++-------
+ 3 files changed, 1071 insertions(+), 243 deletions(-)

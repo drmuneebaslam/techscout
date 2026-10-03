@@ -45,6 +45,10 @@ class AdRenderer {
                     return true;
                 }
             }
+            // 4. Per-user flag to disable ads
+            if (!empty($user['disable_ads'])) {
+                return true;
+            }
 
             return false;
         } catch (\Throwable $e) {

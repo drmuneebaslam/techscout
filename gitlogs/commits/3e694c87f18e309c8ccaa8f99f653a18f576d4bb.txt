@@ -1,0 +1,13 @@
+commit 3e694c87f18e309c8ccaa8f99f653a18f576d4bb
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 16:38:36 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 16:38:36 2026 +0500
+
+    Fix CSS Cache-busting for Cloudfront during development and remove legacy icons
+
+ changes/views/layouts/admin_header.php | 10 ++++++----
+ changes/views/layouts/header.php       | 10 ++++++----
+ views/layouts/admin_header.php         | 10 ++++++----
+ views/layouts/header.php               | 10 ++++++----
+ 4 files changed, 24 insertions(+), 16 deletions(-)

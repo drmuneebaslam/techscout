@@ -1,0 +1,38 @@
+commit 944c0ada6837c921d13fa019b7f71259651c1fab
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Tue Sep 8 10:50:01 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Tue Sep 8 10:50:01 2026 +0500
+
+    feat(admin): high-speed PJAX navigation fast-path, 10-category mail variable engine, event trigger deduplication, and error badge fix
+    
+    - Restored System Error Logs Error Type column badges (🗄️ DATABASE_ERROR, DATABASE_SILENT_ERROR, ✓ RESOLVED) in views/admin/system_logs.php
+    - Optimized SPA/PJAX navigation speed (<100ms) by implementing header fast-path in views/layouts/admin_header.php and admin_footer.php, bypassing outer shell re-rendering on X-PJAX requests
+    - Auto-bound all view script function declarations to global window scope in executeSwappedScripts (admin_footer.php) and mail.php, eliminating 'ReferenceError: switchMailTab is not defined'
+    - Expanded template variable dictionary into 10 comprehensive categories with 60+ tokens in AdminController.php and views/admin/mail.php
+    - Built App/Core/EventTriggerEngine.php for custom event mail triggers and single-delivery duplicate email prevention
+    - Added universal responsive container rules (min-width: 640px; overflow-x: auto) in assets/css/style.css for scrollable admin tables
+    - Synchronized all modified core files into changes/ folder
+
+ app/Controllers/AdminController.php         |  104 +-
+ app/Core/EventTriggerEngine.php             |  174 ++
+ assets/css/style.css                        |    9 +
+ changes/app/Controllers/AdminController.php |  104 +-
+ changes/app/Core/EventTriggerEngine.php     |  174 ++
+ changes/assets/css/style.css                | 2775 +++++++++++++++++++++++++++
+ changes/views/admin/mail.php                | 2727 ++++++++++++++++++++++++++
+ changes/views/admin/system_logs.php         |  687 +++++++
+ changes/views/layouts/admin_footer.php      |  618 ++++++
+ changes/views/layouts/admin_header.php      |  480 +++++
+ views/admin/mail.php                        |    5 +-
+ views/admin/system_logs.php                 |    6 +-
+ views/layouts/admin_footer.php              |    9 +
+ views/layouts/admin_header.php              |    8 +
+ 14 files changed, 7840 insertions(+), 40 deletions(-)
+ create mode 100644 app/Core/EventTriggerEngine.php
+ create mode 100644 changes/app/Core/EventTriggerEngine.php
+ create mode 100644 changes/assets/css/style.css
+ create mode 100644 changes/views/admin/mail.php
+ create mode 100644 changes/views/admin/system_logs.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 changes/views/layouts/admin_header.php

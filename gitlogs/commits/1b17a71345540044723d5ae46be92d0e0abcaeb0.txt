@@ -1,0 +1,36 @@
+commit 1b17a71345540044723d5ae46be92d0e0abcaeb0
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Tue Sep 8 11:04:02 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Tue Sep 8 11:04:02 2026 +0500
+
+    feat: Full-screen 2-column mail template editor modal with live iframe preview, 10 variable categories, asset cache busting, and Event Triggers & Automations management center
+
+ app/Controllers/AdminController.php          |   67 +
+ changes/app/Controllers/AdminController.php  |   67 +
+ changes/app/Core/Database.php                | 1721 ----------------
+ changes/app/Core/EventTriggerEngine.php      |  174 --
+ changes/app/Core/Mailer.php                  | 1671 ----------------
+ changes/assets/css/style.css                 | 2775 --------------------------
+ changes/index.php                            |  702 +++++++
+ changes/views/admin/mail.php                 |  565 +++++-
+ changes/views/admin/mail_template_editor.php |  746 +++++++
+ changes/views/admin/system_logs.php          |  687 -------
+ changes/views/layouts/admin_footer.php       |  618 ------
+ changes/views/layouts/admin_header.php       |    4 +-
+ changes/views/layouts/header.php             |  833 ++++++++
+ index.php                                    |    2 +
+ views/admin/mail.php                         |  565 +++++-
+ views/admin/mail_template_editor.php         |  447 +++++
+ views/layouts/admin_header.php               |    4 +-
+ views/layouts/header.php                     |    2 +-
+ 18 files changed, 3835 insertions(+), 7815 deletions(-)
+ delete mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Core/EventTriggerEngine.php
+ delete mode 100644 changes/app/Core/Mailer.php
+ delete mode 100644 changes/assets/css/style.css
+ create mode 100644 changes/index.php
+ create mode 100644 changes/views/admin/mail_template_editor.php
+ delete mode 100644 changes/views/admin/system_logs.php
+ delete mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 changes/views/layouts/header.php

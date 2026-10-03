@@ -1,0 +1,10 @@
+commit 4eabede8990cb1acc5162b34e3325666f839aa38
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 18:29:46 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 18:29:46 2026 +0500
+
+    chore(git): ignore node_modules from test dependencies
+
+ .gitignore | 2 ++
+ 1 file changed, 2 insertions(+)

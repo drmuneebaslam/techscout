@@ -1,0 +1,55 @@
+commit 94ff61dedfa8a9070e938967b878655c920df94e
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 19:48:47 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 19:48:47 2026 +0500
+
+    feat(api-gateway-webhooks): 100x enhance Webhooks & Custom API Gateway with modals, multi-table queries, all tables sample data, prompt copy ad unlock, resolve system logs error 1265/1364/1064, and document 10k session architecture
+
+ app/Controllers/AdminController.php                |  122 +-
+ app/Controllers/CustomApiController.php            |   25 +-
+ app/Controllers/IncomingWebhookController.php      |   26 +-
+ app/Core/IncomingWebhookEngine.php                 |  505 +-
+ app/Core/NotificationHelper.php                    |    5 +-
+ app/Models/CreatorTipping.php                      |   14 +-
+ app/Models/LinkScanner.php                         |    3 +-
+ assets/js/content-engine.js                        |    2 +-
+ changes/app/Controllers/AdminController.php        | 9402 ++++++++++++++++++++
+ changes/app/Controllers/CustomApiController.php    |   25 +-
+ .../app/Controllers/IncomingWebhookController.php  |   26 +-
+ changes/app/Core/IncomingWebhookEngine.php         |  505 +-
+ changes/app/Core/NotificationHelper.php            |  377 +
+ changes/app/Models/CreatorTipping.php              |  166 +
+ changes/app/Models/LinkScanner.php                 |  226 +
+ changes/assets/js/content-engine.js                |  204 +
+ ...6_09_26_000002_webhook_and_api_gateway_100x.sql |   53 +
+ ...HIGH_CONCURRENCY_AND_PAGINATION_ARCHITECTURE.md |  166 +
+ changes/index.php                                  |    3 +
+ changes/scripts/ec2_deploy_and_migrate.sh          |  132 -
+ changes/views/admin/custom_api_endpoints.php       |  403 +-
+ changes/views/admin/incoming_webhooks.php          |  659 +-
+ changes/views/admin/system_logs.php                |  704 ++
+ changes/views/directory/prompt_single.php          | 1079 +++
+ changes/views/layouts/admin_header.php             |  685 --
+ cintu.txt                                          |  434 +-
+ ...6_09_26_000002_webhook_and_api_gateway_100x.sql |   53 +
+ ...HIGH_CONCURRENCY_AND_PAGINATION_ARCHITECTURE.md |  166 +
+ index.php                                          |    3 +
+ views/admin/custom_api_endpoints.php               |  403 +-
+ views/admin/incoming_webhooks.php                  |  659 +-
+ views/admin/system_logs.php                        |    5 +
+ views/directory/prompt_single.php                  |  138 +-
+ 33 files changed, 15978 insertions(+), 1400 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Core/NotificationHelper.php
+ create mode 100644 changes/app/Models/CreatorTipping.php
+ create mode 100644 changes/app/Models/LinkScanner.php
+ create mode 100644 changes/assets/js/content-engine.js
+ create mode 100644 changes/database/migrations/2026_09_26_000002_webhook_and_api_gateway_100x.sql
+ create mode 100644 changes/docs/HIGH_CONCURRENCY_AND_PAGINATION_ARCHITECTURE.md
+ delete mode 100644 changes/scripts/ec2_deploy_and_migrate.sh
+ create mode 100644 changes/views/admin/system_logs.php
+ create mode 100644 changes/views/directory/prompt_single.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 database/migrations/2026_09_26_000002_webhook_and_api_gateway_100x.sql
+ create mode 100644 docs/HIGH_CONCURRENCY_AND_PAGINATION_ARCHITECTURE.md

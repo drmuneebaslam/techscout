@@ -1,0 +1,20 @@
+commit 75efc27080b522f5cbb7fe17e997362595918225
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Wed Sep 30 22:52:34 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Wed Sep 30 22:52:34 2026 +0500
+
+    Fix modal overlay fixed viewport positioning, eliminate animation transform detachment, standardize dialogs in popups, incoming webhooks, and custom api views, and synthesize comprehensive historical user requests registry
+
+ assets/css/admin.css                         |   39 +-
+ assets/css/style.css                         |   10 +-
+ changes/assets/css/admin.css                 |   39 +-
+ changes/assets/css/style.css                 | 3054 ++++++++++++++++++++++++++
+ changes/views/admin/custom_api_endpoints.php |   26 +-
+ changes/views/admin/incoming_webhooks.php    |   26 +-
+ changes/views/admin/popups.php               |  188 +-
+ views/admin/custom_api_endpoints.php         |   26 +-
+ views/admin/incoming_webhooks.php            |   26 +-
+ views/admin/popups.php                       |  188 +-
+ 10 files changed, 3342 insertions(+), 280 deletions(-)
+ create mode 100644 changes/assets/css/style.css

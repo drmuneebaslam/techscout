@@ -1,0 +1,28 @@
+commit 52177b1e15281593953f61a421b00b7e70c8164d
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Tue Sep 8 11:37:20 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Tue Sep 8 11:37:20 2026 +0500
+
+    feat(mail): restore System Diagnostics sidebar link, disable PJAX screen transitions for clean page reloads, add visual custom URL pattern triggers engine, and integrate rich WYSIWYG editor in template studio
+
+ GEMINI.md                                    |   4 +-
+ app/Controllers/AdminController.php          |  62 ++
+ app/Core/EventTriggerEngine.php              | 125 ++++
+ changes/app/Controllers/AdminController.php  |  62 ++
+ changes/app/Core/EventTriggerEngine.php      | 299 ++++++++++
+ changes/index.php                            |   2 +
+ changes/views/admin/mail.php                 | 362 +++++++++++-
+ changes/views/admin/mail_template_editor.php | 132 ++++-
+ changes/views/layouts/admin_footer.php       | 460 +++++++++++++++
+ changes/views/layouts/admin_header.php       |  14 +-
+ changes/views/layouts/header.php             | 833 ---------------------------
+ index.php                                    |   2 +
+ views/admin/mail.php                         | 362 +++++++++++-
+ views/admin/mail_template_editor.php         | 132 ++++-
+ views/layouts/admin_footer.php               | 166 +-----
+ views/layouts/admin_header.php               |  14 +-
+ 16 files changed, 1988 insertions(+), 1043 deletions(-)
+ create mode 100644 changes/app/Core/EventTriggerEngine.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ delete mode 100644 changes/views/layouts/header.php

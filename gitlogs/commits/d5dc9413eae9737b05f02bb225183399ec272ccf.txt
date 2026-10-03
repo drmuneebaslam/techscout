@@ -1,0 +1,39 @@
+commit d5dc9413eae9737b05f02bb225183399ec272ccf
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 12:45:09 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 12:45:09 2026 +0500
+
+    Remove p.aspect_ratio from Content query, remove QA Testing and Admin Hub buttons, generate massive QA and Feature MD docs
+
+ app/Core/Database.php                              |     4 +-
+ app/Models/Content.php                             |     4 +-
+ changes/app/Core/Config.php                        |   254 -
+ changes/app/Core/Database.php                      |   716 ++
+ changes/app/Core/PopupManager.php                  |   464 -
+ changes/app/Models/Content.php                     |   316 +
+ ...26_10_03_000001_add_aspect_ratio_to_prompts.sql |     1 -
+ changes/docs/FEATURES_LIST.md                      |  7228 ++++++++++++
+ changes/docs/FUNCTIONS_LIST.md                     |  7514 +++++++++++++
+ changes/docs/QA_TESTING_GUIDE.md                   | 11220 +++++++++++++++++++
+ changes/index.php                                  |  1004 --
+ changes/views/layouts/header.php                   |     6 +-
+ changes/views/pages/qa_testing.php                 |    76 -
+ docs/FEATURES_LIST.md                              |  7228 ++++++++++++
+ docs/FUNCTIONS_LIST.md                             |  7514 +++++++++++++
+ docs/QA_TESTING_GUIDE.md                           | 11220 +++++++++++++++++++
+ views/layouts/header.php                           |     6 +-
+ 17 files changed, 52961 insertions(+), 1814 deletions(-)
+ delete mode 100644 changes/app/Core/Config.php
+ create mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Core/PopupManager.php
+ create mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/database/migrations/2026_10_03_000001_add_aspect_ratio_to_prompts.sql
+ create mode 100644 changes/docs/FEATURES_LIST.md
+ create mode 100644 changes/docs/FUNCTIONS_LIST.md
+ create mode 100644 changes/docs/QA_TESTING_GUIDE.md
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/pages/qa_testing.php
+ create mode 100644 docs/FEATURES_LIST.md
+ create mode 100644 docs/FUNCTIONS_LIST.md
+ create mode 100644 docs/QA_TESTING_GUIDE.md

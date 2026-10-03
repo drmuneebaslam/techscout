@@ -1,0 +1,13 @@
+commit f3d4cfbba6468c1f5dac26a86ac45ad641b40e8d
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 22:08:01 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 22:08:01 2026 +0500
+
+    feat(migration): ingest B&W sunglasses prompt with verified users schema
+
+ ...00003_ingest_sunglasses_prompt_fixed_author.sql | 67 ++++++++++++++++++++++
+ ...00003_ingest_sunglasses_prompt_fixed_author.sql | 67 ++++++++++++++++++++++
+ 2 files changed, 134 insertions(+)
+ create mode 100644 changes/database/migrations/2026_09_27_000003_ingest_sunglasses_prompt_fixed_author.sql
+ create mode 100644 database/migrations/2026_09_27_000003_ingest_sunglasses_prompt_fixed_author.sql

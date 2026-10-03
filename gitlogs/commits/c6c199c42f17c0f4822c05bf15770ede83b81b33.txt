@@ -1,0 +1,50 @@
+commit c6c199c42f17c0f4822c05bf15770ede83b81b33
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 17 10:07:14 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 17 10:07:14 2026 +0500
+
+    Refactor taxonomy into strict Categories and Subcategories with separate CRUDs and dedicated Add tabs, eliminate runtime DDL and database seeds in favor of panel migrations, and optimize admin modals with code-splitting and hardware acceleration
+
+ app/Controllers/AdminController.php                |  245 +-
+ app/Core/Database.php                              | 1524 ----
+ assets/css/admin-modals.css                        |  174 +
+ assets/js/admin-modals.js                          |  183 +
+ changes/app/Controllers/AdminController.php        | 8746 ++++++++++++++++++++
+ changes/app/Core/Config.php                        |  229 +
+ changes/app/Core/Database.php                      |  415 +
+ changes/assets/css/admin-modals.css                |  174 +
+ changes/assets/js/admin-modals.js                  |  183 +
+ ...000001_categories_and_subcategories_upgrade.sql |   24 +
+ changes/docs/MISTAKES_LEARNED.md                   |  461 --
+ changes/index.php                                  |    5 +
+ changes/mistakes/MISTAKES_LEARNED.md               |  461 --
+ changes/user_requests_history.html                 |  365 -
+ changes/views/admin/crud/categories.php            |  583 ++
+ changes/views/admin/crud/subcategories.php         |  662 ++
+ changes/views/layouts/admin_footer.php             |  588 ++
+ changes/views/layouts/admin_header.php             |  652 ++
+ ...000001_categories_and_subcategories_upgrade.sql |   24 +
+ index.php                                          |    5 +
+ views/admin/crud/categories.php                    |  742 +-
+ views/admin/crud/subcategories.php                 |  662 ++
+ views/layouts/admin_footer.php                     |    1 +
+ views/layouts/admin_header.php                     |    9 +-
+ 24 files changed, 13824 insertions(+), 3293 deletions(-)
+ create mode 100644 assets/css/admin-modals.css
+ create mode 100644 assets/js/admin-modals.js
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Core/Config.php
+ create mode 100644 changes/app/Core/Database.php
+ create mode 100644 changes/assets/css/admin-modals.css
+ create mode 100644 changes/assets/js/admin-modals.js
+ create mode 100644 changes/database/migrations/2026_09_17_000001_categories_and_subcategories_upgrade.sql
+ delete mode 100644 changes/docs/MISTAKES_LEARNED.md
+ delete mode 100644 changes/mistakes/MISTAKES_LEARNED.md
+ delete mode 100644 changes/user_requests_history.html
+ create mode 100644 changes/views/admin/crud/categories.php
+ create mode 100644 changes/views/admin/crud/subcategories.php
+ create mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 database/migrations/2026_09_17_000001_categories_and_subcategories_upgrade.sql
+ create mode 100644 views/admin/crud/subcategories.php

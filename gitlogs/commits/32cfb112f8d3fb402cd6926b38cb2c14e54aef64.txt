@@ -1,0 +1,24 @@
+commit 32cfb112f8d3fb402cd6926b38cb2c14e54aef64
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 6 22:55:44 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 6 22:55:44 2026 +0500
+
+    feat: universal mail envelope, block-based component builder, light-mode sanitization and payout receipt attachments
+
+ CHANGELOG.md                                |   33 +
+ app/Controllers/AdminController.php         |   36 +-
+ app/Core/Mailer.php                         |  139 +-
+ changes/app/Controllers/AdminController.php | 6696 +++++++++++++++++++++++++++
+ changes/app/Core/Mailer.php                 | 1684 +++++++
+ changes/database/mail_tracking_upgrade.sql  |   74 +
+ changes/views/admin/mail.php                | 2673 +++++++++++
+ changes/views/admin/revenue.php             | 2371 ++++++++++
+ database/mail_tracking_upgrade.sql          |   30 +
+ views/admin/mail.php                        |   73 +-
+ 10 files changed, 13754 insertions(+), 55 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Core/Mailer.php
+ create mode 100644 changes/database/mail_tracking_upgrade.sql
+ create mode 100644 changes/views/admin/mail.php
+ create mode 100644 changes/views/admin/revenue.php

@@ -1,0 +1,40 @@
+commit 1d28288c669e743b0393435328f744523ad3baab
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 21:35:15 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 21:35:15 2026 +0500
+
+    chore: ignore changes folder and remove it from tracking
+
+ .gitignore                                         |  Bin 83 -> 103 bytes
+ changes/app/Controllers/AdminController.php        | 9476 --------------------
+ changes/app/Controllers/ApiController.php          | 2246 -----
+ changes/app/Controllers/AuthorStudioController.php | 1331 ---
+ .../app/Controllers/IncomingWebhookController.php  |  223 -
+ changes/app/Models/Content.php                     |  319 -
+ changes/app/Models/CreatorTipping.php              |  166 -
+ ..._10_03_174140_create_author_feedbacks_table.sql |   11 -
+ changes/docs/QA_TESTING_GUIDE.md                   |   61 -
+ changes/index.php                                  | 1012 ---
+ changes/views/admin/advertisements.php             |  955 --
+ changes/views/admin/author_feedbacks.php           |  120 -
+ changes/views/author/dashboard.php                 | 3485 -------
+ changes/views/layouts/admin_header.php             |  689 --
+ changes/views/layouts/footer.php                   |  214 -
+ changes/views/layouts/header.php                   |  956 --
+ 16 files changed, 21264 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Controllers/AuthorStudioController.php
+ delete mode 100644 changes/app/Controllers/IncomingWebhookController.php
+ delete mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/app/Models/CreatorTipping.php
+ delete mode 100644 changes/database/migrations/2026_10_03_174140_create_author_feedbacks_table.sql
+ delete mode 100644 changes/docs/QA_TESTING_GUIDE.md
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/advertisements.php
+ delete mode 100644 changes/views/admin/author_feedbacks.php
+ delete mode 100644 changes/views/author/dashboard.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/layouts/footer.php
+ delete mode 100644 changes/views/layouts/header.php

@@ -1,0 +1,24 @@
+commit 03d559873fd4d2dc779364214fefc258588cd90a
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 16:31:27 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 16:31:27 2026 +0500
+
+    Fix CSS cache busting with filemtime and remove alternate icon
+
+ changes/app/Core/Database.php          |   716 --
+ changes/app/Models/Content.php         |   316 -
+ changes/docs/FEATURES_LIST.md          |  7228 --------------------
+ changes/docs/FUNCTIONS_LIST.md         |  7514 ---------------------
+ changes/docs/QA_TESTING_GUIDE.md       | 11220 -------------------------------
+ changes/views/layouts/admin_header.php |   684 ++
+ changes/views/layouts/header.php       |     3 +-
+ views/layouts/admin_header.php         |     7 +-
+ views/layouts/header.php               |     3 +-
+ 9 files changed, 689 insertions(+), 27002 deletions(-)
+ delete mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/docs/FEATURES_LIST.md
+ delete mode 100644 changes/docs/FUNCTIONS_LIST.md
+ delete mode 100644 changes/docs/QA_TESTING_GUIDE.md
+ create mode 100644 changes/views/layouts/admin_header.php

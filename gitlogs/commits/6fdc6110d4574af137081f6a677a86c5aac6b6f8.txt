@@ -1,0 +1,37 @@
+commit 6fdc6110d4574af137081f6a677a86c5aac6b6f8
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 10:24:26 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 10:24:26 2026 +0500
+
+    fix(admin): resolve SQL 1054 column error, remove audit table from system view, add PHP event key selector, and document MISTAKE-11
+    
+    - Fix SQLSTATE[42S22] 1054 Unknown column 'c.created_at' in app/Controllers/AdminController.php by ensuring unaliased queries on contents use created_at and joined queries use explicit c.created_at
+    - Document MISTAKE-11 (Unaliased Table Columns in Dynamic WHERE Clauses) in docs/MISTAKES_LEARNED.md and add rule 11 to the response audit protocol
+    - Remove redundant Live System Audit Records Stream table from /admin/system in views/admin/system.php and AdminController::system, adding clean launch card to dedicated /admin/audit-logs station
+    - Enhance Visual Automation Trigger Studio in views/admin/mail.php with direct selection of all 33+ platform PHP system event keys categorized into Auth & Security, Payouts & Treasury, Editorial, and Community
+    - Add 1-click auto-configuration on event selection (friendly name, event key, default template, delivery policy, and event description badge)
+    - Add HTML5 datalist auto-completion and recommended route pattern presets
+    - Synchronize core project changes into changes/ folder per workflow rules
+
+ app/Controllers/AdminController.php         |    7 +-
+ changes/app/Controllers/AdminController.php |    7 +-
+ changes/app/Core/EventTriggerEngine.php     |  478 --------
+ changes/assets/css/admin.css                | 1710 ---------------------------
+ changes/assets/js/admin_table_paginator.js  |  295 -----
+ changes/docs/MISTAKES_LEARNED.md            |  148 +++
+ changes/index.php                           |  706 -----------
+ changes/views/admin/analytics.php           |  704 -----------
+ changes/views/admin/mail.php                |  173 ++-
+ changes/views/admin/system.php              |  188 +++
+ docs/MISTAKES_LEARNED.md                    |   12 +
+ views/admin/mail.php                        |  173 ++-
+ views/admin/system.php                      |   63 +-
+ 13 files changed, 680 insertions(+), 3984 deletions(-)
+ delete mode 100644 changes/app/Core/EventTriggerEngine.php
+ delete mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/assets/js/admin_table_paginator.js
+ create mode 100644 changes/docs/MISTAKES_LEARNED.md
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/analytics.php
+ create mode 100644 changes/views/admin/system.php

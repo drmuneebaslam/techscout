@@ -1,0 +1,75 @@
+commit d876bddeec058c8b6a141c4579b2ca3efb82d4b2
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 17 13:26:02 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 17 13:26:02 2026 +0500
+
+    feat(taxonomy): strict entity separation, parent-child scope locking, single sidebar option, topics elimination with subscriptions, many-to-many category relations, and re-runnable migrations engine
+
+ app/Controllers/AdminController.php                |   76 +-
+ app/Controllers/CategoryController.php             |  251 +++
+ app/Core/SeoEngine.php                             |    2 +-
+ assets/js/main.js                                  |   15 +-
+ changes/app/Controllers/AdminController.php        |   76 +-
+ changes/app/Controllers/CategoryController.php     |  251 +++
+ changes/app/Core/Database.php                      |  498 -----
+ changes/app/Core/SeoEngine.php                     |   86 +
+ changes/app/Models/DatabaseBackupManager.php       |  200 --
+ changes/assets/js/main.js                          |  996 ++++++++++
+ ..._000002_entity_categories_and_subscriptions.sql |   44 +
+ changes/docs/MISTAKES_LEARNED.md                   |  470 -----
+ changes/docs/USER_REQUESTS_TODO_TRACKER.md         |   31 +
+ changes/index.php                                  |  867 +++++++++
+ changes/views/admin/crud/categories.php            |   47 +-
+ changes/views/admin/crud/subcategories.php         |    3 -
+ changes/views/admin/crud/topics.php                |    3 +
+ changes/views/admin/db_manager.php                 | 1937 ++++++++++++++++++++
+ changes/views/admin/subscribers.php                |  459 +++++
+ changes/views/blog/article.php                     |  919 ++++++++++
+ changes/views/components/category_explorer.php     |   81 +
+ changes/views/directory/prompt_single.php          |  995 ++++++++++
+ changes/views/layouts/admin_header.php             |  649 +++++++
+ changes/views/layouts/header.php                   |  936 ++++++++++
+ changes/views/public/categories.php                |  214 +++
+ changes/views/public/category_single.php           |  218 +++
+ changes/views/public/home.php                      |  623 +++++++
+ ..._000002_entity_categories_and_subscriptions.sql |   44 +
+ docs/USER_REQUESTS_TODO_TRACKER.md                 |   31 +
+ index.php                                          |   12 +-
+ views/admin/crud/categories.php                    |   47 +-
+ views/admin/crud/topics.php                        |  180 +-
+ views/admin/db_manager.php                         |   21 +-
+ views/admin/subscribers.php                        |    4 +-
+ views/blog/article.php                             |   58 +-
+ views/components/category_explorer.php             |    6 +-
+ views/directory/prompt_single.php                  |   82 +-
+ views/layouts/admin_header.php                     |    7 +-
+ views/layouts/header.php                           |   14 +-
+ views/public/categories.php                        |  214 +++
+ views/public/category_single.php                   |  218 +++
+ views/public/home.php                              |   23 +-
+ 42 files changed, 10462 insertions(+), 1446 deletions(-)
+ create mode 100644 app/Controllers/CategoryController.php
+ create mode 100644 changes/app/Controllers/CategoryController.php
+ delete mode 100644 changes/app/Core/Database.php
+ create mode 100644 changes/app/Core/SeoEngine.php
+ delete mode 100644 changes/app/Models/DatabaseBackupManager.php
+ create mode 100644 changes/assets/js/main.js
+ create mode 100644 changes/database/migrations/2026_09_17_000002_entity_categories_and_subscriptions.sql
+ delete mode 100644 changes/docs/MISTAKES_LEARNED.md
+ create mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/crud/subcategories.php
+ create mode 100644 changes/views/admin/crud/topics.php
+ create mode 100644 changes/views/admin/db_manager.php
+ create mode 100644 changes/views/admin/subscribers.php
+ create mode 100644 changes/views/blog/article.php
+ create mode 100644 changes/views/components/category_explorer.php
+ create mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 changes/views/layouts/header.php
+ create mode 100644 changes/views/public/categories.php
+ create mode 100644 changes/views/public/category_single.php
+ create mode 100644 changes/views/public/home.php
+ create mode 100644 database/migrations/2026_09_17_000002_entity_categories_and_subscriptions.sql
+ create mode 100644 views/public/categories.php
+ create mode 100644 views/public/category_single.php

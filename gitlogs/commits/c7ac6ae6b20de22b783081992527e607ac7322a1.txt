@@ -1,0 +1,76 @@
+commit c7ac6ae6b20de22b783081992527e607ac7322a1
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Mon Sep 7 20:32:43 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Mon Sep 7 20:32:43 2026 +0500
+
+    feat(cms): Help articles & legal pages CMS, new-tab mail template maker, and granular RBAC navigation gating
+    
+    - Add Help Center Article Management CMS with YouTube/TikTok style step builder, FAQs, and categories
+    - Add Legal & Compliance Content Management CMS with dynamic DB loading and full-page policy editors
+    - Add dedicated full-screen scrollable Mail Template Editor (/admin/mail/template/editor) opening in new tab
+    - Add dynamic RBAC capability checks across all admin sidebar menus and groups to show only authorized items
+    - Mirror only newly updated files into changes/ folder
+    - Add database migration upgrade script (database/help_legal_upgrade.sql) and updated schema.sql
+
+ app/Controllers/AdminController.php                |  283 +++
+ app/Controllers/PageController.php                 |   72 +-
+ app/Core/Database.php                              |   14 +
+ changes/app/Controllers/AdminController.php        |  283 +++
+ changes/app/Controllers/PageController.php         |  135 +
+ changes/app/Core/Database.php                      | 1716 +++++++++++++
+ changes/app/Core/ErrorLogger.php                   |  579 -----
+ changes/database/database_upgrade_v2.sql           |   40 -
+ changes/database/help_legal_upgrade.sql            |  338 +++
+ changes/database/schema.sql                        |   54 +
+ .../docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md    |  234 --
+ changes/index.php                                  |   13 +
+ changes/views/admin/audit_logs.php                 |  706 -----
+ changes/views/admin/db_manager.php                 |  454 ----
+ changes/views/admin/help_article_editor.php        |  334 +++
+ changes/views/admin/help_articles.php              |  170 ++
+ changes/views/admin/legal_page_editor.php          |  134 +
+ changes/views/admin/legal_pages.php                |   76 +
+ changes/views/admin/mail.php                       | 2683 ++++++++++++++++++++
+ changes/views/admin/mail_template_editor.php       |  299 +++
+ changes/views/admin/system_logs.php                |  687 -----
+ changes/views/layouts/admin_header.php             |  314 ++-
+ changes/views/pages/help.php                       |  967 +++++++
+ changes/views/pages/legal_page.php                 |   46 +
+ database/help_legal_upgrade.sql                    |  338 +++
+ database/schema.sql                                |   54 +
+ index.php                                          |   13 +
+ views/admin/help_article_editor.php                |  334 +++
+ views/admin/help_articles.php                      |  170 ++
+ views/admin/legal_page_editor.php                  |  134 +
+ views/admin/legal_pages.php                        |   76 +
+ views/admin/mail.php                               |   13 +-
+ views/admin/mail_template_editor.php               |  299 +++
+ views/layouts/admin_header.php                     |  314 ++-
+ views/pages/help.php                               |  104 +-
+ views/pages/legal_page.php                         |   46 +
+ 36 files changed, 9515 insertions(+), 3011 deletions(-)
+ create mode 100644 changes/app/Controllers/PageController.php
+ create mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Core/ErrorLogger.php
+ delete mode 100644 changes/database/database_upgrade_v2.sql
+ create mode 100644 changes/database/help_legal_upgrade.sql
+ delete mode 100644 changes/docs/WEBHOOKS_CAPABILITIES_AND_USE_CASES.md
+ delete mode 100644 changes/views/admin/audit_logs.php
+ delete mode 100644 changes/views/admin/db_manager.php
+ create mode 100644 changes/views/admin/help_article_editor.php
+ create mode 100644 changes/views/admin/help_articles.php
+ create mode 100644 changes/views/admin/legal_page_editor.php
+ create mode 100644 changes/views/admin/legal_pages.php
+ create mode 100644 changes/views/admin/mail.php
+ create mode 100644 changes/views/admin/mail_template_editor.php
+ delete mode 100644 changes/views/admin/system_logs.php
+ create mode 100644 changes/views/pages/help.php
+ create mode 100644 changes/views/pages/legal_page.php
+ create mode 100644 database/help_legal_upgrade.sql
+ create mode 100644 views/admin/help_article_editor.php
+ create mode 100644 views/admin/help_articles.php
+ create mode 100644 views/admin/legal_page_editor.php
+ create mode 100644 views/admin/legal_pages.php
+ create mode 100644 views/admin/mail_template_editor.php
+ create mode 100644 views/pages/legal_page.php

@@ -1,0 +1,12 @@
+commit c27dfe5b34e7e02986634182f8fad947fb5fb3cf
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 21:57:28 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 21:57:28 2026 +0500
+
+    fix(deploy-sync): resolve unbuffered PDO queries during migration execution
+
+ app/Controllers/ApiController.php         |   22 +-
+ changes/app/Controllers/ApiController.php | 2246 +++++++++++++++++++++++++++++
+ 2 files changed, 2265 insertions(+), 3 deletions(-)
+ create mode 100644 changes/app/Controllers/ApiController.php

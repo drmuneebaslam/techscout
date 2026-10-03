@@ -1,0 +1,29 @@
+commit ded27b9865c8308397accdee8282ef915ab35518
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Wed Sep 30 22:41:42 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Wed Sep 30 22:41:42 2026 +0500
+
+    Refactor admin modals into strict floating viewport overlays with body scroll locks
+
+ assets/css/admin.css                         |   41 +-
+ changes/app/Core/IncomingWebhookEngine.php   | 1098 -----------
+ changes/app/Core/PopupManager.php            |  464 -----
+ changes/app/Models/Content.php               |  316 ----
+ changes/assets/css/admin.css                 | 2579 ++++++++++++++++++++++++++
+ changes/database/schema.sql                  | 1627 ----------------
+ changes/views/admin/custom_api_endpoints.php | 1024 ++++++++++
+ changes/views/admin/incoming_webhooks.php    | 1004 ++++++++++
+ changes/views/admin/popups.php               |  434 +++++
+ views/admin/custom_api_endpoints.php         |  115 +-
+ views/admin/incoming_webhooks.php            |  933 +++-------
+ views/admin/popups.php                       |   13 +
+ 12 files changed, 5427 insertions(+), 4221 deletions(-)
+ delete mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ delete mode 100644 changes/app/Core/PopupManager.php
+ delete mode 100644 changes/app/Models/Content.php
+ create mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/database/schema.sql
+ create mode 100644 changes/views/admin/custom_api_endpoints.php
+ create mode 100644 changes/views/admin/incoming_webhooks.php
+ create mode 100644 changes/views/admin/popups.php

@@ -1,0 +1,99 @@
+commit 0e61230aa8e72c1a35f2853822a84fe14142f13f
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 12 20:38:50 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 12 20:38:50 2026 +0500
+
+    feat(enterprise): universal image uploads, prompt galleries, crypto ads, db engine & roadmap 2.0
+    
+    - [MISTAKE-23] Documented universal image upload mandate across all forms; added file inputs to ads, sponsor, prompt galleries, and author studio.
+    - [Prompt Blueprints] Added multi-image gallery showcase, thumbnail selector, lightbox zoom, half-visible teaser mask with blur, and copy button popunder/direct ad trigger.
+    - [Ad & Sponsorship CRUD] Enhanced scheduler with 4 subtabs (ads, sponsored, settings, tips), duration tiers (7, 30, 90 days with 15% & 30% bulk discounts), central treasury wallets (BTC, ETH, USDT, SOL), and author payout ledger.
+    - [Comments & Social] Anti-spam validation blocking URLs & emails, @mention autocomplete & notification dispatch, multi-emoji reaction bar with mobile expand, 60s long polling stream, and author pin badge.
+    - [Interactive Widgets] Community polls with live AJAX voting, quote share card generator, collapsed-by-default sticky TOC, 1-click PDF export, and creator tip jar.
+    - [Editorial Studio] Client-side Word (.docx) ingestion via Mammoth.js, code highlighter with 20+ languages, client-side WebP converter, peer-review bubbles; automated broken link checker placed exclusively in admin console.
+    - [Timezone Suite] Admin topbar dual clock with live ticker and switcher, localized user format preferences, 24-hr regional activity heatmap, and relative time ticker.
+    - [Database & Storage Engine] Interactive ERD visualizer tab, slow query profiler & AI index advisor, schema migration runner with rollback history, orphaned media garbage collector, live IOPS benchmark & latency monitor, portable SQLite database exporter.
+    - [Roadmap 2.0] Created features_roadmap_2.html with 108+ new hyper-advanced enterprise specifications, search, category filters, dark/light theme, and JSON export.
+    - [Deployment] Synced all core changes to changes/ with InfinityFree production credentials in app/Core/Config.php, and completed direct FTP deployment to /htdocs/ with 0 errors.
+
+ app/Controllers/AdminController.php                |  614 +-
+ app/Controllers/ApiController.php                  |  222 +
+ app/Controllers/DirectoryController.php            |   17 +-
+ assets/js/main.js                                  |   76 +-
+ changes/app/Controllers/AdminController.php        | 8363 ++++++++++++++++++++
+ changes/app/Controllers/ApiController.php          | 1523 ++++
+ changes/app/Controllers/DirectoryController.php    |  664 ++
+ changes/app/Core/Config.php                        |   52 +
+ changes/assets/css/admin.css                       | 2510 ------
+ changes/assets/js/main.js                          |  997 +++
+ changes/database/enterprise_features_upgrade.sql   |  157 +
+ ...26_09_12_000001_enterprise_features_upgrade.sql |   81 +
+ ..._09_12_000002_add_social_and_crypto_indices.sql |    8 +
+ changes/docs/MISTAKES_LEARNED.md                   |  322 +
+ changes/features_roadmap.html                      | 2556 ------
+ changes/features_roadmap_2.html                    | 2467 ++++++
+ changes/index.php                                  |  755 ++
+ changes/views/account/settings.php                 | 1351 ++++
+ changes/views/admin/advertisements.php             |  626 ++
+ changes/views/admin/analytics.php                  |  755 ++
+ changes/views/admin/content_queue.php              |  956 +++
+ changes/views/admin/db_manager.php                 | 1922 +++++
+ changes/views/author/editor.php                    | 1788 +++++
+ changes/views/blog/article.php                     |  799 ++
+ changes/views/components/comments_section.php      |  748 ++
+ changes/views/directory/prompt_single.php          |  384 +
+ changes/views/directory/prompts.php                |  384 +
+ changes/views/layouts/admin_header.php             |  645 ++
+ .../views/public/components/crypto_payment_box.php |  212 +
+ changes/views/public/sponsor.php                   |  358 +
+ database/enterprise_features_upgrade.sql           |  157 +
+ ...26_09_12_000001_enterprise_features_upgrade.sql |   81 +
+ ..._09_12_000002_add_social_and_crypto_indices.sql |    8 +
+ docs/MISTAKES_LEARNED.md                           |   12 +
+ features_roadmap_2.html                            | 2467 ++++++
+ index.php                                          |   16 +
+ views/account/settings.php                         |   48 +
+ views/admin/advertisements.php                     |  712 +-
+ views/admin/analytics.php                          |   51 +
+ views/admin/content_queue.php                      |   79 +
+ views/admin/db_manager.php                         |  564 +-
+ views/author/editor.php                            |  312 +-
+ views/blog/article.php                             |  342 +-
+ views/components/comments_section.php              |  304 +-
+ views/directory/prompt_single.php                  |  338 +-
+ views/directory/prompts.php                        |   16 +-
+ views/layouts/admin_header.php                     |   47 +
+ views/public/components/crypto_payment_box.php     |  168 +-
+ views/public/sponsor.php                           |   47 +-
+ 49 files changed, 32730 insertions(+), 5351 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/ApiController.php
+ create mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/assets/css/admin.css
+ create mode 100644 changes/assets/js/main.js
+ create mode 100644 changes/database/enterprise_features_upgrade.sql
+ create mode 100644 changes/database/migrations/2026_09_12_000001_enterprise_features_upgrade.sql
+ create mode 100644 changes/database/migrations/2026_09_12_000002_add_social_and_crypto_indices.sql
+ create mode 100644 changes/docs/MISTAKES_LEARNED.md
+ delete mode 100644 changes/features_roadmap.html
+ create mode 100644 changes/features_roadmap_2.html
+ create mode 100644 changes/index.php
+ create mode 100644 changes/views/account/settings.php
+ create mode 100644 changes/views/admin/advertisements.php
+ create mode 100644 changes/views/admin/analytics.php
+ create mode 100644 changes/views/admin/content_queue.php
+ create mode 100644 changes/views/admin/db_manager.php
+ create mode 100644 changes/views/author/editor.php
+ create mode 100644 changes/views/blog/article.php
+ create mode 100644 changes/views/components/comments_section.php
+ create mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 changes/views/directory/prompts.php
+ create mode 100644 changes/views/layouts/admin_header.php
+ create mode 100644 changes/views/public/components/crypto_payment_box.php
+ create mode 100644 changes/views/public/sponsor.php
+ create mode 100644 database/enterprise_features_upgrade.sql
+ create mode 100644 database/migrations/2026_09_12_000001_enterprise_features_upgrade.sql
+ create mode 100644 database/migrations/2026_09_12_000002_add_social_and_crypto_indices.sql
+ create mode 100644 features_roadmap_2.html

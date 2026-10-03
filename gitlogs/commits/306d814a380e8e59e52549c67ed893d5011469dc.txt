@@ -1,0 +1,28 @@
+commit 306d814a380e8e59e52549c67ed893d5011469dc
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Fri Sep 11 21:28:11 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Fri Sep 11 21:28:11 2026 +0500
+
+    fix(database): eliminate silent errors, remove runtime DDL, sanitize json attachments, and provide non-destructive upgrade SQL
+
+ app/Controllers/AdminController.php         |   33 +-
+ app/Core/Database.php                       |   92 +-
+ app/Core/Mailer.php                         |   15 +-
+ changes/app/Controllers/AdminController.php |   33 +-
+ changes/app/Core/Database.php               |   92 +-
+ changes/app/Core/Mailer.php                 | 1684 +++++++++++++++++++++++++++
+ changes/database/schema.sql                 |   16 +-
+ changes/database/upgrade_v2_fix.sql         |  118 ++
+ changes/docs/MISTAKES_LEARNED.md            |   69 ++
+ changes/views/admin/engagement_studio.php   |  727 ------------
+ database/schema.sql                         |   16 +-
+ database/upgrade_v2_fix.sql                 |  118 ++
+ docs/MISTAKES_LEARNED.md                    |   69 ++
+ 13 files changed, 2214 insertions(+), 868 deletions(-)
+ create mode 100644 changes/app/Core/Mailer.php
+ create mode 100644 changes/database/upgrade_v2_fix.sql
+ create mode 100644 changes/docs/MISTAKES_LEARNED.md
+ delete mode 100644 changes/views/admin/engagement_studio.php
+ create mode 100644 database/upgrade_v2_fix.sql
+ create mode 100644 docs/MISTAKES_LEARNED.md

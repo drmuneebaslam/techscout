@@ -1,0 +1,52 @@
+commit 50265631426e71c4157bb23885536b6cb6a6bf68
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 23:06:51 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 23:06:51 2026 +0500
+
+    Fix prompt frontend visibility, link primary and secondary categories to content type, hide small copy button, and add migration 05
+
+ app/Models/Content.php                             |    5 +-
+ changes/app/Controllers/AdminController.php        | 9432 --------------------
+ changes/app/Controllers/ApiController.php          | 2246 -----
+ changes/app/Controllers/CustomApiController.php    |  998 ---
+ changes/app/Core/CloudFrontHelper.php              |  102 -
+ changes/app/Core/Config.php                        |  254 -
+ changes/app/Core/IncomingWebhookEngine.php         | 1043 ---
+ changes/app/Core/Response.php                      |   95 -
+ changes/app/Models/Content.php                     |  316 +
+ changes/app/Models/PersonaFollowerEngine.php       |  271 -
+ changes/assets/js/content-engine.js                |  204 -
+ ...00001_enterprise_100x_telemetry_and_prompts.sql |  117 -
+ ...ngest_sunglasses_prompt_and_telemetry_fixes.sql |   78 -
+ ...00003_ingest_sunglasses_prompt_fixed_author.sql |   67 -
+ .../2026_09_27_000004_sunglasses_tags.sql          |   32 -
+ ..._sunglasses_prompt_and_secondary_categories.sql |  106 +
+ ...VE_PLATFORM_ANALYSIS_QOL_BOTTLENECKS_ROADMAP.md |  888 --
+ .../SCALABILITY_AND_CONCURRENCY_100X_ENGINE.md     |  134 -
+ .../TESTING_CHECKLIST_ALL_DEVICES_AND_THEMES.md    |   84 -
+ changes/views/admin/crud/prompts.php               | 1573 ----
+ changes/views/directory/prompt_single.php          |   37 +-
+ ..._sunglasses_prompt_and_secondary_categories.sql |  106 +
+ views/directory/prompt_single.php                  |   37 +-
+ 23 files changed, 537 insertions(+), 17688 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Controllers/CustomApiController.php
+ delete mode 100644 changes/app/Core/CloudFrontHelper.php
+ delete mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ delete mode 100644 changes/app/Core/Response.php
+ create mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/app/Models/PersonaFollowerEngine.php
+ delete mode 100644 changes/assets/js/content-engine.js
+ delete mode 100644 changes/database/migrations/2026_09_27_000001_enterprise_100x_telemetry_and_prompts.sql
+ delete mode 100644 changes/database/migrations/2026_09_27_000002_ingest_sunglasses_prompt_and_telemetry_fixes.sql
+ delete mode 100644 changes/database/migrations/2026_09_27_000003_ingest_sunglasses_prompt_fixed_author.sql
+ delete mode 100644 changes/database/migrations/2026_09_27_000004_sunglasses_tags.sql
+ create mode 100644 changes/database/migrations/2026_09_27_000005_fix_sunglasses_prompt_and_secondary_categories.sql
+ delete mode 100644 changes/docs/COMPREHENSIVE_PLATFORM_ANALYSIS_QOL_BOTTLENECKS_ROADMAP.md
+ delete mode 100644 changes/docs/SCALABILITY_AND_CONCURRENCY_100X_ENGINE.md
+ delete mode 100644 changes/docs/TESTING_CHECKLIST_ALL_DEVICES_AND_THEMES.md
+ delete mode 100644 changes/views/admin/crud/prompts.php
+ create mode 100644 database/migrations/2026_09_27_000005_fix_sunglasses_prompt_and_secondary_categories.sql

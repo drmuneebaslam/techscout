@@ -1,0 +1,30 @@
+commit 6da5e9bc6df76804c57fd57627c3d37a1364d05d
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 14:03:08 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 14:03:08 2026 +0500
+
+    feat(prompts): AI Image prompts pure visual grid, hierarchical category breadcrumbs, and popunder ad integration on card clicks and blueprint actions
+
+ app/Controllers/DirectoryController.php         |   43 +-
+ app/Models/Content.php                          |   12 +-
+ changes/app/Controllers/AdminController.php     | 8567 -----------------------
+ changes/app/Controllers/DirectoryController.php |  734 ++
+ changes/app/Models/Content.php                  |  304 +
+ changes/views/admin/crud/gpts.php               |  754 --
+ changes/views/admin/crud/prompts.php            | 1155 ---
+ changes/views/directory/prompt_single.php       |  592 ++
+ changes/views/directory/prompts.php             |  436 ++
+ changes/views/directory/prompts_images.php      |  267 +
+ views/directory/prompt_single.php               |  311 +-
+ views/directory/prompts.php                     |  290 +-
+ views/directory/prompts_images.php              |  317 +-
+ 13 files changed, 3051 insertions(+), 10731 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Models/Content.php
+ delete mode 100644 changes/views/admin/crud/gpts.php
+ delete mode 100644 changes/views/admin/crud/prompts.php
+ create mode 100644 changes/views/directory/prompt_single.php
+ create mode 100644 changes/views/directory/prompts.php
+ create mode 100644 changes/views/directory/prompts_images.php

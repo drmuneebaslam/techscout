@@ -1,0 +1,60 @@
+commit f168db079533e977a0f03ff106fb5a9a9a0445de
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 03:30:06 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 03:30:06 2026 +0500
+
+    Fix production crash telemetry errors, implement server sudo deploy command, resolve funwithcoding blank screen, add CloudFront asset cache busting, and configure 3-environment credential profiles
+
+ app/Controllers/ApiController.php               |   36 +-
+ app/Controllers/CategoryController.php          |   22 +-
+ app/Controllers/DirectoryController.php         |    4 +-
+ app/Controllers/FeedController.php              |    4 +-
+ app/Core/AdRenderer.php                         |   12 +-
+ app/Core/Config.php                             |  126 +-
+ app/Core/ErrorLogger.php                        |    6 +-
+ app/Core/Request.php                            |    2 +-
+ app/Core/Router.php                             |    4 +
+ app/Core/helpers.php                            |   24 +-
+ app/Models/SecurityAnomalyEngine.php            |    4 +-
+ changes/app/Controllers/AdminController.php     | 9346 -----------------------
+ changes/app/Controllers/ApiController.php       |   36 +-
+ changes/app/Controllers/CategoryController.php  |  316 +
+ changes/app/Controllers/CustomApiController.php |  700 --
+ changes/app/Controllers/DirectoryController.php |  937 +++
+ changes/app/Controllers/FeedController.php      |  325 +
+ changes/app/Core/AdRenderer.php                 |  169 +
+ changes/app/Core/Config.php                     |  254 +
+ changes/app/Core/Database.php                   |  698 --
+ changes/app/Core/ErrorLogger.php                |  597 ++
+ changes/app/Core/IncomingWebhookEngine.php      |  324 -
+ changes/app/Core/Request.php                    |  139 +
+ changes/app/Core/Router.php                     |  144 +
+ changes/app/Core/helpers.php                    |  159 +
+ changes/app/Models/SecurityAnomalyEngine.php    |  183 +
+ changes/index.php                               |    2 +-
+ changes/views/admin/custom_api_endpoints.php    |  577 --
+ changes/views/admin/incoming_webhooks.php       |  525 --
+ changes/views/admin/popups.php                  |  344 -
+ changes/views/layouts/admin_header.php          |  681 ++
+ index.php                                       |    2 +-
+ views/layouts/admin_header.php                  |    2 +-
+ 33 files changed, 4094 insertions(+), 12610 deletions(-)
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/CategoryController.php
+ delete mode 100644 changes/app/Controllers/CustomApiController.php
+ create mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Controllers/FeedController.php
+ create mode 100644 changes/app/Core/AdRenderer.php
+ create mode 100644 changes/app/Core/Config.php
+ delete mode 100644 changes/app/Core/Database.php
+ create mode 100644 changes/app/Core/ErrorLogger.php
+ delete mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ create mode 100644 changes/app/Core/Request.php
+ create mode 100644 changes/app/Core/Router.php
+ create mode 100644 changes/app/Core/helpers.php
+ create mode 100644 changes/app/Models/SecurityAnomalyEngine.php
+ delete mode 100644 changes/views/admin/custom_api_endpoints.php
+ delete mode 100644 changes/views/admin/incoming_webhooks.php
+ delete mode 100644 changes/views/admin/popups.php
+ create mode 100644 changes/views/layouts/admin_header.php

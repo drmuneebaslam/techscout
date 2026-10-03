@@ -1,0 +1,21 @@
+commit 2d7a6be49951f1139efd99bdb42c7e851c598bb6 (HEAD -> main, origin/main)
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 21:43:06 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 21:43:06 2026 +0500
+
+    feat(core): enforce UTC timezone globally and fix missing CSRF tokens in admin forms
+
+ app/Core/Database.php                              |   4 +-
+ app/Core/DateHelper.php                            |   9 +-
+ changes/app/Core/ErrorLogger.php                   | 599 +++++++++++++++++++++
+ ...800_add_ingestion_mode_to_incoming_webhooks.sql |   1 +
+ cron.php                                           |   2 +-
+ errors/bootstrap.php                               |   2 +-
+ index.php                                          |   2 +-
+ public/errors/bootstrap.php                        |   2 +-
+ views/admin/revenue.php                            |   1 +
+ views/admin/system.php                             |   1 +
+ 10 files changed, 611 insertions(+), 12 deletions(-)
+ create mode 100644 changes/app/Core/ErrorLogger.php
+ create mode 100644 changes/database/migrations/2026_10_03_180800_add_ingestion_mode_to_incoming_webhooks.sql

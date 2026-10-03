@@ -1,0 +1,32 @@
+commit c6f42e9abc35d65c1b2754d28aaeca3bbb11e857
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 12:29:52 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 12:29:52 2026 +0500
+
+    fix(webhooks, api, deployment): resolve 403 authorization in webhooks and custom api, support multi-table importing and get-by-id in custom api, fix ec2 detached head deployment
+
+ app/Controllers/CustomApiController.php            | 293 +++++-
+ app/Controllers/IncomingWebhookController.php      |  83 +-
+ app/Core/IncomingWebhookEngine.php                 | 227 +++--
+ changes/app/Controllers/CustomApiController.php    | 977 ++++++++++++++++++++
+ .../app/Controllers/IncomingWebhookController.php  | 175 ++++
+ changes/app/Core/IncomingWebhookEngine.php         | 429 +++++++++
+ changes/index.php                                  | 992 +++++++++++++++++++++
+ changes/scripts/ec2_deploy_and_migrate.sh          |   7 +-
+ changes/views/admin/custom_api_endpoints.php       | 616 +++++++++++++
+ changes/views/admin/incoming_webhooks.php          | 554 ++++++++++++
+ changes/views/layouts/admin_header.php             | 685 ++++++++++++++
+ index.php                                          |  17 +-
+ scripts/ec2_deploy_and_migrate.sh                  |   7 +-
+ views/admin/custom_api_endpoints.php               |  49 +-
+ views/admin/incoming_webhooks.php                  |  24 +-
+ views/layouts/admin_header.php                     |   4 +
+ 16 files changed, 5029 insertions(+), 110 deletions(-)
+ create mode 100644 changes/app/Controllers/CustomApiController.php
+ create mode 100644 changes/app/Controllers/IncomingWebhookController.php
+ create mode 100644 changes/app/Core/IncomingWebhookEngine.php
+ create mode 100644 changes/index.php
+ create mode 100644 changes/views/admin/custom_api_endpoints.php
+ create mode 100644 changes/views/admin/incoming_webhooks.php
+ create mode 100644 changes/views/layouts/admin_header.php

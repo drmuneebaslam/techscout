@@ -1,0 +1,45 @@
+commit b6d83548611cb2e02bb4fb3c59696c504318a3a6
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 12:59:23 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 12:59:23 2026 +0500
+
+    feat(admin-crud): Enterprise overhaul of Prompt Blueprints and Custom GPTs CRUD with multi-tab modal editors, variable builders, live playgrounds, and dual-theme design system
+
+ app/Controllers/AdminController.php                |  142 +-
+ changes/app/Controllers/AdminController.php        | 8567 ++++++++++++++++++++
+ changes/app/Controllers/ApiController.php          | 1712 ----
+ changes/app/Core/Config.php                        |   12 -
+ changes/app/Core/Database.php                      | 1871 -----
+ changes/app/Models/Analytics.php                   |  438 -
+ changes/app/Models/LinkScanner.php                 |  225 -
+ changes/assets/js/content-engine.js                |  204 -
+ changes/cron.php                                   |  719 --
+ .../features/50_enterprise_platform_features.md    |  142 -
+ changes/index.php                                  |  831 --
+ changes/views/admin/content_analytics.php          |  703 --
+ changes/views/admin/crud/gpts.php                  |  754 ++
+ changes/views/admin/crud/prompts.php               | 1155 +++
+ changes/views/author/content_analytics.php         |  626 --
+ changes/views/blog/article.php                     |  881 --
+ changes/views/components/comments_section.php      |  784 --
+ changes/views/public/author_profile.php            |  609 --
+ views/admin/crud/gpts.php                          |  729 +-
+ views/admin/crud/prompts.php                       | 1067 ++-
+ 20 files changed, 12177 insertions(+), 9994 deletions(-)
+ create mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Models/Analytics.php
+ delete mode 100644 changes/app/Models/LinkScanner.php
+ delete mode 100644 changes/assets/js/content-engine.js
+ delete mode 100644 changes/cron.php
+ delete mode 100644 changes/docs/features/50_enterprise_platform_features.md
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/views/admin/content_analytics.php
+ create mode 100644 changes/views/admin/crud/gpts.php
+ create mode 100644 changes/views/admin/crud/prompts.php
+ delete mode 100644 changes/views/author/content_analytics.php
+ delete mode 100644 changes/views/blog/article.php
+ delete mode 100644 changes/views/components/comments_section.php
+ delete mode 100644 changes/views/public/author_profile.php

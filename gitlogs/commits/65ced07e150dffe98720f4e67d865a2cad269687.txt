@@ -1,0 +1,134 @@
+commit 65ced07e150dffe98720f4e67d865a2cad269687
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 11:17:03 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 11:17:03 2026 +0500
+
+    feat(prompts-pricing): separate text vs image prompts, add prompt CRUD image upload, integrate real-time crypto pricing APIs, and on-chain payment verification
+    
+    - Prompt Architecture Segregation:
+      * Non-destructive migration prompts_and_pricing_upgrade.sql adding prompt_type ENUM('text', 'image')
+      * DirectoryController and Content model now segregate text prompts (/prompts) from image prompts (/prompts/images)
+      * Text prompts strictly render blueprint terminals with no image attachments (featured_image_url = NULL)
+      * Image prompts prominently display output artwork and preview modal
+    
+    - Enhanced Prompt CRUD & Author Studio:
+      * Admin prompts CRUD updated with segmented type selector, direct drag-and-drop image upload to /storage/uploads/prompts/, AI model tags, and live syntax validation
+      * Author Studio editor updated with prompt type selector and conditional showcase media upload
+    
+    - Real-Time Live Pricing APIs (PricingEngine):
+      * Built PricingEngine service with CoinGecko API integration and Binance API failover
+      * Site settings caching with configurable TTL and baseline fallback spot rates
+      * Added public API route /api/v1/pricing/crypto-rates and admin test endpoint /api/v1/pricing/test
+      * Admin Advertisements tab enhanced with live pricing engine configuration and ping diagnostic tool
+    
+    - Decentralized Payment Transaction Verification (TransactionVerifier):
+      * Built TransactionVerifier service supporting BTC (Mempool.space), ETH (Etherscan), TRON/TRC20, and SOL (Solscan/RPC)
+      * Live on-chain transaction hash format validation and ledger query
+      * Updated public Crypto Payment Box with live coin conversion rates, dynamic QR codes, and instant on-chain TXID verification badge
+      * Added Forensic On-Chain Transaction Inspector modal to Admin Advertisements & Sponsorships for 1-click approvals/rejections
+
+ app/Controllers/AdminController.php                |  110 +-
+ app/Controllers/ApiController.php                  |   48 +
+ app/Controllers/AuthorStudioController.php         |   12 +-
+ app/Controllers/DirectoryController.php            |    9 +-
+ app/Core/PricingEngine.php                         |  318 ++
+ app/Core/TransactionVerifier.php                   |  425 ++
+ app/Models/Content.php                             |   12 +-
+ changes/app/Controllers/AdminController.php        |  110 +-
+ changes/app/Controllers/ApiController.php          |   48 +
+ changes/app/Controllers/AuthController.php         |  765 ---
+ changes/app/Controllers/AuthorStudioController.php | 1186 +++++
+ changes/app/Controllers/DirectoryController.php    |    9 +-
+ changes/app/Controllers/FeedController.php         |  212 -
+ changes/app/Controllers/HomeController.php         |  401 --
+ changes/app/Controllers/PageController.php         |  201 -
+ changes/app/Core/AdRenderer.php                    |  117 -
+ changes/app/Core/Config.php                        |    4 +-
+ changes/app/Core/Firewall.php                      |  100 -
+ changes/app/Core/PricingEngine.php                 |  318 ++
+ changes/app/Core/RateLimiter.php                   |  151 -
+ changes/app/Core/Request.php                       |  139 -
+ changes/app/Core/Totp.php                          |  119 -
+ changes/app/Core/TransactionVerifier.php           |  425 ++
+ changes/app/Models/Content.php                     |   12 +-
+ changes/cron.php                                   |  134 -
+ .../2026_09_12_000003_enterprise_enhancements.sql  |   30 -
+ changes/database/prompts_and_pricing_upgrade.sql   |   53 +
+ changes/docs/MISTAKES_LEARNED.md                   |  385 --
+ changes/features_roadmap.html                      | 5561 --------------------
+ changes/features_roadmap_2.html                    |   16 -
+ changes/index.php                                  |   11 +
+ changes/manifest.json                              |   17 -
+ changes/sw.js                                      |   86 -
+ changes/views/account/settings.php                 | 1351 -----
+ changes/views/admin/advertisements.php             |  248 +-
+ changes/views/admin/crud/articles.php              |  547 --
+ changes/views/admin/crud/campaigns.php             |  546 --
+ changes/views/admin/crud/gpts.php                  |  155 -
+ changes/views/admin/crud/prompts.php               |  390 ++
+ changes/views/admin/crud/tools.php                 |  542 --
+ changes/views/admin/settings.php                   | 1106 ----
+ changes/views/author/dashboard.php                 | 2452 ---------
+ changes/views/author/editor.php                    |   43 +-
+ changes/views/components/comments_section.php      |  749 ---
+ changes/views/directory/prompt_single.php          |   20 +-
+ changes/views/directory/prompts.php                |   42 +-
+ changes/views/directory/prompts_images.php         |  180 -
+ changes/views/errors/503.php                       |  129 -
+ changes/views/layouts/footer.php                   |  197 -
+ changes/views/layouts/header.php                   |  937 ----
+ changes/views/pages/status.php                     |  118 -
+ .../views/public/components/crypto_payment_box.php |  214 +-
+ changes/views/public/sponsor.php                   |  358 --
+ changes/views/support/index.php                    |  281 -
+ changes/views/support/ticket.php                   |  260 -
+ database/prompts_and_pricing_upgrade.sql           |   53 +
+ index.php                                          |   11 +
+ views/admin/advertisements.php                     |  248 +-
+ views/admin/crud/prompts.php                       |  315 +-
+ views/author/editor.php                            |   43 +-
+ views/directory/prompt_single.php                  |   20 +-
+ views/directory/prompts.php                        |   42 +-
+ views/public/components/crypto_payment_box.php     |  214 +-
+ 63 files changed, 4776 insertions(+), 18579 deletions(-)
+ create mode 100644 app/Core/PricingEngine.php
+ create mode 100644 app/Core/TransactionVerifier.php
+ delete mode 100644 changes/app/Controllers/AuthController.php
+ create mode 100644 changes/app/Controllers/AuthorStudioController.php
+ delete mode 100644 changes/app/Controllers/FeedController.php
+ delete mode 100644 changes/app/Controllers/HomeController.php
+ delete mode 100644 changes/app/Controllers/PageController.php
+ delete mode 100644 changes/app/Core/AdRenderer.php
+ delete mode 100644 changes/app/Core/Firewall.php
+ create mode 100644 changes/app/Core/PricingEngine.php
+ delete mode 100644 changes/app/Core/RateLimiter.php
+ delete mode 100644 changes/app/Core/Request.php
+ delete mode 100644 changes/app/Core/Totp.php
+ create mode 100644 changes/app/Core/TransactionVerifier.php
+ delete mode 100644 changes/cron.php
+ delete mode 100644 changes/database/migrations/2026_09_12_000003_enterprise_enhancements.sql
+ create mode 100644 changes/database/prompts_and_pricing_upgrade.sql
+ delete mode 100644 changes/docs/MISTAKES_LEARNED.md
+ delete mode 100644 changes/features_roadmap.html
+ delete mode 100644 changes/features_roadmap_2.html
+ delete mode 100644 changes/manifest.json
+ delete mode 100644 changes/sw.js
+ delete mode 100644 changes/views/account/settings.php
+ delete mode 100644 changes/views/admin/crud/articles.php
+ delete mode 100644 changes/views/admin/crud/campaigns.php
+ delete mode 100644 changes/views/admin/crud/gpts.php
+ create mode 100644 changes/views/admin/crud/prompts.php
+ delete mode 100644 changes/views/admin/crud/tools.php
+ delete mode 100644 changes/views/admin/settings.php
+ delete mode 100644 changes/views/author/dashboard.php
+ delete mode 100644 changes/views/components/comments_section.php
+ delete mode 100644 changes/views/directory/prompts_images.php
+ delete mode 100644 changes/views/errors/503.php
+ delete mode 100644 changes/views/layouts/footer.php
+ delete mode 100644 changes/views/layouts/header.php
+ delete mode 100644 changes/views/pages/status.php
+ delete mode 100644 changes/views/public/sponsor.php
+ delete mode 100644 changes/views/support/index.php
+ delete mode 100644 changes/views/support/ticket.php
+ create mode 100644 database/prompts_and_pricing_upgrade.sql

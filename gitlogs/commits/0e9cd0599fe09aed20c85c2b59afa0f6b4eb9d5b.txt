@@ -1,0 +1,37 @@
+commit 0e9cd0599fe09aed20c85c2b59afa0f6b4eb9d5b
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 24 00:29:36 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 24 00:29:36 2026 +0500
+
+    fix(db-manager): make escapeHtml bulletproof against numbers and nulls, prevent TypeError in query runner and dashboard, sync EC2
+
+ .gitignore                                         |    3 +
+ assets/js/main.js                                  |   11 +-
+ changes/.gitignore                                 |    8 +
+ changes/GEMINI.md                                  |   43 -
+ changes/app/Controllers/AdminController.php        | 9259 --------------------
+ changes/app/Controllers/ApiController.php          | 2143 -----
+ changes/assets/js/main.js                          | 1072 +++
+ .../2026_09_23_000001_enterprise_v2_upgrade.sql    |  106 -
+ changes/index.php                                  |  915 --
+ changes/scripts/ec2_deploy_and_migrate.sh          |  107 -
+ changes/views/admin/db_manager.php                 |    7 +-
+ changes/views/admin/incoming_webhooks.php          |  521 ++
+ changes/views/admin/system.php                     |  197 -
+ changes/views/author/dashboard.php                 | 3465 ++++++++
+ views/admin/db_manager.php                         |    7 +-
+ views/admin/incoming_webhooks.php                  |    3 +-
+ views/author/dashboard.php                         |    4 +-
+ 17 files changed, 5092 insertions(+), 12779 deletions(-)
+ create mode 100644 changes/.gitignore
+ delete mode 100644 changes/GEMINI.md
+ delete mode 100644 changes/app/Controllers/AdminController.php
+ delete mode 100644 changes/app/Controllers/ApiController.php
+ create mode 100644 changes/assets/js/main.js
+ delete mode 100644 changes/database/migrations/2026_09_23_000001_enterprise_v2_upgrade.sql
+ delete mode 100644 changes/index.php
+ delete mode 100644 changes/scripts/ec2_deploy_and_migrate.sh
+ create mode 100644 changes/views/admin/incoming_webhooks.php
+ delete mode 100644 changes/views/admin/system.php
+ create mode 100644 changes/views/author/dashboard.php

@@ -1,0 +1,37 @@
+commit be1caf676e82fa106489f9c901777d3e5092afd8
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Thu Sep 17 13:49:14 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Thu Sep 17 13:49:14 2026 +0500
+
+    Fix category save white screen, add user ID filtering, fix category type filtering and content_categories fallback
+
+ app/Controllers/AdminController.php                |   68 +-
+ app/Controllers/CategoryController.php             |  125 +-
+ app/Core/AuditLog.php                              |   32 +
+ changes/app/Controllers/AdminController.php        | 8864 ++++++++++++++++++++
+ changes/app/Controllers/CategoryController.php     |  300 +
+ changes/app/Core/AuditLog.php                      |   32 +
+ changes/assets/css/admin.css                       | 2553 ------
+ ..._000002_entity_categories_and_subscriptions.sql |   48 -
+ changes/docs/USER_REQUESTS_TODO_TRACKER.md         |   33 +
+ changes/index.php                                  |  869 ++
+ changes/views/admin/crud/categories.php            | 1237 +++
+ changes/views/admin/users.php                      |    2 +-
+ changes/views/layouts/admin_header.php             |  667 --
+ changes/views/layouts/header.php                   |  957 ---
+ docs/USER_REQUESTS_TODO_TRACKER.md                 |   33 +
+ index.php                                          |    2 +
+ views/admin/crud/categories.php                    |   28 +-
+ views/admin/users.php                              |    2 +-
+ 18 files changed, 11563 insertions(+), 4289 deletions(-)
+ create mode 100644 app/Core/AuditLog.php
+ create mode 100644 changes/app/Controllers/AdminController.php
+ create mode 100644 changes/app/Controllers/CategoryController.php
+ create mode 100644 changes/app/Core/AuditLog.php
+ delete mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/database/migrations/2026_09_17_000002_entity_categories_and_subscriptions.sql
+ create mode 100644 changes/index.php
+ create mode 100644 changes/views/admin/crud/categories.php
+ delete mode 100644 changes/views/layouts/admin_header.php
+ delete mode 100644 changes/views/layouts/header.php

@@ -1,0 +1,14 @@
+commit a10d05c8de32b69b36659da2cf6c82b4845e9b12
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Sep 26 02:15:24 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Sep 26 02:15:24 2026 +0500
+
+    fix(deploy): add deployPull handler to AdminController, improve EC2 git pull permissions in ApiController
+
+ app/Controllers/AdminController.php         |   30 +
+ app/Controllers/ApiController.php           |   12 +-
+ changes/app/Controllers/AdminController.php |   30 +
+ changes/app/Controllers/ApiController.php   | 2153 +++++++++++++++++++++++++++
+ 4 files changed, 2224 insertions(+), 1 deletion(-)
+ create mode 100644 changes/app/Controllers/ApiController.php

@@ -1,0 +1,25 @@
+commit e54473161feabb0a70c879855257021062cd4cce
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sat Oct 3 17:05:27 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sat Oct 3 17:05:27 2026 +0500
+
+    Extract 140+ inline styles to CSS files for all layouts
+
+ assets/css/admin.css                   |  169 ++
+ assets/css/style.css                   |  331 ++++
+ changes/assets/css/admin.css           | 2757 ++++++++++++++++++++++++++
+ changes/assets/css/style.css           | 3385 ++++++++++++++++++++++++++++++++
+ changes/views/layouts/admin_footer.php |  588 ++++++
+ changes/views/layouts/admin_header.php |  111 +-
+ changes/views/layouts/footer.php       |  214 ++
+ changes/views/layouts/header.php       |  256 ++-
+ views/layouts/admin_footer.php         |   88 +-
+ views/layouts/admin_header.php         |  111 +-
+ views/layouts/footer.php               |   38 +-
+ views/layouts/header.php               |  256 ++-
+ 12 files changed, 7833 insertions(+), 471 deletions(-)
+ create mode 100644 changes/assets/css/admin.css
+ create mode 100644 changes/assets/css/style.css
+ create mode 100644 changes/views/layouts/admin_footer.php
+ create mode 100644 changes/views/layouts/footer.php

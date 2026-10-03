@@ -1,0 +1,43 @@
+commit 0b592038fad0eafc4cacc90ebc1da537374645a0
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Fri Sep 11 22:52:29 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Fri Sep 11 22:52:29 2026 +0500
+
+    feat(theme): preserve dark/light dual theme across mail studio, remove hardcoded inline tag styles, and add mistake verification rule
+    
+    - GEMINI.md:
+      - Added mandatory rule to review MISTAKES_LEARNED.md, analyze changed files, verify against all documented mistakes, and correct any violations before completing turns
+      - Added strict rule to preserve dual themes (dark & light) across all web components, prohibiting hardcoded inline tag styles for web UI, and restricting light backgrounds exclusively to email template document sheet preview and dispatched email bodies
+    - docs/MISTAKES_LEARNED.md:
+      - Added MISTAKE-10: Forcing Light Mode on Web UI Components & Inlining Tag Styles Instead of Dual-Theme CSS
+      - Updated Response Audit Protocol with item 10 for dual-theme UI preservation
+    - assets/css/admin.css:
+      - Added comprehensive Mail Template Studio dual-theme CSS architecture (.mail-studio-shell, .mail-studio-card, .mail-studio-palette-accordion, .mail-studio-blocks-card, .mail-studio-editor-box, .mail-studio-viewport, .mail-email-document-sheet, .mail-studio-code-editor, .mail-studio-preview-card, etc.) with complete dark mode defaults and [data-theme='light'] overrides
+    - views/admin/mail_template_editor.php:
+      - Removed all hardcoded inline light styles from outer page, top strip, metadata cards, variable accordions, blocks toolbar, and editor containers
+      - Switched to semantic CSS classes respecting active site theme
+      - Styled visual WYSIWYG editor canvas as a clean white email document sheet inside a viewport container, keeping the surrounding studio chrome in theme
+    - views/admin/mail.php:
+      - Refactored #templateEditorModal from hardcoded light inline styles to semantic classes and standard admin modal styling
+      - Preserved white email document sheet inside viewport container while allowing modal frame and controls to obey active theme
+
+ GEMINI.md                                    |   17 +-
+ assets/css/admin.css                         |  416 ++++++
+ changes/GEMINI.md                            |   26 +
+ changes/app/Core/EventTriggerEngine.php      |  413 ------
+ changes/app/Core/Mailer.php                  | 2053 --------------------------
+ changes/assets/css/admin.css                 | 1666 +++++++++++++++++++++
+ changes/database/upgrade_v2_fix.sql          |  152 --
+ changes/docs/MISTAKES_LEARNED.md             |   14 +
+ changes/views/admin/mail.php                 |  214 +--
+ changes/views/admin/mail_template_editor.php |  194 +--
+ docs/MISTAKES_LEARNED.md                     |   14 +
+ views/admin/mail.php                         |  214 +--
+ views/admin/mail_template_editor.php         |  194 +--
+ 13 files changed, 2559 insertions(+), 3028 deletions(-)
+ create mode 100644 changes/GEMINI.md
+ delete mode 100644 changes/app/Core/EventTriggerEngine.php
+ delete mode 100644 changes/app/Core/Mailer.php
+ create mode 100644 changes/assets/css/admin.css
+ delete mode 100644 changes/database/upgrade_v2_fix.sql

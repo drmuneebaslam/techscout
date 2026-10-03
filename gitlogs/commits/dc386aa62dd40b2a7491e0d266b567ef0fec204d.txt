@@ -1,0 +1,74 @@
+commit dc386aa62dd40b2a7491e0d266b567ef0fec204d
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Fri Sep 11 22:37:11 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Fri Sep 11 22:37:11 2026 +0500
+
+    feat(mail-studio): enhance mail template studio, dual-mode block/tag insertion, clean light theme, and expand templates
+    
+    - mail_template_editor.php:
+      - Converted entire studio layout to a modern clean light aesthetic matching white email templates
+      - Fixed 1-click responsive blocks and variable tags to support dual-mode caret insertion (active WYSIWYG selection and raw HTML textarea sync)
+      - Added 14 responsive email component blocks (Hero Header, Gradient Banner, Featured Article Card, 2-Col Grid, 3-Col Metrics, Callouts, Buttons, Quotes, Author Bio, Social Channels, Security Notice, Receipt Box, Footer Unsubscribe)
+      - Added Starter Clean White Boilerplate generator
+      - Removed duplicate concatenated view layout to prevent ID collisions
+    - mail.php:
+      - Restyled Template Editor modal from dark to clean light studio theme, eliminating theme discrepancies
+      - Upgraded insertTmplTag and insertBlockComponent with dual-mode caret insertion and micro-toasts
+      - Added 14 responsive blocks library and clean white boilerplate button
+      - Synchronized WYSIWYG editor and raw HTML textarea across all modal opening, snippet, and template load events
+    - Mailer.php:
+      - Added 15 new email templates across Auth/Security, Editorial/Content, Creator Economy/Financials, and Marketing/Digests categories (total: 41 templates)
+      - Added responsive clean white default envelope HTML bodies for all new templates
+      - Updated category mappings for all new templates
+    - EventTriggerEngine.php:
+      - Registered trigger events corresponding to the 15 new email templates
+    - upgrade_v2_fix.sql:
+      - Appended INSERT IGNORE definitions for all 15 new email templates
+    - MISTAKES_LEARNED.md:
+      - Documented MISTAKE-09: Dual-Mode WYSIWYG & HTML Editor Insertion Failure & View Duplication
+
+ app/Core/EventTriggerEngine.php                    |   90 ++
+ app/Core/Mailer.php                                |  308 ++++-
+ changes/.htaccess                                  |   51 -
+ changes/app/Controllers/AuthorStudioController.php | 1178 --------------------
+ changes/app/Controllers/DirectoryController.php    |  564 ----------
+ changes/app/Core/EventTriggerEngine.php            |   90 ++
+ changes/app/Core/Mailer.php                        |  308 ++++-
+ changes/database/upgrade_v2_fix.sql                |   17 +-
+ changes/docs/MISTAKES_LEARNED.md                   |   18 +
+ changes/errors/403.php                             |   44 -
+ changes/errors/404.php                             |   42 -
+ changes/errors/405.php                             |   41 -
+ changes/errors/429.php                             |   41 -
+ changes/errors/500.php                             |   41 -
+ changes/errors/bootstrap.php                       |   41 -
+ changes/public/errors/403.php                      |   44 -
+ changes/public/errors/404.php                      |   42 -
+ changes/public/errors/405.php                      |   41 -
+ changes/public/errors/429.php                      |   41 -
+ changes/public/errors/500.php                      |   41 -
+ changes/public/errors/bootstrap.php                |   41 -
+ changes/views/admin/mail.php                       |  392 ++++---
+ changes/views/admin/mail_template_editor.php       |  700 ++++++++++++
+ database/upgrade_v2_fix.sql                        |   17 +-
+ docs/MISTAKES_LEARNED.md                           |   18 +
+ views/admin/mail.php                               |  392 ++++---
+ views/admin/mail_template_editor.php               |  754 +++++--------
+ 27 files changed, 2384 insertions(+), 3013 deletions(-)
+ delete mode 100644 changes/.htaccess
+ delete mode 100644 changes/app/Controllers/AuthorStudioController.php
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ delete mode 100644 changes/errors/403.php
+ delete mode 100644 changes/errors/404.php
+ delete mode 100644 changes/errors/405.php
+ delete mode 100644 changes/errors/429.php
+ delete mode 100644 changes/errors/500.php
+ delete mode 100644 changes/errors/bootstrap.php
+ delete mode 100644 changes/public/errors/403.php
+ delete mode 100644 changes/public/errors/404.php
+ delete mode 100644 changes/public/errors/405.php
+ delete mode 100644 changes/public/errors/429.php
+ delete mode 100644 changes/public/errors/500.php
+ delete mode 100644 changes/public/errors/bootstrap.php
+ create mode 100644 changes/views/admin/mail_template_editor.php

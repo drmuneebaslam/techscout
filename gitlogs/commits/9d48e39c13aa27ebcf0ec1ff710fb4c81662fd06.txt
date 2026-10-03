@@ -1,0 +1,78 @@
+commit 9d48e39c13aa27ebcf0ec1ff710fb4c81662fd06
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 13 11:51:00 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 13 11:51:00 2026 +0500
+
+    Fix InfinityFree MySQL compatibility, retire PWA/manifest, resolve queryScalar & JS errors, enhance TXID verification, enforce dual-theme CSS on maintenance & author dashboard, and add 300+ roadmap features
+    
+    - Core Database & Migrations: Replaced dynamic PREPARE stmt and information_schema queries with safe SHOW COLUMNS checks compatible with InfinityFree; added Database::queryScalar(), Database::querySilent(), and Database::fetchSilent(); added Step 31 auto-migration for prompts.prompt_type; fixed SQLSTATE 42S22 column errors in AdminController::prompts and AdminController::dbManager.
+    - Production SQL: Rewrote database/prompts_and_pricing_upgrade.sql with standard MySQL DDL executable in phpMyAdmin without permission denied #1044 errors.
+    - PWA & Manifest Removal: Retired manifest.json and sw.js service workers per InfinityFree environment requirements; updated index.php to gracefully unregister existing workers and return empty JSON; removed manifest link and sw registration from header and footer.
+    - Single Article & Telemetry Fixes: Resolved fatal Call to undefined method App\Core\Database::queryScalar() in article.php:25; fixed JS SyntaxError: Identifier 'cryptoRates' has already been declared by converting to window.cryptoRates singleton; resolved 404 missing ad card by adding cloudmatrix_card.webp and graceful onerror fallback in AdRenderer.
+    - Crypto Payment Verification: Enhanced TransactionVerifier with configured platform treasury address validation across BTC, ETH, USDT (TRC-20 & ERC-20), and SOL; added matched_treasury_wallet and address feedback in crypto payment box component.
+    - Strict Text Prompts Rendering: Enforced that text prompts never display attached images; image cards only render when in image prompts tab and prompt_type === 'image'.
+    - Maintenance Mode & Dual Themes: Completely redesigned views/errors/503.php with high-contrast dual-theme CSS ensuring light mode text is never invisible; added admin maintenance preview and visitor lockout simulation controls in header banner.
+    - 100x Enhanced Author Dashboard: Added full dual-theme CSS styles preventing white-on-white text in light mode; added 4 new interactive tabs/panes: AI Prompts Studio, Crypto Tip Jar & Direct Patronage, Reader Feedback & Discussions, and Security & Active Device Sessions; updated AuthorStudioController to query prompts, comments, and sessions.
+    - Comprehensive Features Roadmap: Added 300 brand new features to features_roadmap.html (expanding roadmap from 222 to 522+ unified features) categorized across Guest Experience (75), Member Workspace (75), Author Studio (75), and Admin Governance (75).
+    - Deployment Prep: Cleaned and updated changes/ directory with all core modified files and configured InfinityFree production credentials in changes/app/Core/Config.php.
+
+ app/Controllers/AdminController.php                |    24 +-
+ app/Controllers/AuthorStudioController.php         |    34 +-
+ app/Core/AdRenderer.php                            |     2 +-
+ app/Core/Database.php                              |    63 +-
+ app/Core/TransactionVerifier.php                   |    77 +-
+ assets/images/ads/cloudmatrix_card.webp            |   Bin 0 -> 3520 bytes
+ changes/app/Controllers/AdminController.php        |    24 +-
+ changes/app/Controllers/ApiController.php          |  1591 ---
+ changes/app/Controllers/AuthorStudioController.php |    34 +-
+ changes/app/Controllers/DirectoryController.php    |   699 --
+ changes/app/Core/AdRenderer.php                    |   117 +
+ changes/app/Core/Config.php                        |     2 +-
+ changes/app/Core/Database.php                      |  1771 +++
+ changes/app/Core/PricingEngine.php                 |   318 -
+ changes/app/Core/TransactionVerifier.php           |    77 +-
+ changes/app/Models/Content.php                     |   300 -
+ changes/assets/images/ads/cloudmatrix_card.webp    |   Bin 0 -> 3520 bytes
+ changes/database/prompts_and_pricing_upgrade.sql   |    22 +-
+ changes/features_roadmap.html                      | 12165 +++++++++++++++++++
+ changes/index.php                                  |    51 +-
+ changes/views/admin/advertisements.php             |   866 --
+ changes/views/admin/crud/prompts.php               |   390 -
+ changes/views/author/dashboard.php                 |  3106 +++++
+ changes/views/author/editor.php                    |  1819 ---
+ changes/views/directory/prompt_single.php          |     4 -
+ changes/views/directory/prompts.php                |    19 +-
+ changes/views/errors/503.php                       |   315 +
+ changes/views/layouts/footer.php                   |   190 +
+ changes/views/layouts/header.php                   |   936 ++
+ .../views/public/components/crypto_payment_box.php |   113 +-
+ chat_history_and_git_logs.html                     |  4222 +++++++
+ database/prompts_and_pricing_upgrade.sql           |    22 +-
+ features_roadmap.html                              |  6612 +++++++++-
+ index.php                                          |    51 +-
+ views/author/dashboard.php                         |   680 +-
+ views/directory/prompt_single.php                  |     4 -
+ views/directory/prompts.php                        |    19 +-
+ views/errors/503.php                               |   270 +-
+ views/layouts/footer.php                           |     9 +-
+ views/layouts/header.php                           |     7 +-
+ views/public/components/crypto_payment_box.php     |   113 +-
+ 41 files changed, 30816 insertions(+), 6322 deletions(-)
+ create mode 100644 assets/images/ads/cloudmatrix_card.webp
+ delete mode 100644 changes/app/Controllers/ApiController.php
+ delete mode 100644 changes/app/Controllers/DirectoryController.php
+ create mode 100644 changes/app/Core/AdRenderer.php
+ create mode 100644 changes/app/Core/Database.php
+ delete mode 100644 changes/app/Core/PricingEngine.php
+ delete mode 100644 changes/app/Models/Content.php
+ create mode 100644 changes/assets/images/ads/cloudmatrix_card.webp
+ create mode 100644 changes/features_roadmap.html
+ delete mode 100644 changes/views/admin/advertisements.php
+ delete mode 100644 changes/views/admin/crud/prompts.php
+ create mode 100644 changes/views/author/dashboard.php
+ delete mode 100644 changes/views/author/editor.php
+ create mode 100644 changes/views/errors/503.php
+ create mode 100644 changes/views/layouts/footer.php
+ create mode 100644 changes/views/layouts/header.php
+ create mode 100644 chat_history_and_git_logs.html

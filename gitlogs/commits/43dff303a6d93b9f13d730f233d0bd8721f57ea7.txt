@@ -1,0 +1,13 @@
+commit 43dff303a6d93b9f13d730f233d0bd8721f57ea7
+Author:     TechScout Admin <admin@techscout.online>
+AuthorDate: Sun Sep 27 23:11:56 2026 +0500
+Commit:     TechScout Admin <admin@techscout.online>
+CommitDate: Sun Sep 27 23:11:56 2026 +0500
+
+    Ensure prompts table columns and findBySlug stability on EC2
+
+ app/Models/Content.php                             |  2 +-
+ changes/app/Models/Content.php                     |  2 +-
+ ..._sunglasses_prompt_and_secondary_categories.sql | 39 ++++++++++------------
+ ..._sunglasses_prompt_and_secondary_categories.sql | 39 ++++++++++------------
+ 4 files changed, 36 insertions(+), 46 deletions(-)
