@@ -31,7 +31,7 @@ if (php_sapi_name() !== 'cli') {
     }
 }
 
-date_default_timezone_set('Asia/Karachi');
+date_default_timezone_set('UTC');
 set_time_limit(300);
 
 $db = Database::getConnection();

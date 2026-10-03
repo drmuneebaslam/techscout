@@ -208,7 +208,6 @@ class DateHelper {
         $targetTz = $targetTimezone ?: self::timezone();
         try {
             $tzObj = new \DateTimeZone($targetTz);
-            $appTz = new \DateTimeZone('Asia/Karachi');
             $utcTz = new \DateTimeZone('UTC');
 
             if (is_numeric($time)) {
@@ -222,12 +221,10 @@ class DateHelper {
                 if (preg_match('/[+-]\d{2}:?\d{2}|Z$/', $timeStr)) {
                     $dt = new \DateTime($timeStr);
                 } else {
-                    // Raw database DATETIME strings were saved in Pakistan Standard Time (Asia/Karachi, UTC+5)
-                    $dt = new \DateTime($timeStr, $appTz);
+                    // Raw database DATETIME strings are now saved in UTC
+                    $dt = new \DateTime($timeStr, $utcTz);
                 }
-                // Step 1: Explicitly convert PKT to GMT/UTC
-                $dt->setTimezone($utcTz);
-                // Step 2: Convert from GMT/UTC to target visitor timezone
+                // Convert from GMT/UTC to target visitor timezone
                 $dt->setTimezone($tzObj);
             }
             return $dt;

@@ -1698,6 +1698,7 @@
     </div>
 
     <form action="<?= url('/admin/revenue/process-payout') ?>" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
       <input type="hidden" name="payout_id" id="proc_payout_id" value="">
 
       <div style="margin-bottom: 1rem;">

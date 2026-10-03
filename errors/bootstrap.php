@@ -14,7 +14,7 @@ if (!defined('TECHSCOUT_BOOTSTRAPPED')) {
     }
     
     // Timezone
-    date_default_timezone_set('Asia/Karachi');
+    date_default_timezone_set('UTC');
     
     // Start session if not active
     if (class_exists('\\App\\Core\\Session')) {

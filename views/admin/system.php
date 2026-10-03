@@ -10,6 +10,7 @@
     </div>
     <div style="display: flex; gap: 0.75rem;">
       <form action="<?= url('/admin/system/deploy-pull') ?>" method="POST" onsubmit="return confirm('Pull latest code from GitHub and run all pending migrations on this server?');" style="margin: 0;">
+        <?= csrf_field() ?>
         <button type="submit" class="admin-btn admin-btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
           <i data-lucide="cloud-download"></i> Sync &amp; Run Migrations
         </button>

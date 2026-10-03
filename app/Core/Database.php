@@ -103,9 +103,9 @@ class Database {
                     ]);
                 }
 
-                // Force session timezone to Pakistan Standard Time (UTC+5) so MySQL NOW() and CURRENT_TIMESTAMP match server/app time
+                // Force session timezone to UTC (+00:00) so MySQL NOW() and CURRENT_TIMESTAMP match app time
                 try {
-                    self::$instance->exec("SET time_zone = '+05:00'");
+                    self::$instance->exec("SET time_zone = '+00:00'");
                 } catch (Throwable $tzEx) {}
 
                 // Auto-initialize schema & seed data if tables are missing

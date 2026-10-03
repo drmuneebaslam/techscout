@@ -67,7 +67,7 @@ require_once __DIR__ . '/app/autoload.php';
 \App\Core\ErrorLogger::register();
 
 // Standard Platform Timezone: Pakistani Standard Time (UTC+5 / Asia/Karachi)
-date_default_timezone_set('Asia/Karachi');
+date_default_timezone_set('UTC');
 
 use App\Core\Request;
 use App\Core\Response;
