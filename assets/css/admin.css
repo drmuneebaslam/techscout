@@ -97,6 +97,7 @@ body.admin-body {
   position: sticky;
   top: 0;
   height: 100vh;
+  align-self: flex-start;
   z-index: 100;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -177,7 +178,6 @@ body.admin-body {
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
   background-color: var(--admin-bg-base);
 }
 
@@ -247,7 +247,6 @@ body.admin-body {
   .admin-main {
     width: 100% !important;
     min-width: 0 !important;
-    overflow-x: hidden !important;
   }
 
   .admin-topbar {
