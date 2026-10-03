@@ -248,7 +248,15 @@
               <a href="javascript:void(0)" onclick="loadMultiTableSampleIntoSimulator()" style="font-size: 0.72rem; color: #a855f7; text-decoration: none;">Multi-Table Sample</a>
             </div>
           </div>
-          <textarea id="simPayloadInput" rows="5" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem; width: 100%; margin-bottom: 0.6rem;"></textarea>
+          <textarea id="simPayloadInput" rows="5" class="admin-input" style="font-family: var(--admin-font-mono); font-size: 0.78rem; width: 100%; margin-bottom: 0.6rem;" oninput="handleSimulatorChange()"></textarea>
+          
+          <div id="dynamicCurlPreviewBox" style="display: none; background: #050811; border: 1px solid var(--admin-border-main); border-radius: 6px; padding: 0.5rem; margin-bottom: 0.6rem; font-family: var(--admin-font-mono); font-size: 0.72rem;">
+            <div style="color: #38bdf8; font-weight: bold; margin-bottom: 0.2rem;">Dynamic GET URL:</div>
+            <div id="dynGetUrl" style="word-break: break-all; color: #94a3b8; margin-bottom: 0.4rem;"></div>
+            <div style="color: #34d399; font-weight: bold; margin-bottom: 0.2rem;">Dynamic POST cURL:</div>
+            <div id="dynPostCurl" style="word-break: break-all; color: #94a3b8; white-space: pre-wrap;"></div>
+          </div>
+
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <button type="button" onclick="sendTestSimulation()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
               🚀 Execute Test Dispatch
@@ -275,6 +283,7 @@
 
         <form id="mappingForm" onsubmit="saveFieldMappings(event)">
           <input type="hidden" id="mappingWebhookId" name="webhook_id">
+          <datalist id="jsonKeysList"></datalist>
           
           <div id="mappingRowsContainer" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 320px; overflow-y: auto; padding-right: 0.4rem; margin-bottom: 1rem;">
             <!-- Rows injected dynamically via JS -->
@@ -635,6 +644,31 @@ print(response.status_code, response.json())</pre>
 let currentActiveWebhook = null;
 let pollInterval = null;
 let lastLogId = 0;
+
+const flattenJSON = (obj, prefix = '') => {
+  let res = {};
+  for (const k in obj) {
+    if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+      Object.assign(res, flattenJSON(obj[k], prefix + k + '.'));
+    } else {
+      res[prefix + k] = obj[k];
+    }
+  }
+  return res;
+};
+
+function updateJsonKeysDatalist(jsonObj) {
+  const flatKeys = Object.keys(flattenJSON(jsonObj));
+  const dl = document.getElementById('jsonKeysList');
+  if (dl) {
+    dl.innerHTML = '';
+    flatKeys.forEach(k => {
+      const opt = document.createElement('option');
+      opt.value = k;
+      dl.appendChild(opt);
+    });
+  }
+}
 const PERMITTED_TABLES = <?= json_encode($permittedTables, JSON_HEX_TAG | JSON_HEX_AMP) ?>;
 
 // Global Escape Key Listener for Modals
@@ -768,6 +802,7 @@ function loadSampleModalIntoSimulator() {
     if (firstWh) openLiveListener(firstWh);
   }
   document.getElementById('simPayloadInput').value = payload;
+  handleSimulatorChange();
 }
 
 function quickLoadTableSample(table) {
@@ -792,6 +827,7 @@ async function loadTableSampleIntoSimulator() {
     if (res.ok) {
       const data = await res.json();
       document.getElementById('simPayloadInput').value = JSON.stringify(data, null, 2);
+      handleSimulatorChange();
     }
   } catch(e) {}
 }
@@ -804,6 +840,7 @@ async function loadMultiTableSampleIntoSimulator() {
     if (res.ok) {
       const data = await res.json();
       document.getElementById('simPayloadInput').value = JSON.stringify(data, null, 2);
+      handleSimulatorChange();
     }
   } catch(e) {}
 }
@@ -835,7 +872,7 @@ function addMappingRow(jsonKey = '', targetCol = '') {
   });
 
   row.innerHTML = `
-    <input type="text" class="admin-input map-json-key" placeholder="JSON Key (e.g. data.title)" value="${escapeHtml(jsonKey)}" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
+    <input type="text" list="jsonKeysList" class="admin-input map-json-key" placeholder="JSON Key (e.g. data.title)" value="${escapeHtml(jsonKey)}" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
     <span style="color: var(--admin-text-secondary);">&rarr;</span>
     <select class="admin-input map-target-col" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
       ${colOptions}
@@ -937,17 +974,7 @@ async function pollLatestLogs() {
         let parsedPayload = {};
         try { parsedPayload = JSON.parse(log.payload_json); } catch(e) {}
         
-        const flattenJSON = (obj, prefix = '') => {
-          let res = {};
-          for (const k in obj) {
-            if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
-              Object.assign(res, flattenJSON(obj[k], prefix + k + '.'));
-            } else {
-              res[prefix + k] = obj[k];
-            }
-          }
-          return res;
-        };
+
         const flatFields = flattenJSON(parsedPayload);
         let fieldsHtml = '';
         if (Object.keys(flatFields).length > 0) {
@@ -967,6 +994,41 @@ async function pollLatestLogs() {
       document.getElementById('streamCounter').textContent = data.logs.length + ' payloads synced';
     }
   } catch(e) {}
+}
+
+function handleSimulatorChange() {
+  const val = document.getElementById('simPayloadInput').value;
+  try {
+    const obj = JSON.parse(val);
+    updateJsonKeysDatalist(obj);
+    
+    if (currentActiveWebhook) {
+      const baseUrl = '<?= url('/api/v1/webhook/') ?>' + currentActiveWebhook.slug;
+      const box = document.getElementById('dynamicCurlPreviewBox');
+      box.style.display = 'block';
+      
+      let curlCmd = 'curl -X POST "' + baseUrl + '" \\\n  -H "Content-Type: application/json"';
+      if (currentActiveWebhook.auth_type === 'bearer') {
+        curlCmd += ' \\\n  -H "Authorization: Bearer ' + currentActiveWebhook.secret_key + '"';
+      }
+      curlCmd += ' \\\n  -d \'' + val.replace(/'/g, "'\\''") + '\'';
+      document.getElementById('dynPostCurl').textContent = curlCmd;
+
+      let queryStr = '?';
+      const flat = flattenJSON(obj);
+      for (let k in flat) {
+        queryStr += encodeURIComponent(k) + '=' + encodeURIComponent(flat[k]) + '&';
+      }
+      if (currentActiveWebhook.auth_type === 'token' || currentActiveWebhook.auth_type === 'bearer') {
+        queryStr += 'token=' + encodeURIComponent(currentActiveWebhook.secret_key);
+      } else {
+        queryStr = queryStr.slice(0, -1);
+      }
+      document.getElementById('dynGetUrl').textContent = baseUrl + queryStr;
+    }
+  } catch(e) {
+    document.getElementById('dynamicCurlPreviewBox').style.display = 'none';
+  }
 }
 
 async function sendTestSimulation() {

@@ -1494,7 +1494,9 @@ function openUserDetailModal(userId) {
             <td style="font-weight:700; color:#10b981;">$${parseFloat(p.amount_usd).toFixed(2)}</td>
             <td>${p.payout_method}</td>
             <td><span class="ts-badge ${p.status === 'paid' ? 'ts-badge-green' : 'ts-badge-amber'}">${p.status.toUpperCase()}</span></td>
-            <td style="font-size:0.78rem; font-family:var(--admin-font-mono);">${p.transaction_reference || '—'}</td>
+            <td style="font-size:0.78rem; font-family:var(--admin-font-mono);">
+              ${p.transaction_reference ? `<a href="<?= url('/admin/system/financial?ref=') ?>${p.transaction_reference}" style="color:#38bdf8; text-decoration:none;">${p.transaction_reference}</a>` : '—'}
+            </td>
           </tr>`).join('') + '</tbody></table>';
       } else {
         pOut += '<p style="color:#64748b; font-size:0.88rem;">No withdrawal requests found.</p>';

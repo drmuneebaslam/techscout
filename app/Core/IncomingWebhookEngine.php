@@ -461,8 +461,14 @@ class IncomingWebhookEngine {
                     return ['success' => false, 'code' => 422, 'error' => $errorSummary, 'validation_errors' => $validationErrors];
                 }
             } else {
+                if ($webhookId) {
+                    $errorSummary = "Webhook has no explicit field mappings configured. Payload rejected.";
+                    self::logExecution($webhookId, $slug, $headers, $rawBody, 'failed', 422, 0, $errorSummary, $ip);
+                    return ['success' => false, 'code' => 422, 'error' => $errorSummary];
+                }
+                
                 // ------------------------------------------------------------
-                // 2. Fallback Permissive Mode (Only when NO rules configured)
+                // 2. Fallback Permissive Mode (Only for Omni/Universal Webhooks)
                 // ------------------------------------------------------------
                 foreach ($itemData as $k => $v) {
                     if (in_array($k, ['table', 'target_table', '_table', 'records', 'items'], true)) continue;

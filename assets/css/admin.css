@@ -71,7 +71,6 @@ body.admin-body {
   color: var(--admin-text-secondary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
-  overflow-x: clip;
   line-height: 1.5;
 }
 
@@ -83,7 +82,6 @@ body.admin-body {
   min-height: 100vh;
   width: 100%;
   position: relative;
-  overflow-x: clip;
   background-color: var(--admin-bg-base);
 }
 
