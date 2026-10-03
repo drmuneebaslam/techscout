@@ -38,7 +38,7 @@ $encodedSummary = urlencode($sSummary);
 
       <!-- LinkedIn -->
       <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= $encodedUrl ?>" target="_blank" rel="noopener noreferrer" class="ts-btn ts-btn-outline ts-btn-sm share-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem; color: #38bdf8; border-color: rgba(56,189,248,0.3);" title="Share on LinkedIn">
-        <i data-lucide="linkedin" style="width: 13px; height: 13px;"></i> LinkedIn
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> LinkedIn
       </a>
 
       <!-- Reddit -->

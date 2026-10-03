@@ -628,7 +628,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
       </a>
       <a href="<?= url('/prompts') ?>" class="mobile-nav-link">
         <i data-lucide="terminal"></i>
-        <span>Prompt Blueprints</span>
+        <span>Prompts</span>
       </a>
       <a href="<?= url('/gpts') ?>" class="mobile-nav-link">
         <i data-lucide="bot"></i>
