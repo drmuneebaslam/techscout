@@ -382,15 +382,17 @@ class ApiController {
 
     // TS-CR-05: Creator Crypto Tip Jar Submission (Central Treasury, 5% fee)
     public function submitCreatorTip(Request $request): void {
-        $authorUsername = trim((string)($request->post('author_username') ?? $request->post('author_name') ?? ''));
-        $authorIdParam = (int)$request->post('author_id', 0);
-        $articleUrl = trim((string)$request->post('article_url', ''));
-        $articleId = (int)$request->post('article_id', 0);
-        $grossAmount = (float)($request->post('amount') ?? $request->post('amount_usd') ?? 10.00);
-        $currency = strtoupper(trim((string)($request->post('currency') ?? $request->post('crypto_symbol') ?? 'USDT')));
-        $txid = trim((string)$request->post('txid', ''));
-        $senderName = trim((string)($request->post('sender_name') ?? $request->post('tipper_name') ?? 'Anonymous Supporter'));
-        $senderWallet = trim((string)$request->post('sender_wallet', ''));
+        $getParam = fn($key, $default = '') => $request->json($key) ?? $request->post($key) ?? $default;
+        
+        $authorUsername = trim((string)($getParam('author_username') ?: $getParam('author_name')));
+        $authorIdParam = (int)$getParam('author_id', 0);
+        $articleUrl = trim((string)$getParam('article_url', ''));
+        $articleId = (int)$getParam('article_id', 0);
+        $grossAmount = (float)($getParam('amount') ?: $getParam('amount_usd') ?: 10.00);
+        $currency = strtoupper(trim((string)($getParam('currency') ?: $getParam('crypto_symbol') ?: 'USDT')));
+        $txid = trim((string)$getParam('txid', ''));
+        $senderName = trim((string)($getParam('sender_name') ?: $getParam('tipper_name') ?: 'Anonymous Supporter'));
+        $senderWallet = trim((string)$getParam('sender_wallet', ''));
 
         if ($grossAmount <= 0 || empty($txid)) {
             Response::json(['error' => 'Please provide a valid tip amount ($1+) and payment TXID.'], 400);
@@ -415,7 +417,8 @@ class ApiController {
         $userId = Auth::id() ? (int)Auth::id() : null;
         $tipperName = $senderName ?: 'Anonymous Supporter';
         $paymentMethod = 'crypto_' . strtolower($currency);
-        $message = "Currency: {$currency} | TXID: {$txid}" . ($articleUrl ? " | Target: {$articleUrl}" : "");
+        $tipperMessage = trim((string)$getParam('message', ''));
+        $message = "Currency: {$currency} | TXID: {$txid}" . ($articleUrl ? " | Target: {$articleUrl}" : "") . ($tipperMessage ? " | Feedback: {$tipperMessage}" : "");
 
         // Dynamically inspect existing author_tips columns to ensure complete schema compatibility
         $tipCols = [];

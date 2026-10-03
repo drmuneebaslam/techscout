@@ -141,20 +141,9 @@ class FeedController {
         header('Content-Type: application/xml; charset=utf-8');
         $baseUrl = rtrim(Config::url('/'), '/');
         $now = date('Y-m-d');
-        $chunkSize = 5000;
 
         $db = Database::getConnection();
-
-        // Calculate partition counts for each major entity type
-        $toolsCount = (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'tool' AND status = 'published'")->fetchColumn() ?: 0);
-        $promptsCount = (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'prompt' AND status = 'published'")->fetchColumn() ?: 0);
-        $gptsCount = (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'custom_gpt' AND status = 'published'")->fetchColumn() ?: 0);
-        $articlesCount = (int)($db->query("SELECT COUNT(*) FROM contents WHERE content_type = 'article' AND status = 'published'")->fetchColumn() ?: 0);
-
-        $toolPartitions = max(1, (int)ceil($toolsCount / $chunkSize));
-        $promptPartitions = max(1, (int)ceil($promptsCount / $chunkSize));
-        $gptPartitions = max(1, (int)ceil($gptsCount / $chunkSize));
-        $articlePartitions = max(1, (int)ceil($articlesCount / $chunkSize));
+        $categories = $db->query("SELECT slug FROM categories ORDER BY id ASC")->fetchAll(\PDO::FETCH_ASSOC);
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         echo '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
@@ -163,24 +152,10 @@ class FeedController {
         echo "  <sitemap><loc>{$baseUrl}/sitemap-static.xml</loc><lastmod>{$now}</lastmod></sitemap>\n";
         echo "  <sitemap><loc>{$baseUrl}/sitemap-categories.xml</loc><lastmod>{$now}</lastmod></sitemap>\n";
 
-        // Articles partitions
-        for ($i = 1; $i <= $articlePartitions; $i++) {
-            echo "  <sitemap><loc>{$baseUrl}/sitemap-articles-{$i}.xml</loc><lastmod>{$now}</lastmod></sitemap>\n";
-        }
-
-        // Tools partitions
-        for ($i = 1; $i <= $toolPartitions; $i++) {
-            echo "  <sitemap><loc>{$baseUrl}/sitemap-tools-{$i}.xml</loc><lastmod>{$now}</lastmod></sitemap>\n";
-        }
-
-        // Prompts partitions
-        for ($i = 1; $i <= $promptPartitions; $i++) {
-            echo "  <sitemap><loc>{$baseUrl}/sitemap-prompts-{$i}.xml</loc><lastmod>{$now}</lastmod></sitemap>\n";
-        }
-
-        // Custom GPTs partitions
-        for ($i = 1; $i <= $gptPartitions; $i++) {
-            echo "  <sitemap><loc>{$baseUrl}/sitemap-gpts-{$i}.xml</loc><lastmod>{$now}</lastmod></sitemap>\n";
+        // Category-wise sitemaps
+        foreach ($categories as $cat) {
+            $slug = htmlspecialchars($cat['slug']);
+            echo "  <sitemap><loc>{$baseUrl}/sitemap-category-{$slug}.xml</loc><lastmod>{$now}</lastmod></sitemap>\n";
         }
 
         echo '</sitemapindex>';
@@ -239,87 +214,58 @@ class FeedController {
     }
 
     /**
-     * Dynamic Partitioned Sitemap Dispatcher
-     * Supports:
-     * - /sitemap-articles-{page}.xml
-     * - /sitemap-tools-{page}.xml
-     * - /sitemap-prompts-{page}.xml
-     * - /sitemap-gpts-{page}.xml
-     * - /sitemap-articles.xml (defaults to page 1)
-     * - /sitemap-tools.xml (defaults to page 1)
-     * - /sitemap-prompts.xml (defaults to page 1)
-     * - /sitemap-gpts.xml (defaults to page 1)
+     * Category Content Sitemap
+     * Example: /sitemap-category-software.xml
      */
-    public function sitemapPartition(Request $request, array $params): void {
+    public function sitemapCategoryContent(Request $request, array $params): void {
         header('Content-Type: application/xml; charset=utf-8');
-        $type = strtolower(trim((string)($params['type'] ?? 'tools')));
-        $page = max(1, (int)($params['page'] ?? 1));
-        $chunkSize = 5000;
-        $offset = ($page - 1) * $chunkSize;
+        $baseUrl = rtrim(Config::url('/'), '/');
+        $slug = $params['slug'] ?? '';
+        
+        $db = Database::getConnection();
+        $catStmt = $db->prepare("SELECT id FROM categories WHERE slug = ?");
+        $catStmt->execute([$slug]);
+        $catId = $catStmt->fetchColumn();
 
-        $contentTypeMap = [
-            'tools' => 'tool',
-            'prompts' => 'prompt',
-            'gpts' => 'custom_gpt',
-            'articles' => 'article'
-        ];
-
-        $routePrefixMap = [
-            'tools' => '/tools/',
-            'prompts' => '/prompts/',
-            'gpts' => '/gpts/',
-            'articles' => '/article/'
-        ];
-
-        if (!isset($contentTypeMap[$type])) {
+        if (!$catId) {
             http_response_code(404);
-            echo '<?xml version="1.0" encoding="UTF-8"?><error>Invalid sitemap type</error>';
+            echo '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
             exit;
         }
 
-        $contentType = $contentTypeMap[$type];
-        $prefix = $routePrefixMap[$type];
-        $baseUrl = rtrim(Config::url('/'), '/');
-
-        $db = Database::getConnection();
-        // MISTAKE-35: Explicit integer casting in LIMIT/OFFSET
         $stmt = $db->prepare("
-            SELECT slug, updated_at, created_at 
+            SELECT content_type, slug, updated_at, created_at 
             FROM contents 
-            WHERE content_type = :ctype AND status = 'published'
-            ORDER BY id ASC
-            LIMIT " . (int)$offset . ", " . (int)$chunkSize . "
+            WHERE category_id = ? AND status = 'published'
+            ORDER BY created_at DESC LIMIT 50000
         ");
-        $stmt->execute([':ctype' => $contentType]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt->execute([$catId]);
+        $contents = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
-        foreach ($rows as $row) {
-            $date = date('Y-m-d', strtotime($row['updated_at'] ?? $row['created_at'] ?? 'now'));
-            $loc = $baseUrl . $prefix . $row['slug'];
-            echo "  <url><loc>{$loc}</loc><lastmod>{$date}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>\n";
+        
+        foreach ($contents as $item) {
+            $pathMap = [
+                'article' => '/article/',
+                'tool' => '/tool/',
+                'prompt' => '/prompts/',
+                'custom_gpt' => '/gpts/'
+            ];
+            $prefix = $pathMap[$item['content_type']] ?? '/content/';
+            $loc = $baseUrl . $prefix . $item['slug'];
+            $date = date('Y-m-d', strtotime($item['updated_at'] ?? $item['created_at'] ?? 'now'));
+            
+            echo "  <url>\n";
+            echo "    <loc>{$loc}</loc>\n";
+            echo "    <lastmod>{$date}</lastmod>\n";
+            echo "    <changefreq>weekly</changefreq>\n";
+            echo "    <priority>0.64</priority>\n";
+            echo "  </url>\n";
         }
 
         echo '</urlset>';
         exit;
-    }
-
-    public function sitemapArticles(Request $request): void {
-        $this->sitemapPartition($request, ['type' => 'articles', 'page' => 1]);
-    }
-
-    public function sitemapTools(Request $request): void {
-        $this->sitemapPartition($request, ['type' => 'tools', 'page' => 1]);
-    }
-
-    public function sitemapPrompts(Request $request): void {
-        $this->sitemapPartition($request, ['type' => 'prompts', 'page' => 1]);
-    }
-
-    public function sitemapGpts(Request $request): void {
-        $this->sitemapPartition($request, ['type' => 'gpts', 'page' => 1]);
     }
 }
 

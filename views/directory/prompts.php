@@ -30,10 +30,10 @@
   <?php endif; ?>
 
   <div style="text-align: center; margin-bottom: 2.25rem;">
-    <span class="ts-badge ts-badge-green" style="margin-bottom: 0.75rem;">AI Prompt Library &amp; Model Blueprints</span>
-    <h1 style="font-size: clamp(2rem, 4vw, 2.75rem); margin-bottom: 0.5rem; font-weight: 800;">Prompt Engineering Blueprints</h1>
+    <span class="ts-badge ts-badge-green" style="margin-bottom: 0.75rem;">AI Prompt Library</span>
+    <h1 style="font-size: clamp(2rem, 4vw, 2.75rem); margin-bottom: 0.5rem; font-weight: 800;">Prompts</h1>
     <p style="color: var(--ts-text-secondary); max-width: 680px; margin: 0 auto; font-size: 1.05rem;">
-      Battle-tested system prompts for LLMs and state-of-the-art visual blueprints for Midjourney, DALL-E 3, Flux.1, and Stable Diffusion.
+      Battle-tested system prompts for LLMs and state-of-the-art visual prompts for Midjourney, DALL-E 3, Flux.1, and Stable Diffusion.
     </p>
 
     <!-- Top Primary Mode Tabs -->
@@ -51,7 +51,7 @@
         📁 All Categories Hub
       </a>
       <a href="<?= url('/prompts?tab=all') ?>" class="ts-btn ts-btn-sm <?= ($activeTab ?? '') === 'all' ? 'ts-btn-primary' : 'ts-btn-ghost' ?>" style="border-radius: 24px; padding: 0.45rem 1.25rem; font-weight: 600; text-decoration: none;">
-        🌟 All Blueprints
+        🌟 All Prompts
       </a>
     </div>
 
@@ -315,7 +315,7 @@
     <?php else: ?>
       <div class="ts-card" style="grid-column: 1 / -1; text-align: center; padding: 3.5rem;">
         <i data-lucide="terminal" style="width: 48px; height: 48px; color: var(--ts-primary); margin-bottom: 1rem;"></i>
-        <h3>No Prompt Blueprints Found</h3>
+        <h3>No Prompts Found</h3>
         <p style="color: var(--ts-text-secondary); margin-top: 0.5rem;">Check other categories or reset search filters.</p>
         <a href="<?= url('/prompts') ?>" class="ts-btn ts-btn-primary" style="margin-top: 1rem;">View All Prompts</a>
       </div>

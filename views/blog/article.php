@@ -208,10 +208,6 @@ if (\App\Core\Auth::check()) {
       </div>
 
       <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-        <!-- [TS-ED-11] 1-Click PDF / ePub eBook Export Engine -->
-        <button type="button" onclick="window.print()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;" title="Export printable PDF whitepaper">
-          <i data-lucide="printer" style="width: 13px; height: 13px;"></i> PDF Whitepaper
-        </button>
 
         <button type="button" onclick="toggleBookmark(<?= (int)$article['id'] ?>)" id="top-bookmark-btn" class="ts-btn <?= !empty($isBookmarked) ? 'ts-btn-primary' : 'ts-btn-outline' ?> ts-btn-sm" style="<?= !empty($isBookmarked) ? 'background:#ec4899; border-color:#ec4899;' : 'color:#ec4899; border-color:rgba(236,72,153,0.3);' ?>">
           <span><?= !empty($isBookmarked) ? '🔖 Saved' : '🔖 Save' ?></span>
@@ -398,9 +394,14 @@ if (\App\Core\Auth::check()) {
             </div>
           </div>
 
-          <div style="margin-bottom: 1.25rem;">
+          <div style="margin-bottom: 0.75rem;">
             <label class="ts-form-label">Blockchain Transaction Hash (TXID)</label>
             <input type="text" name="txid" class="ts-form-input" placeholder="Paste on-chain transaction hash..." required style="font-family: monospace; font-size: 0.8rem;">
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label class="ts-form-label">Feedback / Message for Author (Optional)</label>
+            <textarea name="message" class="ts-form-input" rows="2" placeholder="Send a note of appreciation or feedback..."></textarea>
           </div>
 
           <button type="submit" class="ts-btn ts-btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #f59e0b, #d97706);">
@@ -544,7 +545,8 @@ async function submitAuthorTip(e) {
     author_username: form.author_username.value,
     crypto_symbol: form.crypto_symbol.value,
     amount_usd: form.amount_usd.value,
-    txid: form.txid.value
+    txid: form.txid.value,
+    message: form.message.value
   };
   try {
     const res = await fetch('<?= url('/api/v1/tips/submit') ?>', {

@@ -727,11 +727,7 @@ $router->get('/feed.xml', [\App\Controllers\FeedController::class, 'articlesXml'
 $router->get('/sitemap.xml', [\App\Controllers\FeedController::class, 'sitemapIndex']);
 $router->get('/sitemap-static.xml', [\App\Controllers\FeedController::class, 'sitemapStatic']);
 $router->get('/sitemap-categories.xml', [\App\Controllers\FeedController::class, 'sitemapCategories']);
-$router->get('/sitemap-articles.xml', [\App\Controllers\FeedController::class, 'sitemapArticles']);
-$router->get('/sitemap-tools.xml', [\App\Controllers\FeedController::class, 'sitemapTools']);
-$router->get('/sitemap-prompts.xml', [\App\Controllers\FeedController::class, 'sitemapPrompts']);
-$router->get('/sitemap-gpts.xml', [\App\Controllers\FeedController::class, 'sitemapGpts']);
-$router->get('/sitemap-{type}-{page}.xml', [\App\Controllers\FeedController::class, 'sitemapPartition']);
+$router->get('/sitemap-category-{slug}.xml', [\App\Controllers\FeedController::class, 'sitemapCategoryContent']);
 
 
 // System, Audit Logs & Backup Exporter
