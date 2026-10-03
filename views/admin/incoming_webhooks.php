@@ -65,8 +65,8 @@
               </div>
 
               <!-- Endpoint URL with Copy -->
-              <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.55rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.85rem;">
-                <code style="font-size: 0.76rem; color: #38bdf8; font-family: var(--admin-font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+              <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.55rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.85rem; min-width: 0;">
+                <code style="font-size: 0.76rem; color: #38bdf8; font-family: var(--admin-font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">
                   <?= htmlspecialchars($endpointUrl) ?>
                 </code>
                 <button type="button" onclick="copyToClipboard('<?= htmlspecialchars(addslashes($endpointUrl)) ?>')" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.72rem;" title="Copy Endpoint URL">
@@ -79,31 +79,35 @@
               </div>
             </div>
 
-            <div style="display: flex; gap: 0.4rem; border-top: 1px solid var(--admin-border-main); padding-top: 0.85rem; flex-wrap: wrap;">
-              <button type="button" onclick="openLiveListener(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="flex: 1; font-weight: 700; font-size: 0.76rem;">
-                <i data-lucide="radio"></i> Live Studio
-              </button>
-              <button type="button" onclick="openEditIncomingModal(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #38bdf8;" title="Edit Webhook Settings">
-                <i data-lucide="edit-3" style="width: 13px; height: 13px;"></i> Edit
-              </button>
-              <button type="button" onclick="quickLoadTableSample('<?= htmlspecialchars(addslashes($wh['target_table'])) ?>')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #a855f7;" title="Load Sample Payload for <?= htmlspecialchars($wh['target_table']) ?>">
-                <i data-lucide="code" style="width: 13px; height: 13px;"></i> Sample
-              </button>
-              <form action="<?= url('/admin/incoming-webhooks/toggle-mode/' . $wh['id']) ?>" method="POST" style="margin: 0;">
-                <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Mode: <?= $ingestMode === 'listen_only' ? 'Switch to Live Ingestion (Writes to DB)' : 'Switch to Schema Listener (No DB Writes)' ?>">
-                  <i data-lucide="<?= $ingestMode === 'listen_only' ? 'database' : 'headphones' ?>" style="width: 13px; height: 13px; color: <?= $ingestMode === 'listen_only' ? '#10b981' : '#f59e0b' ?>;"></i>
+            <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; flex: 1;">
+                <button type="button" onclick="openLiveListener(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700; font-size: 0.76rem;">
+                  <i data-lucide="radio" style="width: 14px; height: 14px;"></i> Live Studio
                 </button>
-              </form>
-              <form action="<?= url('/admin/incoming-webhooks/toggle/' . $wh['id']) ?>" method="POST" style="margin: 0;">
-                <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" title="Toggle Active Status">
-                  <i data-lucide="<?= !empty($wh['is_active']) ? 'pause' : 'play' ?>" style="width: 13px; height: 13px;"></i>
+                <button type="button" onclick="openEditIncomingModal(<?= htmlspecialchars(json_encode($wh, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #38bdf8;" title="Edit Settings">
+                  <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit
                 </button>
-              </form>
-              <form action="<?= url('/admin/incoming-webhooks/delete/' . $wh['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this incoming webhook endpoint?');" style="margin: 0;">
-                <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444;" title="Delete Webhook">
-                  <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
+                <button type="button" onclick="quickLoadTableSample('<?= htmlspecialchars(addslashes($wh['target_table'])) ?>')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.76rem; color: #a855f7;" title="Load Sample">
+                  <i data-lucide="code" style="width: 14px; height: 14px;"></i> Sample
                 </button>
-              </form>
+              </div>
+              <div style="display: flex; gap: 0.4rem;">
+                <form action="<?= url('/admin/incoming-webhooks/toggle-mode/' . $wh['id']) ?>" method="POST" style="margin: 0;">
+                  <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.35rem 0.5rem;" title="Toggle Mode">
+                    <i data-lucide="<?= $ingestMode === 'listen_only' ? 'database' : 'headphones' ?>" style="width: 14px; height: 14px; color: <?= $ingestMode === 'listen_only' ? '#10b981' : '#f59e0b' ?>;"></i>
+                  </button>
+                </form>
+                <form action="<?= url('/admin/incoming-webhooks/toggle/' . $wh['id']) ?>" method="POST" style="margin: 0;">
+                  <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 0.35rem 0.5rem;" title="Toggle Active">
+                    <i data-lucide="<?= !empty($wh['is_active']) ? 'pause' : 'play' ?>" style="width: 14px; height: 14px;"></i>
+                  </button>
+                </form>
+                <form action="<?= url('/admin/incoming-webhooks/delete/' . $wh['id']) ?>" method="POST" onsubmit="return confirm('Permanently delete this incoming webhook endpoint?');" style="margin: 0;">
+                  <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; padding: 0.35rem 0.5rem;" title="Delete">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         <?php endforeach; ?>
@@ -313,10 +317,10 @@
 
       <div style="margin-bottom: 1rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-          <label style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin: 0;">Target Database Table</label>
-          <a href="javascript:void(0)" onclick="quickLoadTableSample(document.getElementById('new_wh_table').value)" style="font-size: 0.72rem; color: #38bdf8; text-decoration: none;">View Sample JSON</a>
+          <label style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin: 0;">Target Database Table(s)</label>
+          <a href="javascript:void(0)" onclick="quickLoadTableSample(document.getElementById('new_wh_table').value || document.getElementById('new_wh_table').options[0].value)" style="font-size: 0.72rem; color: #38bdf8; text-decoration: none;">View Sample JSON</a>
         </div>
-        <select name="target_table" id="new_wh_table" class="admin-input" required>
+        <select name="target_table[]" id="new_wh_table" class="admin-input" multiple required style="height: 100px;">
           <?php foreach ($permittedTables as $tblName => $tblMeta): 
             $colSlice = array_slice($tblMeta['columns'] ?? [], 0, 5);
             $colPreview = implode(', ', $colSlice);
@@ -399,10 +403,10 @@
 
         <div style="margin-bottom: 1.15rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-            <label style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin: 0;">Target Database Table</label>
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin: 0;">Target Database Table(s)</label>
             <span style="font-size: 0.72rem; color: var(--admin-text-secondary);">Table where records will be validated and inserted</span>
           </div>
-          <select name="target_table" id="edit_wh_table" class="admin-input" required>
+          <select name="target_table[]" id="edit_wh_table" class="admin-input" multiple required style="height: 100px;">
             <?php foreach ($permittedTables as $tblName => $tblMeta): ?>
               <option value="<?= htmlspecialchars($tblName) ?>"><?= htmlspecialchars($tblName) ?> (<?= count($tblMeta['columns'] ?? []) ?> columns)</option>
             <?php endforeach; ?>
@@ -690,7 +694,11 @@ function openEditIncomingModal(wh) {
   document.getElementById('edit_wh_id').value = wh.id;
   document.getElementById('edit_wh_name').value = wh.name || '';
   document.getElementById('edit_wh_slug').value = wh.slug || '';
-  document.getElementById('edit_wh_table').value = wh.target_table || 'prompts';
+  const targetTables = (wh.target_table || 'prompts').split(',').map(t => t.trim());
+  const selectEl = document.getElementById('edit_wh_table');
+  for (let i = 0; i < selectEl.options.length; i++) {
+    selectEl.options[i].selected = targetTables.includes(selectEl.options[i].value);
+  }
   document.getElementById('edit_wh_auth').value = wh.auth_type || 'none';
   document.getElementById('edit_wh_secret').value = wh.secret_key || '';
   document.getElementById('edit_wh_mode').value = wh.ingestion_mode || 'live_ingest';
@@ -924,10 +932,35 @@ async function pollLatestLogs() {
       data.logs.forEach(log => {
         if (log.id > lastLogId) lastLogId = log.id;
         const entry = document.createElement('div');
-        entry.style.cssText = 'border-bottom: 1px dashed rgba(148,163,184,0.15); padding: 0.5rem 0;';
+        entry.style.cssText = 'border-bottom: 1px dashed rgba(148,163,184,0.15); padding: 0.75rem 0;';
+        
+        let parsedPayload = {};
+        try { parsedPayload = JSON.parse(log.payload_json); } catch(e) {}
+        
+        const flattenJSON = (obj, prefix = '') => {
+          let res = {};
+          for (const k in obj) {
+            if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+              Object.assign(res, flattenJSON(obj[k], prefix + k + '.'));
+            } else {
+              res[prefix + k] = obj[k];
+            }
+          }
+          return res;
+        };
+        const flatFields = flattenJSON(parsedPayload);
+        let fieldsHtml = '';
+        if (Object.keys(flatFields).length > 0) {
+          for (const k in flatFields) {
+            fieldsHtml += `<div style="font-size: 0.76rem; margin-bottom: 0.15rem;"><strong style="color:#a855f7;">${escapeHtml(k)}</strong> <span style="color:var(--admin-text-secondary);">=</span> <span style="color:#10b981;">${escapeHtml(String(flatFields[k]).substring(0,100))}${String(flatFields[k]).length>100?'...':''}</span></div>`;
+          }
+        } else {
+          fieldsHtml = `<pre style="margin: 0.2rem 0; color: #f8fafc; font-size: 0.75rem; white-space: pre-wrap;">${escapeHtml(log.payload_json)}</pre>`;
+        }
+
         entry.innerHTML = `
-          <div style="color: #38bdf8; font-size: 0.72rem;">[${log.created_at}] Status: ${log.status.toUpperCase()} &bull; Code: ${log.response_code} &bull; Affected: ${log.records_affected}</div>
-          <pre style="margin: 0.2rem 0; color: #f8fafc; font-size: 0.75rem; white-space: pre-wrap;">${escapeHtml(log.payload_json)}</pre>
+          <div style="color: #38bdf8; font-size: 0.72rem; margin-bottom: 0.4rem; font-weight: 700;">[${log.created_at}] Status: ${log.status.toUpperCase()} &bull; Code: ${log.response_code} &bull; Affected: ${log.records_affected}</div>
+          <div style="background: rgba(15,23,42,0.5); padding: 0.5rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">${fieldsHtml}</div>
         `;
         viewer.prepend(entry);
       });

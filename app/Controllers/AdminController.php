@@ -9129,7 +9129,8 @@ class AdminController {
         $name = trim((string)($request->post('name', '') ?: ($request->json('name', '') ?: '')));
         $rawSlug = trim((string)($request->post('slug', '') ?: ($request->json('slug', '') ?: '')));
         $slug = strtolower(preg_replace('/[^a-z0-9_-]/', '-', $rawSlug));
-        $targetTable = trim((string)($request->post('target_table', 'contents') ?: ($request->json('target_table', 'contents') ?: 'contents')));
+        $targetTableRaw = $request->post('target_table') ?? $request->json('target_table');
+        $targetTable = is_array($targetTableRaw) ? implode(',', array_map('trim', $targetTableRaw)) : trim((string)($targetTableRaw ?: 'contents'));
         $authType = trim((string)($request->post('auth_type', 'none') ?: ($request->json('auth_type', 'none') ?: 'none')));
         $secretKey = trim((string)($request->post('secret_key', '') ?: ($request->json('secret_key', '') ?: '')));
         $isActive = ($request->post('is_active') !== null) ? ((int)$request->post('is_active') ? 1 : 0) : 1;

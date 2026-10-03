@@ -71,7 +71,7 @@ body.admin-body {
   color: var(--admin-text-secondary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   line-height: 1.5;
 }
 
@@ -83,6 +83,7 @@ body.admin-body {
   min-height: 100vh;
   width: 100%;
   position: relative;
+  overflow-x: clip;
   background-color: var(--admin-bg-base);
 }
 
@@ -1417,6 +1418,30 @@ body.theme-light .audit-inspector-footer {
   color: #4338ca;
   font-weight: 700;
   border-left: 3px solid #4f46e5;
+}
+
+[data-theme="light"] pre,
+[data-theme="light"] code,
+.theme-light pre,
+.theme-light code {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .admin-card h1,
+[data-theme="light"] .admin-card h2,
+[data-theme="light"] .admin-card h3,
+[data-theme="light"] .admin-card h4,
+[data-theme="light"] .admin-card h5,
+[data-theme="light"] .admin-card h6,
+.theme-light .admin-card h1,
+.theme-light .admin-card h2,
+.theme-light .admin-card h3,
+.theme-light .admin-card h4,
+.theme-light .admin-card h5,
+.theme-light .admin-card h6 {
+  color: #0f172a !important;
 }
 
 [data-theme="light"] .nav-section-label {
