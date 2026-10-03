@@ -251,7 +251,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
 
   <!-- Top Navigation Bar -->
   <header class="ts-navbar">
-    <div class="container nav-inner">
+    <div class="nav-inner" style="width: 100%; max-width: 100%; padding: 0 2rem;">
       <div style="display: flex; align-items: center; gap: 0.75rem;">
         <!-- Mobile Sidebar Toggle -->
         <button id="mobile-menu-toggle" class="ts-mobile-menu-btn" aria-label="Toggle Mobile Navigation">
@@ -335,6 +335,12 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
         <button id="theme-toggle" type="button" onclick="toggleTheme()" class="ts-btn ts-btn-outline ts-btn-sm" title="Toggle Theme">
           <i data-lucide="moon" style="width: 15px; height: 15px;"></i>
         </button>
+
+        <!-- QA Testing -->
+        <a href="<?= url('/qa-testing') ?>" class="ts-btn ts-btn-outline ts-btn-sm desktop-only-flex" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);" title="QA Testing Cases">
+          <i data-lucide="flask-conical" style="width: 15px; height: 15px;"></i>
+          <span>QA Testing</span>
+        </a>
 
         <?php if ($user): ?>
           <?php $unreadNotifCount = \App\Core\NotificationHelper::getUnreadCount((int)$user['id']); ?>
@@ -448,10 +454,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
                   <i data-lucide="layout-dashboard"></i>
                   <span>Creator Studio</span>
                 </a>
-                <a href="<?= url('/author/rewards') ?>" class="ts-dropdown-item">
-                  <i data-lucide="award"></i>
-                  <span>Rewards &amp; Balance</span>
-                </a>
+
                 <a href="<?= url('/author/analytics') ?>" class="ts-dropdown-item">
                   <i data-lucide="bar-chart-2"></i>
                   <span>Telemetry &amp; Views</span>
@@ -632,10 +635,7 @@ $activeTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
             <i data-lucide="layout-dashboard"></i>
             <span>Creator Studio</span>
           </a>
-          <a href="<?= url('/author/rewards') ?>" class="mobile-nav-link">
-            <i data-lucide="award"></i>
-            <span>Rewards &amp; Balance</span>
-          </a>
+
           <a href="<?= url('/author/analytics') ?>" class="mobile-nav-link">
             <i data-lucide="bar-chart-2"></i>
             <span>Telemetry &amp; Views</span>

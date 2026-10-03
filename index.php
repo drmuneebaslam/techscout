@@ -703,6 +703,9 @@ $router->get('/accessibility', [PageController::class, 'accessibility']);
 $router->get('/acceptable-use', [PageController::class, 'acceptableUse']);
 $router->get('/security', [PageController::class, 'securityPolicy']);
 $router->get('/disclosure', [PageController::class, 'disclosure']);
+$router->get('/qa-testing', function() {
+    \App\Core\Response::view('pages/qa_testing');
+});
 
 $router->get('/help', [PageController::class, 'help']);
 $router->get('/help/{slug}', [PageController::class, 'help']);
