@@ -14,24 +14,31 @@
     </div>
 
     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-      <a href="<?= url('/admin/db-manager/export-sqlite') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700;">
-        <i data-lucide="download"></i> Export SQLite DB 📥
-      </a>
-      <form action="<?= url('/admin/db-manager/backup') ?>" method="POST" style="margin: 0;">
-        <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700;">
-          <i data-lucide="database"></i> Generate SQL Snapshot Now ⚡
-        </button>
-      </form>
-      <form action="<?= url('/admin/db-manager/auto-repair-schema') ?>" method="POST" onsubmit="return confirm('Execute automated schema alignment and missing column migration?');" style="margin: 0;">
-        <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.4);">
-          <i data-lucide="wrench"></i> Auto-Repair Schema
-        </button>
-      </form>
-      <form action="<?= url('/admin/db-manager/optimize') ?>" method="POST" onsubmit="return confirm('Recalculate indices and optimize all database tables?');" style="margin: 0;">
-        <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm">
-          <i data-lucide="zap"></i> Optimize All Tables
-        </button>
-      </form>
+      <details class="admin-dropdown" style="margin-left: auto;">
+        <summary class="ts-btn ts-btn-outline ts-btn-sm" style="color: #cbd5e1; border-color: rgba(203,213,225,0.3);">
+          <i data-lucide="settings"></i> Database Actions <span style="font-size: 0.7rem;">▼</span>
+        </summary>
+        <div class="admin-dropdown-menu">
+          <a href="<?= url('/admin/db-manager/export-sqlite') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: transparent; text-align: left; width: 100%; text-decoration: none;">
+            <i data-lucide="download"></i> Export SQLite DB 📥
+          </a>
+          <form action="<?= url('/admin/db-manager/backup') ?>" method="POST" style="margin: 0; width: 100%;">
+            <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #6366f1; border-color: transparent; text-align: left; width: 100%;">
+              <i data-lucide="database"></i> Generate SQL Snapshot ⚡
+            </button>
+          </form>
+          <form action="<?= url('/admin/db-manager/auto-repair-schema') ?>" method="POST" onsubmit="return confirm('Execute automated schema alignment and missing column migration?');" style="margin: 0; width: 100%;">
+            <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #10b981; border-color: transparent; text-align: left; width: 100%;">
+              <i data-lucide="wrench"></i> Auto-Repair Schema
+            </button>
+          </form>
+          <form action="<?= url('/admin/db-manager/optimize') ?>" method="POST" onsubmit="return confirm('Recalculate indices and optimize all database tables?');" style="margin: 0; width: 100%;">
+            <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #cbd5e1; border-color: transparent; text-align: left; width: 100%;">
+              <i data-lucide="zap"></i> Optimize All Tables
+            </button>
+          </form>
+        </div>
+      </details>
     </div>
   </div>
 

@@ -114,7 +114,9 @@
                 <?php endif; ?>
               </td>
               <td>
-                <strong style="color: #f8fafc; font-size: 0.9rem;"><?= htmlspecialchars($t['user_display_name'] ?? $t['username']) ?></strong>
+                <a href="<?= url('/admin/users?q=' . urlencode($t['username'])) ?>" target="_blank" style="text-decoration: none;">
+                  <strong style="color: #f8fafc; font-size: 0.9rem;" onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='#f8fafc'"><?= htmlspecialchars($t['user_display_name'] ?? $t['username']) ?> <span style="font-size: 0.7rem;">↗</span></strong>
+                </a>
                 <div style="font-size: 0.75rem; color: #38bdf8;"><?= htmlspecialchars($t['email']) ?></div>
               </td>
               <td>

@@ -957,7 +957,7 @@ class IncomingWebhookEngine {
             $name = $col['COLUMN_NAME'];
             $type = strtolower($col['DATA_TYPE']);
 
-            if (in_array($name, ['id', 'created_at', 'updated_at', 'last_login', 'deleted_at'], true)) {
+            if (in_array($name, ['id', 'created_at', 'modified_at', 'updated_at', 'last_login', 'deleted_at'], true)) {
                 continue;
             }
 

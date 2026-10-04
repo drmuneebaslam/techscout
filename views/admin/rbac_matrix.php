@@ -23,40 +23,46 @@ require __DIR__ . '/../layouts/admin_header.php';
     </div>
   </div>
 
-  <!-- Role Overview Cards Grid -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
-    <?php foreach ($roles as $r): ?>
-      <div class="admin-table-wrap" style="padding: 1.5rem; border-top: 3px solid <?= !empty($r['is_system']) ? '#a855f7' : '#38bdf8' ?>; background: rgba(15,23,42,0.6);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
-          <div>
-            <h3 style="font-size: 1.1rem; color: #f8fafc; margin: 0 0 0.2rem 0; font-weight: 700;">
-              <?= htmlspecialchars($r['name']) ?>
-            </h3>
-            <span style="font-family: monospace; font-size: 0.75rem; color: #38bdf8;">@<?= htmlspecialchars($r['role_key']) ?></span>
-          </div>
-
-          <?php if (!empty($r['is_system'])): ?>
-            <span class="ts-badge ts-badge-purple" style="font-size: 0.65rem;">SYSTEM ROLE</span>
-          <?php else: ?>
-            <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">CUSTOM</span>
-          <?php endif; ?>
-        </div>
-
-        <p style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5; margin: 0 0 1rem 0; min-height: 38px;">
-          <?= htmlspecialchars($r['description'] ?: 'Custom administrative staff role.') ?>
-        </p>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(148,163,184,0.12); padding-top: 0.75rem;">
-          <div style="font-size: 0.78rem; color: #cbd5e1;">
-            <strong style="color: #10b981;"><?= count($r['permissions']) ?></strong> Capabilities &bull; <strong style="color: #f8fafc;"><?= $r['user_count'] ?></strong> Staff
-          </div>
-
-          <button type="button" onclick="editRole(<?= htmlspecialchars(json_encode($r)) ?>)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.6rem;">
-            Configure →
-          </button>
-        </div>
-      </div>
-    <?php endforeach; ?>
+  <!-- Role Overview Table -->
+  <div class="admin-table-wrap" style="margin-bottom: 2.5rem;">
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Role Name</th>
+            <th>Role Key</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Capabilities</th>
+            <th>Staff Count</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($roles as $r): ?>
+            <tr>
+              <td><strong style="color: #f8fafc;"><?= htmlspecialchars($r['name']) ?></strong></td>
+              <td><span style="font-family: monospace; font-size: 0.75rem; color: #38bdf8;">@<?= htmlspecialchars($r['role_key']) ?></span></td>
+              <td>
+                <?php if (!empty($r['is_system'])): ?>
+                  <span class="ts-badge ts-badge-purple" style="font-size: 0.65rem;">SYSTEM</span>
+                <?php else: ?>
+                  <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">CUSTOM</span>
+                <?php endif; ?>
+              </td>
+              <td><span style="font-size: 0.82rem; color: #94a3b8;"><?= htmlspecialchars($r['description'] ?: 'Custom administrative staff role.') ?></span></td>
+              <td><strong style="color: #10b981;"><?= count($r['permissions']) ?></strong></td>
+              <td><strong style="color: #f8fafc;"><?= $r['user_count'] ?></strong></td>
+              <td>
+                <button type="button" onclick='editRole(<?= json_encode($r, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.6rem;">
+                  Configure &rarr;
+                </button>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Staff User Role Assignments Table -->

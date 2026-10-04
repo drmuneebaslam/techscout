@@ -12,19 +12,26 @@
       </h1>
     </div>
 
-    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
       <a href="<?= url('/admin/incoming-webhooks') ?>" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600;">
         <i data-lucide="arrow-down-to-line"></i> Webhooks
       </a>
-      <button type="button" onclick="openMultiTableQueryModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #a855f7;">
-        <i data-lucide="git-merge"></i> Multi-Table Query 🔗
-      </button>
-      <button type="button" onclick="openAllTablesCatalogModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #10b981;">
-        <i data-lucide="code"></i> All Tables JSON Catalog ⚡
-      </button>
-      <button type="button" onclick="loadWholeDatabaseBlueprint()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #38bdf8;">
-        <i data-lucide="database"></i> Describe DB 📐
-      </button>
+      <details class="admin-dropdown">
+        <summary class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
+          More Tools <i data-lucide="chevron-down" style="width: 14px; margin-left: 4px;"></i>
+        </summary>
+        <div class="admin-dropdown-menu">
+          <button type="button" onclick="openMultiTableQueryModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #a855f7; border: none;">
+            <i data-lucide="git-merge"></i> Multi-Table Query 🔗
+          </button>
+          <button type="button" onclick="openAllTablesCatalogModal()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700; color: #10b981; border: none;">
+            <i data-lucide="code"></i> JSON Catalog ⚡
+          </button>
+          <button type="button" onclick="loadWholeDatabaseBlueprint()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 600; color: #38bdf8; border: none;">
+            <i data-lucide="database"></i> Describe DB 📐
+          </button>
+        </div>
+      </details>
       <button type="button" onclick="openNewEndpointModal()" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
         <i data-lucide="plus"></i> New Endpoint 🚀
       </button>

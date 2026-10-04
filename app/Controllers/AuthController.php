@@ -232,13 +232,10 @@ class AuthController {
                     'browser' => $_SERVER['HTTP_USER_AGENT'] ?? 'Web Browser'
                 ]);
             } catch (\Throwable $e) {}
-
-            Session::flash('success', "A password reset authorization link has been dispatched to {$email}.");
-        } else {
-            Session::flash('info', 'If that email is registered in our database, a recovery link has been dispatched.');
         }
 
-        Response::redirect('/forgot-password');
+        Session::flash('info', 'If an account exists on that email, the recovery link will be sent to that email.');
+        Response::redirect('/auth/login');
     }
 
     public function showResetPassword(Request $request): void {

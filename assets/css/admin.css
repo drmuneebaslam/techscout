@@ -2608,3 +2608,39 @@ body.theme-light .admin-card:hover {
 
 
 
+
+/* Admin Dropdown */
+.admin-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.admin-dropdown > summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.admin-dropdown > summary::-webkit-details-marker {
+  display: none;
+}
+.admin-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border-main);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 50;
+  min-width: 200px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.admin-dropdown-menu .admin-btn {
+  justify-content: flex-start;
+  width: 100%;
+  text-align: left;
+}
+

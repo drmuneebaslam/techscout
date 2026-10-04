@@ -480,16 +480,47 @@ class Mailer {
 <head>
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <meta name='x-apple-disable-message-reformatting'>
   <title>" . htmlspecialchars($subject) . "</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+      .email-body {
+        padding: 20px 16px !important;
+      }
+      .email-header {
+        padding: 20px 16px !important;
+      }
+      .email-footer {
+        padding: 20px 16px !important;
+      }
+      .button-link {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        text-align: center !important;
+      }
+      .responsive-text {
+        font-size: 14px !important;
+      }
+      .responsive-title {
+        font-size: 20px !important;
+      }
+    }
+  </style>
 </head>
-<body style='margin:0;padding:0;background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif;color:#0f172a;'>
-  <table width='100%' border='0' cellspacing='0' cellpadding='0' style='background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;padding:36px 12px;'>
+<body style='margin:0;padding:0;background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif;color:#0f172a; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;'>
+  <table width='100%' border='0' cellspacing='0' cellpadding='0' style='background-color:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.08) 1px, transparent 1px);background-size:32px 32px;padding:36px 12px;width:100%;' class='email-wrapper'>
     <tr>
       <td align='center'>
-        <table width='100%' border='0' cellspacing='0' cellpadding='0' style='max-width:600px;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.07), 0 8px 10px -6px rgba(0,0,0,0.05);overflow:hidden;'>
+        <table width='100%' border='0' cellspacing='0' cellpadding='0' class='email-container' style='max-width:600px;width:100%;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.07), 0 8px 10px -6px rgba(0,0,0,0.05);overflow:hidden;margin:0 auto;'>
           <!-- Header Branding with Universal Grid Accent -->
           <tr>
-            <td style='background:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.05) 1px, transparent 1px);background-size:24px 24px;padding:26px 32px;border-bottom:2px solid #6366f1;text-align:center;'>
+            <td class='email-header' style='background:#ffffff;background-image:linear-gradient(to right, rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.05) 1px, transparent 1px);background-size:24px 24px;padding:26px 32px;border-bottom:2px solid #6366f1;text-align:center;'>
               <a href='" . $appUrl . "' style='text-decoration:none;'>
                 <span style='font-size:24px;font-weight:900;letter-spacing:-0.5px;color:#0f172a;'>Tech<span style='color:#6366f1;'>Scout</span></span>
               </a>
@@ -498,18 +529,20 @@ class Mailer {
           </tr>
           <!-- Body Content Area -->
           <tr>
-            <td style='padding:36px 32px;color:#1e293b;font-size:15px;line-height:1.65;'>
+            <td class='email-body' style='padding:36px 32px;color:#1e293b;font-size:15px;line-height:1.65;'>
+              <div style='max-width:100%;overflow-x:hidden;'>
               " . $cleanInner . "
               " . $attachmentsHtml . "
+              </div>
             </td>
           </tr>
           <!-- Footer -->
           <tr>
-            <td style='background-color:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center;'>
-              <p style='color:#64748b;font-size:12px;margin:0 0 6px 0;'>
+            <td class='email-footer' style='background-color:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center;'>
+              <p style='color:#64748b;font-size:12px;margin:0 0 6px 0;line-height:1.5;'>
                 &copy; " . date('Y') . " " . htmlspecialchars($siteName) . " Platform &bull; Built for builders, engineers, and creators.
               </p>
-              <p style='color:#64748b;font-size:11px;margin:0;'>
+              <p style='color:#64748b;font-size:11px;margin:0;line-height:1.5;'>
                 You received this email because you are an active member, creator, or subscriber.
               </p>
             </td>
@@ -723,19 +756,12 @@ class Mailer {
                 </div>",
 
             'password_reset' => "
-                <h2 style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Reset Your Password 🔒</h2>
-                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 16px 0;'>Hello <strong>{{name}}</strong>,</p>
-                <p style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px 0;'>We received a request to reset your password for your TechScout account. Click the button below to securely choose a new password:</p>
+                <h2 class='responsive-title' style='color:#0f172a;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Password Reset Request 🔒</h2>
+                <p class='responsive-text' style='color:#334155;font-size:15px;line-height:1.65;margin:0 0 16px 0;'>Hello <strong>{{name}}</strong>, we received a request to reset your password for your TechScout account.</p>
                 <div style='text-align:center;margin:30px 0;'>
-                  <a href='{{action_url}}' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:14px 34px;border-radius:8px;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.3);letter-spacing:0.3px;'>Click Here to Reset Password &rarr;</a>
+                  <a href='{{action_url}}' class='button-link' style='display:inline-block;background:linear-gradient(135deg,#4f46e5,#2563eb);color:#ffffff;font-weight:700;text-decoration:none;padding:14px 34px;border-radius:8px;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.3);letter-spacing:0.3px;'>Reset Password Now &rarr;</a>
                 </div>
-                <div style='background:#f8fafc;background-image:linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);background-size:16px 16px;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px;margin-bottom:24px;'>
-                  <div style='font-size:13px;color:#64748b;margin-bottom:8px;font-weight:600;'>Can't click the button? Copy and paste this secure link directly into your browser:</div>
-                  <div style='word-break:break-all;font-size:13px;color:#2563eb;font-family:monospace;background:#ffffff;padding:10px 12px;border:1px solid #cbd5e1;border-radius:6px;'>
-                    <a href='{{action_url}}' style='color:#2563eb;text-decoration:underline;'>{{action_url}}</a>
-                  </div>
-                </div>
-                <p style='color:#64748b;font-size:13px;line-height:1.6;margin:0;'>This recovery link is valid for 2 hours. If you did not request this password reset, please disregard this email &mdash; your account remains completely secure.</p>",
+                <p class='responsive-text' style='color:#64748b;font-size:13px;line-height:1.6;margin:0;text-align:center;'>If you did not request this password reset, please disregard this email &mdash; your account remains completely secure.</p>",
 
             'security_alert' => "
                 <h2 style='color:#dc2626;font-size:22px;font-weight:800;margin:0 0 16px 0;'>Security Perimeter Notice 🛡️</h2>
