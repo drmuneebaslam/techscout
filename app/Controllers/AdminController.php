@@ -1556,6 +1556,12 @@ class AdminController {
             case 'banned':
                 $sql .= " AND u.status = 'banned'";
                 break;
+            case 'donors':
+                $sql .= " AND EXISTS (SELECT 1 FROM author_tips t WHERE t.tipper_user_id = u.id AND t.status = 'completed')";
+                break;
+            case 'freeloaders':
+                $sql .= " AND u.disable_ads = 1 AND NOT EXISTS (SELECT 1 FROM author_tips t WHERE t.tipper_user_id = u.id AND t.status = 'completed' AND t.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY))";
+                break;
         }
 
         // Apply Search Filter (supports direct numeric ID, #ID prefix, username, email, display name)
@@ -1589,6 +1595,8 @@ class AdminController {
             'suspicious' => (int)(Database::fetch("SELECT COUNT(*) as c FROM users WHERE is_flagged_suspicious = 1")['c'] ?? 0),
             'suspended' => (int)(Database::fetch("SELECT COUNT(*) as c FROM users WHERE status = 'suspended'")['c'] ?? 0),
             'banned' => (int)(Database::fetch("SELECT COUNT(*) as c FROM users WHERE status = 'banned'")['c'] ?? 0),
+            'donors' => (int)(Database::fetch("SELECT COUNT(*) as c FROM users u WHERE EXISTS (SELECT 1 FROM author_tips t WHERE t.tipper_user_id = u.id AND t.status = 'completed')")['c'] ?? 0),
+            'freeloaders' => (int)(Database::fetch("SELECT COUNT(*) as c FROM users u WHERE u.disable_ads = 1 AND NOT EXISTS (SELECT 1 FROM author_tips t WHERE t.tipper_user_id = u.id AND t.status = 'completed' AND t.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY))")['c'] ?? 0),
         ];
 
         Response::view('admin/users', [
@@ -5887,7 +5895,7 @@ class AdminController {
                                                 COUNT(*) as count 
                                          FROM users u 
                                          LEFT JOIN admin_roles ar ON (u.admin_role_id = ar.id) 
-                                         GROUP BY role_key, ar.name 
+                                         GROUP BY COALESCE(NULLIF(TRIM(u.role), ''), 'member'), ar.name 
                                          ORDER BY count DESC");
         } catch (\Throwable $e) {
             try {

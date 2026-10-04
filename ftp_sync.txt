@@ -1,0 +1,41 @@
+open ftpupload.net
+if0_40102772
+Fp9QFWfj5fm
+cd /htdocs/
+lcd changes/
+
+cd app
+lcd app
+cd Controllers
+lcd Controllers
+put AuthController.php
+cd ..
+lcd ..
+cd Core
+lcd Core
+put IncomingWebhookEngine.php
+put Mailer.php
+cd ../..
+lcd ../..
+
+cd assets
+lcd assets
+cd css
+lcd css
+put admin.css
+cd ../..
+lcd ../..
+
+cd views
+lcd views
+cd admin
+lcd admin
+put custom_api_endpoints.php
+put db_manager.php
+put rbac_matrix.php
+put tickets.php
+put users.php
+cd ../..
+lcd ../..
+
+quit

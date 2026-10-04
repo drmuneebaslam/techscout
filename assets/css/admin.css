@@ -98,6 +98,8 @@ body.admin-body {
   top: 0;
   height: 100vh;
   align-self: flex-start;
+  overflow-y: auto;
+  align-self: flex-start;
   z-index: 100;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);

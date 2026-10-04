@@ -13,29 +13,21 @@
     </div>
 
     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-      <button type="button" onclick="openCreateUserModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #10b981, #38bdf8); font-weight: 700;">
-        <i data-lucide="user-plus"></i> Add User +
+      <a href="<?= url('/admin/mail') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #94a3b8; border-color: rgba(148,163,184,0.3); text-decoration: none;">
+        <i data-lucide="settings"></i> Mail Center
+      </a>
+      <button type="button" onclick="openMergeModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
+        <i data-lucide="git-merge"></i> Merge Accounts 🔀
       </button>
-      
-      <details class="admin-dropdown" style="margin-left: auto;">
-        <summary class="ts-btn ts-btn-outline ts-btn-sm" style="color: #cbd5e1; border-color: rgba(203,213,225,0.3);">
-          <i data-lucide="settings"></i> Actions <span style="font-size: 0.7rem;">▼</span>
-        </summary>
-        <div class="admin-dropdown-menu">
-          <button type="button" onclick="openMergeModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: transparent; text-align: left; width: 100%;">
-            <i data-lucide="git-merge"></i> Merge Accounts 🔀
-          </button>
-          <button type="button" onclick="openBulkEmailModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #f59e0b; border-color: transparent; text-align: left; width: 100%;">
-            <i data-lucide="mail"></i> Bulk Email Dispatcher ✉️
-          </button>
-          <button type="button" onclick="openBroadcastModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #a855f7; border-color: transparent; text-align: left; width: 100%;">
-            <i data-lucide="radio"></i> Broadcast Notification 📢
-          </button>
-          <a href="<?= url('/admin/mail') ?>" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #94a3b8; border-color: transparent; text-align: left; width: 100%; text-decoration: none;">
-            <i data-lucide="settings"></i> Mail Center
-          </a>
-        </div>
-      </details>
+      <button type="button" onclick="openBulkEmailModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #f59e0b; border-color: rgba(245,158,11,0.3);">
+        <i data-lucide="mail"></i> Bulk Email Dispatcher ✉️
+      </button>
+      <button type="button" onclick="openBroadcastModal()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #a855f7; border-color: rgba(168,85,247,0.3);">
+        <i data-lucide="radio"></i> Broadcast Notification 📢
+      </button>
+      <button type="button" onclick="openCreateUserModal()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #10b981, #38bdf8); font-weight: 700;">
+        <i data-lucide="user-plus"></i> Add User 🚀
+      </button>
     </div>
   </div>
 
@@ -50,6 +42,8 @@
         'editors' => ['label' => 'Editors', 'icon' => 'check-circle', 'count' => $counts['editors']],
         'admins' => ['label' => 'Administrators', 'icon' => 'shield-alert', 'count' => $counts['admins']],
         'verified' => ['label' => 'Verified Users', 'icon' => 'award', 'count' => $counts['verified']],
+        'donors' => ['label' => 'Donors', 'icon' => 'heart', 'count' => $counts['donors']],
+        'freeloaders' => ['label' => 'Ads Disabled (No Recent Donation)', 'icon' => 'eye-off', 'count' => $counts['freeloaders']],
         'suspicious' => ['label' => 'Suspicious / Flagged', 'icon' => 'alert-octagon', 'count' => $counts['suspicious']],
         'suspended' => ['label' => 'Suspended', 'icon' => 'alert-triangle', 'count' => $counts['suspended']],
         'banned' => ['label' => 'Banned', 'icon' => 'slash', 'count' => $counts['banned']],
