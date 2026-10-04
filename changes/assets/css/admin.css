@@ -79,10 +79,11 @@ body.admin-body {
    ========================================================================== */
 .admin-shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   position: relative;
   background-color: var(--admin-bg-base);
+  overflow: hidden;
 }
 
 /* Sidebar */
@@ -181,6 +182,7 @@ body.admin-body {
   display: flex;
   flex-direction: column;
   background-color: var(--admin-bg-base);
+  overflow-y: auto;
 }
 
 .admin-topbar {
@@ -195,6 +197,8 @@ body.admin-body {
   z-index: 90;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .admin-content-wrapper {
@@ -455,17 +459,20 @@ body.admin-body {
 }
 
 .admin-topbar {
-  height: 68px;
+  height: auto;
+  min-height: 68px;
   background: rgba(7, 13, 24, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--admin-border-main);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2.5rem;
+  padding: 0.75rem 2.5rem;
   position: sticky;
   top: 0;
   z-index: 90;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .admin-content-inner {
@@ -658,9 +665,9 @@ body.admin-body {
   z-index: 999999 !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1.25rem;
+  padding: 2rem 1.25rem;
   box-sizing: border-box;
   overflow-y: auto !important;
   transform: none !important;
@@ -706,6 +713,7 @@ body.ts-modal-open {
 .admin-modal-box {
   width: 100%;
   max-width: 600px;
+  margin: auto;
   background: var(--admin-bg-surface);
   color: var(--admin-text-primary);
   border: 1px solid var(--admin-border-main);

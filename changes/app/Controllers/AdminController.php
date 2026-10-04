@@ -3998,6 +3998,27 @@ class AdminController {
         ]);
     }
 
+    public function viewContactMessage(Request $request, array $params): void {
+        $id = (int)($params['id'] ?? 0);
+        $msg = Database::fetch("SELECT * FROM contact_messages WHERE id = ?", [$id]);
+        if (!$msg) {
+            Session::flash('error', 'Message not found.');
+            Response::redirect('/admin/contact-messages');
+            return;
+        }
+
+        // Mark as read if unread
+        if ($msg['status'] === 'unread') {
+            Database::execute("UPDATE contact_messages SET status = 'read' WHERE id = ?", [$id]);
+            $msg['status'] = 'read';
+        }
+
+        Response::view('admin/contact_message_thread', [
+            'title' => 'View Inquiry Thread | Admin Hub',
+            'msg' => $msg
+        ]);
+    }
+
     public function replyContactMessage(Request $request, array $params): void {
         $id = (int)($params['id'] ?? 0);
         $replyText = trim((string)$request->post('reply_text', ''));
@@ -4008,7 +4029,7 @@ class AdminController {
                 $replyText, $adminId, $id
             ]);
 
-            // Notify user if registered
+            // Notify user if registered, or send email if not
             $msg = Database::fetch("SELECT * FROM contact_messages WHERE id = ?", [$id]);
             if ($msg) {
                 $targetUserId = $msg['user_id'];
@@ -4024,6 +4045,13 @@ class AdminController {
                         "Our team replied to '{$msg['subject']}': " . mb_strimwidth($replyText, 0, 90, '...'),
                         '/inbox'
                     );
+                } else if (!empty($msg['email'])) {
+                    \App\Core\Mailer::sendTemplate('contact_reply', $msg['email'], $msg['name'], [
+                        'name' => $msg['name'],
+                        'inquiry_subject' => $msg['subject'],
+                        'reply_message' => $replyText,
+                        'action_url' => url('/')
+                    ]);
                 }
             }
 
