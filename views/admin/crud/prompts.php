@@ -10,7 +10,7 @@
     </p>
   </div>
 
-  <div style="display: flex; gap: 0.6rem; align-items: center;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.6rem; align-items: center;">
     <button onclick="openNewPromptModal()" class="ts-btn ts-btn-primary" style="font-weight: 700;">
       <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Create Prompt Blueprint
     </button>
@@ -106,7 +106,7 @@
     
     <!-- Modal Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--admin-border-color, rgba(148,163,184,0.12)); padding-bottom: 0.75rem;">
-      <div style="display: flex; align-items: center; gap: 0.65rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem;">
         <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(56,189,248,0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center;">
           <i data-lucide="terminal" style="width: 18px; height: 18px;"></i>
         </div>
@@ -121,7 +121,7 @@
     </div>
 
     <!-- Modal Navigation Tabs -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-bottom: 0.5rem; overflow-x: auto;" id="promptModalTabs">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-bottom: 0.5rem; overflow-x: auto;" id="promptModalTabs">
       <button type="button" onclick="switchPromptTab('prompt-tab-identity')" id="btn-prompt-tab-identity" class="ts-btn ts-btn-sm ts-btn-primary">1. Identity &amp; Classification</button>
       <button type="button" onclick="switchPromptTab('prompt-tab-architecture')" id="btn-prompt-tab-architecture" class="ts-btn ts-btn-sm ts-btn-outline">2. Architecture &amp; Variables</button>
       <button type="button" onclick="switchPromptTab('prompt-tab-hyperparameters')" id="btn-prompt-tab-hyperparameters" class="ts-btn ts-btn-sm ts-btn-outline">3. Target Models &amp; Tuning</button>
@@ -183,7 +183,7 @@
         <!-- Conditional Visual Showcase & Multi-Image Gallery: Strictly for Image Generation Prompts -->
         <div id="imageUploadContainer" style="display: none; margin-bottom: 1.5rem; background: rgba(236,72,153,0.04); border: 1px dashed rgba(236,72,153,0.35); border-radius: 12px; padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
               <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(236,72,153,0.15); display: flex; align-items: center; justify-content: center; color: #ec4899;">
                 <i data-lucide="images" style="width: 16px; height: 16px;"></i>
               </div>
@@ -204,7 +204,7 @@
                 <input type="file" name="gallery_files[]" id="prompt_gallery_files" multiple accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;" onchange="handleMultipleGalleryFiles(this)">
               </label>
             </div>
-            <div style="display: flex; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
               <input type="text" id="manualGalleryUrlInput" placeholder="Paste image URL (https://...)" style="flex: 1; background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding: 0.6rem 0.75rem; border-radius: 6px; color: var(--admin-text-primary, #f8fafc); font-size: 0.82rem;">
               <button type="button" onclick="addManualGalleryUrl()" class="ts-btn ts-btn-outline" style="border-color: #ec4899; color: #ec4899; padding: 0.6rem 0.85rem; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;">
                 + Add URL
@@ -229,7 +229,7 @@
         </div>
 
         <!-- Text Prompt Notice -->
-        <div id="textPromptNotice" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 0.65rem 1rem;">
+        <div id="textPromptNotice" style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 0.65rem 1rem;">
           <i data-lucide="info" style="width: 15px; height: 15px; color: #38bdf8; flex-shrink: 0;"></i>
           <span style="font-size: 0.78rem; color: var(--admin-text-secondary, #94a3b8);">
             Text blueprints strictly have <strong>no image attached</strong>. They render pure code cards with syntax-highlighted variable parameters and 1-click clipboard injectors.
@@ -258,7 +258,7 @@
 
           <div>
             <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text-primary, #f8fafc); margin-bottom: 0.4rem;">Discovery Visibility</label>
-            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
               <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.85rem; color: var(--admin-text-primary, #f8fafc);">
                 <input type="checkbox" name="is_featured" id="prompt_is_featured" value="1">
                 ⭐ Featured
@@ -408,7 +408,7 @@
 
         <!-- Diffusion Prompt Settings (Negative Prompt & Aspect Ratio) -->
         <div id="diffusionParamContainer" style="display: none; background: rgba(236,72,153,0.03); border: 1px solid rgba(236,72,153,0.25); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
-          <div style="font-weight: 700; color: #ec4899; font-size: 0.88rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+          <div style="flex-wrap: wrap; align-items: center; font-weight: 700; color: #ec4899; font-size: 0.88rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
             <i data-lucide="palette" style="width: 16px; height: 16px;"></i> Diffusion Model Hyperparameters
           </div>
           <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
@@ -442,14 +442,14 @@
               + Add Custom Link
             </button>
           </div>
-          <div id="promptCustomLinksContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <div id="promptCustomLinksContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.65rem;">
             <!-- Rendered dynamically -->
           </div>
         </div>
 
         <!-- Frontend Display & Customization Controls (Show/Hide Metadata on Single Prompt Page) -->
         <div style="background: var(--admin-card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
             <i data-lucide="eye" style="width: 16px; height: 16px; color: #10b981;"></i>
             <strong style="color: var(--admin-text-primary, #f8fafc); font-size: 0.92rem;">Frontend Single Page Metadata Visibility</strong>
             <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">Customizable</span>
@@ -564,7 +564,7 @@
           <button type="button" onclick="switchPromptTab('prompt-tab-hyperparameters')" class="ts-btn ts-btn-outline">
             ← Back: Tuning
           </button>
-          <div style="display: flex; gap: 0.75rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
             <button type="button" onclick="closePromptModal()" class="ts-btn ts-btn-outline">Cancel</button>
             <button type="submit" class="ts-btn ts-btn-primary" style="font-weight: 700;">
               Save Prompt Blueprint ⚡
@@ -581,7 +581,7 @@
   <div class="admin-table-wrap" style="width: 100%; max-width: 780px; max-height: 90vh; overflow-y: auto; padding: 2rem; background: var(--admin-card-bg, #090d16); border: 1px solid rgba(16,185,129,0.35); box-shadow: 0 25px 60px rgba(0,0,0,0.9); border-radius: 14px;">
     
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--admin-border-color, rgba(148,163,184,0.12)); padding-bottom: 0.75rem;">
-      <div style="display: flex; align-items: center; gap: 0.65rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem;">
         <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(16,185,129,0.15); color: #10b981; display: flex; align-items: center; justify-content: center;">
           <i data-lucide="play" style="width: 18px; height: 18px;"></i>
         </div>
@@ -610,7 +610,7 @@
     </div>
 
     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-top: 1.25rem;">
-      <div id="quickExternalLinks" style="display: flex; gap: 0.5rem;">
+      <div id="quickExternalLinks" style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
         <a id="btnOpenChatGPT" href="https://chatgpt.com" target="_blank" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.75rem;">
           Open ChatGPT ↗
         </a>
@@ -618,7 +618,7 @@
           Open Claude ↗
         </a>
       </div>
-      <div style="display: flex; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
         <button type="button" onclick="closeQuickPlayground()" class="ts-btn ts-btn-outline">Close</button>
         <button type="button" onclick="copyQuickPlaygroundPrompt()" class="ts-btn ts-btn-primary" style="background: #10b981; border-color: #10b981; font-weight: 700;">
           📋 Copy Prompt
@@ -694,7 +694,7 @@
             <?php endif; ?>
           </td>
           <td>
-            <div style="display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start;">
               <span class="ts-badge <?= $isImage ? 'ts-badge-pink' : 'ts-badge-cyan' ?>" style="font-size: 0.72rem; font-weight: 700;">
                 <?= $isImage ? '🎨 Diffusion' : '📝 Text / Code' ?>
               </span>
@@ -721,7 +721,7 @@
             </div>
           </td>
           <td>
-            <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.2rem;">
               <span style="font-size: 0.85rem; font-weight: 700; color: #10b981; font-family: var(--admin-font-mono, monospace);">
                 📋 <?= number_format($p['copy_count'] ?? 0) ?>
               </span>
@@ -898,7 +898,7 @@ function renderPromptGalleryGrid() {
         </button>
         <button type="button" onclick="removeGalleryItem(${idx})" style="position: absolute; top: 6px; right: 6px; background: rgba(239,68,68,0.85); color: #fff; border: none; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700;" title="Remove image">&times;</button>
       </div>
-      <div style="padding: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
+      <div style="flex-wrap: wrap; align-items: center; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
         <input type="text" value="${escapeHtml(item.caption || '')}" oninput="updateGalleryCaption(${idx}, this.value)" placeholder="Caption / variant label" style="width: 100%; background: var(--admin-card-bg, #090d16); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding: 0.35rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: var(--admin-text-primary, #f8fafc);">
         ${item.isExisting ? `
           <input type="hidden" name="existing_gallery_urls[]" value="${escapeHtml(item.url)}">

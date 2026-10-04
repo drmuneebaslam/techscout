@@ -53,7 +53,7 @@
             <tr>
               <td>
                 <div style="font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.2rem;"><?= htmlspecialchars($wh['name']) ?></div>
-                <div style="font-size: 0.72rem; color: #38bdf8; font-family: var(--admin-font-mono); display: flex; align-items: center; gap: 0.4rem;">
+                <div style="flex-wrap: wrap; align-items: center; font-size: 0.72rem; color: #38bdf8; font-family: var(--admin-font-mono); display: flex; align-items: center; gap: 0.4rem;">
                   <?= htmlspecialchars($endpointUrl) ?>
                   <i data-lucide="copy" style="width: 12px; height: 12px; cursor: pointer; color: var(--admin-text-secondary);" onclick="copyToClipboard('<?= htmlspecialchars(addslashes($endpointUrl)) ?>')" title="Copy Endpoint URL"></i>
                 </div>
@@ -72,7 +72,7 @@
                 <div style="font-size: 0.76rem; color: var(--admin-text-secondary); margin-bottom: 0.2rem;">
                   Target: <strong style="color: #a855f7;"><?= htmlspecialchars($wh['target_table']) ?></strong>
                 </div>
-                <div style="font-size: 0.72rem; display: flex; gap: 0.4rem; align-items: center;">
+                <div style="flex-wrap: wrap; align-items: center; font-size: 0.72rem; display: flex; gap: 0.4rem; align-items: center;">
                   <span class="ts-badge ts-badge-amber" style="padding: 0.1rem 0.4rem;">Auth: <?= strtoupper(htmlspecialchars($wh['auth_type'])) ?></span>
                   <span class="ts-badge" style="background: rgba(99,102,241,0.15); color: #818cf8; padding: 0.1rem 0.4rem;"><?= count($rules) ?> Maps</span>
                 </div>
@@ -212,7 +212,7 @@
   <div class="admin-modal-box modal-cyan" style="max-width: 1040px; max-height: 92vh; display: flex; flex-direction: column; padding: 0;">
     
     <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
         <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; animation: pulseGlow 1.5s infinite;"></div>
         <div>
           <h2 style="font-size: 1.2rem; margin: 0; color: var(--admin-text-primary); font-family: var(--admin-font-heading); font-weight: 800;">
@@ -222,7 +222,7 @@
         </div>
       </div>
 
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
         <button type="button" onclick="pollLatestLogs()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.75rem;">
           <i data-lucide="refresh-cw"></i> Refresh Stream
         </button>
@@ -250,7 +250,7 @@
         <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem;">
           <div style="font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <span>⚡ Test Simulation Dispatcher</span>
-            <div style="display: flex; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
               <a href="javascript:void(0)" onclick="loadTableSampleIntoSimulator()" style="font-size: 0.72rem; color: #38bdf8; text-decoration: none;">Load Table Sample</a>
               <span style="color: var(--admin-text-secondary);">&bull;</span>
               <a href="javascript:void(0)" onclick="loadMultiTableSampleIntoSimulator()" style="font-size: 0.72rem; color: #a855f7; text-decoration: none;">Multi-Table Sample</a>
@@ -293,7 +293,7 @@
           <input type="hidden" id="mappingWebhookId" name="webhook_id">
           <datalist id="jsonKeysList"></datalist>
           
-          <div id="mappingRowsContainer" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 320px; overflow-y: auto; padding-right: 0.4rem; margin-bottom: 1rem;">
+          <div id="mappingRowsContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.5rem; max-height: 320px; overflow-y: auto; padding-right: 0.4rem; margin-bottom: 1rem;">
             <!-- Rows injected dynamically via JS -->
           </div>
 
@@ -326,7 +326,7 @@
 
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
           <input type="text" name="slug" id="new_wh_slug" placeholder="midjourney-prompts" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
         </div>
@@ -373,7 +373,7 @@
         </select>
       </div>
 
-      <div class="admin-modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+      <div class="admin-modal-footer" style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.5rem;">
         <button type="button" onclick="closeNewIncomingModal()" class="admin-btn admin-btn-outline">Cancel</button>
         <button type="submit" class="admin-btn admin-btn-primary" style="font-weight: 700;">Create Ingestion Webhook 🚀</button>
       </div>
@@ -390,7 +390,7 @@
     
     <!-- Modal Header -->
     <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
-      <div style="display: flex; align-items: center; gap: 0.65rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem;">
         <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem; font-weight: 700;">WEBHOOK SETTINGS</span>
         <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.2rem; font-family: var(--admin-font-heading); font-weight: 800;" id="editModalHeading">
           Manage Ingestion Webhook
@@ -412,7 +412,7 @@
 
         <div style="margin-bottom: 1.15rem;">
           <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
-          <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
             <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/webhook/') ?></span>
             <input type="text" name="slug" id="edit_wh_slug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
           </div>
@@ -463,7 +463,7 @@
           </label>
         </div>
 
-        <div class="admin-modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 1rem;">
+        <div class="admin-modal-footer" style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.5rem; border-top: 1px solid var(--admin-border-main); padding-top: 1rem;">
           <button type="button" onclick="closeEditIncomingModal()" class="admin-btn admin-btn-outline">Cancel</button>
           <button type="submit" class="admin-btn admin-btn-primary" style="font-weight: 700;">Save Webhook Configuration 🚀</button>
         </div>
@@ -486,7 +486,7 @@
     </div>
 
     <!-- Tabs Header -->
-    <div style="display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--admin-border-main); background: var(--admin-card-bg-elevated); overflow-x: auto;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--admin-border-main); background: var(--admin-card-bg-elevated); overflow-x: auto;">
       <button type="button" onclick="switchTutorialTab('prompts')" id="tut-tab-prompts" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
         🖼️ Prompts Ingestion
       </button>
@@ -554,7 +554,7 @@
       <!-- TAB 4: Integrations -->
       <div id="tut-pane-integrations" style="display: none;">
         <h4 style="color: #f59e0b; margin: 0 0 0.5rem 0;">Developer &amp; No-Code Integration Snippets</h4>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem;">
           <div>
             <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-primary);">cURL Command:</span>
             <pre style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 6px; padding: 0.75rem; color: #38bdf8; font-size: 0.75rem; margin-top: 0.35rem; overflow-x: auto;">curl -X POST "<?= url('/api/v1/webhook/your-webhook-slug') ?>" \
@@ -625,7 +625,7 @@ print(response.status_code, response.json())</pre>
       <div style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 1rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
           <span id="samplePayloadHeading" style="font-family: var(--admin-font-mono); font-size: 0.75rem; color: #34d399;">SAMPLE PAYLOAD: prompts</span>
-          <div style="display: flex; gap: 0.5rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
             <button type="button" onclick="copySnippet('sampleModalPayloadBox')" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">
               📋 Copy JSON
             </button>

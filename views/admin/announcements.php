@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-indigo">SITE BROADCAST &bull; MARQUEE RIBBONS</span>
         <span style="font-size: 0.8rem; color: #64748b;">Global Alert Banners, Flash Promotions &amp; Maintenance Notices</span>
       </div>
@@ -24,7 +24,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
       <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0;">Published Announcement Banners</h3>
       
-      <div style="display: flex; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
         <button type="button" onclick="filterAnnouncements('all')" class="ts-btn ts-btn-sm ts-btn-primary ann-filter-btn" id="afbtn-all">All (<?= count($announcements) ?>)</button>
         <button type="button" onclick="filterAnnouncements('active')" class="ts-btn ts-btn-sm ts-btn-outline ann-filter-btn" id="afbtn-active">Active</button>
         <button type="button" onclick="filterAnnouncements('inactive')" class="ts-btn ts-btn-sm ts-btn-outline ann-filter-btn" id="afbtn-inactive">Paused</button>
@@ -83,7 +83,7 @@
                 </form>
               </td>
               <td>
-                <div style="display: flex; gap: 0.35rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;">
                   <button type="button" onclick='editAnnouncement(<?= json_encode($ann) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; color: #38bdf8;">
                     Edit ✏️
                   </button>
@@ -169,7 +169,7 @@
         </div>
       </div>
 
-      <div style="display: flex; gap: 1.5rem; margin-bottom: 1.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 1.5rem; margin-bottom: 1.25rem;">
         <label style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.85rem; cursor: pointer;">
           <input type="checkbox" name="is_dismissible" id="ann_dismissible" value="1" checked>
           Allow readers to dismiss banner

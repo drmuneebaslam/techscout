@@ -3,7 +3,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink">TRUST & SAFETY HUD</span>
         <span style="font-size: 0.8rem; color: #64748b;">Community Reports, Spam Defense & Content Moderation</span>
       </div>
@@ -64,7 +64,7 @@
     </div>
 
     <!-- Entity Type Selector -->
-    <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
       <span style="font-size: 0.8rem; color: #64748b;">Entity Filter:</span>
       <select onchange="location.href='<?= url('/admin/moderation?status=' . ($currentStatus ?? 'all')) ?>&type=' + this.value" style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.35rem 0.75rem; border-radius: 6px; color: #f8fafc; font-size: 0.82rem;">
         <option value="all" <?= empty($currentType) || $currentType === 'all' ? 'selected' : '' ?>>All Entities</option>

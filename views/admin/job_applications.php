@@ -128,7 +128,7 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="document.getElementById('candidateModal').style.display='none'" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-weight: 700;">Save Candidate Status</button>
       </div>

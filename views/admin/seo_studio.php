@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">SEARCH INTELLIGENCE &bull; SCHEMA.ORG</span>
         <span style="font-size: 0.8rem; color: #64748b;">Dynamic Sitemap Generation, Robots.txt &amp; OpenGraph Controls</span>
       </div>

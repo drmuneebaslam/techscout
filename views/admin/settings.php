@@ -3,7 +3,7 @@
   <!-- Topbar Header -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-indigo">ENTERPRISE CONFIG &bull; MASTER CONTROL HUD</span>
         <span style="font-size: 0.8rem; color: #64748b;">Global Platform Directives, Security Perimeter &amp; Service Providers</span>
       </div>
@@ -303,7 +303,7 @@
           <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
               <div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
                   <span class="ts-badge ts-badge-cyan" style="font-size: 0.7rem; font-weight: 800;">WHITE-LABEL SYSTEM</span>
                   <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">WEB INSTALLER</span>
                 </div>
@@ -504,7 +504,7 @@
 
           <!-- Enterprise Crypto Wallet Addresses Configuration -->
           <div style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
               <span class="ts-badge ts-badge-gold" style="font-weight: 800;">DECENTRALIZED TREASURY</span>
               <span class="ts-badge ts-badge-cyan">SPONSORSHIPS &amp; ADS</span>
             </div>
@@ -684,7 +684,7 @@
           <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 10px; padding: 1.25rem; margin-top: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
               <div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
                   <span class="ts-badge ts-badge-green" style="font-weight: 800;">DYNAMIC XML &amp; RSS FEEDS</span>
                   <span class="ts-badge ts-badge-cyan">PARTITIONED</span>
                 </div>

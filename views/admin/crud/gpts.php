@@ -10,7 +10,7 @@
     </p>
   </div>
 
-  <div style="display: flex; gap: 0.6rem; align-items: center;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.6rem; align-items: center;">
     <button onclick="openNewGptModal()" class="ts-btn ts-btn-primary" style="font-weight: 700;">
       <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Add Custom GPT Agent
     </button>
@@ -78,7 +78,7 @@
     
     <!-- Modal Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--admin-border-color, rgba(148,163,184,0.12)); padding-bottom: 0.75rem;">
-      <div style="display: flex; align-items: center; gap: 0.65rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem;">
         <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(168,85,247,0.15); color: #a855f7; display: flex; align-items: center; justify-content: center;">
           <i data-lucide="bot" style="width: 18px; height: 18px;"></i>
         </div>
@@ -93,7 +93,7 @@
     </div>
 
     <!-- Modal Navigation Tabs -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-bottom: 0.5rem; overflow-x: auto;" id="gptModalTabs">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-bottom: 0.5rem; overflow-x: auto;" id="gptModalTabs">
       <button type="button" onclick="switchGptTab('gpt-tab-basic')" id="btn-gpt-tab-basic" class="ts-btn ts-btn-sm ts-btn-primary">1. Identity &amp; Taxonomy</button>
       <button type="button" onclick="switchGptTab('gpt-tab-capabilities')" id="btn-gpt-tab-capabilities" class="ts-btn ts-btn-sm ts-btn-outline">2. Model &amp; Tool Capabilities</button>
       <button type="button" onclick="switchGptTab('gpt-tab-starters')" id="btn-gpt-tab-starters" class="ts-btn ts-btn-sm ts-btn-outline">3. Conversation Starters</button>
@@ -147,7 +147,7 @@
           </div>
 
           <!-- Avatar Preview Box -->
-          <div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(15,23,42,0.4); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--admin-border-color, rgba(148,163,184,0.1));">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem; background: rgba(15,23,42,0.4); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--admin-border-color, rgba(148,163,184,0.1));">
             <div id="gptAvatarBox" style="width: 48px; height: 48px; border-radius: 10px; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
               <img id="gptAvatarImg" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
               <i id="gptAvatarPlaceholder" data-lucide="bot" style="width: 24px; height: 24px; color: #a855f7;"></i>
@@ -270,7 +270,7 @@
           </button>
         </div>
 
-        <div id="startersContainer" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div id="startersContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
           <!-- Starter inputs dynamically inserted here -->
         </div>
 
@@ -316,7 +316,7 @@
               + Add Custom Link
             </button>
           </div>
-          <div id="gptCustomLinksContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <div id="gptCustomLinksContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.65rem;">
             <!-- Rendered dynamically -->
           </div>
         </div>
@@ -364,7 +364,7 @@
       </div>
 
       <!-- Modal Footer -->
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-top: 1.25rem; margin-top: 1.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-top: 1.25rem; margin-top: 1.5rem;">
         <button type="button" onclick="closeGptModal()" class="ts-btn ts-btn-outline">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary" style="font-weight: 700; background: linear-gradient(135deg, #a855f7, #6366f1);">
           Save GPT Agent Blueprint ⚡
@@ -379,10 +379,10 @@
   <div class="admin-table-wrap" style="width: 100%; max-width: 680px; padding: 2rem; background: var(--admin-card-bg, #090d16); border: 1px solid rgba(168,85,247,0.4); border-radius: 14px; position: relative;">
     <button onclick="document.getElementById('gptPreviewModal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--admin-text-secondary); font-size: 1.4rem; cursor: pointer;">&times;</button>
     
-    <div style="display: flex; gap: 1.25rem; align-items: center; margin-bottom: 1.25rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 1.25rem; align-items: center; margin-bottom: 1.25rem;">
       <div id="previewGptAvatar" style="width: 64px; height: 64px; border-radius: 12px; background: rgba(168,85,247,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;"></div>
       <div>
-        <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.25rem;">
           <span id="previewGptModel" class="ts-badge ts-badge-cyan" style="font-size: 0.72rem;"></span>
           <span id="previewGptBadge" class="ts-badge ts-badge-green" style="font-size: 0.7rem;"></span>
         </div>
@@ -397,7 +397,7 @@
       <strong style="display: block; font-size: 0.82rem; color: var(--admin-text-primary, #f8fafc); margin-bottom: 0.5rem; text-transform: uppercase;">
         💬 Conversation Starters (Click to copy)
       </strong>
-      <div id="previewGptStarters" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+      <div id="previewGptStarters" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.5rem;"></div>
     </div>
 
     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--admin-border-color, rgba(148,163,184,0.15)); padding-top: 1rem; margin-top: 1rem;">

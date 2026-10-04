@@ -7,7 +7,7 @@ require __DIR__ . '/../layouts/admin_header.php';
   <!-- Page Header -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-purple" style="font-size: 0.68rem; font-weight: 800;">SECURITY &amp; GOVERNANCE HUD</span>
         <span style="color: #64748b; font-size: 0.8rem;">Granular Role-Based Access Control (RBAC)</span>
       </div>
@@ -161,7 +161,7 @@ require __DIR__ . '/../layouts/admin_header.php';
       <div style="margin-bottom: 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
           <label class="admin-modal-label" style="margin: 0;">Assigned Capabilities &amp; Permission Nodes</label>
-          <div style="display: flex; gap: 0.5rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
             <button type="button" onclick="toggleAllPerms(true)" style="background: none; border: none; color: #38bdf8; font-size: 0.75rem; cursor: pointer; text-decoration: underline;">Select All</button>
             <button type="button" onclick="toggleAllPerms(false)" style="background: none; border: none; color: #94a3b8; font-size: 0.75rem; cursor: pointer; text-decoration: underline;">Clear All</button>
           </div>
@@ -169,7 +169,7 @@ require __DIR__ . '/../layouts/admin_header.php';
 
         <?php foreach ($catalog as $domain => $perms): ?>
           <div style="margin-bottom: 1.25rem; background: rgba(15,23,42,0.5); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 1rem;">
-            <div style="font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
               <span>📁</span> <?= htmlspecialchars($domain) ?>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">

@@ -7,7 +7,7 @@ require __DIR__ . '/../layouts/admin_header.php';
   <!-- Page Header -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <a href="<?= url('/admin/legal-pages') ?>" style="color: #38bdf8; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
           &larr; Back to Legal Pages Hub
         </a>
@@ -20,7 +20,7 @@ require __DIR__ . '/../layouts/admin_header.php';
       </p>
     </div>
 
-    <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
       <a href="<?= url('/' . $page['slug']) ?>" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8;">
         <i data-lucide="external-link"></i> Preview Live ↗
       </a>
@@ -36,7 +36,7 @@ require __DIR__ . '/../layouts/admin_header.php';
     <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 1.5rem; align-items: start;">
       
       <!-- Main Content Column -->
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1.5rem;">
         
         <div class="admin-table-wrap" style="padding: 1.75rem;">
           <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0; font-weight: 700; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.75rem;">
@@ -65,7 +65,7 @@ require __DIR__ . '/../layouts/admin_header.php';
       </div>
 
       <!-- Settings & Metadata Column -->
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1.5rem;">
         
         <div class="admin-table-wrap" style="padding: 1.75rem;">
           <h3 style="font-size: 1.1rem; color: #f8fafc; margin: 0 0 1rem 0; font-weight: 700; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.5rem;">

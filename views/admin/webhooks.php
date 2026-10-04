@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">EVENT STREAM &bull; HMAC-SHA256</span>
         <span style="font-size: 0.8rem; color: #64748b;">Outbound Webhooks &amp; Real-Time Integration Pipelines</span>
       </div>
@@ -69,7 +69,7 @@
                 </span>
               </td>
               <td>
-                <div style="display: flex; gap: 0.4rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
                   <button type="button" onclick='editWebhook(<?= json_encode($wh) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.55rem; color: #38bdf8;">
                     ✏️
                   </button>
@@ -135,7 +135,7 @@
                 </span>
               </td>
               <td>
-                <div style="display: flex; gap: 0.35rem; align-items: center;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
                   <button type="button" onclick='inspectDelivery(<?= htmlspecialchars(json_encode($del), ENT_QUOTES, 'UTF-8') ?>)' class="ts-btn ts-btn-outline ts-btn-xs" style="color: #38bdf8; border-color: rgba(56,189,248,0.3); padding: 0.2rem 0.5rem; font-size: 0.72rem;">
                     🔍 Inspect
                   </button>

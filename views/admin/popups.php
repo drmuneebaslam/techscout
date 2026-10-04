@@ -3,7 +3,7 @@
 <!-- Topbar -->
 <div class="admin-topbar">
   <div>
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
       <span class="ts-badge ts-badge-pink">ENGAGEMENT &bull; TARGETED CONVERSIONS</span>
       <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Exit-Intent Modals, Lead Magnets &amp; Broadcast Overlays</span>
     </div>
@@ -33,7 +33,7 @@
             <span class="ts-badge ts-badge-pink" style="font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px;">
               <?= htmlspecialchars($p['badge_text'] ?? 'ANNOUNCEMENT') ?>
             </span>
-            <div style="display: flex; gap: 0.35rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
               <span class="ts-badge <?= !empty($p['is_active']) ? 'ts-badge-green' : 'ts-badge-pink' ?>" style="font-size: 0.68rem; font-weight: 800;">
                 <?= !empty($p['is_active']) ? 'ACTIVE' : 'PAUSED' ?>
               </span>
@@ -218,7 +218,7 @@
             </label>
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--admin-border-main); padding-top: 1rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--admin-border-main); padding-top: 1rem;">
             <button type="button" onclick="closePopupModal()" class="admin-btn admin-btn-outline">Cancel</button>
             <button type="submit" class="admin-btn admin-btn-primary" style="font-weight: 700;">Save Popup Settings 🚀</button>
           </div>
@@ -227,7 +227,7 @@
 
       <!-- Right: Real-Time Live Preview Studio Pane -->
       <div style="background: var(--admin-card-bg-elevated); border-left: 1px solid var(--admin-border-main); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <div style="font-size: 0.78rem; font-weight: 800; color: var(--admin-text-secondary); text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;">
+        <div style="flex-wrap: wrap; align-items: center; font-size: 0.78rem; font-weight: 800; color: var(--admin-text-secondary); text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;">
           <i data-lucide="monitor" style="width: 14px; height: 14px; color: #38bdf8;"></i> Live Modal Preview (WYSIWYG)
         </div>
 

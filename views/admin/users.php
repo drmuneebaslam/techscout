@@ -3,7 +3,7 @@
   <!-- Topbar Header -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">IDENTITY &amp; ACCESS GOVERNANCE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Member Profiles, Publishing Scopes, Multi-Tab User Audits &amp; Role Management</span>
       </div>
@@ -33,7 +33,7 @@
 
   <!-- Segment Filter Tabs Strip (9 Segments) -->
   <div class="admin-table-wrap" style="padding: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto;">
-    <div style="display: flex; gap: 0.35rem; min-width: max-content; align-items: center;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; min-width: max-content; align-items: center;">
       <?php
       $segments = [
         'all' => ['label' => 'All Users', 'icon' => 'users', 'count' => $counts['all']],
@@ -103,7 +103,7 @@
           <?php foreach ($users as $u): ?>
             <tr style="<?= !empty($u['is_flagged_suspicious']) ? 'background: rgba(239,68,68,0.06);' : '' ?>">
               <td>
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem;">
                   <div style="width: 38px; height: 38px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #38bdf8; font-size: 0.9rem; border: 1px solid rgba(56,189,248,0.25); flex-shrink: 0;">
                     <?= strtoupper(substr($u['display_name'] ?? $u['username'], 0, 1)) ?>
                   </div>
@@ -128,7 +128,7 @@
                     </div>
 
                     <?php if (!empty($u['is_flagged_suspicious'])): ?>
-                      <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                      <div style="flex-wrap: wrap; align-items: center; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
                         <span class="ts-badge ts-badge-pink" style="font-size: 0.62rem; padding: 0.1rem 0.4rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="<?= htmlspecialchars($u['suspicious_reason'] ?? 'High frequency activities detected') ?>">
                           ⚠️ FLAGGED SUSPICIOUS
                         </span>
@@ -144,7 +144,7 @@
               </td>
 
               <td>
-                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.35rem;">
                   <form action="<?= url('/admin/users/action/' . $u['id']) ?>" method="POST" style="display: inline-block;">
                     <input type="hidden" name="action" value="update_role">
                     <select name="role" onchange="this.form.submit()" class="admin-modal-select" style="font-size: 0.76rem; padding: 0.2rem 0.4rem; min-width: 95px;">
@@ -183,7 +183,7 @@
               </td>
 
               <td>
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.25rem;">
                   <form action="<?= url('/admin/users/action/' . $u['id']) ?>" method="POST" style="display: inline-block;">
                     <input type="hidden" name="action" value="toggle_ban">
                     <button type="submit" class="ts-badge <?= $u['status'] === 'active' ? 'ts-badge-green' : ($u['status'] === 'suspended' ? 'ts-badge-amber' : 'ts-badge-pink') ?>" style="cursor: pointer; border: none;" title="Click to toggle status">
@@ -193,7 +193,7 @@
 
                   <!-- Structured Strike Counter Badge -->
                   <?php $stkCount = (int)($u['active_strikes'] ?? $u['strike_count'] ?? 0); ?>
-                  <div style="display: flex; align-items: center; gap: 0.25rem;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.25rem;">
                     <span class="ts-badge <?= $stkCount === 0 ? 'ts-badge-green' : ($stkCount === 1 ? 'ts-badge-amber' : 'ts-badge-pink') ?>" style="font-size: 0.65rem; padding: 0.08rem 0.35rem;" title="<?= $stkCount ?> active strike(s) on file">
                       <?= $stkCount ?>/3 Strikes
                     </span>
@@ -279,7 +279,7 @@
 <div id="userDetailModal" class="admin-modal-overlay">
   <div class="admin-modal-box modal-cyan" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
     <div class="admin-modal-header" style="flex: 0 0 auto;">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
         <div id="ud_avatar" style="width: 42px; height: 42px; border-radius: 50%; background: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #38bdf8; font-size: 1.1rem; border: 1px solid #38bdf8;"></div>
         <div>
           <h3 class="admin-modal-title" id="ud_name_header" style="color: #f8fafc; margin: 0; font-size: 1.25rem;">User Detail Hub</h3>
@@ -290,7 +290,7 @@
     </div>
 
     <!-- 10 Sub-Panel Navigation Strip -->
-    <div id="ud_tabs_strip" style="display: flex; gap: 0.25rem; overflow-x: auto; background: rgba(15,23,42,0.8); padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); flex: 0 0 auto;">
+    <div id="ud_tabs_strip" style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.25rem; overflow-x: auto; background: rgba(15,23,42,0.8); padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); flex: 0 0 auto;">
       <?php
       $detailTabs = [
         'profile' => 'Profile',
@@ -486,7 +486,7 @@
         <form id="ud_perm_form" action="" method="POST">
           <input type="hidden" name="action" value="update_permissions">
           <h4 style="color: #f8fafc; font-size: 1rem; margin-top: 0; margin-bottom: 1rem;">Direct RBAC &amp; Publishing Permissions</h4>
-          <div style="display: flex; flex-direction: column; gap: 0.85rem; background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--admin-border-subtle); margin-bottom: 1.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.85rem; background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--admin-border-subtle); margin-bottom: 1.25rem;">
             <label style="display: flex; align-items: center; gap: 0.65rem; color: #f8fafc; cursor: pointer;">
               <input type="checkbox" name="can_use_templates" id="ud_perm_templates" value="1" style="accent-color: #6366f1; width: 16px; height: 16px;">
               <span><strong>Curated Templates Studio:</strong> Author can view, select, and save custom publication templates</span>
@@ -632,7 +632,7 @@
           </select>
         </div>
       </div>
-      <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
         <label class="ts-checkbox-wrapper">
           <input type="checkbox" name="disable_ads" id="eu_disable_ads" value="1">
           <span class="ts-checkbox-label" style="font-size: 0.82rem; font-weight: 600; color: #f8fafc;">Disable Advertisements for this User</span>
@@ -984,7 +984,7 @@
 
       <div style="margin-bottom: 1.25rem;">
         <label class="admin-modal-label">1-Click Quick Login Link (Direct Access)</label>
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
           <input type="text" id="qr_quick_login_input" readonly class="admin-modal-input" style="font-family: monospace; font-size: 0.8rem; background: #090d16;">
           <button type="button" onclick="copyQuickInput('qr_quick_login_input')" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #10b981; border-color: #10b981; color: #000; font-weight: 700; white-space: nowrap;">
             Copy Link 📋
@@ -994,7 +994,7 @@
 
       <div style="margin-bottom: 1.25rem;">
         <label class="admin-modal-label">Password Reset URL (Sets New Password)</label>
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
           <input type="text" id="qr_reset_input" readonly class="admin-modal-input" style="font-family: monospace; font-size: 0.8rem; background: #090d16;">
           <button type="button" onclick="copyQuickInput('qr_reset_input')" class="ts-btn ts-btn-outline ts-btn-sm" style="white-space: nowrap;">
             Copy 📋
@@ -1021,7 +1021,7 @@
   <!-- Drawer Header -->
   <div style="padding: 1.25rem 1.5rem; background: #0f172a; border-bottom: 1px solid var(--admin-border-subtle); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <span class="ts-badge ts-badge-purple" style="font-size: 0.65rem;">SECURITY &amp; AUDIT TRAIL</span>
         <span style="font-size: 0.75rem; color: #64748b;" id="uad_user_handle">@username</span>
       </div>
@@ -1031,7 +1031,7 @@
   </div>
 
   <!-- Drawer Tab Buttons Strip -->
-  <div style="display: flex; gap: 0.25rem; background: #090d16; padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); overflow-x: auto; flex-shrink: 0;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.25rem; background: #090d16; padding: 0.5rem 1rem; border-bottom: 1px solid var(--admin-border-subtle); overflow-x: auto; flex-shrink: 0;">
     <button type="button" onclick="switchDrawerTab('sessions', this)" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">
       💻 Logins &amp; Devices (20)
     </button>
@@ -1054,7 +1054,7 @@
         <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">Last 20 Logins, IP Changes &amp; User Agents</span>
         <div id="uad_device_revoke_wrap"></div>
       </div>
-      <div id="uad_sessions_list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <div id="uad_sessions_list" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.75rem;">
         <div style="text-align: center; color: #64748b; padding: 2rem;">Loading session telemetry...</div>
       </div>
     </div>
@@ -1062,7 +1062,7 @@
     <!-- Subtab 2: Security Timeline & Events -->
     <div id="drawer-tab-timeline" style="display: none;">
       <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-bottom: 1rem;">Security Updates &amp; Authorization Events</div>
-      <div id="uad_timeline_list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <div id="uad_timeline_list" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.75rem;">
         <div style="text-align: center; color: #64748b; padding: 2rem;">Loading timeline...</div>
       </div>
     </div>
@@ -1070,7 +1070,7 @@
     <!-- Subtab 3: Security Anomalies -->
     <div id="drawer-tab-anomalies" style="display: none;">
       <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-bottom: 1rem;">Anomaly Detection &amp; Threat Forensics</div>
-      <div id="uad_anomalies_list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <div id="uad_anomalies_list" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.75rem;">
         <div style="text-align: center; color: #64748b; padding: 2rem;">Loading anomalies...</div>
       </div>
     </div>
@@ -1078,7 +1078,7 @@
     <!-- Subtab 4: Strikes History -->
     <div id="drawer-tab-strikes" style="display: none;">
       <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-bottom: 1rem;">Editorial Strikes &amp; Penalties History</div>
-      <div id="uad_strikes_list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <div id="uad_strikes_list" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.75rem;">
         <div style="text-align: center; color: #64748b; padding: 2rem;">Loading strikes...</div>
       </div>
     </div>
@@ -1294,7 +1294,7 @@ function openUserDetailModal(userId) {
               <td style="color:#38bdf8; font-weight:700;">${c.view_count || 0}</td>
               <td style="font-size:0.78rem; color:#64748b;">${c.created_at ? c.created_at.substring(0, 10) : ''}</td>
               <td>
-                <div style="display:flex; gap:0.35rem;">
+                <div style="flex-wrap: wrap; align-items: center; display:flex; gap:0.35rem;">
                   <a href="${liveUrl}" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size:0.7rem; padding:0.15rem 0.45rem; color:#38bdf8;" title="View Live Page">
                     Open ↗
                   </a>
@@ -1315,7 +1315,7 @@ function openUserDetailModal(userId) {
       const comCountLabel = document.getElementById('ud_comments_count_label');
       if (d.comments && d.comments.length > 0) {
         if (comCountLabel) comCountLabel.innerText = `${d.comments.length} comments`;
-        comList.innerHTML = '<div style="display:flex; flex-direction:column; gap:0.75rem;">' +
+        comList.innerHTML = '<div style="flex-wrap: wrap; align-items: center; display:flex; flex-direction:column; gap:0.75rem;">' +
           d.comments.map(cm => `
             <div style="background:rgba(15,23,42,0.6); padding:1rem; border-radius:8px; border:1px solid var(--admin-border-subtle);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.5rem;">
@@ -1325,7 +1325,7 @@ function openUserDetailModal(userId) {
                     ${cm.content_title || 'Publication'} ↗
                   </a>
                 </div>
-                <div style="display:flex; align-items:center; gap:0.5rem;">
+                <div style="flex-wrap: wrap; align-items: center; display:flex; align-items:center; gap:0.5rem;">
                   <span class="ts-badge ts-badge-cyan" style="font-size:0.68rem;">👍 ${cm.reaction_count || 0} Helpful</span>
                   <span style="font-size:0.72rem; color:#64748b;">${cm.created_at}</span>
                 </div>
@@ -1410,7 +1410,7 @@ function openUserDetailModal(userId) {
       // 4. Author Applications
       const appList = document.getElementById('ud_applications_list');
       if (d.applications && d.applications.length > 0) {
-        appList.innerHTML = '<div style="display:flex; flex-direction:column; gap:0.75rem;">' +
+        appList.innerHTML = '<div style="flex-wrap: wrap; align-items: center; display:flex; flex-direction:column; gap:0.75rem;">' +
           d.applications.map(ap => `
             <div style="background:rgba(15,23,42,0.6); padding:1.25rem; border-radius:8px; border:1px solid var(--admin-border-subtle);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">

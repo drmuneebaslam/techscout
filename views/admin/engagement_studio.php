@@ -27,14 +27,14 @@ require __DIR__ . '/../layouts/admin_header.php';
   </div>
 
   <?php if (!empty($flashSuccess = \App\Core\Session::flash('success'))): ?>
-    <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; color: #34d399; display: flex; align-items: center; gap: 0.75rem;">
+    <div style="flex-wrap: wrap; align-items: center; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; color: #34d399; display: flex; align-items: center; gap: 0.75rem;">
       <i data-lucide="check-circle" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
       <div style="font-size: 0.92rem; font-weight: 600;"><?= htmlspecialchars($flashSuccess) ?></div>
     </div>
   <?php endif; ?>
 
   <?php if (!empty($flashError = \App\Core\Session::flash('error'))): ?>
-    <div style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; color: #f87171; display: flex; align-items: center; gap: 0.75rem;">
+    <div style="flex-wrap: wrap; align-items: center; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; color: #f87171; display: flex; align-items: center; gap: 0.75rem;">
       <i data-lucide="alert-circle" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
       <div style="font-size: 0.92rem; font-weight: 600;"><?= htmlspecialchars($flashError) ?></div>
     </div>
@@ -42,7 +42,7 @@ require __DIR__ . '/../layouts/admin_header.php';
 
   <!-- Pure Numerical Simulation Guarantee Card -->
   <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.25); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
       <span style="font-size: 1.3rem;">🛡️</span>
       <div>
         <strong style="color: #38bdf8; font-size: 0.92rem; display: block;">Pure Numerical Telemetry Engine Active</strong>
@@ -58,7 +58,7 @@ require __DIR__ . '/../layouts/admin_header.php';
   <div style="background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(8,13,24,0.95)); border: 1px solid rgba(99,102,241,0.3); border-radius: 16px; padding: 1.75rem; margin-bottom: 2rem; box-shadow: 0 12px 36px rgba(0,0,0,0.5);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
       <div>
-        <div style="font-weight: 800; color: #f8fafc; font-size: 1.15rem; display: flex; align-items: center; gap: 0.6rem; font-family: 'Outfit', sans-serif;">
+        <div style="flex-wrap: wrap; align-items: center; font-weight: 800; color: #f8fafc; font-size: 1.15rem; display: flex; align-items: center; gap: 0.6rem; font-family: 'Outfit', sans-serif;">
           <span style="width: 32px; height: 32px; border-radius: 8px; background: rgba(56,189,248,0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
             <i data-lucide="target" style="width: 18px; height: 18px;"></i>
           </span>
@@ -160,7 +160,7 @@ require __DIR__ . '/../layouts/admin_header.php';
           </div>
         </div>
 
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
           <a href="<?= url('/' . ($selectedContent['content_type'] ?? 'article') . '/' . $selectedContent['slug']) ?>" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.4);">
             <i data-lucide="external-link" style="width: 14px;"></i> View Live Page ↗
           </a>
@@ -211,7 +211,7 @@ require __DIR__ . '/../layouts/admin_header.php';
       
       <!-- Panel 1: Telemetry View Booster -->
       <div class="ts-card" style="padding: 1.5rem; border: 1px solid rgba(56,189,248,0.3); border-radius: 14px;">
-        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
           <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(56,189,248,0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
             <i data-lucide="zap"></i>
           </div>
@@ -236,7 +236,7 @@ require __DIR__ . '/../layouts/admin_header.php';
             <button type="button" onclick="document.getElementById('view_input').value=100000" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.78rem;">+100k Reads</button>
           </div>
 
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <input type="number" name="view_increment" id="view_input" value="250" min="1" max="1000000" style="flex: 1; background: #05070b; border: 1px solid rgba(148,163,184,0.25); color: #f8fafc; padding: 0.6rem 0.75rem; border-radius: 8px; font-size: 0.9rem;">
             <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #0284c7, #38bdf8); font-weight: 700; white-space: nowrap;">
               + Boost Views ⚡
@@ -261,7 +261,7 @@ require __DIR__ . '/../layouts/admin_header.php';
 
       <!-- Panel 2: Anonymous Dwell & Traffic Origins Simulator -->
       <div class="ts-card" style="padding: 1.5rem; border: 1px solid rgba(16,185,129,0.35); border-radius: 14px;">
-        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
           <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; color: #10b981;">
             <i data-lucide="activity"></i>
           </div>
@@ -293,7 +293,7 @@ require __DIR__ . '/../layouts/admin_header.php';
             </div>
           </div>
 
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <input type="text" name="custom_referrer" placeholder="Optional custom referrer (e.g. /search, x.com)..." class="admin-modal-input" style="flex: 1; padding: 0.55rem 0.75rem; font-size: 0.82rem;">
             <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 700; white-space: nowrap;">
               Simulate Reads ⚡
@@ -304,7 +304,7 @@ require __DIR__ . '/../layouts/admin_header.php';
 
       <!-- Panel 3: Reactions & Bookmarks Studio -->
       <div class="ts-card" style="padding: 1.5rem; border: 1px solid rgba(236,72,153,0.3); border-radius: 14px;">
-        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
           <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(236,72,153,0.15); display: flex; align-items: center; justify-content: center; color: #ec4899;">
             <i data-lucide="heart"></i>
           </div>
@@ -316,7 +316,7 @@ require __DIR__ . '/../layouts/admin_header.php';
           </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem;">
           <!-- Boost Reactions Form -->
           <form action="<?= url('/admin/engagement-studio/simulate') ?>" method="POST" style="display: flex; gap: 0.5rem; align-items: center;">
             <input type="hidden" name="sim_action" value="boost_reactions">
@@ -364,7 +364,7 @@ require __DIR__ . '/../layouts/admin_header.php';
     <!-- Panel 4: Developer Comment & Discussion Simulator -->
     <div class="ts-card" style="padding: 1.75rem; border: 1px solid rgba(99,102,241,0.3); border-radius: 16px; margin-bottom: 2.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
           <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(99,102,241,0.15); display: flex; align-items: center; justify-content: center; color: #818cf8; font-size: 1.2rem;">
             💬
           </div>
@@ -465,12 +465,12 @@ require __DIR__ . '/../layouts/admin_header.php';
     <!-- ========================================================================= -->
     <div style="background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(10,18,30,0.9)); border: 1px solid rgba(168,85,247,0.35); border-radius: 16px; padding: 1.75rem; margin-bottom: 2rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 1rem;">
           <div style="width: 54px; height: 54px; border-radius: 50%; border: 2px solid #a855f7; overflow: hidden; background: #000;">
             <img src="<?= htmlspecialchars(image_url($selectedAuthor['avatar_url'] ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop')) ?>" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
               <h2 style="font-size: 1.45rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
                 <?= htmlspecialchars($selectedAuthor['display_name']) ?>
               </h2>
@@ -543,7 +543,7 @@ require __DIR__ . '/../layouts/admin_header.php';
           <form action="<?= url('/admin/engagement-studio/simulate') ?>" method="POST" style="margin-bottom: 0.85rem;">
             <input type="hidden" name="sim_action" value="boost_followers">
             <input type="hidden" name="author_id" value="<?= $selectedAuthor['id'] ?>">
-            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.45rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-bottom: 0.45rem;">
               <input type="number" name="follower_count" id="follower_input" value="100" min="1" max="1000000" class="admin-modal-input" style="flex: 1; padding: 0.45rem 0.65rem; font-size: 0.85rem;">
               <button type="submit" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #0284c7, #38bdf8); font-weight: 700; font-size: 0.85rem; white-space: nowrap;">
                 + Boost Followers 👥
@@ -561,7 +561,7 @@ require __DIR__ . '/../layouts/admin_header.php';
               <span style="font-size: 0.73rem; font-weight: 700; color: #38bdf8;">✨ Inject Persona Followers</span>
               <span style="font-size: 0.68rem; color: #94a3b8;">Avatars • Bios • Roster</span>
             </div>
-            <div style="display: flex; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
               <form action="<?= url('/admin/engagement-studio/simulate') ?>" method="POST" style="flex: 1;">
                 <input type="hidden" name="sim_action" value="inject_personas">
                 <input type="hidden" name="author_id" value="<?= $selectedAuthor['id'] ?>">
@@ -625,7 +625,7 @@ require __DIR__ . '/../layouts/admin_header.php';
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
         <?php foreach (array_slice($contents, 0, 8) as $item): ?>
-          <div class="ts-card" style="padding: 1.15rem; background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.15); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
+          <div class="ts-card" style="flex-wrap: wrap; align-items: center; padding: 1.15rem; background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.15); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
             <div>
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
                 <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem;"><?= strtoupper($item['type'] ?? 'ARTICLE') ?></span>

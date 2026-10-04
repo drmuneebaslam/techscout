@@ -3,7 +3,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">SUPPORT DESK</span>
         <span style="font-size: 0.8rem; color: #64748b;">Member Inquiries, Technical Support &amp; Appeals</span>
       </div>
@@ -120,7 +120,7 @@
                 <div style="font-size: 0.75rem; color: #38bdf8;"><?= htmlspecialchars($t['email']) ?></div>
               </td>
               <td>
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.25rem;">
                   <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: <?= $t['priority'] === 'urgent' ? '#ef4444' : ($t['priority'] === 'high' ? '#f97316' : '#38bdf8') ?>;">
                     <?= htmlspecialchars($t['priority'] ?? 'normal') ?>
                   </span>

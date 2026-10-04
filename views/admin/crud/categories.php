@@ -56,7 +56,7 @@ foreach ($subcategories as $sub) {
 <!-- Header Title & Action Buttons -->
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
   <div>
-    <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
       <h1 style="font-size: 1.75rem; color: var(--admin-text-primary); margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
         Taxonomy Architecture
       </h1>
@@ -80,7 +80,7 @@ foreach ($subcategories as $sub) {
 </div>
 
 <!-- Primary Navigation Tabs (Same Screen Unified Architecture) -->
-<div class="admin-nav-tabs" style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--admin-border-main); margin-bottom: 1.75rem; overflow-x: auto;">
+<div class="admin-nav-tabs" style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; border-bottom: 2px solid var(--admin-border-main); margin-bottom: 1.75rem; overflow-x: auto;">
   <button type="button" id="tab-btn-categories" onclick="switchTaxonomyTab('categories')" class="ts-subtab-link <?= $activeTab === 'categories' ? 'active' : '' ?>">
     <i data-lucide="folder" style="width: 15px; height: 15px;"></i>
     <span>📁 Root Categories (<?= count($categories) ?>)</span>
@@ -139,7 +139,7 @@ foreach ($subcategories as $sub) {
   </div>
 
   <!-- Scope Sub-Tabs -->
-  <div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--admin-border-main); margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.25rem;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; border-bottom: 1px solid var(--admin-border-main); margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.25rem;">
     <a href="<?= url('/admin/categories?tab=categories&scope=all') ?>" class="ts-subtab-link <?= $currentScope === 'all' ? 'active' : '' ?>">
       🌐 All Scopes (<?= $catScopeCounts['all'] ?>)
     </a>
@@ -170,7 +170,7 @@ foreach ($subcategories as $sub) {
         <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--admin-text-muted);"></i>
         <input type="text" id="categorySearchInput" oninput="filterCategoryTable()" placeholder="Search root categories by name or slug..." class="admin-input" style="padding-left: 2.25rem;">
       </div>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
         <span id="categoryRowCountText" style="font-size: 0.8rem; color: var(--admin-text-muted); font-family: var(--admin-font-mono);">
           Showing <?= count($categories) ?> categories
         </span>
@@ -333,7 +333,7 @@ foreach ($subcategories as $sub) {
   </div>
 
   <!-- Scope Sub-Tabs -->
-  <div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--admin-border-main); margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.25rem;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; border-bottom: 1px solid var(--admin-border-main); margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.25rem;">
     <a href="<?= url('/admin/categories?tab=subcategories&scope=all' . ($filterParent ? '&parent_id=' . $filterParent : '')) ?>" class="ts-subtab-link <?= $currentScope === 'all' ? 'active' : '' ?>">
       🌐 All Scopes (<?= $subScopeCounts['all'] ?>)
     </a>
@@ -360,7 +360,7 @@ foreach ($subcategories as $sub) {
   <!-- Search & Parent Filter Toolbar -->
   <div class="admin-card" style="padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
     <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-      <div style="display: flex; gap: 0.75rem; align-items: center; flex: 1; min-width: 280px;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; align-items: center; flex: 1; min-width: 280px;">
         <div style="position: relative; flex: 1;">
           <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--admin-text-muted);"></i>
           <input type="text" id="subcategorySearchInput" oninput="filterSubcategoryTable()" placeholder="Search subcategories by name, parent, or slug..." class="admin-input" style="padding-left: 2.25rem;">
@@ -378,7 +378,7 @@ foreach ($subcategories as $sub) {
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <span id="subcategoryRowCountText" style="font-size: 0.8rem; color: var(--admin-text-muted); font-family: var(--admin-font-mono);">
           Showing <?= count($subcategories) ?> subcategories
         </span>
@@ -438,7 +438,7 @@ foreach ($subcategories as $sub) {
                 </td>
 
                 <td>
-                  <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--admin-text-muted); margin-bottom: 0.15rem;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--admin-text-muted); margin-bottom: 0.15rem;">
                     <i data-lucide="folder" style="width: 12px; height: 12px;"></i>
                     <span style="color: var(--admin-text-secondary); font-weight: 600;">
                       <?= htmlspecialchars($sub['parent_name'] ?? 'Root') ?>
@@ -528,7 +528,7 @@ foreach ($subcategories as $sub) {
      ========================================================================= -->
 <div id="panel-add_category" class="taxonomy-panel" style="<?= $activeTab === 'add_category' ? 'display: block;' : 'display: none;' ?>">
   <div class="admin-card" style="max-width: 820px; margin: 0 auto 2.5rem auto; padding: 2rem; border-radius: 16px;">
-    <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-main); padding-bottom: 1rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-main); padding-bottom: 1rem;">
       <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; color: var(--admin-accent-primary);">
         <i data-lucide="folder-plus" style="width: 20px; height: 20px;"></i>
       </div>
@@ -593,7 +593,7 @@ foreach ($subcategories as $sub) {
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
             Lucide Icon Name
           </label>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <input type="text" name="icon_name" id="tab_cat_icon" value="folder" class="admin-input" style="font-family: var(--admin-font-mono);">
             <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
               <?php foreach (['folder', 'cpu', 'code', 'terminal', 'bot', 'sparkles', 'database', 'globe'] as $ic): ?>
@@ -609,9 +609,9 @@ foreach ($subcategories as $sub) {
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
             Accent Color
           </label>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <input type="color" name="color_hex" id="tab_cat_color" value="#6366f1" style="height: 38px; width: 44px; padding: 2px; border-radius: 6px; border: 1px solid var(--admin-border-main); background: var(--admin-bg-surface-elevated); cursor: pointer;">
-            <div style="display: flex; gap: 0.35rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
               <?php foreach (['#6366f1', '#38bdf8', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'] as $hex): ?>
                 <span onclick="document.getElementById('tab_cat_color').value='<?= $hex ?>'" style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background: <?= $hex ?>; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);"></span>
               <?php endforeach; ?>
@@ -641,7 +641,7 @@ foreach ($subcategories as $sub) {
         </label>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="switchTaxonomyTab('categories')" class="admin-btn admin-btn-outline">Cancel</button>
         <button type="submit" class="admin-btn admin-btn-primary" style="padding: 0.65rem 1.75rem; font-weight: 700;">
           Create Root Category 🚀
@@ -656,7 +656,7 @@ foreach ($subcategories as $sub) {
      ========================================================================= -->
 <div id="panel-add_subcategory" class="taxonomy-panel" style="<?= $activeTab === 'add_subcategory' ? 'display: block;' : 'display: none;' ?>">
   <div class="admin-card" style="max-width: 840px; margin: 0 auto 2.5rem auto; padding: 2rem; border-radius: 16px;">
-    <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-main); padding-bottom: 1rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-main); padding-bottom: 1rem;">
       <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
         <i data-lucide="corner-down-right" style="width: 20px; height: 20px;"></i>
       </div>
@@ -736,7 +736,7 @@ foreach ($subcategories as $sub) {
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
             Lucide Icon Name
           </label>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <input type="text" name="icon_name" id="tab_sub_icon" value="tag" class="admin-input" style="font-family: var(--admin-font-mono);">
             <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
               <?php foreach (['tag', 'bookmark', 'layers', 'code', 'terminal', 'cpu', 'sparkles', 'git-branch'] as $ic): ?>
@@ -752,9 +752,9 @@ foreach ($subcategories as $sub) {
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
             Accent Color
           </label>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <input type="color" name="color_hex" id="tab_sub_color" value="#38bdf8" style="height: 38px; width: 44px; padding: 2px; border-radius: 6px; border: 1px solid var(--admin-border-main); background: var(--admin-bg-surface-elevated); cursor: pointer;">
-            <div style="display: flex; gap: 0.35rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
               <?php foreach (['#38bdf8', '#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#14b8a6'] as $hex): ?>
                 <span onclick="document.getElementById('tab_sub_color').value='<?= $hex ?>'" style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background: <?= $hex ?>; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);"></span>
               <?php endforeach; ?>
@@ -784,7 +784,7 @@ foreach ($subcategories as $sub) {
         </label>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="switchTaxonomyTab('subcategories')" class="admin-btn admin-btn-outline">Cancel</button>
         <button type="submit" class="admin-btn admin-btn-primary" style="padding: 0.65rem 1.75rem; font-weight: 700;">
           Create Subcategory 🚀
@@ -800,7 +800,7 @@ foreach ($subcategories as $sub) {
 <div id="categoryModal" class="ts-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="catModalHeaderTitle">
   <div class="ts-modal-card" style="max-width: 640px;">
     <div class="ts-modal-header">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; color: var(--admin-accent-primary);">
           <i data-lucide="folder" style="width: 16px; height: 16px;"></i>
         </div>
@@ -863,7 +863,7 @@ foreach ($subcategories as $sub) {
             <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
               Lucide Icon Name
             </label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
               <input type="text" name="icon_name" id="modal_cat_icon" value="folder" class="admin-input" style="font-family: var(--admin-font-mono);">
               <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
                 <?php foreach (['folder', 'cpu', 'code', 'terminal', 'bot', 'sparkles', 'database', 'globe'] as $ic): ?>
@@ -879,9 +879,9 @@ foreach ($subcategories as $sub) {
             <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
               Accent Color
             </label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
               <input type="color" name="color_hex" id="modal_cat_color" value="#6366f1" style="height: 38px; width: 44px; padding: 2px; border-radius: 6px; border: 1px solid var(--admin-border-main); background: var(--admin-bg-surface-elevated); cursor: pointer;">
-              <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
                 <?php foreach (['#6366f1', '#38bdf8', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'] as $hex): ?>
                   <span onclick="document.getElementById('modal_cat_color').value='<?= $hex ?>'" style="display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: <?= $hex ?>; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);"></span>
                 <?php endforeach; ?>
@@ -928,7 +928,7 @@ foreach ($subcategories as $sub) {
 <div id="subcategoryModal" class="ts-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="subModalHeaderTitle">
   <div class="ts-modal-card" style="max-width: 640px;">
     <div class="ts-modal-header">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
           <i data-lucide="corner-down-right" style="width: 16px; height: 16px;"></i>
         </div>
@@ -1004,7 +1004,7 @@ foreach ($subcategories as $sub) {
             <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
               Lucide Icon Name
             </label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
               <input type="text" name="icon_name" id="modal_sub_icon" value="tag" class="admin-input" style="font-family: var(--admin-font-mono);">
               <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
                 <?php foreach (['tag', 'bookmark', 'layers', 'code', 'terminal', 'cpu', 'sparkles', 'git-branch'] as $ic): ?>
@@ -1020,9 +1020,9 @@ foreach ($subcategories as $sub) {
             <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--admin-text-primary); margin-bottom: 0.35rem;">
               Accent Color
             </label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
               <input type="color" name="color_hex" id="modal_sub_color" value="#38bdf8" style="height: 38px; width: 44px; padding: 2px; border-radius: 6px; border: 1px solid var(--admin-border-main); background: var(--admin-bg-surface-elevated); cursor: pointer;">
-              <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
                 <?php foreach (['#38bdf8', '#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#14b8a6'] as $hex): ?>
                   <span onclick="document.getElementById('modal_sub_color').value='<?= $hex ?>'" style="display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: <?= $hex ?>; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);"></span>
                 <?php endforeach; ?>

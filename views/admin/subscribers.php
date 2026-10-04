@@ -4,14 +4,14 @@
   <!-- Top Bar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink">COMMUNITY AUDIENCE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Subscribers, Radar Follows & Creator Graphs</span>
       </div>
       <h1 style="font-size: 1.6rem; color: #f8fafc; margin: 0;">Audience Intelligence & Subscribers Roster</h1>
     </div>
 
-    <div style="display: flex; gap: 0.75rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
       <a href="<?= url('/admin/categories') ?>" class="ts-btn ts-btn-outline ts-btn-sm">
         <i data-lucide="layers"></i> Manage Categories
       </a>
@@ -85,7 +85,7 @@
           <?php foreach ($topics as $t): ?>
             <tr>
               <td>
-                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                   <div style="width: 12px; height: 12px; border-radius: 50%; background: <?= htmlspecialchars($t['color_hex'] ?: '#6366f1') ?>;"></div>
                   <strong style="color: #f8fafc; font-size: 1rem;"><?= htmlspecialchars($t['name']) ?></strong>
                 </div>
@@ -139,7 +139,7 @@
           <?php foreach ($authors as $a): ?>
             <tr>
               <td>
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
                   <?php if (!empty($a['avatar_url'])): ?>
                     <img src="<?= htmlspecialchars(image_url($a['avatar_url'])) ?>" alt="" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;">
                   <?php else: ?>
@@ -198,7 +198,7 @@
           <?php foreach ($categories as $c): ?>
             <tr>
               <td>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                   <div style="width: 10px; height: 10px; border-radius: 50%; background: <?= htmlspecialchars($c['color_hex'] ?: '#38bdf8') ?>;"></div>
                   <strong style="color: #f8fafc;"><?= htmlspecialchars($c['name']) ?></strong>
                 </div>
@@ -250,7 +250,7 @@
           <?php foreach ($recentSubs as $s): ?>
             <tr>
               <td>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                   <div style="width: 28px; height: 28px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #38bdf8;">
                     <?= strtoupper(substr($s['user_name'] ?? $s['username'] ?? 'U', 0, 1)) ?>
                   </div>
@@ -314,7 +314,7 @@
     </div>
 
     <!-- Subscriber Items Container -->
-    <div id="modalSubListContainer" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
+    <div id="modalSubListContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
       <div style="text-align: center; padding: 2rem; color: #64748b;">
         <i data-lucide="loader" class="ts-spin" style="width: 28px; height: 28px; color: var(--ts-primary);"></i>
         <div style="margin-top: 0.5rem;">Loading subscribers roster...</div>
@@ -390,7 +390,7 @@ async function inspectSubscribers(type, id, targetName) {
           const initial = (sub.display_name || sub.username || 'U').charAt(0).toUpperCase();
           html += `
             <div class="modal-sub-card" data-search="${(sub.display_name + ' ' + sub.username + ' ' + sub.email).toLowerCase()}" style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); padding: 0.75rem 1rem; border-radius: 8px;">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
                 <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #38bdf8); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; font-size: 0.9rem;">
                   ${initial}
                 </div>

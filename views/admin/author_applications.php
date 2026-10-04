@@ -4,14 +4,14 @@
   <!-- Top Bar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink">CREATOR ONBOARDING</span>
         <span style="font-size: 0.8rem; color: #64748b;">Community Growth Pipeline</span>
       </div>
       <h1 style="font-size: 1.6rem; color: #f8fafc; margin: 0;">Author Applications & Creator Approvals</h1>
     </div>
 
-    <div style="display: flex; gap: 0.75rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
       <a href="<?= url('/admin/users') ?>" class="ts-btn ts-btn-outline ts-btn-sm">
         <i data-lucide="users"></i> Manage All Users
       </a>
@@ -63,88 +63,95 @@
     </div>
   </div>
 
-  <!-- Cards Grid View -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
-    <?php if (!empty($applications)): ?>
-      <?php foreach ($applications as $app): ?>
-        <?php 
-          $appId = (int)$app['id'];
-          $isPending = ($app['status'] === 'pending');
-          $isApproved = ($app['status'] === 'approved');
-          $isRejected = ($app['status'] === 'rejected');
-        ?>
-        <div class="ts-card" style="display: flex; flex-direction: column; background: #090d16; border: 1px solid <?= $isPending ? 'rgba(245,158,11,0.35)' : ($isApproved ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)') ?>; border-radius: 12px; padding: 1.5rem;">
-          
-          <!-- Card Top: Avatar, Name & Status Badge -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; gap: 0.75rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ec4899, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800; color: #fff; flex-shrink: 0;">
-                <?= strtoupper(substr($app['display_name'], 0, 1)) ?>
-              </div>
-              <div>
-                <h3 style="font-size: 1.05rem; color: #f8fafc; margin: 0; line-height: 1.2;">
-                  <?= htmlspecialchars($app['display_name']) ?>
-                </h3>
-                <span style="font-size: 0.8rem; color: #64748b; font-family: monospace;">@<?= htmlspecialchars($app['username']) ?></span>
-              </div>
-            </div>
-
-            <?php if ($isPending): ?>
-              <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">PENDING</span>
-            <?php elseif ($isApproved): ?>
-              <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">APPROVED</span>
-            <?php else: ?>
-              <span class="ts-badge" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); font-size: 0.65rem;">REVISION</span>
-            <?php endif; ?>
-          </div>
-
-          <!-- Headline & Bio Snippet -->
-          <div style="font-size: 0.88rem; color: #38bdf8; font-weight: 600; margin-bottom: 0.5rem;">
-            <?= htmlspecialchars($app['headline'] ?: 'Technical Writer & Scout') ?>
-          </div>
-          <p style="font-size: 0.84rem; color: #94a3b8; line-height: 1.5; margin: 0 0 1rem 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-            <?= htmlspecialchars($app['bio'] ?: 'No bio provided.') ?>
-          </p>
-
-          <!-- Metadata Tags -->
-          <div style="background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.08); font-size: 0.78rem; margin-bottom: 1.25rem;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
-              <span style="color: #64748b;">Specialization:</span>
-              <span style="color: #f8fafc; font-weight: 600;"><?= htmlspecialchars($app['specializations'] ?: 'General Engineering') ?></span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
-              <span style="color: #64748b;">Applied At:</span>
-              <span style="color: #cbd5e1; font-family: monospace;"><?= \App\Core\DateHelper::format($app['created_at']) ?></span>
-            </div>
-            <div style="display: flex; gap: 0.35rem; margin-top: 0.5rem; flex-wrap: wrap;">
-              <?php if (!empty($app['requested_prompts'])): ?><span class="ts-badge ts-badge-green" style="font-size: 0.62rem;">Prompts</span><?php endif; ?>
-              <?php if (!empty($app['requested_gpts'])): ?><span class="ts-badge ts-badge-cyan" style="font-size: 0.62rem;">GPTs</span><?php endif; ?>
-              <?php if (!empty($app['requested_tools'])): ?><span class="ts-badge ts-badge-pink" style="font-size: 0.62rem;">Tools</span><?php endif; ?>
-            </div>
-          </div>
-
-          <!-- Bottom Action Buttons -->
-          <div style="display: flex; gap: 0.6rem; align-items: center; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 1rem; margin-top: auto;">
-            <button type="button" onclick='openApplicationModal(<?= json_encode($app, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="ts-btn ts-btn-primary ts-btn-sm" style="flex: 1; font-weight: 700;">
-              <i data-lucide="eye" style="width: 13px;"></i> Inspect & Decide 🔍
-            </button>
-            <form action="<?= url('/admin/applications/action/' . $appId) ?>" method="POST" onsubmit="return confirm('Permanently delete this application record?');">
-              <input type="hidden" name="action" value="delete">
-              <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.35rem 0.6rem; color: #ef4444;" title="Delete Application">
-                <i data-lucide="trash-2" style="width: 13px;"></i>
-              </button>
-            </form>
-          </div>
-
-        </div>
-      <?php endforeach; ?>
-    <?php else: ?>
-      <div class="ts-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: #64748b;">
-        <i data-lucide="user-check" style="width: 48px; height: 48px; color: var(--ts-primary); margin-bottom: 1rem;"></i>
-        <h3 style="color: #f8fafc; margin-bottom: 0.5rem;">No Applications Found</h3>
-        <p style="margin: 0;">There are currently no author submissions matching this filter.</p>
-      </div>
-    <?php endif; ?>
+  <!-- Table View -->
+  <div class="admin-table-wrap" style="background: rgba(13,21,39,0.7); border: 1px solid rgba(99,102,241,0.2); border-radius: 12px; overflow: hidden; margin-bottom: 3rem;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 250px;">Applicant Profile</th>
+          <th>Specialization</th>
+          <th>Requested Privileges</th>
+          <th>Applied Date</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (!empty($applications)): ?>
+          <?php foreach ($applications as $app): ?>
+            <?php 
+              $appId = (int)$app['id'];
+              $isPending = ($app['status'] === 'pending');
+              $isApproved = ($app['status'] === 'approved');
+              $isRejected = ($app['status'] === 'rejected');
+            ?>
+            <tr>
+              <td>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ec4899, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; color: #fff; flex-shrink: 0;">
+                    <?= strtoupper(substr($app['display_name'], 0, 1)) ?>
+                  </div>
+                  <div>
+                    <strong style="color: #f8fafc; font-size: 0.95rem; display: block;"><?= htmlspecialchars($app['display_name']) ?></strong>
+                    <span style="font-size: 0.8rem; color: #64748b; font-family: monospace;">@<?= htmlspecialchars($app['username']) ?></span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-size: 0.85rem; font-weight: 600; color: #38bdf8;">
+                  <?= htmlspecialchars($app['headline'] ?: 'Technical Writer & Scout') ?>
+                </div>
+                <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.2rem;">
+                  <?= htmlspecialchars($app['specializations'] ?: 'General Engineering') ?>
+                </div>
+              </td>
+              <td>
+                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                  <?php if (!empty($app['requested_prompts'])): ?><span class="ts-badge ts-badge-green" style="font-size: 0.62rem;">Prompts</span><?php endif; ?>
+                  <?php if (!empty($app['requested_gpts'])): ?><span class="ts-badge ts-badge-cyan" style="font-size: 0.62rem;">GPTs</span><?php endif; ?>
+                  <?php if (!empty($app['requested_tools'])): ?><span class="ts-badge ts-badge-pink" style="font-size: 0.62rem;">Tools</span><?php endif; ?>
+                </div>
+              </td>
+              <td>
+                <span style="font-family: monospace; font-size: 0.85rem; color: #cbd5e1;">
+                  <?= \App\Core\DateHelper::format($app['created_at']) ?>
+                </span>
+              </td>
+              <td>
+                <?php if ($isPending): ?>
+                  <span class="ts-badge ts-badge-pink" style="font-size: 0.7rem;">PENDING</span>
+                <?php elseif ($isApproved): ?>
+                  <span class="ts-badge ts-badge-green" style="font-size: 0.7rem;">APPROVED</span>
+                <?php else: ?>
+                  <span class="ts-badge" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); font-size: 0.7rem;">REVISION</span>
+                <?php endif; ?>
+              </td>
+              <td style="text-align: right;">
+                <div style="display: inline-flex; gap: 0.4rem; align-items: center;">
+                  <button type="button" onclick='openApplicationModal(<?= json_encode($app, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="ts-btn ts-btn-primary ts-btn-sm" style="font-weight: 700; padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+                    Inspect 🔍
+                  </button>
+                  <form action="<?= url('/admin/applications/action/' . $appId) ?>" method="POST" onsubmit="return confirm('Permanently delete this application record?');" style="margin: 0; display: inline;">
+                    <input type="hidden" name="action" value="delete">
+                    <button type="submit" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.35rem 0.6rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Delete Application">
+                      <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 4rem; color: #64748b;">
+              <i data-lucide="user-check" style="width: 42px; height: 42px; color: var(--ts-primary); margin-bottom: 1rem;"></i>
+              <h3 style="color: #f8fafc; margin-bottom: 0.5rem;">No Applications Found</h3>
+              <p style="margin: 0;">There are currently no author submissions matching this filter.</p>
+            </td>
+          </tr>
+        <?php endif; ?>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -154,7 +161,7 @@
     
     <!-- Modal Header -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 1rem;">
-      <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 1rem;">
         <div id="modalAvatar" style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #ec4899, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; color: #fff;">
           A
         </div>
@@ -170,7 +177,7 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
       <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);">
         <h4 style="color: #f8fafc; font-size: 0.95rem; margin: 0 0 0.75rem 0;">Applicant Profile & Links</h4>
-        <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
           <div><strong style="color: #64748b;">Username:</strong> <span id="modalUsername" style="color: #f8fafc; font-family: monospace;"></span></div>
           <div><strong style="color: #64748b;">Specializations:</strong> <span id="modalSpecializations" style="color: #38bdf8;"></span></div>
           <div id="modalPortfolioWrap"><strong style="color: #64748b;">Portfolio / Website:</strong> <a id="modalPortfolio" href="#" target="_blank" style="color: #38bdf8; text-decoration: underline;">Link ↗</a></div>
@@ -198,7 +205,7 @@
 
     <!-- Action Forms Tabs -->
     <div style="background: #05070b; border: 1px solid rgba(99,102,241,0.3); border-radius: 10px; padding: 1.5rem;">
-      <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(148,163,184,0.1); padding-bottom: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(148,163,184,0.1); padding-bottom: 0.75rem;">
         <button type="button" onclick="switchDecisionTab('approve')" id="dec-tab-approve" class="ts-btn ts-btn-sm ts-btn-primary" style="font-weight: 700;">
           <i data-lucide="check-circle"></i> Approve as Author 🚀
         </button>
@@ -259,7 +266,7 @@
             <input type="text" name="admin_feedback" value="Welcome to the TechScout Author Guild!" style="width: 100%; background: #090d16; border: 1px solid rgba(148,163,184,0.2); padding: 0.6rem 0.85rem; border-radius: 6px; color: #f8fafc; font-size: 0.88rem;">
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
             <button type="button" onclick="document.getElementById('applicationReviewModal').style.display='none'" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
             <button type="submit" class="ts-btn ts-btn-primary" style="padding: 0.6rem 1.5rem; font-weight: 700;">Confirm & Approve Creator Account 🚀</button>
           </div>
@@ -275,7 +282,7 @@
             <textarea name="admin_feedback" id="feedbackText" rows="3" placeholder="Specify requirements or improvements needed..." style="width: 100%; background: #090d16; border: 1px solid rgba(148,163,184,0.2); padding: 0.6rem 0.85rem; border-radius: 6px; color: #f8fafc; font-size: 0.88rem;" required></textarea>
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
             <button type="button" onclick="document.getElementById('applicationReviewModal').style.display='none'" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
             <button type="submit" id="feedbackSubmitBtn" class="ts-btn ts-btn-primary" style="padding: 0.6rem 1.5rem; font-weight: 700;">Submit Decision</button>
           </div>

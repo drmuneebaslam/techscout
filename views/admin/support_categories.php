@@ -2,7 +2,7 @@
     <!-- Header -->
     <div class="admin-header-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
       <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
           <span class="ts-badge ts-badge-cyan">SUPPORT TAXONOMY &amp; SLA ENGINE</span>
           <span style="font-size: 0.8rem; color: #64748b;">Department Routing, Category Hierarchy &amp; Escalation Targets</span>
         </div>
@@ -11,7 +11,7 @@
         </h1>
       </div>
 
-      <div style="display: flex; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
         <a href="<?= url('/support') ?>" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm">
           Live Helpdesk ↗
         </a>
@@ -80,20 +80,12 @@
                   </code>
                 </td>
                 <td>
-                  <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; max-width: 420px; align-items: center;">
-                    <?php if (!empty($cat['subcategories'])): ?>
-                      <?php foreach ($cat['subcategories'] as $sub): ?>
-                        <span class="ts-badge" style="font-size: 0.72rem; background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.25); color: #e2e8f0; display: inline-flex; align-items: center; gap: 0.35rem;" title="Priority: <?= htmlspecialchars($sub['priority'] ?? 'default') ?> • SLA: <?= (int)($sub['sla_hours'] ?? 24) ?>h">
-                          <?= htmlspecialchars($sub['name']) ?>
-                          <span style="font-size: 0.65rem; color: #38bdf8;">(<?= (int)($sub['sla_hours'] ?? 24) ?>h)</span>
-                          <button type="button" onclick="confirmDeleteSubcategory(<?= (int)$cat['id'] ?>, '<?= htmlspecialchars(addslashes($sub['slug'] ?? $sub['name'])) ?>', '<?= htmlspecialchars(addslashes($sub['name'])) ?>')" style="background:none; border:none; color:#ef4444; padding:0; cursor:pointer; font-size:0.85rem; line-height:1; opacity:0.75;" title="Remove this subcategory">&times;</button>
-                        </span>
-                      <?php endforeach; ?>
-                    <?php else: ?>
-                      <span style="color: #64748b; font-size: 0.8rem; font-style: italic;">No subcategories defined</span>
-                    <?php endif; ?>
-                    <button onclick='openQuickSubcatModal(<?= (int)$cat['id'] ?>, <?= json_encode($cat['name']) ?>)' class="ts-btn ts-btn-outline ts-btn-xs" style="color: #38bdf8; border-color: rgba(56,189,248,0.3); padding: 0.15rem 0.45rem; font-size: 0.7rem;" title="Quickly add subcategory to <?= htmlspecialchars($cat['name']) ?>">
-                      + Add
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem;">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: #f8fafc;">
+                      <?= count($cat['subcategories'] ?? []) ?> Active Queues
+                    </div>
+                    <button type="button" onclick='editCategory(<?= json_encode($cat, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)' class="ts-btn ts-btn-outline ts-btn-xs" style="color: #38bdf8; border-color: rgba(56,189,248,0.3); padding: 0.15rem 0.45rem; font-size: 0.7rem;" title="Manage subcategories for <?= htmlspecialchars($cat['name']) ?>">
+                      <i data-lucide="layers" style="width: 12px; height: 12px; display: inline-block; vertical-align: -2px; margin-right: 2px;"></i> Manage Queues
                     </button>
                   </div>
                 </td>
@@ -219,13 +211,13 @@
           </button>
         </div>
 
-        <div id="subcat_list_container" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 260px; overflow-y: auto; padding-right: 0.25rem;">
+        <div id="subcat_list_container" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.6rem; max-height: 260px; overflow-y: auto; padding-right: 0.25rem;">
           <!-- Dynamically populated rows -->
         </div>
         <input type="hidden" name="subcategories" id="cat_subcategories_hidden" value="[]">
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(148,163,184,0.15); padding-top: 1rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(148,163,184,0.15); padding-top: 1rem;">
         <button type="button" onclick="closeCategoryModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-weight: 700;">Save Category</button>
       </div>
@@ -271,7 +263,7 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="closeQuickSubcatModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="font-weight: 700;">Add Subcategory</button>
       </div>
@@ -344,7 +336,7 @@ function appendSubcatRowHtml(name = '', slug = '', priority = 'medium', sla = 24
         <option value="low" ${priority === 'low' ? 'selected' : ''}>Low</option>
       </select>
     </div>
-    <div style="display: flex; align-items: center; gap: 0.25rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.25rem;">
       <input type="number" class="sub-sla" value="${parseInt(sla) || 24}" min="1" max="168" style="width: 100%; background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.2); padding: 0.45rem 0.5rem; border-radius: 4px; color: #f8fafc; font-size: 0.82rem;">
       <span style="font-size: 0.72rem; color: #94a3b8;">h</span>
     </div>

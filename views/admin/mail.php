@@ -94,7 +94,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">SYSTEM MAIL &amp; API INTEGRATION HUB</span>
         <span style="font-size: 0.8rem; color: #64748b;">Transactional Delivery, Multi-Provider Credentials (Brevo/Resend/SMTP), System Templates &amp; Delivery Logs</span>
       </div>
@@ -219,7 +219,7 @@
         </div>
 
         <!-- View Mode Switcher -->
-        <div style="display: flex; gap: 0.35rem; background: #05070b; padding: 4px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.15);">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; background: #05070b; padding: 4px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.15);">
           <button type="button" onclick="setViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-view-split" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">
             🌓 Split View
           </button>
@@ -387,7 +387,7 @@
                     <div style="font-size: 0.7rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 0.35rem; letter-spacing: 0.5px;">
                       <?= htmlspecialchars($cat) ?>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.25rem;">
                       <?php foreach ($vars as $tag => $desc): ?>
                         <button type="button" onclick="insertTag('<?= $tag ?>')" style="display: flex; justify-content: space-between; align-items: center; text-align: left; background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.15); padding: 0.2rem 0.4rem; border-radius: 4px; color: #cbd5e1; font-size: 0.7rem; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.06)'" title="Insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
                           <code style="color: #38bdf8; font-weight: 700;"><?= htmlspecialchars($tag) ?></code>
@@ -413,7 +413,7 @@
               <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.5rem;">
                 Assign custom values to any dynamic tags (e.g. <code>{{headline}}</code>, <code>{{amount}}</code>, or any custom tag). Overrides apply to both dispatched emails and live preview.
               </div>
-              <div id="var_overrides_container" style="display: flex; flex-direction: column; gap: 0.45rem;">
+              <div id="var_overrides_container" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.45rem;">
                 <!-- Injected via JavaScript -->
               </div>
             </div>
@@ -523,7 +523,7 @@
           <span id="batchSelectedCountBadge" style="background: #6366f1; color: #fff; padding: 0.2rem 0.6rem; border-radius: 9999px; margin-right: 0.5rem; font-size: 0.78rem;">0</span>
           recipients currently selected for newsletter dispatch
         </div>
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
           <button type="button" onclick="composeToSelectedUsers()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700;">
             ✉️ Compose to Selected Recipients 🚀
           </button>
@@ -624,7 +624,7 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
           <!-- Card 1: Gmail SMTP App Passwords -->
           <div style="background: #05070b; border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 1rem;">
-            <div style="color: #38bdf8; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; color: #38bdf8; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
               <span>🔑</span> 1. Gmail SMTP with App Passwords
             </div>
             <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
@@ -634,7 +634,7 @@
 
           <!-- Card 2: ImprovMX 25 Mails -->
           <div style="background: #05070b; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; padding: 1rem;">
-            <div style="color: #34d399; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; color: #34d399; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
               <span>📨</span> 2. ImprovMX Free Custom Domain (25 Mails)
             </div>
             <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
@@ -644,7 +644,7 @@
 
           <!-- Card 3: Manual Assignment -->
           <div style="background: #05070b; border: 1px solid rgba(168,85,247,0.2); border-radius: 8px; padding: 1rem;">
-            <div style="color: #c084fc; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; color: #c084fc; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
               <span>🎯</span> 3. Manual Template &amp; Send Mapping
             </div>
             <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
@@ -672,7 +672,7 @@
                   <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">
                     <?= htmlspecialchars($mc['name']) ?>
                   </div>
-                  <div style="margin-top: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <div style="flex-wrap: wrap; align-items: center; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
                     <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem; text-transform: uppercase;">
                       <?= htmlspecialchars($mc['provider']) ?>
                     </span>
@@ -856,7 +856,7 @@
       <!-- Save Button At The End Of The Page (No refresh per click) -->
       <div style="margin-top: 2rem; padding: 1.5rem 2rem; background: rgba(15,23,42,0.9); border: 1px solid rgba(16,185,129,0.35); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
         <div>
-          <div style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <div style="flex-wrap: wrap; align-items: center; font-weight: 700; color: #f8fafc; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
             <i data-lucide="check-circle" style="color: #10b981; width: 20px; height: 20px;"></i> Save All Template Provider Assignments
           </div>
           <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.25rem;">
@@ -864,7 +864,7 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; align-items: center;">
           <span id="tmplUnsavedChangesNotice" style="display: none; font-size: 0.78rem; color: #f59e0b; font-weight: 700; background: rgba(245,158,11,0.12); padding: 0.3rem 0.65rem; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3);">
             ⚠️ Unsaved Changes
           </span>
@@ -940,7 +940,7 @@
                   data-opened="<?= !empty($log['open_count']) ? '1' : '0' ?>"
                   data-clicked="<?= !empty($log['click_count']) ? '1' : '0' ?>">
                 <td>
-                  <div style="display: flex; flex-direction: column; gap: 3px; align-items: flex-start;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 3px; align-items: flex-start;">
                     <?php if ($log['status'] === 'sent'): ?>
                       <span class="ts-badge ts-badge-green" style="font-size: 0.68rem; padding: 2px 7px;">SENT ✓</span>
                     <?php else: ?>
@@ -1148,7 +1148,7 @@
           </p>
         </div>
 
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
           <button type="button" onclick="openTestEventTriggerModal('user_registered', 'User Account Registration')" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #a855f7, #6366f1); font-weight: 700;">
             ⚡ Test Fire Event Trigger
           </button>
@@ -1171,7 +1171,7 @@
             <?php foreach ($eventTriggers as $eKey => $eInfo): ?>
               <tr>
                 <td>
-                  <div style="font-weight: 700; color: #f8fafc; font-size: 0.92rem; display: flex; align-items: center; gap: 0.35rem;">
+                  <div style="flex-wrap: wrap; align-items: center; font-weight: 700; color: #f8fafc; font-size: 0.92rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>⚡ <?= htmlspecialchars($eInfo['name']) ?></span>
                   </div>
                   <code style="font-size: 0.72rem; color: #c084fc; font-family: monospace; margin-top: 2px; display: inline-block;">
@@ -1206,7 +1206,7 @@
                 </td>
 
                 <td style="text-align: center;">
-                  <div style="display: flex; gap: 0.35rem; justify-content: center;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; justify-content: center;">
                     <button type="button" onclick="saveEventTriggerMapping('<?= htmlspecialchars($eKey) ?>', 'event_tmpl_select_<?= htmlspecialchars($eKey) ?>')" class="ts-btn ts-btn-primary ts-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; background: #a855f7; border-color: #a855f7; font-weight: 700;">
                       Save 💾
                     </button>
@@ -1277,7 +1277,7 @@
                     <?= !empty($ct['single_delivery']) ? '<span class="ts-badge ts-badge-cyan" style="font-size:0.65rem;">🔒 SINGLE</span>' : '<span class="ts-badge ts-badge-green" style="font-size:0.65rem;">🔄 MULTI</span>' ?>
                   </td>
                   <td style="text-align: center;">
-                    <div style="display: flex; gap: 0.35rem; justify-content: center;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; justify-content: center;">
                       <button type="button" onclick="openTestEventTriggerModal('<?= htmlspecialchars(addslashes($ct['key_or_pattern'])) ?>', '<?= htmlspecialchars(addslashes($ct['name'])) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #38bdf8;" title="Test Fire Trigger">Test ⚡</button>
                       <button type="button" onclick='openEditCustomTriggerModal(<?= json_encode($ct, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #c084fc; border-color: rgba(168,85,247,0.35);" title="Edit Custom Trigger">Edit ✏️</button>
                       <button type="button" onclick="deleteCustomTrigger('<?= htmlspecialchars($ct['id']) ?>')" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Delete Trigger">Delete 🗑️</button>
@@ -1355,7 +1355,7 @@
         </div>
       </div>
       
-      <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; align-items: center;">
         <div class="mail-studio-toolbar-cluster">
           <button type="button" onclick="setModalTmplViewMode('split')" class="ts-btn ts-btn-sm ts-btn-primary" id="btn-tmpl-modal-split" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">🌓 Split View</button>
           <button type="button" onclick="setModalTmplViewMode('editor')" class="ts-btn ts-btn-sm ts-btn-outline" id="btn-tmpl-modal-editor" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">📝 Editor Only</button>
@@ -1418,7 +1418,7 @@
               <?php foreach ($availableVariables as $cat => $vars): ?>
                 <div class="mail-studio-palette-cat">
                   <div class="mail-studio-cat-title"><?= htmlspecialchars($cat) ?></div>
-                  <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.2rem;">
                     <?php foreach ($vars as $tag => $desc): ?>
                       <button type="button" onclick="insertTmplTag('<?= $tag ?>')" class="mail-studio-token-btn" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
                         <code class="mail-studio-token-code"><?= htmlspecialchars($tag) ?></code>
@@ -1434,7 +1434,7 @@
           <!-- Modern Block Component Library (14 Responsive Email Blocks) -->
           <div class="mail-studio-blocks-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.5rem;">
-              <div style="font-size: 0.8rem; font-weight: 800; color: var(--admin-text-primary); display: flex; align-items: center; gap: 0.35rem;">
+              <div style="flex-wrap: wrap; align-items: center; font-size: 0.8rem; font-weight: 800; color: var(--admin-text-primary); display: flex; align-items: center; gap: 0.35rem;">
                 <i data-lucide="blocks" style="width: 15px; height: 15px; color: var(--admin-primary);"></i> 
                 <span>1-Click Universal Responsive Email Blocks</span>
               </div>
@@ -1459,14 +1459,14 @@
           </div>
 
           <!-- Visual Editor Mode Switcher & Rich Formatting Toolbar -->
-          <div class="mail-studio-editor-box" style="border-radius: 10px 10px 0 0; padding: 0.65rem 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0;">
+          <div class="mail-studio-editor-box" style="flex-wrap: wrap; align-items: center; border-radius: 10px 10px 0 0; padding: 0.65rem 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-              <div style="display: flex; gap: 0.25rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.25rem;">
                 <button type="button" onclick="switchTmplEditMode('wysiwyg')" id="btn-tmpl-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.25rem 0.6rem;">🎨 Visual WYSIWYG Editor</button>
                 <button type="button" onclick="switchTmplEditMode('html')" id="btn-tmpl-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.25rem 0.6rem;">💻 Raw HTML Code</button>
               </div>
               
-              <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
                 <!-- Dynamic Variable Selector Dropdown -->
                 <select onchange="if(this.value){ insertTmplTag(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.22rem 0.5rem; font-size: 0.72rem; width: auto; max-width: 220px; font-weight: 700;">
                   <option value="">⚡ Quick Token Insert... ▾</option>
@@ -1546,7 +1546,7 @@
         </div>
       </div>
 
-      <div class="admin-modal-footer" style="padding: 0.85rem 1rem 0 1rem; margin-top: 0.75rem; border-top: 1px solid var(--admin-border-subtle); display: flex; justify-content: flex-end; gap: 0.5rem;">
+      <div class="admin-modal-footer" style="flex-wrap: wrap; align-items: center; padding: 0.85rem 1rem 0 1rem; margin-top: 0.75rem; border-top: 1px solid var(--admin-border-subtle); display: flex; justify-content: flex-end; gap: 0.5rem;">
         <button type="button" onclick="closeTemplateEditorModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
         <button type="submit" id="tmplSubmitBtn" class="ts-btn ts-btn-primary" style="font-weight: 800; padding: 0.65rem 1.85rem;">
           <i data-lucide="save"></i> Save HTML Template 💾
@@ -1599,7 +1599,7 @@
 <div id="createCustomTriggerModal" class="admin-modal-overlay" style="display: none;">
   <div class="admin-modal-box modal-cyan" style="max-width: 760px; width: 95%;">
     <div class="admin-modal-header" style="border-bottom: 1px solid rgba(56,189,248,0.2); padding-bottom: 1rem;">
-      <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
         <span style="font-size: 1.4rem;">⚡</span>
         <div>
           <h3 class="admin-modal-title" style="color: #38bdf8; font-size: 1.25rem;">Automation Trigger Studio</h3>
@@ -1612,7 +1612,7 @@
     </div>
 
     <!-- Modal Internal Navigation Tabs -->
-    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 0.75rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-top: 1rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 0.75rem;">
       <button type="button" id="cmodal-tab-btn-config" onclick="switchCustomTriggerModalTab('config')" class="ts-btn ts-btn-sm ts-btn-primary" style="font-weight: 700;">
         ⚙️ Trigger Configuration
       </button>
@@ -1733,7 +1733,7 @@
 
         <!-- In-Modal Quick Test Simulator -->
         <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
-          <div style="font-size: 0.78rem; font-weight: 700; color: #c084fc; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+          <div style="flex-wrap: wrap; align-items: center; font-size: 0.78rem; font-weight: 700; color: #c084fc; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
             <span>⚡ In-Modal Quick Test Fire Simulator</span>
           </div>
           <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
@@ -1962,7 +1962,7 @@
 
     <!-- Subtab Navigation & Action Toolbar -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.4rem;">
-      <div style="display: flex; gap: 0.35rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;">
         <button type="button" onclick="switchInspectSubTab('preview')" id="btnInspectSubPreview" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem;">
           👁️ Email Sandbox (Light Mode)
         </button>
@@ -1971,7 +1971,7 @@
         </button>
       </div>
 
-      <div style="display: flex; gap: 0.35rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;">
         <button type="button" onclick="copyInspectHtml()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; color: #38bdf8;" title="Copy complete HTML body to clipboard">
           📋 Copy HTML
         </button>
@@ -2908,7 +2908,7 @@ function insertBlockComponent(type) {
     otp_box: `\n<div style="text-align:center;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;">\n  <div style="font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;">One-Time Authorization Code (Valid {{expires_in}})</div>\n  <div style="font-size:36px;font-weight:900;color:#4f46e5;letter-spacing:10px;margin:10px 0 6px 0;font-family:Consolas,Monaco,monospace;">{{verification_code}}</div>\n  <div style="font-size:12px;color:#94a3b8;">Do not share this confidential verification PIN with anyone.</div>\n</div>\n`,
     two_col_card: `\n<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-collapse:separate;border-spacing:12px 0;">\n  <tr>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:6px;">📈 Performance</div>\n      <div style="font-size:20px;font-weight:800;color:#0f172a;">{{total_reads}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Total Article Reads</div>\n    </td>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;margin-bottom:6px;">💎 Earnings</div>\n      <div style="font-size:20px;font-weight:800;color:#059669;">\${{amount}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Disbursed to date</div>\n    </td>\n  </tr>\n</table>\n`,
     quote: `\n<blockquote style="margin:20px 0;padding:16px 20px;background:#f8fafc;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;color:#334155;font-size:14px;line-height:1.6;font-style:italic;">\n  &ldquo;{{comment_snippet}}&rdquo;\n  <div style="margin-top:8px;font-weight:700;color:#0f172a;font-style:normal;font-size:13px;">&mdash; {{commenter_name}}</div>\n</blockquote>\n`,
-    checklist: `\n<div style="margin:20px 0;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;">\n  <div style="font-weight:700;color:#0f172a;margin-bottom:10px;font-size:14px;">Next Recommended Steps:</div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Complete your author profile and developer bio\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Connect your preferred creator payout method\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Submit your first technical breakdown or AI workflow\n  </div>\n</div>\n`,
+    checklist: `\n<div style="margin:20px 0;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;">\n  <div style="font-weight:700;color:#0f172a;margin-bottom:10px;font-size:14px;">Next Recommended Steps:</div>\n  <div style="flex-wrap: wrap; align-items: center; display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Complete your author profile and developer bio\n  </div>\n  <div style="flex-wrap: wrap; align-items: center; display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Connect your preferred creator payout method\n  </div>\n  <div style="flex-wrap: wrap; align-items: center; display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Submit your first technical breakdown or AI workflow\n  </div>\n</div>\n`,
     divider: `\n<hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0;">\n`
   };
 

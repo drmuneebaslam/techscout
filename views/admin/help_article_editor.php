@@ -19,7 +19,7 @@ if (!empty($article['faqs_json'])) {
   <!-- Page Header -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <a href="<?= url('/admin/help-articles') ?>" style="color: #38bdf8; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
           &larr; Back to Help Articles List
         </a>
@@ -32,7 +32,7 @@ if (!empty($article['faqs_json'])) {
       </p>
     </div>
 
-    <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
       <?php if (!empty($article['slug'])): ?>
         <a href="<?= url('/help/' . $article['slug']) ?>" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8;">
           <i data-lucide="external-link"></i> Preview Live ↗
@@ -50,7 +50,7 @@ if (!empty($article['faqs_json'])) {
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start;">
       
       <!-- Left Column: Core Content, Steps & FAQs -->
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1.5rem;">
         
         <!-- Main Details Card -->
         <div class="admin-table-wrap" style="padding: 1.75rem;">
@@ -100,7 +100,7 @@ if (!empty($article['faqs_json'])) {
             </button>
           </div>
 
-          <div id="stepsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div id="stepsContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem;">
             <?php if (!empty($steps)): ?>
               <?php foreach ($steps as $i => $s): ?>
                 <div class="step-card-row" style="background: rgba(15,23,42,0.8); border: 1px solid var(--admin-border-subtle); border-radius: 8px; padding: 1rem; position: relative;">
@@ -139,7 +139,7 @@ if (!empty($article['faqs_json'])) {
             </button>
           </div>
 
-          <div id="faqsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div id="faqsContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem;">
             <?php if (!empty($faqs)): ?>
               <?php foreach ($faqs as $j => $f): ?>
                 <div class="faq-card-row" style="background: rgba(15,23,42,0.8); border: 1px solid var(--admin-border-subtle); border-radius: 8px; padding: 1rem; position: relative;">
@@ -178,7 +178,7 @@ if (!empty($article['faqs_json'])) {
       </div>
 
       <!-- Right Column: Taxonomy, Category, Publishing & Sorting -->
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1.5rem;">
         
         <!-- Category & Classification -->
         <div class="admin-table-wrap" style="padding: 1.75rem;">

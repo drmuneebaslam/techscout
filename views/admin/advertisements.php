@@ -89,7 +89,7 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="document.getElementById('adFormModal').style.display='none'" class="admin-btn admin-btn-outline">Cancel</button>
         <button type="submit" class="admin-btn admin-btn-primary">Save Campaign 🚀</button>
       </div>
@@ -98,7 +98,7 @@
 </div>
 
 <!-- 4 Navigation Sub-Tabs -->
-<div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--admin-border-main); margin-bottom: 1.75rem; overflow-x: auto;">
+<div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; border-bottom: 1px solid var(--admin-border-main); margin-bottom: 1.75rem; overflow-x: auto;">
   <a href="<?= url('/admin/advertisements?tab=ads') ?>" class="ts-subtab-link <?= (($activeTab ?? 'ads') === 'ads') ? 'active' : '' ?>">
     📢 Display Banners &amp; Ad Slots (<?= count($ads ?? []) ?>)
   </a>
@@ -218,7 +218,7 @@
             ?>
             <tr>
               <td>
-                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;">
                   <span class="admin-pill-badge <?= $sub['type'] === 'tool' ? 'badge-cyan' : 'badge-warning' ?>" style="font-size: 0.65rem;">
                     <?= strtoupper(htmlspecialchars($sub['type'])) ?>
                   </span>
@@ -576,7 +576,7 @@
                       <?php endif; ?>
                     </div>
                     
-                    <div style="display: flex; gap: 1rem; justify-content: flex-end; border-top: 1px solid var(--admin-border-color); padding-top: 1.5rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 1rem; justify-content: flex-end; border-top: 1px solid var(--admin-border-color); padding-top: 1.5rem;">
                       <?php if (!$isCompleted): ?>
                         <form action="<?= url('/admin/advertisements/tips/verify/' . $tip['id']) ?>" method="POST" style="margin: 0;">
                           <button type="submit" class="admin-btn" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.4); padding: 0.6rem 1.25rem;">
@@ -681,7 +681,7 @@
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem;">Blockchain Transfer TXID *</label>
         <input type="text" name="payout_txid" class="admin-input" placeholder="Paste transaction hash after sending crypto..." required style="font-family: var(--admin-font-mono);">
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="document.getElementById('processPayoutModal').style.display='none'" class="admin-btn admin-btn-outline">Cancel</button>
         <button type="submit" class="admin-btn admin-btn-primary">Mark as Paid &amp; Notify Creator ✓</button>
       </div>
@@ -743,9 +743,9 @@
       </details>
 
       <!-- Action Decision Form Buttons -->
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; border-top: 1px solid var(--admin-border-main); padding-top: 1.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; border-top: 1px solid var(--admin-border-main); padding-top: 1.25rem;">
         <button type="button" onclick="closeOnChainInspector()" class="admin-btn admin-btn-outline">Close</button>
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
           <form id="inspectorRejectForm" method="POST" action="" onsubmit="return confirm('Reject this sponsored submission and invalidate payment?');" style="margin: 0;">
             <button type="submit" class="admin-btn admin-btn-outline" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">Reject Payment</button>
           </form>
@@ -930,7 +930,7 @@ async function testLivePricingApi() {
             ? `<span style="font-size: 0.72rem; margin-left: 0.35rem; font-weight: 700; color: ${change >= 0 ? '#10b981' : '#ef4444'};">(${change >= 0 ? '+' : ''}${change.toFixed(2)}%)</span>` 
             : '';
           const formatted = isNaN(numPrice) ? '0.00' : Number(numPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
-          pills += `<div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); padding: 0.45rem 0.85rem; border-radius: 8px; font-family: var(--admin-font-mono); font-size: 0.82rem; color: var(--admin-text-primary); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;"><strong style="color: #10b981;">${coin}:</strong> <span>$${formatted}${changeBadge}</span></div>`;
+          pills += `<div style="flex-wrap: wrap; align-items: center; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); padding: 0.45rem 0.85rem; border-radius: 8px; font-family: var(--admin-font-mono); font-size: 0.82rem; color: var(--admin-text-primary); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;"><strong style="color: #10b981;">${coin}:</strong> <span>$${formatted}${changeBadge}</span></div>`;
         }
         gridEl.innerHTML = pills;
       }

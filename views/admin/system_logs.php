@@ -7,7 +7,7 @@ require __DIR__ . '/../layouts/admin_header.php';
   <!-- Page Header -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink" style="font-size: 0.68rem; font-weight: 800;">CRASH TELEMETRY &amp; FORENSICS HUD</span>
         <span style="color: #64748b; font-size: 0.8rem;">Deep Request, Device, User Context &amp; Stack Inspection</span>
       </div>
@@ -205,7 +205,7 @@ require __DIR__ . '/../layouts/admin_header.php';
                     <?= htmlspecialchars($log['message']) ?>
                   </div>
                   <?php if (!empty($log['file'])): ?>
-                    <div style="font-size: 0.75rem; color: #38bdf8; font-family: var(--admin-font-mono); margin-top: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
+                    <div style="flex-wrap: wrap; align-items: center; font-size: 0.75rem; color: #38bdf8; font-family: var(--admin-font-mono); margin-top: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
                       <span>📄 <?= htmlspecialchars(basename($log['file'])) ?><?= $log['line'] ? ':' . (int)$log['line'] : '' ?></span>
                     </div>
                   <?php endif; ?>
@@ -229,7 +229,7 @@ require __DIR__ . '/../layouts/admin_header.php';
                 <!-- 4. CLIENT, DEVICE & USER DETAILS -->
                 <td style="font-size: 0.78rem;">
                   <!-- IP & Location -->
-                  <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--admin-font-mono);">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem; font-family: var(--admin-font-mono);">
                     <span style="color: #38bdf8; font-weight: 600;"><?= htmlspecialchars($log['ip_address'] ?? '127.0.0.1') ?></span>
                     <span style="font-size: 0.75rem; color: #94a3b8;"><?= htmlspecialchars($countryDisplay) ?></span>
                   </div>
@@ -241,7 +241,7 @@ require __DIR__ . '/../layouts/admin_header.php';
 
                   <!-- Authenticated User or Guest -->
                   <?php if ($hasUser): ?>
-                    <div style="margin-top: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
+                    <div style="flex-wrap: wrap; align-items: center; margin-top: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
                       <span class="ts-badge ts-badge-indigo" style="font-size: 0.65rem; padding: 0.1rem 0.4rem;">
                         👤 <?= htmlspecialchars($usernameDisplay ?: 'User #' . (int)$log['user_id']) ?>
                       </span>
@@ -585,12 +585,12 @@ function openFullErrorInspector(btn) {
       
       userWrap.innerHTML = `
         <div style="background: #05070b; border: 1px solid rgba(99,102,241,0.3); border-radius: 10px; padding: 1.5rem;">
-          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
             <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: #ffffff;">
               ${username.charAt(0).toUpperCase()}
             </div>
             <div>
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                 <h4 style="color: #f8fafc; margin: 0; font-size: 1.15rem;">${escapeHtml(username)}</h4>
                 <span class="ts-badge ts-badge-indigo" style="font-size: 0.68rem; font-weight: 800;">${escapeHtml(role)}</span>
                 <span class="ts-badge ts-badge-green" style="font-size: 0.68rem;">${escapeHtml(status)}</span>

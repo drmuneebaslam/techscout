@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">SEARCH ENGINE OPTIMIZATION &bull; SCHEMA &bull; REDIRECTS</span>
         <span style="font-size: 0.8rem; color: #64748b;">Global Meta, Schema.org JSON-LD, Sitemaps, Canonicals &amp; 301 Rules</span>
       </div>
@@ -28,7 +28,7 @@
 
   <!-- 12-Module SEO Navigation Ribbon -->
   <div class="ts-card" style="background: rgba(13,19,34,0.7); margin-bottom: 2rem; padding: 0.75rem; border-radius: 12px; overflow-x: auto;">
-    <div style="display: flex; gap: 0.35rem; min-width: 980px;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; min-width: 980px;">
       <?php
       $seoTabs = [
         'global' => '🌐 Global SEO',

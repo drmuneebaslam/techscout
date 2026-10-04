@@ -523,6 +523,7 @@ $router->post('/admin/jobs/applications/delete/{id}', [AdminController::class, '
 
 // Inbox & Contact Messages CRUD
 $router->get('/admin/contact-messages', [AdminController::class, 'contactMessages'], ['admin']);
+$router->get('/admin/contact-messages/view/{id}', [AdminController::class, 'viewContactMessage'], ['admin']);
 $router->post('/admin/contact-messages/reply/{id}', [AdminController::class, 'replyContactMessage'], ['admin']);
 $router->post('/admin/contact-messages/delete/{id}', [AdminController::class, 'deleteContactMessage'], ['admin']);
 

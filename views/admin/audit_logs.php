@@ -136,7 +136,7 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">FORENSIC TELEMETRY HUD</span>
         <span style="font-size: 0.8rem; color: #64748b;">Immutable Entity Audit Trail &amp; Administrative Mutation Explorer</span>
       </div>
@@ -297,7 +297,7 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
               <!-- 2. ACTOR / USER -->
               <td>
                 <?php if (!empty($log['username'])): ?>
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                     <div style="width: 28px; height: 28px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #38bdf8; font-size: 0.75rem;">
                       <?= strtoupper(substr($log['display_name'] ?? $log['username'], 0, 1)) ?>
                     </div>
@@ -326,8 +326,8 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
 
               <!-- 4. LINKED ENTITY -->
               <td>
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                  <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.25rem;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                     <span class="ts-badge <?= $entityInfo['badge'] ?>" style="font-size: 0.68rem; font-weight: 700;">
                       <?= htmlspecialchars($entityInfo['name']) ?>
                     </span>
@@ -352,7 +352,7 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
 
               <!-- 5. IP & ORIGIN COUNTRY -->
               <td>
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                   <span style="font-family: var(--admin-font-mono); font-size: 0.8rem; color: #38bdf8; font-weight: 600;"><?= htmlspecialchars($log['ip_address']) ?></span>
                   <a href="<?= url('/admin/firewall?ip=' . urlencode($log['ip_address'])) ?>" target="_blank" style="font-size: 0.68rem; color: #94a3b8;" title="Check IP in Firewall">🛡️</a>
                 </div>
@@ -443,7 +443,7 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
           <!-- Actor Card -->
           <div class="audit-inspector-card">
             <div style="font-size: 0.72rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Actor / Operator Profile</div>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
               <div id="auditActorInitial" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: #fff;"></div>
               <div>
                 <div id="auditActorName" style="color: var(--admin-text-main); font-weight: 800; font-size: 0.95rem;"></div>
@@ -456,7 +456,7 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
           <!-- Target Entity Card -->
           <div class="audit-inspector-card">
             <div style="font-size: 0.72rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Linked Target Entity</div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
               <span id="auditEntityNameBadge" class="ts-badge ts-badge-cyan" style="font-size: 0.75rem; font-weight: 800;"></span>
               <span id="auditEntityIdBadge" style="font-family: var(--admin-font-mono); color: var(--admin-text-main); font-weight: 700;"></span>
             </div>
@@ -466,7 +466,7 @@ function resolveEntityLink(?string $entityType, mixed $entityId): array {
           <!-- Network & Device Card -->
           <div class="audit-inspector-card">
             <div style="font-size: 0.72rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Network &amp; Device Context</div>
-            <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--admin-font-mono); font-size: 0.88rem; color: #38bdf8; font-weight: 700;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem; font-family: var(--admin-font-mono); font-size: 0.88rem; color: #38bdf8; font-weight: 700;">
               <span id="auditClientIp"></span>
             </div>
             <div id="auditCountryLocation" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-top: 0.2rem;"></div>
@@ -586,7 +586,7 @@ function openAuditForensicInspector(btn) {
     const actorWrap = document.getElementById('auditActorLinkWrap');
     if (log.user_id) {
       actorWrap.innerHTML = `
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
           <a href="${window.location.origin}/admin/users?q=${encodeURIComponent(log.username || log.user_id)}" target="_blank" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">
             👤 View User in Admin ↗
           </a>

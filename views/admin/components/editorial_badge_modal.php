@@ -5,7 +5,7 @@
   <div class="admin-modal-box modal-cyan" style="max-width: 540px; width: 95%; background: var(--ts-bg-surface, #090d16); border: 1px solid rgba(99,102,241,0.4); border-radius: 16px; padding: 2rem; box-shadow: 0 25px 70px rgba(0,0,0,0.85);">
     <div class="admin-modal-header" style="border-bottom: 1px solid var(--ts-border-subtle, rgba(148,163,184,0.12)); padding-bottom: 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
       <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
           <span class="ts-badge ts-badge-cyan">EDITORIAL METADATA</span>
         </div>
         <h3 class="admin-modal-title" style="color: var(--ts-text-primary, #f8fafc); font-size: 1.25rem; font-weight: 800; margin: 0;">
@@ -29,14 +29,14 @@
 
     <!-- Create Custom Badge Inline -->
     <div style="background: var(--ts-bg-surface-2, rgba(15,23,42,0.8)); border: 1px solid var(--ts-border-subtle); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
-      <div style="font-size: 0.78rem; font-weight: 700; color: var(--ts-text-primary); text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;">
+      <div style="flex-wrap: wrap; align-items: center; font-size: 0.78rem; font-weight: 700; color: var(--ts-text-primary); text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;">
         <i data-lucide="palette" style="width: 14px; height: 14px; color: #ec4899;"></i> Create New Custom Badge with Hex Colors
       </div>
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
         <div>
           <input type="text" id="newBadgeName" placeholder="e.g. Deep Dive, Breaking, Staff Pick" class="admin-modal-input" style="width: 100%; font-size: 0.85rem; padding: 0.45rem 0.75rem;" oninput="updateBadgePreview()">
         </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
           <input type="color" id="newBadgeColor" value="#38bdf8" style="width: 38px; height: 34px; border: none; border-radius: 6px; cursor: pointer; background: transparent;" oninput="updateBadgePreview()" title="Badge Accent Color">
           <span style="font-size: 0.75rem; color: var(--ts-text-tertiary); font-family: var(--ts-font-mono);" id="newBadgeColorHex">#38bdf8</span>
         </div>

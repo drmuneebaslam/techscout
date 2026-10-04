@@ -90,7 +90,7 @@ require_once __DIR__ . '/../layouts/admin_header.php';
                         <label style="display: block; color: var(--admin-text-secondary); font-size: 0.85rem; margin-bottom: 0.4rem;">Admin Internal Notes</label>
                         <textarea name="admin_notes" rows="3" class="admin-input"><?= htmlspecialchars($fb['admin_notes'] ?? '') ?></textarea>
                       </div>
-                      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 1rem; justify-content: flex-end;">
                         <button type="submit" class="admin-btn admin-btn-primary">
                           <i data-lucide="save" style="width: 16px; margin-right: 6px;"></i> Save Changes
                         </button>

@@ -3,7 +3,7 @@
   <!-- Topbar Header -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-indigo">AUDIENCE &bull; CMS NEWSLETTER HUB</span>
         <span style="font-size: 0.8rem; color: #64748b;">Subscribers Roster, Campaign Issues, HTML Issue Composer &amp; Dynamic Variable Personalization</span>
       </div>
@@ -73,7 +73,7 @@
 
   <!-- Newsletter Tabs Strip (7 Modules) -->
   <div class="admin-table-wrap" style="padding: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto;">
-    <div style="display: flex; gap: 0.35rem; min-width: max-content;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; min-width: max-content;">
       <?php
       $nTabs = [
         'newsletters' => ['label' => 'Newsletters & Campaigns (' . count($issues) . ')', 'icon' => 'mail'],
@@ -167,7 +167,7 @@
                 ?>
                 <tr>
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                       <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #38bdf8); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #ffffff; font-size: 0.8rem; overflow: hidden; flex-shrink: 0;">
                         <?php if (!empty($sub['avatar_url'])): ?>
                           <img src="<?= htmlspecialchars(\App\Core\Config::url($sub['avatar_url'])) ?>" style="width: 100%; height: 100%; object-fit: cover;">
@@ -260,7 +260,7 @@
     <div class="admin-table-wrap" style="margin-bottom: 1.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--admin-border-subtle); flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-purple">DELIVERY AUDIT &amp; CLICK TELEMETRY</span>
             <span style="font-size: 0.8rem; color: #64748b;">Live SMTP/API relay logging &bull; 1x1 GIF tracking &bull; Link redirect tracking</span>
           </div>
@@ -402,7 +402,7 @@
               <?php foreach ($deliveryLogs as $log): ?>
                 <tr>
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                       <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #1e293b, #334155); display: flex; align-items: center; justify-content: center; color: #38bdf8; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(56,189,248,0.2);">
                         <?= strtoupper(substr($log['to_name'] ?: ($log['to_email'] ?? 'U'), 0, 1)) ?>
                       </div>
@@ -429,7 +429,7 @@
                   </td>
 
                   <td>
-                    <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.3rem;">
                       <?php if ($log['status'] === 'clicked'): ?>
                         <span class="ts-badge" style="background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); font-weight: 700; font-size: 0.75rem;">
                           🖱️ CLICKED (<?= (int)$log['click_count'] ?>x)
@@ -536,7 +536,7 @@
     <div class="admin-table-wrap" style="padding: 2rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-pink">LIVE MESSAGE &amp; DIGEST DISPATCHER</span>
             <span style="font-size: 0.8rem; color: #64748b;">Dynamic variables injected per recipient</span>
           </div>
@@ -546,7 +546,7 @@
         </div>
 
         <!-- Live Preview Mode Toggle -->
-        <div style="display: flex; gap: 0.4rem; background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem; background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; padding: 0.25rem;">
           <button type="button" onclick="setComposerMode('editor')" id="mode_btn_editor" class="ts-btn ts-btn-primary ts-btn-sm" style="font-size: 0.75rem; padding: 0.3rem 0.75rem;">
             <i data-lucide="code"></i> HTML Editor
           </button>
@@ -728,7 +728,7 @@
             <label class="admin-modal-label" style="margin: 0;">💡 Quick Inserter: Embed Published TechScout Article Card</label>
             <span style="font-size: 0.75rem; color: #64748b;">Pick any published article to append its formatted card directly into the HTML body</span>
           </div>
-          <div style="display: flex; gap: 0.5rem; flex: 1; max-width: 500px;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; flex: 1; max-width: 500px;">
             <select id="articleQuickPicker" class="admin-modal-select" style="font-size: 0.82rem;">
               <?php foreach ($recentArticles as $ra): ?>
                 <option value="<?= htmlspecialchars($ra['title']) ?>" data-slug="<?= htmlspecialchars($ra['slug']) ?>" data-summary="<?= htmlspecialchars($ra['summary']) ?>">
@@ -792,7 +792,7 @@
             <label class="admin-modal-label" style="margin: 0; color: #34d399;">
               <i data-lucide="monitor" style="width: 14px; height: 14px; display: inline;"></i> Live Injected HTML Preview
             </label>
-            <div style="display: flex; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
               <button type="button" onclick="setPreviewDevice('desktop')" id="dev_btn_desktop" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Desktop</button>
               <button type="button" onclick="setPreviewDevice('mobile')" id="dev_btn_mobile" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Mobile (375px)</button>
             </div>
@@ -822,7 +822,7 @@
           </div>
 
           <!-- Dispatch Controls -->
-          <div style="display: flex; gap: 0.6rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.6rem;">
             <button type="reset" class="ts-btn ts-btn-outline ts-btn-sm">Reset</button>
             <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700; font-size: 0.85rem; padding: 0.5rem 1.25rem;">
               <i data-lucide="send"></i> Dispatch Message to Audience 🚀
@@ -1468,7 +1468,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <div class="admin-modal-box modal-emerald" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
     <div class="admin-modal-header" style="flex: 0 0 auto;">
       <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
           <span class="live-pulse"></span>
           <span class="ts-badge ts-badge-green" style="font-size: 0.68rem;">LIVE TRANSMISSION ENGINE</span>
         </div>

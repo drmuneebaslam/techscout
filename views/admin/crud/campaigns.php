@@ -7,7 +7,7 @@
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
   <div>
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
       <span class="ts-badge ts-badge-pink">HACKATHONS &amp; CAMPAIGNS HUB</span>
       <span style="font-size: 0.8rem; color: #64748b;">Developer Challenges, Submission Governance &amp; Viral Referrals</span>
     </div>
@@ -24,7 +24,7 @@
 </div>
 
 <!-- Navigation Tabs -->
-<div style="display: flex; gap: 0.5rem; margin-bottom: 1.75rem; border-bottom: 1px solid rgba(148,163,184,0.12); padding-bottom: 0.75rem;">
+<div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-bottom: 1.75rem; border-bottom: 1px solid rgba(148,163,184,0.12); padding-bottom: 0.75rem;">
   <button type="button" onclick="switchAdminCampTab('campaigns')" id="tab_btn_campaigns" class="ts-btn ts-btn-sm <?= $activeTab === 'campaigns' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="border-radius: 999px; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem;">
     <i data-lucide="trophy" style="width: 14px; height: 14px;"></i>
     <span>Active Challenges</span>
@@ -92,7 +92,7 @@
                 </div>
               </td>
               <td style="text-align: right;">
-                <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; justify-content: flex-end;">
                   <button onclick='editCamp(<?= json_encode($c, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.75rem;">
                     Edit
                   </button>
@@ -161,7 +161,7 @@
             ?>
             <tr class="sub-row" data-status="<?= htmlspecialchars($status) ?>">
               <td>
-                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                   <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #6366f1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; color: #fff;">
                     <?= strtoupper(substr($sub['submitter_name'] ?: 'U', 0, 1)) ?>
                   </div>

@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">ENTERPRISE STORAGE &bull; INNODB TELEMETRY</span>
         <span style="font-size: 0.8rem; color: #64748b;">Table Defragmentation, SQL Snapshots &amp; Schema Integrity</span>
       </div>
@@ -74,7 +74,7 @@
   </div>
 
   <!-- DB Manager Navigation Sub-Tabs -->
-  <div style="display: flex; border-bottom: 1px solid rgba(148,163,184,0.15); margin-bottom: 1.5rem; gap: 0.5rem; overflow-x: auto;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; border-bottom: 1px solid rgba(148,163,184,0.15); margin-bottom: 1.5rem; gap: 0.5rem; overflow-x: auto;">
     <a href="<?= url('/admin/db-manager?tab=tables') ?>" class="ts-subtab-link <?= ($activeTab === 'tables') ? 'active' : '' ?>">
       🗄️ Tables &amp; Allocation (<?= count($tables) ?>)
     </a>
@@ -293,7 +293,7 @@
       </div>
 
       <!-- Health Checklist -->
-      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
         <?php foreach ($healthChecks as $check): ?>
           <?php
             $isHealthy = $check['status'] === 'healthy';
@@ -301,7 +301,7 @@
           ?>
           <div class="audit-inspector-card" style="border-color: <?= $isHealthy ? 'rgba(16,185,129,0.3)' : ($isCritical ? 'rgba(239,68,68,0.4)' : 'rgba(245,158,11,0.4)') ?>; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
-              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
                 <span style="font-size: 1.1rem;"><?= $isHealthy ? '✅' : ($isCritical ? '❌' : '⚠️') ?></span>
                 <strong style="color: var(--admin-text-main); font-size: 0.95rem;"><?= htmlspecialchars($check['name']) ?></strong>
                 <span class="ts-badge <?= $isHealthy ? 'ts-badge-green' : ($isCritical ? 'ts-badge-red' : 'ts-badge-amber') ?>" style="font-size: 0.65rem;">
@@ -370,7 +370,7 @@ ALTER TABLE `system_error_logs`
             Execute live safe queries (<code style="color: #38bdf8;">SELECT</code>, <code style="color: #38bdf8;">SHOW</code>, <code style="color: #38bdf8;">EXPLAIN</code>, <code style="color: #38bdf8;">DESCRIBE</code>, <code style="color: #38bdf8;">CHECK</code>, <code style="color: #38bdf8;">OPTIMIZE</code>) with interactive grid results.
           </p>
         </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
           <span class="ts-badge ts-badge-cyan" style="font-family: var(--admin-font-mono); font-size: 0.72rem;">Ctrl+Enter to Execute</span>
         </div>
       </div>
@@ -410,7 +410,7 @@ ALTER TABLE `system_error_logs`
           <textarea name="sql_query" id="sqlQueryInput" rows="5" placeholder="SELECT * FROM users ORDER BY id DESC LIMIT 15;" style="width: 100%; background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.2)); border-radius: 8px; padding: 1rem; color: #38bdf8; font-family: var(--admin-font-mono); font-size: 0.88rem; line-height: 1.6; box-sizing: border-box; resize: vertical;"><?= htmlspecialchars($persistedSql) ?></textarea>
         </div>
         <div style="margin-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <button type="button" onclick="formatSqlInInput()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.75rem;">
               ✨ Format Query
             </button>
@@ -447,7 +447,7 @@ ALTER TABLE `system_error_logs`
               </div>
               
               <?php if (!empty($rows)): ?>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
                   <input type="text" id="queryGridFilter" onkeyup="filterQueryResults()" placeholder="🔍 Filter results..." style="background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.2)); padding: 0.35rem 0.65rem; border-radius: 6px; color: var(--admin-text-main); font-size: 0.78rem; width: 170px;">
                   <button type="button" onclick="exportQueryResultsCsv()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.35rem 0.65rem;">
                     📥 CSV
@@ -515,7 +515,7 @@ ALTER TABLE `system_error_logs`
       <div class="admin-table-wrap" style="padding: 1.75rem; margin-bottom: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
               <span class="ts-badge ts-badge-cyan" style="font-weight: 800;">ENTERPRISE DEPLOYMENT STUDIO</span>
               <span class="ts-badge ts-badge-green">GRANULAR SEED SELECTOR</span>
             </div>
@@ -556,7 +556,7 @@ ALTER TABLE `system_error_logs`
               </h3>
               <p style="color: var(--admin-text-muted); font-size: 0.8rem; margin: 0;">Choose root directories to compress into the deployment archive</p>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
               <button type="button" onclick="toggleAllFolders(true)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Check All</button>
               <button type="button" onclick="toggleAllFolders(false)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Uncheck All</button>
             </div>
@@ -577,7 +577,7 @@ ALTER TABLE `system_error_logs`
                   <div style="font-size: 0.75rem; color: var(--admin-text-muted); margin-bottom: 0.45rem;">
                     <?= htmlspecialchars($dir['desc']) ?>
                   </div>
-                  <div style="display: flex; gap: 0.75rem; font-size: 0.72rem; color: #38bdf8; font-family: var(--admin-font-mono);">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; font-size: 0.72rem; color: #38bdf8; font-family: var(--admin-font-mono);">
                     <span>📄 <?= number_format($dir['file_count']) ?> files</span>
                     <span>💾 <?= htmlspecialchars($dir['size_formatted']) ?></span>
                   </div>
@@ -697,7 +697,7 @@ ALTER TABLE `system_error_logs`
       <!-- Floating Sticky Action Dock -->
       <div style="position: sticky; bottom: 1.5rem; z-index: 50; padding: 1.25rem 1.75rem; background: var(--admin-card-bg); border: 1px solid rgba(56,189,248,0.3); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; backdrop-filter: blur(12px);">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.95rem; font-weight: 700; color: var(--admin-text-main);">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem; font-size: 0.95rem; font-weight: 700; color: var(--admin-text-main);">
             <span>🚀 Custom Export Summary:</span>
             <span id="hud_folders_count" style="color: #38bdf8;">0 Folders</span>
             <span>&bull;</span>
@@ -729,7 +729,7 @@ ALTER TABLE `system_error_logs`
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.75rem; flex-wrap: wrap;">
           <input type="text" id="seedRowSearchInput" onkeyup="searchSeedRowsDebounced()" placeholder="🔍 Search records..." style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); padding: 0.4rem 0.85rem; border-radius: 6px; color: var(--admin-text-main); font-size: 0.82rem; flex: 1; min-width: 200px;">
-          <div style="display: flex; gap: 0.4rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
             <button type="button" onclick="toggleAllModalRows(true)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem;">Select All Visible</button>
             <button type="button" onclick="toggleAllModalRows(false)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem;">Deselect All Visible</button>
           </div>
@@ -750,7 +750,7 @@ ALTER TABLE `system_error_logs`
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; border-top: 1px solid var(--admin-border-color); padding-top: 0.75rem;">
           <span id="seedModalSelectedCount" style="font-size: 0.85rem; color: #38bdf8; font-weight: 700;">0 rows selected</span>
-          <div style="display: flex; gap: 0.5rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem;">
             <button type="button" onclick="closeSeedPickerModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
             <button type="button" onclick="saveSeedPickerSelection()" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #10b981; font-weight: 700;">
               Confirm Selected Seeds ✓
@@ -767,7 +767,7 @@ ALTER TABLE `system_error_logs`
     <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
             <span class="ts-badge ts-badge-cyan" style="font-weight: 800;">ENTERPRISE SCHEMA TOPOLOGY</span>
             <span class="ts-badge ts-badge-indigo"><?= count($erdTables ?? []) ?> Core Tables</span>
             <span class="ts-badge ts-badge-green"><?= count($erdRelations ?? []) ?> Relational Foreign Keys</span>
@@ -779,7 +779,7 @@ ALTER TABLE `system_error_logs`
             Interactive schema topology map illustrating primary keys, foreign key references, and relational data flows.
           </p>
         </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
           <input type="text" id="erdFilterInput" onkeyup="filterErdTables()" placeholder="🔍 Highlight table..." style="background: var(--admin-input-bg); border: 1px solid var(--admin-border-color); padding: 0.4rem 0.85rem; border-radius: 6px; color: var(--admin-text-main); font-size: 0.82rem; width: 180px;">
           <button type="button" onclick="zoomErd(1.1)" class="ts-btn ts-btn-outline ts-btn-sm" title="Zoom In">+</button>
           <button type="button" onclick="zoomErd(0.9)" class="ts-btn ts-btn-outline ts-btn-sm" title="Zoom Out">-</button>
@@ -801,7 +801,7 @@ ALTER TABLE `system_error_logs`
           <?php foreach (($erdTables ?? []) as $tName => $tCols): ?>
             <div class="erd-table-card" id="erd_table_<?= htmlspecialchars($tName) ?>" style="background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden; transition: all 0.2s ease;">
               <div style="background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(99,102,241,0.05)); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--admin-border-color); display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                   <i data-lucide="database" style="width: 14px; color: #38bdf8;"></i>
                   <strong style="color: var(--admin-text-main); font-size: 0.9rem; font-family: var(--admin-font-mono);"><?= htmlspecialchars($tName) ?></strong>
                 </div>
@@ -857,7 +857,7 @@ ALTER TABLE `system_error_logs`
     <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
             <span class="ts-badge ts-badge-amber" style="font-weight: 800;">REAL-TIME ENGINE TELEMETRY</span>
             <span class="ts-badge ts-badge-green">AI HEURISTIC ADVISOR</span>
           </div>
@@ -964,7 +964,7 @@ ALTER TABLE `system_error_logs`
     <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
             <span class="ts-badge ts-badge-green" style="font-weight: 800;">SCHEMA VERSIONING &bull; ZERO DOWNTIME</span>
             <span class="ts-badge ts-badge-cyan"><?= count($migrationsList ?? []) ?> Applied</span>
             <?php if (!empty($pendingMigrations)): ?>
@@ -1013,14 +1013,14 @@ ALTER TABLE `system_error_logs`
           <h4 style="color: #f59e0b; margin: 0 0 0.5rem 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
             <span>⚠️ Pending Schema Migrations Awaiting Execution</span>
           </h4>
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.5rem;">
             <?php foreach ($pendingMigrations as $pm): ?>
               <div style="display: flex; justify-content: space-between; align-items: center; background: var(--admin-card-bg); padding: 0.6rem 0.9rem; border-radius: 6px; border: 1px solid var(--admin-border-color); font-size: 0.82rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                   <span style="color: #f59e0b;">⏳</span>
                   <code style="color: #38bdf8; font-weight: 700;"><?= htmlspecialchars($pm['file']) ?></code>
                 </div>
-                <div style="display: flex; gap: 1rem; color: var(--admin-text-muted); font-size: 0.75rem; font-family: var(--admin-font-mono);">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 1rem; color: var(--admin-text-muted); font-size: 0.75rem; font-family: var(--admin-font-mono);">
                   <span><?= round($pm['size'] / 1024, 1) ?> KB</span>
                   <span>Created: <?= htmlspecialchars($pm['created_at']) ?></span>
                 </div>
@@ -1092,7 +1092,7 @@ ALTER TABLE `system_error_logs`
     <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
             <span class="ts-badge ts-badge-pink" style="font-weight: 800;">STORAGE RECLAMATION &bull; DAM HYGIENE</span>
             <span class="ts-badge ts-badge-cyan"><?= (int)($orphanedMedia['total_scanned'] ?? 0) ?> Files Scanned</span>
           </div>
@@ -1189,7 +1189,7 @@ ALTER TABLE `system_error_logs`
     <div class="admin-table-wrap" style="padding: 1.5rem; background: var(--admin-card-bg); border: 1px solid var(--admin-border-color); border-radius: 12px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
             <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE HARDWARE &amp; IOPS BENCHMARK</span>
             <span class="ts-badge ts-badge-green">Performance Grade: <?= htmlspecialchars($dbBenchmark['health_grade'] ?? 'A') ?></span>
           </div>
@@ -1493,7 +1493,7 @@ function renderLiveResults(data) {
           <strong>${Number(total).toLocaleString()}</strong> row(s) returned in <strong style="color: #38bdf8;">${duration} ms</strong>
           ${total > rows.length ? `<span style="color: var(--admin-text-muted); font-size: 0.75rem;">(previewing first ${rows.length} rows)</span>` : ''}
         </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
           <input type="text" id="queryGridFilter" onkeyup="filterQueryResults()" placeholder="🔍 Filter results..." style="background: var(--admin-input-bg, #05070b); border: 1px solid var(--admin-border-color, rgba(148,163,184,0.2)); padding: 0.35rem 0.65rem; border-radius: 6px; color: var(--admin-text-main); font-size: 0.78rem; width: 170px;">
           <button type="button" onclick="exportQueryResultsCsv()" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.35rem 0.65rem;">
             📥 CSV

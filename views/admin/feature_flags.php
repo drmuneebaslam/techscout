@@ -8,7 +8,7 @@ $disabledCount = count($flags) - $activeCount;
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink">DYNAMIC RUNTIME ENGINE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Live Platform Module &amp; Capability Switches</span>
       </div>
@@ -29,7 +29,7 @@ $disabledCount = count($flags) - $activeCount;
 
   <!-- Telemetry Overview HUD -->
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-    <div class="ts-card" style="padding: 1.15rem; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); display: flex; align-items: center; gap: 1rem;">
+    <div class="ts-card" style="flex-wrap: wrap; align-items: center; padding: 1.15rem; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); display: flex; align-items: center; gap: 1rem;">
       <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; color: #10b981;">
         <i data-lucide="check-circle-2" style="width: 22px; height: 22px;"></i>
       </div>
@@ -39,7 +39,7 @@ $disabledCount = count($flags) - $activeCount;
       </div>
     </div>
 
-    <div class="ts-card" style="padding: 1.15rem; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); display: flex; align-items: center; gap: 1rem;">
+    <div class="ts-card" style="flex-wrap: wrap; align-items: center; padding: 1.15rem; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); display: flex; align-items: center; gap: 1rem;">
       <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(239,68,68,0.15); display: flex; align-items: center; justify-content: center; color: #ef4444;">
         <i data-lucide="pause-circle" style="width: 22px; height: 22px;"></i>
       </div>
@@ -49,7 +49,7 @@ $disabledCount = count($flags) - $activeCount;
       </div>
     </div>
 
-    <div class="ts-card" style="padding: 1.15rem; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); display: flex; align-items: center; gap: 1rem;">
+    <div class="ts-card" style="flex-wrap: wrap; align-items: center; padding: 1.15rem; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); display: flex; align-items: center; gap: 1rem;">
       <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(56,189,248,0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
         <i data-lucide="layers" style="width: 22px; height: 22px;"></i>
       </div>

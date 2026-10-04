@@ -3,7 +3,7 @@
 <div class="admin-main">
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">EDITORIAL PIPELINE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Review Submissions, Request Author Changes & Publish</span>
       </div>
@@ -244,7 +244,7 @@
           ❌ Reject Submission
         </button>
 
-        <div style="display: flex; gap: 0.75rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
           <button type="submit" name="decision" value="request_changes" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #f59e0b; border-color: rgba(245,158,11,0.5);">
             📋 Request Changes from Author
           </button>
@@ -334,18 +334,18 @@
           </select>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.4rem; padding-top: 1.2rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem; padding-top: 1.2rem;">
           <input type="checkbox" name="is_featured" id="article_is_featured" value="1" style="accent-color: #6366f1;">
           <label for="article_is_featured" style="font-size: 0.85rem; color: #f8fafc; cursor: pointer;">Featured ★</label>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.4rem; padding-top: 1.2rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem; padding-top: 1.2rem;">
           <input type="checkbox" name="is_trending" id="article_is_trending" value="1" style="accent-color: #ec4899;">
           <label for="article_is_trending" style="font-size: 0.85rem; color: #f8fafc; cursor: pointer;">Trending 🔥</label>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="document.getElementById('articleFormModal').style.display='none'" class="ts-btn ts-btn-outline">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary">Save & Publish Article 🚀</button>
       </div>

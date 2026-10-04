@@ -7,7 +7,7 @@ require __DIR__ . '/../layouts/admin_header.php';
   <!-- Page Header -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem; font-weight: 800;">KNOWLEDGE BASE CMS</span>
         <span style="color: #64748b; font-size: 0.8rem;">YouTube &amp; TikTok Style Documentation Engine</span>
       </div>
@@ -138,7 +138,7 @@ require __DIR__ . '/../layouts/admin_header.php';
                   <?php endif; ?>
                 </td>
                 <td style="text-align: right;">
-                  <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; justify-content: flex-end;">
                     <a href="<?= url('/help/' . $art['slug']) ?>" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; color: #38bdf8;" title="View Live">
                       👁️
                     </a>

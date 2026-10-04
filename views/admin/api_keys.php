@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink">REST API GATEWAY &bull; BEARER AUTH</span>
         <span style="font-size: 0.8rem; color: #64748b;">Developer Access Tokens &amp; Rate Limit Quotas</span>
       </div>
@@ -24,7 +24,7 @@
     <div style="background: rgba(16,185,129,0.15); border: 1px solid #10b981; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
       <h4 style="color: #34d399; margin: 0 0 0.5rem 0;">⚡ New API Key Generated</h4>
       <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0 0 0.75rem 0;">Copy this key now. For security purposes, it will never be displayed in plain text again.</p>
-      <div style="display: flex; gap: 0.5rem; max-width: 600px;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; max-width: 600px;">
         <input type="text" value="<?= htmlspecialchars($newKey) ?>" id="generatedKeyField" readonly class="admin-modal-input" style="font-family: monospace; color: #34d399; font-weight: 700;">
         <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('generatedKeyField').value); alert('Copied to clipboard!');" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #10b981; border-color: #10b981; white-space: nowrap;">
           Copy Key 📋

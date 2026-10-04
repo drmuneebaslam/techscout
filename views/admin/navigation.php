@@ -3,7 +3,7 @@
   <!-- Topbar Header -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink">LAYOUT ARCHITECTURE &bull; MULTI-TIER MENUS</span>
         <span style="font-size: 0.8rem; color: #64748b;">Header Menus, Mega Menus, Dropdown Trees, Footer Columns &amp; External Social Links</span>
       </div>
@@ -24,7 +24,7 @@
 
   <!-- Navigation Locations Ribbon (7 Modules) -->
   <div class="admin-table-wrap" style="padding: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto;">
-    <div style="display: flex; gap: 0.35rem; min-width: max-content;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; min-width: max-content;">
       <?php
       $navTabs = [
         'main' => ['label' => 'Main Navigation', 'icon' => 'menu', 'badge' => count($groupedNav['main'])],
@@ -77,7 +77,7 @@
                 <tr>
                   <td style="color: #64748b; font-family: var(--admin-font-mono);"><?= $idx + 1 ?></td>
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                       <strong style="color: #f8fafc; font-size: 0.95rem;"><?= htmlspecialchars($item['label']) ?></strong>
                       <?php if (!empty($item['badge_text'])): ?>
                         <span class="ts-badge ts-badge-<?= htmlspecialchars($item['badge_color'] ?: 'cyan') ?>" style="font-size: 0.65rem;">
@@ -111,7 +111,7 @@
                     </span>
                   </td>
                   <td>
-                    <div style="display: flex; gap: 0.4rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
                       <button type="button" onclick='editNavItem(<?= json_encode($item) ?>)' class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.55rem; color: #38bdf8;">
                         ✏️ Edit
                       </button>

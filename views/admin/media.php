@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">DIGITAL ASSET MANAGEMENT (DAM) &bull; CMS STORAGE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Images, Videos, Audio, Documents, Metadata &amp; Alt Tags</span>
       </div>
@@ -78,7 +78,7 @@
 
       <!-- Search & Folder Filter -->
       <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Folder:</span>
           <select onchange="location.href='<?= url('/admin/media?type=' . ($currentType ?? 'all')) ?>&folder=' + this.value" class="admin-modal-select" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;">
             <option value="all" <?= empty($currentFolder) || $currentFolder === 'all' ? 'selected' : '' ?>>All Folders</option>
@@ -151,7 +151,7 @@
             <?php endif; ?>
 
             <!-- Action Strip -->
-            <div style="display: flex; gap: 0.35rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.6rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; border-top: 1px solid rgba(148,163,184,0.1); padding-top: 0.6rem;">
               <button type="button" onclick='openMediaDetailModal(<?= json_encode($item) ?>, "<?= htmlspecialchars($fullUrl) ?>")' class="ts-btn ts-btn-outline ts-btn-sm" style="flex: 1; font-size: 0.72rem; padding: 0.25rem 0.4rem; color: #38bdf8;">
                 <i data-lucide="info" style="width: 12px; height: 12px;"></i> Inspect
               </button>

@@ -8,7 +8,7 @@
       </h1>
       <p style="color: var(--admin-text-secondary); font-size: 0.95rem; margin: 0;">Configure platform features, customize footer social icons &amp; channels, manage ad placements, and review audit telemetry.</p>
     </div>
-    <div style="display: flex; gap: 0.75rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
       <form action="<?= url('/admin/system/deploy-pull') ?>" method="POST" onsubmit="return confirm('Pull latest code from GitHub and run all pending migrations on this server?');" style="margin: 0;">
         <?= csrf_field() ?>
         <button type="submit" class="admin-btn admin-btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
@@ -112,7 +112,7 @@
           </select>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.85rem;">
           <label style="display: flex; align-items: center; gap: 0.75rem; color: var(--admin-text-primary); font-size: 0.9rem; cursor: pointer;">
             <input type="checkbox" name="enable_bg_grid_lines" value="1" <?= (!empty($settings['enable_bg_grid_lines']) && $settings['enable_bg_grid_lines'] === '1') ? 'checked' : '' ?> style="width: 18px; height: 18px; accent-color: var(--ts-primary);">
             <span><strong>Aesthetic Blueprint Background Grid Lines</strong> (Renders subtle, high-tech architectural blueprint background grid across public and admin pages)</span>
@@ -132,13 +132,13 @@
 
       <!-- Monetag & Google AdSense Ad Slot Embeds -->
       <div class="system-card-box">
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
           <span class="ts-badge ts-badge-pink">Monetization Engine</span>
           <h4 style="color: var(--admin-text-primary); margin: 0; font-size: 1.05rem;">Monetag &amp; Google AdSense Ad Slots</h4>
         </div>
         <p style="color: var(--admin-text-secondary); font-size: 0.85rem; margin: 0 0 1.25rem 0;">Paste your Monetag scripts, Google AdSense tags, or custom banner HTML.</p>
 
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem;">
           <div>
             <label class="system-label">Header Script / Site Verification Code (&lt;head&gt; code)</label>
             <textarea name="ad_header_code" rows="2" placeholder="&lt;script src=&quot;https://pagead2.googlesyndication.com/...&quot;&gt;&lt;/script&gt;" class="admin-modal-textarea" style="font-family: var(--admin-font-mono); font-size: 0.8rem;"><?= htmlspecialchars($settings['ad_header_code'] ?? '') ?></textarea>
@@ -176,7 +176,7 @@
 
   <!-- Dedicated Audit Station Quick Launcher (Replaces legacy embedded table) -->
   <div class="admin-table-wrap" style="padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-color: rgba(56,189,248,0.25);">
-    <div style="display: flex; align-items: center; gap: 1rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 1rem;">
       <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); display: flex; align-items: center; justify-content: center;">
         <i data-lucide="shield-check" style="color: #38bdf8; width: 24px; height: 24px;"></i>
       </div>

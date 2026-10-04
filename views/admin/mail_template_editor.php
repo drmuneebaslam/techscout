@@ -81,13 +81,13 @@ $allVariableCategories = [
 ?>
 
 <!-- Embedded Notification Toast Container -->
-<div id="saToastBox" style="position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;"></div>
+<div id="saToastBox" style="flex-wrap: wrap; align-items: center; position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;"></div>
 
 <div class="admin-content-inner mail-studio-shell">
   <!-- Page Header Strip -->
   <div class="mail-studio-header-strip">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <a href="<?= url('/admin/mail?tab=templates') ?>" class="mail-studio-back-link">
           &larr; Back to Mail &amp; Template Studio
         </a>
@@ -180,7 +180,7 @@ $allVariableCategories = [
             <?php foreach ($allVariableCategories as $cat => $vars): ?>
               <div class="mail-studio-palette-cat">
                 <div class="mail-studio-cat-title"><?= htmlspecialchars($cat) ?></div>
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.25rem;">
                   <?php foreach ($vars as $tag => $desc): ?>
                     <button type="button" onclick="insertVariable('<?= $tag ?>')" class="mail-studio-token-btn" title="Click to insert <?= $tag ?>: <?= htmlspecialchars($desc) ?>">
                       <code class="mail-studio-token-code"><?= htmlspecialchars($tag) ?></code>
@@ -196,7 +196,7 @@ $allVariableCategories = [
         <!-- Modern Block Component Library (14 Responsive Email Blocks) -->
         <div class="mail-studio-blocks-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.55rem; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="font-size: 0.82rem; font-weight: 800; color: var(--admin-text-primary); display: flex; align-items: center; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; font-size: 0.82rem; font-weight: 800; color: var(--admin-text-primary); display: flex; align-items: center; gap: 0.4rem;">
               <i data-lucide="blocks" style="width: 16px; height: 16px; color: var(--admin-primary);"></i> 
               <span>1-Click Universal Responsive Email Blocks</span>
             </div>
@@ -224,12 +224,12 @@ $allVariableCategories = [
         <!-- HTML Code & Visual WYSIWYG Editor Workspace -->
         <div class="mail-studio-editor-box">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="display: flex; gap: 0.35rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
               <button type="button" onclick="switchSaEditMode('wysiwyg')" id="btn-sa-mode-wysiwyg" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.75rem;">🎨 Visual WYSIWYG Editor</button>
               <button type="button" onclick="switchSaEditMode('html')" id="btn-sa-mode-html" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.75rem;">💻 Raw HTML Code</button>
             </div>
 
-            <div style="display: flex; gap: 0.4rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem; align-items: center;">
               <select onchange="if(this.value){ insertVariable(this.value); this.value=''; }" class="admin-modal-select" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; width: auto; max-width: 220px; font-weight: 700;">
                 <option value="">⚡ Quick Token Insert... ▾</option>
                 <?php foreach ($allVariableCategories as $vCat => $vList): ?>
@@ -313,7 +313,7 @@ $allVariableCategories = [
     <!-- Bottom Action Bar -->
     <div class="mail-studio-bottom-bar">
       <div>
-        <div style="font-weight: 800; color: var(--admin-text-primary); font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; font-weight: 800; color: var(--admin-text-primary); font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
           <i data-lucide="check-circle" style="color: #10b981;"></i> Ready to deploy HTML email template?
         </div>
         <div style="font-size: 0.8rem; color: var(--admin-text-secondary); margin-top: 0.2rem;">
@@ -321,7 +321,7 @@ $allVariableCategories = [
         </div>
       </div>
 
-      <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; align-items: center;">
         <a href="<?= url('/admin/mail?tab=templates') ?>" class="ts-btn ts-btn-outline">
           Cancel &amp; Return
         </a>
@@ -407,7 +407,7 @@ function insertBlock(type) {
     otp_box: `\n<div style="text-align:center;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:22px;margin:24px 0;">\n  <div style="font-size:12px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-weight:700;">One-Time Authorization Code (Valid {{expires_in}})</div>\n  <div style="font-size:36px;font-weight:900;color:#4f46e5;letter-spacing:10px;margin:10px 0 6px 0;font-family:Consolas,Monaco,monospace;">{{verification_code}}</div>\n  <div style="font-size:12px;color:#94a3b8;">Do not share this confidential verification PIN with anyone.</div>\n</div>\n`,
     two_col_card: `\n<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-collapse:separate;border-spacing:12px 0;">\n  <tr>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:6px;">📈 Performance</div>\n      <div style="font-size:20px;font-weight:800;color:#0f172a;">{{total_reads}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Total Article Reads</div>\n    </td>\n    <td width="50%" valign="top" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">\n      <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;margin-bottom:6px;">💎 Earnings</div>\n      <div style="font-size:20px;font-weight:800;color:#059669;">\${{amount}}</div>\n      <div style="font-size:12px;color:#64748b;margin-top:2px;">Disbursed to date</div>\n    </td>\n  </tr>\n</table>\n`,
     quote: `\n<blockquote style="margin:20px 0;padding:16px 20px;background:#f8fafc;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;color:#334155;font-size:14px;line-height:1.6;font-style:italic;">\n  &ldquo;{{comment_snippet}}&rdquo;\n  <div style="margin-top:8px;font-weight:700;color:#0f172a;font-style:normal;font-size:13px;">&mdash; {{commenter_name}}</div>\n</blockquote>\n`,
-    checklist: `\n<div style="margin:20px 0;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;">\n  <div style="font-weight:700;color:#0f172a;margin-bottom:10px;font-size:14px;">Next Recommended Steps:</div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Complete your author profile and developer bio\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Connect your preferred creator payout method\n  </div>\n  <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Submit your first technical breakdown or AI workflow\n  </div>\n</div>\n`,
+    checklist: `\n<div style="margin:20px 0;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;">\n  <div style="font-weight:700;color:#0f172a;margin-bottom:10px;font-size:14px;">Next Recommended Steps:</div>\n  <div style="flex-wrap: wrap; align-items: center; display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Complete your author profile and developer bio\n  </div>\n  <div style="flex-wrap: wrap; align-items: center; display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Connect your preferred creator payout method\n  </div>\n  <div style="flex-wrap: wrap; align-items: center; display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#334155;">\n    <span style="color:#10b981;font-weight:bold;">✓</span> Submit your first technical breakdown or AI workflow\n  </div>\n</div>\n`,
     divider: `\n<hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0;">\n`
   };
 

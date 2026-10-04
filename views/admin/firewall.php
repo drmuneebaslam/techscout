@@ -9,7 +9,7 @@
   <!-- Topbar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-pink">CYBER SHIELD &bull; WAF DEFENSE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Intrusion Detection, Malicious Bot Mitigation &amp; IP Blacklisting</span>
       </div>
@@ -60,7 +60,7 @@
   </div>
 
   <!-- Tabbed Navigation Ribbon -->
-  <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(148,163,184,0.12); padding-bottom: 0.75rem; overflow-x: auto; scrollbar-width: none;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(148,163,184,0.12); padding-bottom: 0.75rem; overflow-x: auto; scrollbar-width: none;">
     <button type="button" onclick="switchSecurityTab('rules')" id="tab_btn_rules" class="ts-btn ts-btn-sm" style="border-radius: 999px; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem;">
       <i data-lucide="shield" style="width: 14px; height: 14px;"></i>
       <span>Perimeter Rules</span>
@@ -96,7 +96,7 @@
           <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 0.25rem 0;">Active Perimeter Enforcement Rules</h3>
           <p style="color: #64748b; font-size: 0.85rem; margin: 0;">Configured IP blocks, IP allowlists, and malicious bot user-agent signatures.</p>
         </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
           <input type="text" id="filter_rules_search" onkeyup="filterTableRows('rulesTable', this.value, 'rules_page_info')" placeholder="Search rules (IP, reason)..." style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.45rem 0.85rem; color: #f8fafc; font-size: 0.85rem; min-width: 220px;">
         </div>
       </div>
@@ -157,7 +157,7 @@
       <!-- Pagination for Rules -->
       <div id="rules_pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(148,163,184,0.1);">
         <div id="rules_page_info" style="font-size: 0.82rem; color: #64748b;">Showing <?= count($rules ?? []) ?> rules</div>
-        <div style="display: flex; gap: 0.35rem;" id="rules_page_btns"></div>
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;" id="rules_page_btns"></div>
       </div>
     </div>
   </div>
@@ -170,7 +170,7 @@
           <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 0.25rem 0;">Real-Time Intrusion &amp; Threat Detection Stream</h3>
           <p style="color: #64748b; font-size: 0.85rem; margin: 0;">Live cyber telemetry stream capturing automated 403 blocks, path traversal, and malicious probes.</p>
         </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
           <input type="text" id="filter_threats_search" onkeyup="filterTableRows('threatsTable', this.value, 'threats_page_info')" placeholder="Search threats (IP, path)..." style="background: #05070b; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 0.45rem 0.85rem; color: #f8fafc; font-size: 0.85rem; min-width: 220px;">
         </div>
       </div>
@@ -219,7 +219,7 @@
       <!-- Pagination for Threats -->
       <div id="threats_pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(148,163,184,0.1);">
         <div id="threats_page_info" style="font-size: 0.82rem; color: #64748b;">Showing <?= count($logs ?? []) ?> events</div>
-        <div style="display: flex; gap: 0.35rem;" id="threats_page_btns"></div>
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;" id="threats_page_btns"></div>
       </div>
     </div>
   </div>
@@ -292,7 +292,7 @@
       <!-- Pagination for Lockouts -->
       <div id="lockouts_pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(148,163,184,0.1);">
         <div id="lockouts_page_info" style="font-size: 0.82rem; color: #64748b;">Showing <?= count($activeLockouts) ?> locked IPs</div>
-        <div style="display: flex; gap: 0.35rem;" id="lockouts_page_btns"></div>
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;" id="lockouts_page_btns"></div>
       </div>
     </div>
   </div>
@@ -366,7 +366,7 @@
       <!-- Pagination for Anomalies -->
       <div id="anomalies_pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(148,163,184,0.1);">
         <div id="anomalies_page_info" style="font-size: 0.82rem; color: #64748b;">Showing <?= count($recentAnomalies) ?> anomaly records</div>
-        <div style="display: flex; gap: 0.35rem;" id="anomalies_page_btns"></div>
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;" id="anomalies_page_btns"></div>
       </div>
     </div>
   </div>

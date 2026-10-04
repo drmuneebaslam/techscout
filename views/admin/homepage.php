@@ -4,7 +4,7 @@
   <!-- Topbar -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">DISCOVERY ARCHITECTURE &bull; FRONT-PAGE ENGINE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Configure 15 Homepage Modular Discovery Units</span>
       </div>
@@ -53,7 +53,7 @@
 
   <!-- Sections Accordion Master Form -->
   <form id="homepageMasterForm" action="<?= url('/admin/homepage/save') ?>" method="POST">
-    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 3rem;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 3rem;">
       <?php foreach ($sections as $sec): ?>
         <?php 
           $key = $sec['section_key'];
@@ -62,12 +62,12 @@
         ?>
         <div class="ts-card" style="background: rgba(13,19,34,0.7); border: 1px solid <?= $isEnabled ? 'rgba(99,102,241,0.25)' : 'rgba(148,163,184,0.1)' ?>; padding: 1.25rem; border-radius: 12px;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.85rem;">
               <span style="font-family: var(--admin-font-mono); font-size: 0.85rem; font-weight: 700; color: #64748b; background: rgba(15,23,42,0.8); width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid rgba(148,163,184,0.15);">
                 #<?= $sec['sort_order'] ?>
               </span>
               <div>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                   <strong style="color: #f8fafc; font-size: 1.05rem;"><?= htmlspecialchars($sec['title']) ?></strong>
                   <span class="ts-badge <?= $isEnabled ? 'ts-badge-green' : 'ts-badge-cyan' ?>" style="font-size: 0.68rem;">
                     <?= strtoupper($key) ?>
@@ -79,12 +79,12 @@
 
             <!-- Controls (Toggle, Order, Item Limit) -->
             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                 <label style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Order:</label>
                 <input type="number" name="sections[<?= $key ?>][sort_order]" value="<?= (int)$sec['sort_order'] ?>" style="width: 60px; background: #05070b; border: 1px solid rgba(148,163,184,0.2); color: #f8fafc; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.85rem; text-align: center;">
               </div>
 
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                 <label style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Items:</label>
                 <input type="number" name="sections[<?= $key ?>][item_limit]" value="<?= (int)$sec['item_limit'] ?>" min="1" max="24" style="width: 60px; background: #05070b; border: 1px solid rgba(148,163,184,0.2); color: #f8fafc; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.85rem; text-align: center;">
               </div>
@@ -154,7 +154,7 @@
       <div style="color: #cbd5e1; font-size: 0.9rem;">
         Changes take effect immediately on the live discovery homepage.
       </div>
-      <div style="display: flex; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
         <a href="<?= url('/admin/dashboard') ?>" class="ts-btn ts-btn-outline ts-btn-sm">Return to Dashboard</a>
         <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: linear-gradient(135deg, #6366f1, #38bdf8); font-weight: 700;">
           Save All Sections ✓

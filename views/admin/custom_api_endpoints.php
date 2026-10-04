@@ -3,7 +3,7 @@
 <!-- Topbar -->
 <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-indigo">ENTERPRISE API BUILDER &bull; DATA GATEWAY</span>
         <span style="font-size: 0.8rem; color: var(--admin-text-secondary);">Dynamic Table Introspection, Whole DB Blueprint &amp; Custom REST Endpoints</span>
       </div>
@@ -71,7 +71,7 @@
         </p>
       </div>
 
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
         <select id="quickTableSelect" onchange="inspectSelectedTable(this.value)" class="admin-input" style="min-width: 240px; font-weight: 600;">
           <option value="">-- Choose Table to Describe --</option>
           <?php foreach ($allowedTables as $tblName => $tblDesc): ?>
@@ -180,7 +180,7 @@
             </div>
 
             <!-- Endpoint URL with Copy -->
-            <div style="background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <div style="flex-wrap: wrap; align-items: center; background: var(--admin-card-bg-elevated); border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem;">
               <code style="font-size: 0.75rem; color: #38bdf8; font-family: var(--admin-font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
                 <?= htmlspecialchars($endpointUrl) ?>
               </code>
@@ -232,7 +232,7 @@
     <div class="admin-modal-backdrop" onclick="closeApiTester()"></div>
     <div class="admin-modal-box modal-cyan" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
       <div class="admin-modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--admin-border-main); display: flex; justify-content: space-between; align-items: center; background: var(--admin-bg-surface);">
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.65rem;">
           <span class="ts-badge ts-badge-indigo" style="font-weight: 800;">LIVE API SANDBOX &amp; C.R.U.D. RUNNER</span>
           <h3 style="margin: 0; color: var(--admin-text-primary); font-size: 1.2rem; font-weight: 800;" id="sandboxEndpointTitle">API Sandbox</h3>
         </div>
@@ -267,7 +267,7 @@
         <!-- Response Preview Pane -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
           <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text-secondary);">Live Response Body</span>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
             <span id="sandboxStatusBadge" class="ts-badge" style="font-size: 0.7rem; display: none;"></span>
             <button type="button" onclick="copySandboxResponse()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
               📋 Copy JSON
@@ -295,7 +295,7 @@
 
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/custom/') ?></span>
           <input type="text" name="slug" placeholder="prompts-catalog" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
         </div>
@@ -373,7 +373,7 @@
   <div class="admin-modal-backdrop" onclick="closeEditEndpointModal()"></div>
   <div class="admin-modal-box modal-cyan" style="max-width: 640px;">
     <div class="admin-modal-header">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <span class="ts-badge ts-badge-indigo">ENDPOINT CONFIG</span>
         <h3 style="margin: 0; color: var(--admin-text-primary);" id="editModalHeading">Edit API Endpoint</h3>
       </div>
@@ -389,7 +389,7 @@
 
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-primary);">Endpoint Slug (URL Path)</label>
-        <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
           <span style="font-size: 0.82rem; color: var(--admin-text-secondary); font-family: var(--admin-font-mono);"><?= url('/api/v1/custom/') ?></span>
           <input type="text" name="slug" id="editEndpointSlug" class="admin-input" style="flex: 1;" required pattern="[a-z0-9_\-]+">
         </div>
@@ -462,7 +462,7 @@
   <div class="admin-modal-backdrop" onclick="closeMultiTableQueryModal()"></div>
   <div class="admin-modal-box modal-indigo" style="max-width: 760px;">
     <div class="admin-modal-header">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <span class="ts-badge ts-badge-indigo">MULTI-TABLE GATEWAY</span>
         <h3 style="margin: 0; color: var(--admin-text-primary);">Relational Multi-Table Query Builder</h3>
       </div>
@@ -516,7 +516,7 @@
 
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--admin-text-secondary);">Generated Multi-Table REST Endpoint URL:</label>
-        <div style="background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+        <div style="flex-wrap: wrap; align-items: center; background: #050811; border: 1px solid var(--admin-border-main); border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
           <code id="mtGeneratedUrl" style="font-size: 0.8rem; color: #38bdf8; font-family: var(--admin-font-mono); word-break: break-all;"></code>
           <button type="button" onclick="copyMultiTableUrl()" class="admin-btn admin-btn-outline admin-btn-sm" style="flex-shrink: 0;">📋 Copy</button>
         </div>
@@ -537,7 +537,7 @@
   <div class="admin-modal-backdrop" onclick="closeAllTablesCatalogModal()"></div>
   <div class="admin-modal-box modal-amber" style="max-width: 820px;">
     <div class="admin-modal-header">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <span class="ts-badge ts-badge-green">ALL TABLES CATALOG</span>
         <h3 style="margin: 0; color: var(--admin-text-primary);">Comprehensive Database Sample Data &amp; Schema</h3>
       </div>
@@ -553,7 +553,7 @@
             <?php endforeach; ?>
           </select>
         </div>
-        <div style="display: flex; gap: 0.5rem; margin-top: auto;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-top: auto;">
           <button type="button" onclick="copyCatalogSampleJson()" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
             📋 Copy JSON
           </button>

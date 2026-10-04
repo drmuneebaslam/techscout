@@ -18,13 +18,13 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
 <div class="admin-content-inner">
   <!-- Top Navigation & Breadcrumb -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #94a3b8;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #94a3b8;">
       <a href="<?= url('/admin/analytics') ?>" style="color: #38bdf8; text-decoration: none;">Analytics Hub</a>
       <span>&rsaquo;</span>
       <span style="color: #cbd5e1;"><?= strtoupper($c['content_type']) ?> #<?= (int)$c['id'] ?></span>
     </div>
 
-    <div style="display: flex; gap: 0.6rem; align-items: center;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.6rem; align-items: center;">
       <a href="<?= $targetUrl ?>" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3);">
         🌐 View Live Public ↗
       </a>
@@ -154,7 +154,7 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
             </h3>
             <p style="font-size: 0.78rem; color: #64748b; margin: 0.15rem 0 0 0;">Day-by-day active readership telemetry</p>
           </div>
-          <div style="display: flex; gap: 0.35rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem;">
             <button type="button" onclick="toggleAdminChartMetric('views')" id="admin-chart-btn-views" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.6rem;">Views 👁️</button>
             <button type="button" onclick="toggleAdminChartMetric('watch')" id="admin-chart-btn-watch" class="ts-btn ts-btn-sm ts-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.6rem;">Watch Mins ⏱️</button>
           </div>
@@ -172,7 +172,7 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
           </h3>
           <p style="font-size: 0.78rem; color: #64748b; margin: 0 0 1.25rem 0;">Reader drop-off telemetry</p>
 
-          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.85rem;">
             <div style="background: rgba(15,23,42,0.8); padding: 0.85rem; border-radius: 8px; border: 1px solid rgba(56,189,248,0.15);">
               <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.25rem;">
                 <span style="color: #38bdf8; font-weight: 700;">Intro Retention (0–25%)</span>
@@ -220,7 +220,7 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
           </span>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.85rem;">
           <?php if (!empty($analytics['referrers'])): ?>
             <?php foreach ($analytics['referrers'] as $ref): ?>
               <?php 
@@ -231,7 +231,7 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
               ?>
               <div style="background: rgba(30,41,59,0.5); border: 1px solid rgba(148,163,184,0.08); border-radius: 10px; padding: 0.75rem 1rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 28px; height: 28px; border-radius: 6px; background: <?= $refCol ?>22; color: <?= $refCol ?>; display: flex; align-items: center; justify-content: center;">
                       <i data-lucide="<?= $refIcon ?>" style="width: 15px; height: 15px;"></i>
                     </div>
@@ -302,7 +302,7 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
         <h3 style="font-size: 1.05rem; color: #f8fafc; margin: 0 0 1.25rem 0; font-family: 'Outfit', sans-serif;">
           🔥 5-Reaction Sentiment Breakdown
         </h3>
-        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.85rem;">
           <?php
             $rMap = $analytics['reactions_map'];
             $emojis = [
@@ -380,7 +380,7 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
               ?>
               <tr>
                 <td>
-                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                     <?php if (!empty($rr['user_avatar'])): ?>
                       <img src="<?= htmlspecialchars($rr['user_avatar']) ?>" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
                     <?php else: ?>
@@ -396,21 +396,21 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
                 </td>
                 <td>
                   <?php if ($isCampaign): ?>
-                    <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
                       <span class="ts-badge ts-badge-pink" style="font-size: 0.68rem; font-weight: 700;">USER REFERRAL CAMPAIGN</span>
                     </div>
                     <div style="font-size: 0.78rem; color: #f472b6; font-family: var(--admin-font-mono);">
                       <?= htmlspecialchars($refSource) ?>
                     </div>
                   <?php elseif ($isExternal): ?>
-                    <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
                       <span class="ts-badge ts-badge-cyan" style="font-size: 0.68rem; font-weight: 700;">EXTERNAL REFERRER</span>
                     </div>
                     <div style="font-size: 0.78rem; color: #38bdf8; font-family: var(--admin-font-mono);">
                       <?= htmlspecialchars($refSource) ?>
                     </div>
                   <?php else: ?>
-                    <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
                       <span class="ts-badge ts-badge-indigo" style="font-size: 0.68rem; font-weight: 700;">TECHSCOUT INTERNAL</span>
                     </div>
                     <div style="font-size: 0.78rem; color: #a5b4fc; font-family: var(--admin-font-mono);">
@@ -535,11 +535,11 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
         </span>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1.25rem;">
         <?php foreach (($analytics['heatmap_zones'] ?? []) as $hz): ?>
           <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.1); border-radius: 10px; padding: 1rem 1.25rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-              <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                 <span class="ts-badge" style="background: <?= $hz['color'] ?>22; color: <?= $hz['color'] ?>; border: 1px solid <?= $hz['color'] ?>55; font-weight: 700; font-size: 0.75rem;">
                   <?= $hz['range'] ?>
                 </span>
@@ -548,7 +548,7 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
                 </strong>
               </div>
 
-              <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.85rem;">
+              <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 1rem; font-size: 0.85rem;">
                 <span style="color: #94a3b8;">
                   Retention: <strong style="color: <?= $hz['color'] ?>; font-family: var(--admin-font-mono); font-size: 1rem;"><?= $hz['retained_pct'] ?>%</strong>
                 </span>

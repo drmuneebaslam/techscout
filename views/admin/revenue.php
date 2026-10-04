@@ -3,7 +3,7 @@
   <!-- Topbar Header -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-green">CREATOR ECONOMY &bull; REVENUE &amp; DISBURSEMENTS</span>
         <span style="font-size: 0.8rem; color: #64748b;">Author Payout Approvals, Editorial Grants, Milestone Bounties &amp; Revenue Sharing</span>
       </div>
@@ -59,7 +59,7 @@
 
   <!-- Revenue Tabs Strip -->
   <div class="admin-table-wrap" style="padding: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto;">
-    <div style="display: flex; gap: 0.35rem; min-width: max-content;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; min-width: max-content;">
       <?php
       $appliedCount = count(array_filter($monetizationList ?? [], fn($m) => ($m['monetization_status'] ?? '') === 'applied'));
       $revTabs = [
@@ -173,7 +173,7 @@
                   <?php endif; ?>
                 </td>
                 <td>
-                  <div style="display: flex; gap: 0.35rem; align-items: center;">
+                  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
                     <button type="button" onclick="openProcessPayoutModal(<?= htmlspecialchars(json_encode($p, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP), ENT_QUOTES, 'UTF-8') ?>)" class="ts-btn ts-btn-outline ts-btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #38bdf8;" title="Edit & Process Payout">
                       ⚡ Process
                     </button>
@@ -203,7 +203,7 @@
     <div class="admin-table-wrap" style="padding: 1.75rem; margin-bottom: 2rem;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 1.25rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-cyan">PROPORTIONAL READERSHIP ROYALTIES</span>
             <span style="font-size: 0.8rem; color: #94a3b8;">Fluctuating Base CPM ($0.80) &bull; Dynamic Pool Surplus &bull; Platform Reserve Safeguard</span>
           </div>
@@ -352,7 +352,7 @@
 
           <!-- Admin Permission Notice Banner -->
           <div id="admin_non_monetized_banner" style="display: none; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.82rem; color: #fbbf24; align-items: center; justify-content: space-between; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
               <i data-lucide="shield-alert" style="width: 18px; height: 18px; color: #f59e0b; flex-shrink: 0;"></i>
               <span><strong>Admin Permission Active:</strong> Non-monetized authors are currently visible. By administrative permission, you may include them in this distribution cycle or deselect them.</span>
             </div>
@@ -406,7 +406,7 @@
                         <input type="hidden" name="payouts[<?= $authId ?>][views]" value="<?= $authViews ?>">
                       </td>
                       <td>
-                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                           <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #6366f1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: #ffffff;">
                             <?= strtoupper(substr($pAuth['display_name'] ?: 'A', 0, 1)) ?>
                           </div>
@@ -464,7 +464,7 @@
         <!-- 4. Execution Call to Action & Summary Box -->
         <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 1.25rem 1.75rem; flex-wrap: wrap; gap: 1.25rem;">
           <div>
-            <div style="font-weight: 800; color: #10b981; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+            <div style="flex-wrap: wrap; align-items: center; font-weight: 800; color: #10b981; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
               <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Ready for Distribution
             </div>
             <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;" id="cta_distribution_summary">
@@ -472,7 +472,7 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; align-items: center;">
             <button type="button" onclick="recalculateRoyaltyPool()" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8;">
               <i data-lucide="refresh-cw"></i> Recalculate
             </button>
@@ -492,7 +492,7 @@
     <div class="admin-table-wrap">
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--admin-border-subtle); flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-purple">GROWTH AMBASSADOR ENGINE</span>
             <span style="font-size: 0.8rem; color: #94a3b8;">5% Commission Pool on Referred Creators' Royalties</span>
           </div>
@@ -574,7 +574,7 @@
     <div class="admin-table-wrap" style="padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid #38bdf8;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-cyan">PARTNER ECONOMY &bull; EDITORIAL REVIEW</span>
             <span style="font-size: 0.8rem; color: #94a3b8;">Criteria: 1,000 Followers &bull; 100k Qualified Reads (&ge;10s) &bull; 5 Publications &bull; &ge;70% Quality</span>
           </div>
@@ -645,7 +645,7 @@
             ?>
             <div class="admin-table-wrap monetize-row" data-status="applied" data-search="<?= htmlspecialchars(strtolower($pAuth['display_name'] . ' ' . $pAuth['username'] . ' ' . $pAuth['user_email'])) ?>" style="padding: 1.75rem; border: 1px solid rgba(245,158,11,0.35); background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.7)); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 1rem;">
                   <div style="width: 54px; height: 54px; border-radius: 50%; background: #1e293b; border: 2px solid #fbbf24; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 800; color: #fbbf24;">
                     <?php if (!empty($pAuth['avatar_url'])): ?>
                       <img src="<?= url($pAuth['avatar_url']) ?>" alt="" style="width: 100%; height: 100%; object-fit: cover;">
@@ -946,7 +946,7 @@
                   </td>
 
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                       <strong style="color: <?= $fCount >= 1000 ? '#10b981' : '#f59e0b' ?>; font-family: var(--admin-font-mono);">
                         <?= number_format($fCount) ?>
                       </strong>
@@ -958,7 +958,7 @@
                   </td>
 
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                       <strong style="color: <?= $vCount >= 100000 ? '#38bdf8' : '#cbd5e1' ?>; font-family: var(--admin-font-mono);">
                         <?= number_format($vCount) ?>
                       </strong>
@@ -970,7 +970,7 @@
                   </td>
 
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                       <strong style="color: <?= $pCount >= 5 ? '#c084fc' : '#cbd5e1' ?>; font-family: var(--admin-font-mono);">
                         <?= $pCount ?>
                       </strong>
@@ -1033,7 +1033,7 @@
     <div class="admin-table-wrap">
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--admin-border-subtle); flex-wrap: wrap; gap: 1rem;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-purple">IMMUTABLE FINANCIAL AUDIT</span>
             <span style="font-size: 0.8rem; color: #64748b;">Double-Entry Transaction Ledger with Before/After Snapshots</span>
           </div>
@@ -1180,7 +1180,7 @@
   <div class="rev-pane" id="revpane_grant" style="<?= $activeTab === 'grant' ? 'display:block;' : 'display:none;' ?>">
     <div class="admin-table-wrap" style="padding: 2.25rem; max-width: 860px; margin: 0 auto;">
       <div style="margin-bottom: 1.75rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
           <span class="ts-badge ts-badge-cyan">ADMINISTRATIVE BALANCE MANAGEMENT</span>
         </div>
         <h3 style="font-size: 1.35rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
@@ -1321,7 +1321,7 @@
           </label>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
           <button type="submit" id="adjSubmitBtn" class="ts-btn ts-btn-primary" style="background: linear-gradient(135deg, #10b981, #38bdf8); font-weight: 800; padding: 0.65rem 1.6rem;">
             Execute Balance Adjustment ✓
           </button>
@@ -1379,7 +1379,7 @@
       
       <!-- Top Title Header -->
       <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--admin-border-subtle); padding-bottom: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
           <span class="ts-badge ts-badge-cyan">FINANCIAL GOVERNANCE &amp; SETTLEMENT RULES</span>
         </div>
         <h3 style="font-size: 1.4rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
@@ -1400,7 +1400,7 @@
         <div style="background: rgba(15,23,42,0.85); border: 1px solid rgba(56,189,248,0.25); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <div style="font-weight: 800; color: #38bdf8; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+              <div style="flex-wrap: wrap; align-items: center; font-weight: 800; color: #38bdf8; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
                 <span>💸 Payout Fee Percentages &amp; Bank Deductions</span>
               </div>
               <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.15rem;">
@@ -1452,7 +1452,7 @@
 
           <!-- Dynamic Live Calculator Preview Box -->
           <div style="background: rgba(7,10,19,0.9); border: 1px dashed rgba(148,163,184,0.2); border-radius: 8px; padding: 0.85rem 1.15rem; font-size: 0.82rem;">
-            <div style="font-weight: 700; color: #cbd5e1; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
+            <div style="flex-wrap: wrap; align-items: center; font-weight: 700; color: #cbd5e1; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
               <span>🧮 Live Calculation Example ($100.00 Author Withdrawal Claim)</span>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; color: #94a3b8;">
@@ -1476,7 +1476,7 @@
         <div style="background: rgba(15,23,42,0.85); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <div style="font-weight: 800; color: #34d399; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+              <div style="flex-wrap: wrap; align-items: center; font-weight: 800; color: #34d399; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
                 <span>🏦 Allowed Payout Methods for Creators</span>
               </div>
               <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.15rem;">
@@ -1507,7 +1507,7 @@
                       <input type="checkbox" name="enabled_methods[]" value="<?= htmlspecialchars($m['key']) ?>" <?= !empty($m['enabled']) ? 'checked' : '' ?> style="accent-color: #10b981; transform: scale(1.25); cursor: pointer;">
                     </td>
                     <td>
-                      <div style="display: flex; align-items: center; gap: 0.6rem;">
+                      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.6rem;">
                         <span style="font-size: 1.3rem;"><?= htmlspecialchars($m['icon'] ?? '💳') ?></span>
                         <div>
                           <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">
@@ -1604,7 +1604,7 @@
       <!-- ========================================================================= -->
       <div id="addCustomMethodCard" style="background: rgba(15,23,42,0.9); border: 1px solid rgba(168,85,247,0.3); border-radius: 12px; padding: 1.75rem;">
         <div style="margin-bottom: 1.25rem;">
-          <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;">
+          <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;">
             <span class="ts-badge ts-badge-purple">CUSTOM METHOD BUILDER</span>
           </div>
           <h4 style="font-size: 1.2rem; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800;">
@@ -2359,7 +2359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <textarea name="reason" rows="3" class="admin-modal-textarea" placeholder="e.g. Please publish 2 more technical architecture articles and increase community engagement before reapplying." style="width: 100%; background: #070a13; border: 1px solid rgba(148,163,184,0.2); border-radius: 6px; padding: 0.65rem 0.75rem; color: #f8fafc; font-size: 0.85rem;" required></textarea>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.5rem;">
         <button type="button" onclick="closeDeclineMonetizationModal()" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary ts-btn-sm" style="background: #ef4444; border-color: #ef4444; font-weight: 700;">
           Confirm Decline ❌

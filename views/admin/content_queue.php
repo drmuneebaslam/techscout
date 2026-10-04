@@ -4,7 +4,7 @@
   <!-- Top Bar -->
   <div class="admin-topbar">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">EDITORIAL PIPELINE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Universal Moderation & Multi-Entity Quality Review</span>
       </div>
@@ -217,7 +217,7 @@
               </td>
 
               <td>
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem;">
                   <strong style="color: #34d399; font-size: 0.95rem;"><?= number_format((float)$item['quality_score'], 1) ?></strong>
                   <span style="font-size: 0.72rem; color: #64748b;">/ 100</span>
                 </div>
@@ -375,7 +375,7 @@
 <div id="plagiarismModal" class="admin-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.88); backdrop-filter: blur(10px); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;">
   <div class="ts-card" style="width: 100%; max-width: 680px; padding: 2rem; background: #090d16; border: 1px solid rgba(99,102,241,0.4); box-shadow: 0 25px 60px rgba(0,0,0,0.95); max-height: 90vh; overflow-y: auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 0.75rem;">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
         <span style="font-size: 1.25rem;">🔍</span>
         <div>
           <h3 id="plagModalTitle" style="font-size: 1.15rem; color: #f8fafc; margin: 0;">Plagiarism & Originality Forensic Report</h3>
@@ -406,7 +406,7 @@
 
       <div style="margin-bottom: 1.25rem;">
         <h4 style="font-size: 0.9rem; color: #f8fafc; margin-bottom: 0.5rem;">Matching Internal Sources</h4>
-        <div id="plagSourcesList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+        <div id="plagSourcesList" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.5rem;"></div>
       </div>
 
       <div>
@@ -428,7 +428,7 @@
     <!-- Modal Header -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
       <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
           <span class="ts-badge ts-badge-pink" id="revModalType">ARTICLE</span>
           <span class="ts-badge ts-badge-cyan" id="revModalStatus">IN REVIEW</span>
           <span style="font-size: 0.78rem; color: #64748b;" id="revModalId">ID #0</span>
@@ -438,7 +438,7 @@
         </h2>
       </div>
 
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; align-items: center;">
         <a id="revLivePreviewLink" href="#" target="_blank" class="ts-btn ts-btn-outline ts-btn-sm" style="color: #38bdf8; border-color: rgba(56,189,248,0.3); font-size: 0.75rem;">
           Live Page ↗
         </a>
@@ -492,11 +492,11 @@
         </div>
 
         <!-- Right: Author, Taxonomy & SEO Metas -->
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem;">
           <!-- Author Card -->
           <div style="background: #05070b; border: 1px solid rgba(148,163,184,0.15); border-radius: 10px; padding: 1.25rem;">
             <div style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 0.5rem;">Submitting Creator:</div>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
               <div id="revAuthorAvatarBox" style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #38bdf8); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff;">A</div>
               <div>
                 <div id="revAuthorName" style="color: #f8fafc; font-weight: 700; font-size: 0.95rem;">Author</div>
@@ -525,7 +525,7 @@
           <!-- FEATURE 9: EDITORIAL INTERNAL NOTES SCRATCHPAD (PRIVATE TO ADMINS) -->
           <div style="background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.3); border-radius: 10px; padding: 1rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <div style="font-size: 0.75rem; text-transform: uppercase; color: #818cf8; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
+              <div style="flex-wrap: wrap; align-items: center; font-size: 0.75rem; text-transform: uppercase; color: #818cf8; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
                 <i data-lucide="lock" style="width: 12px; height: 12px;"></i> Internal Scratchpad (Admins Only)
               </div>
               <span id="revScratchpadSaved" style="font-size: 0.72rem; color: #10b981; display: none; font-weight: 700;">Saved ✓</span>

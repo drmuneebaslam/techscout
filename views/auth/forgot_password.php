@@ -7,7 +7,7 @@
         <i data-lucide="key-round" style="width: 24px; height: 24px;"></i>
       </div>
       <h1 style="font-size: 1.6rem; margin-bottom: 0.35rem; color: #f8fafc; font-family: 'Outfit', sans-serif;">Reset Password</h1>
-      <p style="font-size: 0.85rem; color: var(--ts-text-secondary); line-height: 1.4;">Enter your registered email address to receive a cryptographically signed recovery token.</p>
+      <p style="font-size: 0.85rem; color: var(--ts-text-secondary); line-height: 1.4;">Enter your registered email address to receive a password reset link.</p>
     </div>
 
     <?php if ($successMsg = \App\Core\Session::flash('success')): ?>
@@ -29,7 +29,7 @@
       </div>
 
       <button type="submit" class="ts-btn ts-btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 700;">
-        Generate Recovery Token ✉️
+        Send Reset Link ✉️
       </button>
     </form>
 

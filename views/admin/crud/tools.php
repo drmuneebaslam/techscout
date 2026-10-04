@@ -25,7 +25,7 @@
     </div>
 
     <!-- Modal Navigation Tabs -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 0.5rem; overflow-x: auto;" id="toolModalTabs">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 0.5rem; overflow-x: auto;" id="toolModalTabs">
       <button type="button" onclick="switchToolTab('tab-basic')" id="btn-tab-basic" class="ts-btn ts-btn-sm ts-btn-primary">1. Identity &amp; Taxonomy</button>
       <button type="button" onclick="switchToolTab('tab-pricing')" id="btn-tab-pricing" class="ts-btn ts-btn-sm ts-btn-outline">2. Pricing &amp; Affiliate</button>
       <button type="button" onclick="switchToolTab('tab-links')" id="btn-tab-links" class="ts-btn ts-btn-sm ts-btn-outline">3. Official Links</button>
@@ -77,7 +77,7 @@
           <textarea name="summary" id="tool_summary" maxlength="300" rows="3" placeholder="AI-first code editor built for pair-programming with Claude 3.5 Sonnet and GPT-4o..." style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.75rem 1rem; border-radius: 6px; color: #f8fafc;" required></textarea>
         </div>
 
-        <div style="display: flex; gap: 2rem; margin-top: 1rem; background: rgba(15,23,42,0.5); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 2rem; margin-top: 1rem; background: rgba(15,23,42,0.5); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
           <label style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; cursor: pointer;">
             <input type="checkbox" name="verified_by_techscout" id="tool_verified" value="1" checked style="accent-color: #10b981;"> 
             <span><strong>TechScout Verified Badge</strong> (Official Editorial Stamp)</span>
@@ -122,7 +122,7 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
           <div>
             <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #f8fafc; margin-bottom: 0.4rem;">Free Trial Offer</label>
-            <div style="display: flex; align-items: center; gap: 0.5rem; background: #05070b; padding: 0.75rem; border-radius: 6px; border: 1px solid rgba(148,163,184,0.15);">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; background: #05070b; padding: 0.75rem; border-radius: 6px; border: 1px solid rgba(148,163,184,0.15);">
               <input type="checkbox" name="free_trial_available" id="tool_free_trial_available" value="1" checked style="accent-color: #38bdf8;">
               <input type="number" name="free_trial_days" id="tool_free_trial_days" value="14" min="0" max="365" style="width: 60px; background: transparent; border: none; color: #38bdf8; font-weight: 700;"> days trial
             </div>
@@ -202,7 +202,7 @@
               + Add Custom Link
             </button>
           </div>
-          <div id="toolCustomLinksContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <div id="toolCustomLinksContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.65rem;">
             <!-- Rendered dynamically -->
           </div>
         </div>
@@ -318,7 +318,7 @@ https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5" style="width: 100%
       <!-- Modal Footer -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.75rem; border-top: 1px solid rgba(148,163,184,0.15); padding-top: 1rem;">
         <button type="button" onclick="closeToolModal()" class="ts-btn ts-btn-outline">Cancel</button>
-        <div style="display: flex; gap: 0.75rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem;">
           <button type="submit" class="ts-btn ts-btn-primary" style="font-weight: 700;">
             <i data-lucide="check"></i> Save Tool Specification
           </button>
@@ -330,7 +330,7 @@ https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5" style="width: 100%
 
 <!-- Tools Table Directory -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-  <div style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+  <div style="flex-wrap: wrap; align-items: center; font-weight: 700; color: #f8fafc; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
     <i data-lucide="wrench" style="width: 18px; height: 18px; color: #10b981;"></i> Catalog Index (<?= count($tools) ?> Tools Registered)
   </div>
   <input type="text" id="toolSearchInput" placeholder="🔍 Search tools, categories, pricing..." class="ts-input" style="padding: 0.45rem 0.85rem; font-size: 0.84rem; width: 280px; background: #05070b; border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; color: #f8fafc;">
@@ -353,7 +353,7 @@ https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5" style="width: 100%
       <?php foreach ($tools as $t): ?>
         <tr>
           <td>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.75rem;">
               <?php if (!empty($t['featured_image_url'])): ?>
                 <img src="<?= htmlspecialchars(image_url($t['featured_image_url'])) ?>" alt="Logo" style="width: 38px; height: 38px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
               <?php else: ?>

@@ -6,7 +6,7 @@
     <p style="color: #64748b; font-size: 0.9rem; margin: 0;">Post engineering opportunities, manage job listings, and toggle homepage visibility.</p>
   </div>
 
-  <div style="display: flex; gap: 0.75rem; align-items: center;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.75rem; align-items: center;">
     <button onclick="openJobModal()" class="ts-btn ts-btn-primary">
       <i data-lucide="plus-circle"></i> Post New Tech Job
     </button>
@@ -68,7 +68,7 @@
         <textarea name="description_html" id="job_desc" rows="6" placeholder="<p>Job responsibilities, requirements, and tech stack details...</p>" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.15); padding: 0.75rem 1rem; border-radius: 6px; color: #f8fafc; font-family: var(--admin-font-mono); font-size: 0.85rem;" required></textarea>
       </div>
 
-      <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 2rem; margin-bottom: 1.5rem;">
         <label style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.9rem; cursor: pointer;">
           <input type="checkbox" name="is_featured" id="job_is_featured" value="1">
           <span>Featured Position ⭐</span>
@@ -79,7 +79,7 @@
         </label>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button type="button" onclick="document.getElementById('jobFormModal').style.display='none'" class="ts-btn ts-btn-outline">Cancel</button>
         <button type="submit" class="ts-btn ts-btn-primary" style="font-weight: 700;">Save Job Opportunity</button>
       </div>
@@ -129,7 +129,7 @@
             <?php endif; ?>
           </td>
           <td>
-            <div style="display: flex; gap: 0.35rem; align-items: center;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; align-items: center;">
               <form action="<?= url('/admin/jobs/toggle/' . $j['id']) ?>" method="POST" style="display: inline;">
                 <button type="submit" class="ts-btn <?= !empty($j['is_active']) ? 'ts-btn-outline' : 'ts-btn-primary' ?> ts-btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.72rem;" title="Toggle public visibility without deleting">
                   <?= !empty($j['is_active']) ? 'Hide 🔒' : 'Publish 🟢' ?>

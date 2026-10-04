@@ -3,7 +3,7 @@
   <!-- Header Bar -->
   <div class="admin-topbar" style="margin-bottom: 2rem;">
     <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
         <span class="ts-badge ts-badge-cyan">TELEMETRY ENGINE &bull; REAL-TIME INTELLIGENCE</span>
         <span style="font-size: 0.8rem; color: #64748b;">Ecosystem KPIs, Author Velocity, Reader Engagement &amp; Cohort Retention</span>
       </div>
@@ -71,7 +71,7 @@
     </div>
 
     <div class="admin-table-wrap" style="padding: 1.25rem; background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(15,23,42,0.8)); border-color: rgba(6,182,212,0.3);">
-      <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 700; color: #38bdf8; text-transform: uppercase;">
+      <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 700; color: #38bdf8; text-transform: uppercase;">
         <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; display: inline-block;"></span>
         Active Now
       </div>
@@ -84,7 +84,7 @@
 
   <!-- Analytics 14 Telemetry Modules Navigation Ribbon -->
   <div class="admin-table-wrap" style="padding: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto;">
-    <div style="display: flex; gap: 0.35rem; min-width: max-content;">
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.35rem; min-width: max-content;">
       <?php
       $analyticsTabs = [
         'traffic' => ['label' => 'Traffic', 'icon' => 'globe'],
@@ -123,7 +123,7 @@
           <i data-lucide="bar-chart-2" style="color: #38bdf8;"></i> Traffic Sources &amp; Acquisition Channels
         </h3>
         
-        <div style="display: flex; flex-direction: column; gap: 1.1rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1.1rem;">
           <div>
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem; color: #cbd5e1;">
               <span>🌐 Direct / Bookmark Visits</span>
@@ -168,21 +168,21 @@
 
       <div class="admin-table-wrap" style="padding: 1.75rem;">
         <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0;">💻 Device Breakdown</h3>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 1rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.6); padding: 0.75rem 1rem; border-radius: 8px;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.9rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.9rem;">
               <i data-lucide="monitor" style="color: #38bdf8;"></i> Desktop Workstation
             </div>
             <strong style="color: #38bdf8; font-family: var(--admin-font-mono);">64.2%</strong>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.6); padding: 0.75rem 1rem; border-radius: 8px;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.9rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.9rem;">
               <i data-lucide="smartphone" style="color: #10b981;"></i> Mobile Smartphone
             </div>
             <strong style="color: #10b981; font-family: var(--admin-font-mono);">31.1%</strong>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.6); padding: 0.75rem 1rem; border-radius: 8px;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.9rem;">
+            <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem; color: #f8fafc; font-size: 0.9rem;">
               <i data-lucide="tablet" style="color: #a855f7;"></i> Tablet &amp; Touch Device
             </div>
             <strong style="color: #a855f7; font-family: var(--admin-font-mono);">4.7%</strong>
@@ -196,7 +196,7 @@
           </h3>
           <p style="color: #64748b; font-size: 0.82rem; margin: 0;">24-hour visitor density normalized across global time zones (Americas, EMEA, APAC).</p>
         </div>
-        <div style="display: flex; gap: 0.4rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.4rem;">
           <span class="ts-badge ts-badge-cyan" style="font-size: 0.72rem;">AMER (UTC-8 to -4)</span>
           <span class="ts-badge ts-badge-indigo" style="font-size: 0.72rem;">EMEA (UTC+0 to +3)</span>
           <span class="ts-badge ts-badge-pink" style="font-size: 0.72rem;">APAC (UTC+7 to +12)</span>
@@ -265,7 +265,7 @@
               <?php foreach ($users['roles'] as $r): ?>
                 <tr>
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="flex-wrap: wrap; align-items: center; display: flex; align-items: center; gap: 0.5rem;">
                       <span class="ts-badge <?= htmlspecialchars($r['badge'] ?? 'ts-badge-indigo') ?>" style="font-weight: 700; font-size: 0.8rem; padding: 3px 9px; display: inline-flex; align-items: center; gap: 0.35rem;">
                         <span><?= htmlspecialchars($r['icon'] ?? '👤') ?></span>
                         <span><?= htmlspecialchars($r['display_name'] ?? 'Member') ?></span>
@@ -446,7 +446,7 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
       <div class="admin-table-wrap" style="padding: 1.75rem;">
         <h3 style="font-size: 1.15rem; color: #f8fafc; margin: 0 0 1.25rem 0;">⚡ 6-Reaction Heatmap Telemetry</h3>
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.75rem;">
           <?php 
           $reactionIcons = ['fire' => '🔥 Fire', 'rocket' => '🚀 Rocket', 'idea' => '💡 Idea', 'gem' => '💎 Gem', 'brain' => '🧠 Brain', 'shield' => '🛡️ Verified'];
           foreach ($content['heatmap'] as $rh): 

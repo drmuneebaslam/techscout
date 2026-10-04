@@ -208,7 +208,7 @@ require __DIR__ . '/../layouts/admin_header.php';
 
 <!-- Operational Workflow Queue Deck (Tabbed Switcher) -->
 <div class="admin-table-wrap" style="margin-bottom: 2rem;">
-  <div style="display: flex; gap: 0.5rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--admin-border-main); overflow-x: auto; align-items: center;">
+  <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--admin-border-main); overflow-x: auto; align-items: center;">
     <button type="button" onclick="switchOpQueue('editorial')" id="qtab_editorial" class="ts-btn ts-btn-sm ts-btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; font-weight: 700;">
       📝 Editorial Queue (<?= count($pendingReviews) ?>)
     </button>
@@ -294,7 +294,7 @@ require __DIR__ . '/../layouts/admin_header.php';
               </td>
               <td style="font-size: 0.82rem; color: #cbd5e1;"><?= htmlspecialchars($app['specializations'] ?? 'Software Architecture') ?></td>
               <td>
-                <div style="display: flex; gap: 0.25rem;">
+                <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.25rem;">
                   <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;">Articles</span>
                   <?php if (!empty($app['requested_prompts'])): ?><span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">Prompts</span><?php endif; ?>
                   <?php if (!empty($app['requested_gpts'])): ?><span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;">GPTs</span><?php endif; ?>
