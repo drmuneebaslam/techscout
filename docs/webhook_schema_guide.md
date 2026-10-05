@@ -95,27 +95,27 @@ Every post, article, tool, or prompt requires this base structure.
 ---
 
 ### B. Ingesting an "AI Image Prompt" (Complete Master Example)
-*Requires: `contents`, `prompts`, and `tags`*
+*Requires: `contents`, `prompts`, `prompt_images`, `content_categories` and `tags`*
 
-To create a highly detailed Image Prompt with a featured image, primary category, and secondary categories, you map the fields across the three tables:
+To create a highly detailed Image Prompt, utilizing the **latest schema** which supports distinct secondary categories and high-quality prompt image galleries, you will map the following:
 
 1. **`contents`**: Handles the universal metadata (Title, Primary Category, Featured Image URL).
-2. **`prompts`**: Handles all the granular image generation parameters (Aspect Ratio, CFG Scale, Negative Prompts).
-3. **`tags`**: Acts as your **Secondary Categories** (or granular descriptor tags) to make the prompt highly discoverable.
+2. **`prompts`**: Core prompt data (`prompt_template`, `target_models`, etc.).
+3. **`prompt_images`**: If you have multiple gallery images for the prompt.
+4. **`content_categories`**: Used to attach **Secondary Categories**.
+5. **`tags`**: Acts as granular descriptor tags.
 
-**`prompts` Key Fields Supported:**
+**`prompts` Key Fields Supported (Latest Schema):**
 * `prompt_type` (enum: `text` or `image`)
 * `prompt_template` (string, required): The actual prompt text
-* `negative_prompt` (string)
+* `template_variables` (JSON array string)
 * `target_models` (JSON array string, e.g. `["Midjourney", "DALL-E 3"]`)
-* `aspect_ratio` (string, e.g. `16:9`)
-* `cfg_scale` (decimal)
-* `steps` (integer)
-* `sampler` (string)
-* `style_preset` (string)
-* `difficulty_level` (enum: `beginner`, `intermediate`, `advanced`)
-* `how_to_use` (string)
 * `sample_output` (string)
+
+**`prompt_images` Key Fields Supported:**
+* `image_url` (string, required)
+* `caption` (string)
+* `sort_order` (integer)
 
 **Comprehensive Image Prompt Payload Example:**
 ```json
@@ -131,16 +131,25 @@ To create a highly detailed Image Prompt with a featured image, primary category
     "prompts": {
       "prompt_type": "image",
       "prompt_template": "A neon-lit cyberpunk city street level in the rain, 8k resolution, cinematic lighting, photorealistic, reflections on wet pavement --v 6.0",
-      "negative_prompt": "blurry, low resolution, cartoon, 3d render, watermark",
       "target_models": "[\"Midjourney v6\"]",
-      "aspect_ratio": "16:9",
-      "cfg_scale": 7.0,
-      "steps": 40,
-      "sampler": "Euler a",
-      "style_preset": "Cinematic",
-      "difficulty_level": "intermediate",
-      "how_to_use": "Copy the prompt and paste it directly into Midjourney. Adjust the --ar flag if you want a vertical image."
+      "sample_output": "A sprawling neon metropolis at midnight..."
     },
+    "prompt_images": [
+      {
+        "image_url": "https://example.com/gallery1.jpg",
+        "caption": "Variant 1 - Neon Blue",
+        "sort_order": 1
+      },
+      {
+        "image_url": "https://example.com/gallery2.jpg",
+        "caption": "Variant 2 - Rain Heavy",
+        "sort_order": 2
+      }
+    ],
+    "content_categories": [
+      { "category_id": 12, "is_primary": 0 },
+      { "category_id": 15, "is_primary": 0 }
+    ],
     "tags": [
       { "name": "Cyberpunk" },
       { "name": "Sci-Fi" },
@@ -149,7 +158,7 @@ To create a highly detailed Image Prompt with a featured image, primary category
   }
 }
 ```
-*Note: In the example above, `category_name: "Image Generation"` acts as the Primary Category, while the `tags` array (`Cyberpunk`, `Sci-Fi`) acts as your Secondary Categories.*
+*Note: In the example above, `category_name: "Image Generation"` on the `contents` table automatically maps the **Primary Category**. The `content_categories` array links additional **Secondary Categories**, while `tags` adds discoverability markers.*
 
 ---
 
