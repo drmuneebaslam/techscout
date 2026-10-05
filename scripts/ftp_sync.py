@@ -9,6 +9,7 @@ TARGET_DIR = "/htdocs/"
 files_to_upload = [
     "app/Controllers/AuthController.php",
     "app/Models/SecurityAnomalyEngine.php",
+    "views/admin/incoming_webhooks.php",
 ]
 
 def upload_files():

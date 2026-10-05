@@ -146,8 +146,34 @@
   <div class="admin-table-wrap" style="padding: 1.5rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
       <h3 style="font-size: 1.15rem; color: var(--admin-text-primary); margin: 0; font-weight: 800;">Recent Ingestion Activity Logs</h3>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <input type="text" id="logFilterInput" onkeyup="filterActivityLogs()" placeholder="Search logs..." class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 250px;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <form action="<?= url('/admin/incoming-webhooks') ?>" method="GET" style="display: flex; gap: 0.5rem; align-items: center; margin: 0; flex-wrap: wrap;">
+          <input type="hidden" name="tab" value="logs">
+          
+          <select name="webhook_id" class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 140px;">
+            <option value="">All Webhooks</option>
+            <?php foreach ($incomingWebhooks as $wh): ?>
+              <option value="<?= $wh['id'] ?>" <?= (isset($_GET['webhook_id']) && $_GET['webhook_id'] == $wh['id']) ? 'selected' : '' ?>><?= htmlspecialchars($wh['slug']) ?></option>
+            <?php endforeach; ?>
+          </select>
+
+          <select name="status" class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 120px;">
+            <option value="">Any Status</option>
+            <option value="success" <?= (isset($_GET['status']) && $_GET['status'] === 'success') ? 'selected' : '' ?>>Success</option>
+            <option value="simulated" <?= (isset($_GET['status']) && $_GET['status'] === 'simulated') ? 'selected' : '' ?>>Simulated</option>
+            <option value="failed" <?= (isset($_GET['status']) && $_GET['status'] === 'failed') ? 'selected' : '' ?>>Failed</option>
+            <option value="skipped (duplicate)" <?= (isset($_GET['status']) && $_GET['status'] === 'skipped (duplicate)') ? 'selected' : '' ?>>Skipped (Dup)</option>
+          </select>
+
+          <input type="date" name="date" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>" class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 120px;">
+          
+          <input type="text" id="logFilterInput" onkeyup="filterActivityLogs()" placeholder="Client search..." class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 130px;">
+          
+          <button type="submit" class="admin-btn admin-btn-primary admin-btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.6rem;">
+            <i data-lucide="filter"></i> Filter
+          </button>
+        </form>
+
         <form action="<?= url('/admin/incoming-webhooks/clear-logs') ?>" method="POST" onsubmit="return confirm('Clear all incoming webhook execution logs?');" style="margin: 0;">
           <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; font-size: 0.75rem;">
             <i data-lucide="trash"></i> Clear Logs
@@ -912,25 +938,36 @@ function addMappingRow(jsonKey = '', targetCol = '') {
   const container = document.getElementById('mappingRowsContainer');
   const tableRaw = currentActiveWebhook ? currentActiveWebhook.target_table : 'prompts';
   const tables = tableRaw.split(',').map(t => t.trim());
-  let allCols = [];
-  
-  tables.forEach(t => {
-    const tableMeta = PERMITTED_TABLES[t];
-    if (tableMeta && tableMeta.columns) {
-      allCols = allCols.concat(tableMeta.columns);
-    }
-  });
-  allCols = [...new Set(allCols)].sort();
+  let colOptions = '';
+  if (tables.length > 1) {
+    tables.forEach(t => {
+      const tableMeta = PERMITTED_TABLES[t];
+      if (tableMeta && tableMeta.columns) {
+        colOptions += `<optgroup label="Table: ${escapeHtml(t)}">`;
+        tableMeta.columns.sort().forEach(c => {
+          const val = t + '.' + c;
+          const sel = (val === targetCol || c === targetCol) ? 'selected' : '';
+          colOptions += `<option value="${escapeHtml(val)}" ${sel}>${escapeHtml(c)}</option>`;
+        });
+        colOptions += `</optgroup>`;
+      }
+    });
+  } else {
+    let allCols = [];
+    tables.forEach(t => {
+      const tableMeta = PERMITTED_TABLES[t];
+      if (tableMeta && tableMeta.columns) allCols = allCols.concat(tableMeta.columns);
+    });
+    allCols = [...new Set(allCols)].sort();
+    allCols.forEach(c => {
+      const sel = (c === targetCol || targetCol.endsWith('.' + c)) ? 'selected' : '';
+      colOptions += `<option value="${escapeHtml(c)}" ${sel}>${escapeHtml(c)}</option>`;
+    });
+  }
 
   const row = document.createElement('div');
   row.className = 'mapping-row-wrap';
   row.style.cssText = 'display: flex; flex-direction: column; gap: 0.3rem; background: var(--admin-card-bg-elevated); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--admin-border-main);';
-
-  let colOptions = '';
-  allCols.forEach(c => {
-    const sel = (c === targetCol) ? 'selected' : '';
-    colOptions += `<option value="${escapeHtml(c)}" ${sel}>${escapeHtml(c)}</option>`;
-  });
 
   row.innerHTML = `
     <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%;">
@@ -984,9 +1021,14 @@ async function saveFieldMappings(e) {
 
   rows.forEach(r => {
     const key = r.querySelector('.map-json-key').value.trim();
-    const col = r.querySelector('.map-target-col').value.trim();
-    if (key && col) {
-      rules.push({ json_key: key, target_column: col });
+    const colVal = r.querySelector('.map-target-col').value.trim();
+    if (key && colVal) {
+      if (colVal.includes('.')) {
+        const parts = colVal.split('.');
+        rules.push({ json_key: key, target_table: parts[0], target_column: parts[1] });
+      } else {
+        rules.push({ json_key: key, target_column: colVal });
+      }
     }
   });
 
