@@ -74,3 +74,60 @@ To guarantee zero errors, follow these rules:
     Never try to send `id`, `uuid`, `created_at`, or `updated_at`. The engine handles this flawlessly, ensuring UUIDs are cryptographically secure and timestamps match the server timezone perfectly.
 3.  **Check the Webhook Logs UI:**
     If an automation from Make.com or Zapier says "Success" but you don't see the post on the frontend, check the **Webhook Logs** in the TechScout Admin Panel. The system meticulously logs every single incoming request, its raw payload, and any silent background errors.
+
+---
+
+## 5. Official Mapping Guide for Image Prompts
+
+The TechScout Webhook Engine now features **Automatic Remote Image Downloading** and **Dynamic Secondary Category (Tags) Mapping**.
+
+Because our database architecture does not have a distinct `tags` table, all tags sent in the JSON are automatically saved as **Secondary Categories** in the `categories` table (and linked via `content_categories` as `is_primary = 0`). The system takes care of this completely behind the scenes.
+
+If your payload contains an image URL (such as `featured_image_url`, `image_url`, `avatar_url`), the engine will now automatically download it and save it to the `storage/uploads/webhooks` directory. Your database records will perfectly reference your own locally hosted system URLs instead of external ones!
+
+### Perfect JSON Sample
+
+```json
+{
+  "tables": {
+    "contents": {
+      "title": "10mm Fisheye Top-Down Portrait AI Prompt",
+      "content_type": "prompt",
+      "status": "published",
+      "category_name": "Cowboy",
+      "author": "superadmin", 
+      "summary": "Use this AI prompt to transform any photo into a dramatic portrait.",
+      "featured_image_url": "https://img.promptplum.com/.../a26ef25d.webp",
+      "canonical_url": "https://promptplum.com/prompt/fisheye"
+    },
+    "prompts": {
+      "prompt_type": "image",
+      "prompt_template": "A high-fashion editorial studio portrait...",
+      "target_models": "[\"Gemini\", \"Midjourney\"]"
+    },
+    "prompt_images": [
+      {
+        "image_url": "https://img.promptplum.com/.../a26ef25d.webp",
+        "sort_order": 1
+      }
+    ],
+    "tags": [
+      { "name": "Cowboy" },
+      { "name": "Creative" },
+      { "name": "Fashion" }
+    ]
+  }
+}
+```
+
+### Field Mapping Details
+*   **`tables.contents`**: The master metadata container.
+    *   **`author`**: (Optional). Maps dynamically to `users` or `authors` via slug or username. Defaults to Superadmin.
+    *   **`category_name`**: Automatically maps to `categories` table. If it doesn't exist, it is created with `applicable_to = 'prompt'`.
+    *   **`featured_image_url`**: Automatically downloaded from external source to `storage/uploads/contents/`.
+*   **`tables.prompts`**: The extension table unique to Prompts.
+    *   **`target_models`**: Must be a JSON array string.
+*   **`tables.prompt_images`**: A nested array of image objects. The `IncomingWebhookEngine` fully supports nesting for child tables. The `image_url` inside these objects is also automatically downloaded.
+*   **`tables.tags`**: Since there is no `tags` table in TechScout, these are dynamically mapped as **Secondary Categories**. They are ingested into `categories` and linked perfectly via the `content_categories` junction table.
+
+You never have to worry about missing IDs or unmatched URLs. The system auto-heals and auto-resolves everything for you!

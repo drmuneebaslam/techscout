@@ -308,6 +308,9 @@ class IncomingWebhookEngine {
                     $categoryId = isset($cntData['category_id']) ? (int)$cntData['category_id'] : self::resolveCategoryId($cntData['category'] ?? ($cntData['category_name'] ?? null));
                     if (!$categoryId) $categoryId = $defaultCatId;
                     $imgUrl = $cntData['featured_image_url'] ?? ($cntData['image_url'] ?? null);
+                    if ($imgUrl && filter_var($imgUrl, FILTER_VALIDATE_URL) && str_starts_with($imgUrl, 'http')) {
+                        $imgUrl = self::downloadRemoteImage($imgUrl, 'contents');
+                    }
 
                     $existingStmt = $pdo->prepare("SELECT id FROM contents WHERE slug = ? LIMIT 1");
                     $existingStmt->execute([$slugVal]);
@@ -750,6 +753,13 @@ class IncomingWebhookEngine {
      * Helper to upsert a row into any database table
      */
     private static function upsertTableRow(\PDO $pdo, string $table, array $data, ?string $uniqueKey = null): array {
+        foreach ($data as $col => &$val) {
+            if ((str_ends_with($col, 'image_url') || $col === 'avatar_url' || $col === 'featured_image_url') && is_string($val) && str_starts_with($val, 'http')) {
+                $val = self::downloadRemoteImage($val, $table);
+            }
+        }
+        unset($val);
+
         $columns = array_keys($data);
         $placeholders = array_fill(0, count($columns), '?');
         $values = array_values($data);
@@ -798,13 +808,41 @@ class IncomingWebhookEngine {
             if ($tag === '') continue;
 
             $slug = self::slugify($tag);
-            Database::execute("INSERT IGNORE INTO tags (name, slug) VALUES (?, ?)", [$tag, $slug]);
-            $tagId = Database::queryScalar("SELECT id FROM tags WHERE slug = ? LIMIT 1", [$slug]);
+            Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to, created_at) VALUES (?, ?, 'all', NOW())", [$tag, $slug]);
+            $catId = Database::queryScalar("SELECT id FROM categories WHERE slug = ? LIMIT 1", [$slug]);
 
-            if ($tagId) {
-                Database::execute("INSERT IGNORE INTO content_tags (content_id, tag_id) VALUES (?, ?)", [$contentId, (int)$tagId]);
+            if ($catId) {
+                Database::execute("INSERT IGNORE INTO content_categories (content_id, category_id, is_primary) VALUES (?, ?, 0)", [$contentId, (int)$catId]);
             }
         }
+    }
+
+    /**
+     * Download and cache remote image locally
+     */
+    private static function downloadRemoteImage(string $url, string $subDir = 'webhooks'): string {
+        if (!filter_var($url, FILTER_VALIDATE_URL) || str_starts_with($url, '/')) return $url;
+        
+        $uploadDir = dirname(__DIR__, 2) . '/storage/uploads/' . $subDir;
+        if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'TechScout-Webhook-Ingestion');
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        
+        if ($data) {
+            $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+            if (!$ext) $ext = 'webp'; // fallback
+            $filename = 'wh_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+            if (file_put_contents($uploadDir . '/' . $filename, $data)) {
+                return '/storage/uploads/' . $subDir . '/' . $filename;
+            }
+        }
+        return $url;
     }
 
     /**
