@@ -162,7 +162,62 @@ To create a highly detailed Image Prompt, utilizing the **latest schema** which 
 
 ---
 
-### C. Ingesting an "AI Tool" (Directory Listings)
+### C. Real-World Example: External Prompt Ingestion (e.g. PromptPlum)
+*How to seamlessly ingest scraped or third-party prompt data.*
+
+Let's assume you scraped the following raw data:
+* **Title:** 10mm Fisheye Top-Down Portrait AI Prompt
+* **Category:** Cowboy
+* **Model:** Gemini, Gemini Watermark Remover
+* **Tags (Secondary Categories):** Creative, Fashion, Streetwear, Urban
+* **Prompt Text:** A high-fashion editorial studio portrait...
+* **Description:** Use this AI prompt to transform...
+* **Image URL:** https://img.promptplum.com/...webp
+* **Source URL:** https://promptplum.com/prompt/...
+
+**The Professional TechScout Payload Mapping:**
+```json
+{
+  "tables": {
+    "contents": {
+      "title": "10mm Fisheye Top-Down Portrait AI Prompt",
+      "content_type": "prompt",
+      "status": "published",
+      "category_name": "Cowboy",
+      "summary": "Use this AI prompt to transform any photo into a dramatic 10mm fisheye portrait featuring a top-down angle, streetwear jacket, and bold red studio background.",
+      "featured_image_url": "https://img.promptplum.com/cdn-cgi/image/q=78,scq=50,width=1400,height=1400,fit=contain,f=auto/promptImages/a26ef25d-8550-4cdc-94b4-8f7babcdb90a.webp",
+      "canonical_url": "https://promptplum.com/prompt/fisheye-top-down-portrait"
+    },
+    "prompts": {
+      "prompt_type": "image",
+      "prompt_template": "A high-fashion editorial studio portrait of the person from the uploaded photo, captured using an ultra-wide 10mm fisheye lens from a dramatic high top-down angle, creating strong perspective distortion with a noticeably larger head and a compressed body. The subject wears black oversized sunglasses and a plain black cap, with their left hand actively adjusting the sunglasses, and features a confident upward gaze. They are dressed in a color-block puffer jacket featuring panels of blue, yellow, and orange, worn over a black t-shirt, accessorized with a gold chain and white sneakers. The background is a bold red studio seamless with a smooth gradient, high contrast, sharp editorial lighting, captured in a 4:5 aspect ratio.",
+      "target_models": "[\"Gemini\", \"Gemini Watermark Remover\"]"
+    },
+    "prompt_images": [
+      {
+        "image_url": "https://img.promptplum.com/cdn-cgi/image/q=78,scq=50,width=1400,height=1400,fit=contain,f=auto/promptImages/a26ef25d-8550-4cdc-94b4-8f7babcdb90a.webp",
+        "sort_order": 1
+      }
+    ],
+    "tags": [
+      { "name": "Cowboy" },
+      { "name": "Creative" },
+      { "name": "Fashion" },
+      { "name": "Streetwear" },
+      { "name": "Urban" }
+    ]
+  }
+}
+```
+**Why this is the 100X Professional Standard:**
+1. **`category_name`:** Resolves "Cowboy" to a primary category automatically.
+2. **`tags` as Secondary Categories:** Passing the strings in the `tags` array ensures the platform automatically links them (or creates them if missing) without needing exact database `category_id` matches.
+3. **`canonical_url`:** We store the source URL in the `contents.canonical_url` column which heavily protects SEO authority.
+4. **`prompt_images` + `featured_image_url`:** The image serves as the main thumbnail on the `contents` record and is also added to the `prompt_images` gallery for multi-image sliders on the prompt's detail page.
+
+---
+
+### D. Ingesting an "AI Tool" (Directory Listings)
 *Requires: `contents` + `ai_tools`*
 
 **`ai_tools` Fields:**
