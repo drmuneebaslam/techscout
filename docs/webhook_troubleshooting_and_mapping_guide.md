@@ -128,6 +128,7 @@ If your payload contains an image URL (such as `featured_image_url`, `image_url`
 *   **`tables.prompts`**: The extension table unique to Prompts.
     *   **`target_models`**: Must be a JSON array string.
 *   **`tables.prompt_images`**: A nested array of image objects. The `IncomingWebhookEngine` fully supports nesting for child tables. The `image_url` inside these objects is also automatically downloaded.
-*   **`tables.tags`**: Since there is no `tags` table in TechScout, these are dynamically mapped as **Secondary Categories**. They are ingested into `categories` and linked perfectly via the `content_categories` junction table.
+*   **`tables.tags`**: Since there is no `tags` table in TechScout, these are dynamically mapped as **Secondary Categories**. They are ingested into `categories` and linked perfectly via the `content_categories` junction table. 
+    *   **Custom Slugs**: By default, slugs are auto-generated. If you want to explicitly define them, simply pass them in your objects (e.g., `{"name": "Cowboy", "slug": "wild-west-cowboy"}` or `{"category_name": "Cowboy", "category_slug": "wild-west-cowboy"}`).
 
 You never have to worry about missing IDs or unmatched URLs. The system auto-heals and auto-resolves everything for you!

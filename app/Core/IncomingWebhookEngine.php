@@ -305,7 +305,7 @@ class IncomingWebhookEngine {
                     $summaryVal = $cntData['summary'] ?? '';
                     $contentType = $cntData['content_type'] ?? 'article';
                     $authorId = (int)($cntData['author_id'] ?? $defaultAuthorId);
-                    $categoryId = isset($cntData['category_id']) ? (int)$cntData['category_id'] : self::resolveCategoryId($cntData['category'] ?? ($cntData['category_name'] ?? null));
+                    $categoryId = isset($cntData['category_id']) ? (int)$cntData['category_id'] : self::resolveCategoryId($cntData['category'] ?? ($cntData['category_name'] ?? null), $contentType, $cntData['category_slug'] ?? null);
                     if (!$categoryId) $categoryId = $defaultCatId;
                     $imgUrl = $cntData['featured_image_url'] ?? ($cntData['image_url'] ?? null);
                     if ($imgUrl && filter_var($imgUrl, FILTER_VALIDATE_URL) && str_starts_with($imgUrl, 'http')) {
@@ -601,7 +601,7 @@ class IncomingWebhookEngine {
                     
                     // Category resolution with aliases (category_main, category, category_name, topic)
                     $rawCatInput = $itemData['category_main'] ?? ($itemData['category'] ?? ($itemData['category_name'] ?? ($itemData['topic'] ?? null)));
-                    $catId = isset($extractedData['category_id']) ? (int)$extractedData['category_id'] : self::resolveCategoryId($rawCatInput, $parentType);
+                    $catId = isset($extractedData['category_id']) ? (int)$extractedData['category_id'] : self::resolveCategoryId($rawCatInput, $parentType, $extractedData['category_slug'] ?? ($itemData['category_slug'] ?? null));
 
                     // 1. Upsert parent contents record
                     $existingStmt = $pdo->prepare("SELECT id FROM contents WHERE slug = ? LIMIT 1");
@@ -681,7 +681,7 @@ class IncomingWebhookEngine {
                         // 4. Sync Tags if passed
                         $tagsInput = $itemData['tags'] ?? ($itemData['tag_list'] ?? ($itemData['keywords'] ?? null));
                         if (!empty($tagsInput) && $contentId) {
-                            self::syncContentTags($contentId, is_array($tagsInput) ? $tagsInput : explode(',', (string)$tagsInput));
+                            self::syncContentTags($contentId, is_array($tagsInput) ? $tagsInput : explode(',', (string)$tagsInput), $parentType);
                             $tablesModified['tags'] = ($tablesModified['tags'] ?? 0) + 1;
                         }
 
@@ -794,21 +794,31 @@ class IncomingWebhookEngine {
     /**
      * Synchronize tags for content item
      */
-    private static function syncContentTags(int $contentId, array $tags): void {
+    private static function syncContentTags(int $contentId, array $tags, string $applicableTo = 'all'): void {
         if ($contentId <= 0 || empty($tags)) return;
 
         foreach ($tags as $rawTag) {
             $tag = '';
+            $customSlug = null;
             if (is_array($rawTag)) {
                 $tag = trim((string)($rawTag['name'] ?? ($rawTag['tag'] ?? '')));
+                $customSlug = !empty($rawTag['slug']) ? trim((string)$rawTag['slug']) : null;
             } else {
                 $tag = trim((string)$rawTag);
             }
             
             if ($tag === '') continue;
 
-            $slug = self::slugify($tag);
-            Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to, created_at) VALUES (?, ?, 'all', NOW())", [$tag, $slug]);
+            $slug = $customSlug ?: self::slugify($tag);
+            
+            $parentId = null;
+            $topicId = null;
+            if ($applicableTo === 'prompt' || $applicableTo === 'image_prompt') {
+                $parentId = 30; // AI Image Generation
+                $topicId = 1;
+            }
+
+            Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to, parent_id, topic_id, created_at) VALUES (?, ?, ?, ?, ?, NOW())", [$tag, $slug, $applicableTo, $parentId, $topicId]);
             $catId = Database::queryScalar("SELECT id FROM categories WHERE slug = ? LIMIT 1", [$slug]);
 
             if ($catId) {
@@ -848,17 +858,25 @@ class IncomingWebhookEngine {
     /**
      * Resolve category ID by slug or name
      */
-    private static function resolveCategoryId(?string $categoryInput, string $applicableTo = 'all'): ?int {
+    private static function resolveCategoryId(?string $categoryInput, string $applicableTo = 'all', ?string $customSlug = null): ?int {
         if (!$categoryInput) return null;
         $catInput = trim($categoryInput);
 
-        $cat = Database::fetch("SELECT id FROM categories WHERE slug = ? OR name = ? LIMIT 1", [$catInput, $catInput]);
+        $cat = Database::fetch("SELECT id FROM categories WHERE slug = ? OR name = ? LIMIT 1", [$customSlug ?: $catInput, $catInput]);
         if ($cat) {
             return (int)$cat['id'];
         }
 
-        $slug = self::slugify($catInput);
-        Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to) VALUES (?, ?, ?)", [$catInput, $slug, $applicableTo]);
+        $slug = $customSlug ?: self::slugify($catInput);
+        
+        $parentId = null;
+        $topicId = null;
+        if ($applicableTo === 'prompt' || $applicableTo === 'image_prompt') {
+            $parentId = 30; // AI Image Generation
+            $topicId = 1;
+        }
+
+        Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to, parent_id, topic_id, created_at) VALUES (?, ?, ?, ?, ?, NOW())", [$catInput, $slug, $applicableTo, $parentId, $topicId]);
         return (int)(Database::queryScalar("SELECT id FROM categories WHERE slug = ? LIMIT 1", [$slug]) ?? null);
     }
 
