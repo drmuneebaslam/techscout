@@ -150,14 +150,14 @@
         <form action="<?= url('/admin/incoming-webhooks') ?>" method="GET" style="display: flex; gap: 0.5rem; align-items: center; margin: 0; flex-wrap: wrap;">
           <input type="hidden" name="tab" value="logs">
           
-          <select name="webhook_id" class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 140px;">
+          <select name="webhook_id" class="admin-input" onchange="this.form.submit()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 140px;">
             <option value="">All Webhooks</option>
             <?php foreach ($incomingWebhooks as $wh): ?>
               <option value="<?= $wh['id'] ?>" <?= (isset($_GET['webhook_id']) && $_GET['webhook_id'] == $wh['id']) ? 'selected' : '' ?>><?= htmlspecialchars($wh['slug']) ?></option>
             <?php endforeach; ?>
           </select>
 
-          <select name="status" class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 120px;">
+          <select name="status" class="admin-input" onchange="this.form.submit()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 120px;">
             <option value="">Any Status</option>
             <option value="success" <?= (isset($_GET['status']) && $_GET['status'] === 'success') ? 'selected' : '' ?>>Success</option>
             <option value="simulated" <?= (isset($_GET['status']) && $_GET['status'] === 'simulated') ? 'selected' : '' ?>>Simulated</option>
@@ -165,7 +165,7 @@
             <option value="skipped (duplicate)" <?= (isset($_GET['status']) && $_GET['status'] === 'skipped (duplicate)') ? 'selected' : '' ?>>Skipped (Dup)</option>
           </select>
 
-          <input type="date" name="date" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>" class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 120px;">
+          <input type="date" name="date" onchange="this.form.submit()" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>" class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 120px;">
           
           <input type="text" id="logFilterInput" onkeyup="filterActivityLogs()" placeholder="Client search..." class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 130px;">
           
@@ -1252,6 +1252,13 @@ function switchPageTab(tab) {
     }
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const currentTab = '<?= htmlspecialchars($_GET['tab'] ?? 'endpoints') ?>';
+  if (currentTab === 'logs') {
+    switchPageTab('logs');
+  }
+});
 </script>
 
 <?php require __DIR__ . '/../layouts/admin_footer.php'; ?>
