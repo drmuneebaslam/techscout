@@ -573,7 +573,7 @@ class IncomingWebhookEngine {
                     
                     // Category resolution with aliases (category_main, category, category_name, topic)
                     $rawCatInput = $itemData['category_main'] ?? ($itemData['category'] ?? ($itemData['category_name'] ?? ($itemData['topic'] ?? null)));
-                    $catId = isset($extractedData['category_id']) ? (int)$extractedData['category_id'] : self::resolveCategoryId($rawCatInput);
+                    $catId = isset($extractedData['category_id']) ? (int)$extractedData['category_id'] : self::resolveCategoryId($rawCatInput, $parentType);
 
                     // 1. Upsert parent contents record
                     $existingStmt = $pdo->prepare("SELECT id FROM contents WHERE slug = ? LIMIT 1");
@@ -585,7 +585,13 @@ class IncomingWebhookEngine {
                         $upCntStmt = $pdo->prepare("UPDATE contents SET title = ?, summary = ?, category_id = COALESCE(?, category_id), featured_image_url = COALESCE(?, featured_image_url), updated_at = NOW() WHERE id = ?");
                         $upCntStmt->execute([$titleVal, $summaryVal, $catId, $imgUrl, $contentId]);
                     } else {
-                        $authorId = (int)(Database::queryScalar("SELECT id FROM authors ORDER BY id ASC LIMIT 1") ?? 1);
+                        // Author resolution: Explicit mapping > Alias (author, user) > Webhook Creator > Superadmin Default
+                        $rawAuthor = $extractedData['author_id'] ?? ($itemData['author_id'] ?? ($itemData['author'] ?? ($itemData['user'] ?? null)));
+                        $authorId = self::resolveAuthorId($rawAuthor);
+                        if (!$authorId) {
+                            $authorId = (int)(Database::queryScalar("SELECT id FROM authors ORDER BY id ASC LIMIT 1") ?? 1);
+                        }
+
                         if (!$catId) $catId = (int)(Database::queryScalar("SELECT id FROM categories ORDER BY id ASC LIMIT 1") ?? 1);
 
                         $insCntStmt = $pdo->prepare("INSERT INTO contents (uuid, content_type, author_id, category_id, title, slug, summary, featured_image_url, status, visibility, is_featured, is_trending, published_at, created_at, updated_at) 
@@ -773,7 +779,7 @@ class IncomingWebhookEngine {
     /**
      * Resolve category ID by slug or name
      */
-    private static function resolveCategoryId(?string $categoryInput): ?int {
+    private static function resolveCategoryId(?string $categoryInput, string $applicableTo = 'all'): ?int {
         if (!$categoryInput) return null;
         $catInput = trim($categoryInput);
 
@@ -783,8 +789,40 @@ class IncomingWebhookEngine {
         }
 
         $slug = self::slugify($catInput);
-        Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to) VALUES (?, ?, 'all')", [$catInput, $slug]);
+        Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to) VALUES (?, ?, ?)", [$catInput, $slug, $applicableTo]);
         return (int)(Database::queryScalar("SELECT id FROM categories WHERE slug = ? LIMIT 1", [$slug]) ?? null);
+    }
+
+    /**
+     * Resolve author ID by explicit ID, slug, or display name alias
+     */
+    private static function resolveAuthorId($authorInput): ?int {
+        if (!$authorInput) return null;
+        
+        if (is_numeric($authorInput)) {
+            $author = Database::fetch("SELECT id FROM authors WHERE id = ? OR user_id = ? LIMIT 1", [(int)$authorInput, (int)$authorInput]);
+            if ($author) return (int)$author['id'];
+        }
+
+        $cleanInput = trim((string)$authorInput);
+        
+        // Strip '@' if passed as a handle
+        if (strpos($cleanInput, '@') === 0) {
+            $cleanInput = substr($cleanInput, 1);
+        }
+
+        $author = Database::fetch("SELECT id FROM authors WHERE slug = ? OR display_name = ? LIMIT 1", [$cleanInput, $cleanInput]);
+        if ($author) {
+            return (int)$author['id'];
+        }
+        
+        $slug = self::slugify($cleanInput);
+        $author = Database::fetch("SELECT id FROM authors WHERE slug = ? LIMIT 1", [$slug]);
+        if ($author) {
+            return (int)$author['id'];
+        }
+
+        return null;
     }
 
     /**
