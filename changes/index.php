@@ -830,6 +830,7 @@ $router->get('/api/v1/tools', [ApiController::class, 'v1Tools']);
 $router->get('/api/v1/prompts', [ApiController::class, 'v1Prompts']);
 $router->get('/api/v1/gpts', [ApiController::class, 'v1Gpts']);
 $router->get('/api/v1/articles', [ApiController::class, 'v1Articles']);
+$router->get('/api/v1/content/{id}', [ApiController::class, 'v1GetItem']);
 $router->get('/api/v1/admin/telemetry', [ApiController::class, 'v1AdminTelemetry']);
 
 // Dynamic Popup Analytics

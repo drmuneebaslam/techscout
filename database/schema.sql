@@ -545,15 +545,6 @@ CREATE TABLE `content_revisions` (
   CONSTRAINT `fk_revisions_content` FOREIGN KEY (`content_id`) REFERENCES `contents` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `content_tags`;
-CREATE TABLE `content_tags` (
-  `content_id` bigint(20) unsigned NOT NULL,
-  `tag_id` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`content_id`,`tag_id`),
-  KEY `fk_ct_tag` (`tag_id`),
-  CONSTRAINT `fk_ct_content` FOREIGN KEY (`content_id`) REFERENCES `contents` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_ct_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `contents`;
 CREATE TABLE `contents` (
@@ -1304,19 +1295,6 @@ CREATE TABLE `system_settings` (
   PRIMARY KEY (`key_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `tags`;
-CREATE TABLE `tags` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(60) NOT NULL,
-  `slug` varchar(60) NOT NULL,
-  `applicable_to` varchar(50) NOT NULL DEFAULT 'all',
-  `usage_count` int(10) unsigned NOT NULL DEFAULT 0,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `slug` (`slug`),
-  KEY `idx_tags_slug` (`slug`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `ticket_canned_macros`;
 CREATE TABLE `ticket_canned_macros` (

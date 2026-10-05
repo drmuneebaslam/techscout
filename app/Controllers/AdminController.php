@@ -5080,7 +5080,8 @@ class AdminController {
 
         $potentialIndexCols = [
             'comments' => ['content_id', 'user_id', 'is_pinned'],
-            'articles' => ['category_id', 'status', 'published_at'],
+            'contents' => ['category_id', 'status', 'published_at', 'author_id', 'content_type'],
+            'articles' => ['content_id'],
             'author_tips' => ['author_id', 'status'],
             'prompt_images' => ['prompt_id'],
             'article_polls' => ['content_id'],
@@ -5777,23 +5778,30 @@ class AdminController {
 
         // Scope checkbox defaulting strictly to the active tab being saved
         $tabCheckboxes = [
-            'general' => ['site_maintenance_mode', 'enable_user_registration', 'require_email_verification'],
+            'general' => ['site_maintenance_mode'],
+            'authentication' => ['enable_user_registration', 'require_email_verification'],
             'security' => ['force_staff_2fa', 'security_csrf_strict', 'security_csp_strict', 'security_honeypot_enabled'],
             'social' => ['social_login_google', 'social_login_github'],
             'payments' => ['enable_stripe_payments', 'enable_crypto_payments'],
-            'media' => ['auto_compress_images', 'cdn_enabled', 'cdn_minify_assets'],
+            'cdn' => ['cdn_minify_assets'],
+            'media' => ['auto_compress_images', 'cdn_enabled'],
             'seo' => ['search_highlight_matches', 'seo_auto_generate_sitemap'],
             'analytics' => ['analytics_track_internal_telemetry', 'analytics_anonymize_ips'],
             'notifications' => ['notifications_inapp_enabled', 'notifications_sound_enabled'],
             'moderation' => ['moderation_auto_engine_enabled'],
             'api' => ['api_public_enabled', 'api_require_auth_public', 'api_expose_swagger'],
             'integrations' => ['integration_discord_enabled', 'integration_telegram_enabled', 'integration_slack_enabled'],
-            'features' => [
-                'flag_jobs_board', 'flag_community_comments', 'flag_emoji_reactions',
-                'flag_rewards_shop', 'flag_custom_gpts', 'flag_prompt_blueprints',
-                'flag_author_studio', 'flag_markdown_exporter', 'loc_multilang_enabled'
-            ]
+            'localization' => ['loc_multilang_enabled'],
         ];
+
+        if ($activeTab === 'feature_flags') {
+            $flags = \App\Core\FeatureFlag::getAll();
+            foreach ($flags as $f) {
+                if (!isset($allPosts[$f['flag_key']])) {
+                    $allPosts[$f['flag_key']] = '0';
+                }
+            }
+        }
 
         $relevantCheckboxes = $tabCheckboxes[$activeTab] ?? [];
         foreach ($relevantCheckboxes as $cbKey) {
@@ -9147,16 +9155,45 @@ class AdminController {
     public function incomingWebhooks(Request $request): void {
         $webhooks = [];
         $logs = [];
+        $filterWebhook = (int)$request->query('webhook_id', 0);
+        $filterStatus = trim((string)$request->query('status', ''));
+        $filterDate = trim((string)$request->query('date', ''));
+
+        $whereClauses = [];
+        $params = [];
+        
+        if ($filterWebhook > 0) {
+            $whereClauses[] = "webhook_id = ?";
+            $params[] = $filterWebhook;
+        }
+        if ($filterStatus !== '') {
+            if ($filterStatus === 'error') {
+                $whereClauses[] = "status = 'failed'";
+            } else {
+                $whereClauses[] = "status = ?";
+                $params[] = $filterStatus;
+            }
+        }
+        if ($filterDate !== '') {
+            $whereClauses[] = "DATE(created_at) = ?";
+            $params[] = $filterDate;
+        }
+
+        $whereSql = empty($whereClauses) ? "" : "WHERE " . implode(' AND ', $whereClauses);
+
         try {
             $webhooks = Database::query("SELECT * FROM incoming_webhooks ORDER BY id DESC");
-            $logs = Database::query("SELECT * FROM incoming_webhook_logs ORDER BY id DESC LIMIT 50");
+            $logs = Database::query("SELECT * FROM incoming_webhook_logs {$whereSql} ORDER BY id DESC LIMIT 50", $params);
         } catch (\Throwable $e) {}
 
         Response::view('admin/incoming_webhooks', [
             'title' => 'Incoming Webhooks & Live JSON Listener | Admin Hub',
             'incomingWebhooks' => $webhooks,
             'incomingLogs' => $logs,
-            'permittedTables' => \App\Core\IncomingWebhookEngine::getTableDefinitions()
+            'permittedTables' => \App\Core\IncomingWebhookEngine::getTableDefinitions(),
+            'filterWebhook' => $filterWebhook,
+            'filterStatus' => $filterStatus,
+            'filterDate' => $filterDate
         ]);
     }
 

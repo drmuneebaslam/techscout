@@ -186,7 +186,7 @@ class Content {
     }
 
     public static function getTagsForContent(int $contentId): array {
-        return Database::query("SELECT t.name, t.slug FROM tags t INNER JOIN content_tags ct ON t.id = ct.tag_id WHERE ct.content_id = ?", [$contentId]);
+        return Database::query("SELECT c.name, c.slug FROM categories c INNER JOIN content_secondary_categories csc ON c.id = csc.category_id WHERE csc.content_id = ?", [$contentId]);
     }
 
     public static function search(string $query, string $type = 'all', int $limit = 20): array {
@@ -303,15 +303,15 @@ class Content {
                        gpt.openai_url, gpt.model_base,
                        p.copy_count
                 FROM contents c
-                JOIN content_tags ct ON c.id = ct.content_id
-                JOIN tags t ON ct.tag_id = t.id
+                JOIN content_secondary_categories csc ON c.id = csc.content_id
+                JOIN categories sec_cat ON csc.category_id = sec_cat.id
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 LEFT JOIN authors a ON c.author_id = a.id
                 LEFT JOIN articles art ON c.id = art.content_id
                 LEFT JOIN ai_tools tool ON c.id = tool.content_id
                 LEFT JOIN gpt_listings gpt ON c.id = gpt.content_id
                 LEFT JOIN prompts p ON c.id = p.content_id
-                WHERE t.slug = ? AND c.status = 'published' AND c.visibility = 'public'
+                WHERE sec_cat.slug = ? AND c.status = 'published' AND c.visibility = 'public' AND c.content_type = 'article'
                 ORDER BY c.published_at DESC LIMIT {$limit}";
         return Database::query($sql, [$tagSlug]);
     }

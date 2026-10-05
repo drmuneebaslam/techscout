@@ -84,7 +84,7 @@ class BlogController {
 
     public function tag(Request $request, array $params): void {
         $slug = $params['slug'] ?? '';
-        $tag = Database::fetch("SELECT * FROM tags WHERE slug = ?", [$slug]);
+        $tag = Database::fetch("SELECT * FROM categories WHERE slug = ?", [$slug]);
         if (!$tag) {
             Response::redirect('/blog');
             return;

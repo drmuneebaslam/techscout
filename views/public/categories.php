@@ -24,30 +24,7 @@
     </div>
   </div>
 
-  <!-- Scope Filter Ribbon -->
-  <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem;">
-    <a href="<?= url('/categories?entity=all') ?>" class="ts-btn ts-btn-sm <?= $currentScope === 'all' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="white-space: nowrap;">
-      🌐 All Entities
-    </a>
-    <a href="<?= url('/categories?entity=article') ?>" class="ts-btn ts-btn-sm <?= $currentScope === 'article' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="white-space: nowrap;">
-      📝 Technical Articles
-    </a>
-    <a href="<?= url('/categories?entity=prompt') ?>" class="ts-btn ts-btn-sm <?= $currentScope === 'prompt' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="white-space: nowrap;">
-      ⚡ Text Prompts
-    </a>
-    <a href="<?= url('/categories?entity=image_prompt') ?>" class="ts-btn ts-btn-sm <?= $currentScope === 'image_prompt' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="white-space: nowrap;">
-      🎨 Image Prompts
-    </a>
-    <a href="<?= url('/categories?entity=ai_tool') ?>" class="ts-btn ts-btn-sm <?= $currentScope === 'ai_tool' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="white-space: nowrap;">
-      🛠️ AI Tools
-    </a>
-    <a href="<?= url('/categories?entity=gpt_listing') ?>" class="ts-btn ts-btn-sm <?= $currentScope === 'gpt_listing' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="white-space: nowrap;">
-      🤖 Custom GPTs
-    </a>
-    <a href="<?= url('/categories?entity=campaign') ?>" class="ts-btn ts-btn-sm <?= $currentScope === 'campaign' ? 'ts-btn-primary' : 'ts-btn-outline' ?>" style="white-space: nowrap;">
-      🏆 Challenges
-    </a>
-  </div>
+
 
   <!-- Categories Grid -->
   <div id="categoriesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem;">

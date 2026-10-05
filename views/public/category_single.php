@@ -75,31 +75,6 @@
     <?php endif; ?>
   </div>
 
-  <!-- Entity Type Filter Tabs -->
-  <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; border-bottom: 1px solid var(--ts-border);">
-    <a href="<?= url('/category/' . $category['slug'] . '?entity=all') ?>" class="ts-subtab-link <?= $currentEntity === 'all' ? 'active' : '' ?>">
-      🌐 All Resources (<?= $entityCounts['all'] ?>)
-    </a>
-    <a href="<?= url('/category/' . $category['slug'] . '?entity=article') ?>" class="ts-subtab-link <?= $currentEntity === 'article' ? 'active' : '' ?>">
-      📝 Technical Articles (<?= $entityCounts['article'] ?>)
-    </a>
-    <a href="<?= url('/category/' . $category['slug'] . '?entity=prompt') ?>" class="ts-subtab-link <?= $currentEntity === 'prompt' ? 'active' : '' ?>">
-      ⚡ Text Prompts (<?= $entityCounts['prompt'] ?>)
-    </a>
-    <a href="<?= url('/category/' . $category['slug'] . '?entity=image_prompt') ?>" class="ts-subtab-link <?= $currentEntity === 'image_prompt' ? 'active' : '' ?>">
-      🎨 Image Prompts (<?= $entityCounts['image_prompt'] ?>)
-    </a>
-    <a href="<?= url('/category/' . $category['slug'] . '?entity=ai_tool') ?>" class="ts-subtab-link <?= $currentEntity === 'ai_tool' ? 'active' : '' ?>">
-      🛠️ AI Tools (<?= $entityCounts['ai_tool'] ?>)
-    </a>
-    <a href="<?= url('/category/' . $category['slug'] . '?entity=gpt_listing') ?>" class="ts-subtab-link <?= $currentEntity === 'gpt_listing' ? 'active' : '' ?>">
-      🤖 Custom GPTs (<?= $entityCounts['gpt_listing'] ?>)
-    </a>
-    <a href="<?= url('/category/' . $category['slug'] . '?entity=campaign') ?>" class="ts-subtab-link <?= $currentEntity === 'campaign' ? 'active' : '' ?>">
-      🏆 Challenges (<?= $entityCounts['campaign'] ?>)
-    </a>
-  </div>
-
   <!-- Entities Grid -->
   <?php if (empty($items)): ?>
     <div class="ts-card" style="padding: 3rem; text-align: center; border-radius: 14px;">

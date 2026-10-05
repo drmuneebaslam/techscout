@@ -10,6 +10,9 @@
 
     <form action="<?= url('/auth/login') ?>" method="POST">
       <?= csrf_field() ?>
+      <?php if (!empty($redirect)): ?>
+        <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect) ?>">
+      <?php endif; ?>
       <div style="margin-bottom: 1.25rem;">
         <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--ts-text-primary); margin-bottom: 0.4rem;">Email or Username</label>
         <input type="text" name="email" value="" placeholder="name@example.com or username" style="width: 100%; background: var(--ts-bg-surface); border: 1px solid var(--ts-border-main); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: var(--ts-text-primary);" required autocomplete="username">

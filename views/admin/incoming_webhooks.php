@@ -247,10 +247,20 @@
       </div>
     </div>
 
-    <!-- Modal Body: Dual Pane Grid -->
-    <div style="padding: 1.5rem; overflow-y: auto; flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem;">
+    <!-- Tabs Header -->
+    <div style="flex-wrap: wrap; align-items: center; display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--admin-border-main); background: var(--admin-card-bg-elevated);">
+      <button type="button" onclick="switchStudioTab('stream')" id="studio-tab-stream" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
+        <i data-lucide="terminal"></i> Stream &amp; Simulator
+      </button>
+      <button type="button" onclick="switchStudioTab('mapping')" id="studio-tab-mapping" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
+        <i data-lucide="database"></i> Field Mapping
+      </button>
+    </div>
+
+    <!-- Modal Body: Tab Contents -->
+    <div style="padding: 1.5rem; overflow-y: auto; flex: 1;">
       <!-- Left Column: Realtime Payloads Stream & Simulator -->
-      <div>
+      <div id="studio-pane-stream">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
           <h4 style="font-size: 0.92rem; color: var(--admin-text-primary); margin: 0; display: flex; align-items: center; gap: 0.4rem;">
             <i data-lucide="terminal" style="width: 15px; color: #38bdf8;"></i> Captured Payloads Stream
@@ -292,7 +302,7 @@
       </div>
 
       <!-- Right Column: Dynamic Field Mapping to Database -->
-      <div>
+      <div id="studio-pane-mapping" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
           <h4 style="font-size: 0.92rem; color: var(--admin-text-primary); margin: 0; display: flex; align-items: center; gap: 0.4rem;">
             <i data-lucide="database" style="width: 15px; color: #10b981;"></i> Dynamic Field Mapping Matrix
@@ -310,7 +320,7 @@
           <input type="hidden" id="mappingWebhookId" name="webhook_id">
           <datalist id="jsonKeysList"></datalist>
           
-          <div id="mappingRowsContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.5rem; max-height: 320px; overflow-y: auto; padding-right: 0.4rem; margin-bottom: 1rem;">
+          <div id="mappingRowsContainer" style="flex-wrap: wrap; align-items: center; display: flex; flex-direction: column; gap: 0.5rem; max-height: 400px; overflow-y: auto; padding-right: 0.4rem; margin-bottom: 1rem;">
             <!-- Rows injected dynamically via JS -->
           </div>
 
@@ -320,6 +330,22 @@
         </form>
       </div>
     </div>
+    
+    <script>
+    function switchStudioTab(tab) {
+      if (tab === 'stream') {
+        document.getElementById('studio-tab-stream').className = 'admin-btn admin-btn-primary admin-btn-sm';
+        document.getElementById('studio-tab-mapping').className = 'admin-btn admin-btn-outline admin-btn-sm';
+        document.getElementById('studio-pane-stream').style.display = 'block';
+        document.getElementById('studio-pane-mapping').style.display = 'none';
+      } else {
+        document.getElementById('studio-tab-stream').className = 'admin-btn admin-btn-outline admin-btn-sm';
+        document.getElementById('studio-tab-mapping').className = 'admin-btn admin-btn-primary admin-btn-sm';
+        document.getElementById('studio-pane-stream').style.display = 'none';
+        document.getElementById('studio-pane-mapping').style.display = 'block';
+      }
+    }
+    </script>
   </div>
 </div>
 
@@ -884,15 +910,24 @@ function renderFieldMappings(wh) {
 
 function addMappingRow(jsonKey = '', targetCol = '') {
   const container = document.getElementById('mappingRowsContainer');
-  const table = currentActiveWebhook ? currentActiveWebhook.target_table : 'prompts';
-  const tableMeta = PERMITTED_TABLES[table] || { columns: [] };
+  const tableRaw = currentActiveWebhook ? currentActiveWebhook.target_table : 'prompts';
+  const tables = tableRaw.split(',').map(t => t.trim());
+  let allCols = [];
+  
+  tables.forEach(t => {
+    const tableMeta = PERMITTED_TABLES[t];
+    if (tableMeta && tableMeta.columns) {
+      allCols = allCols.concat(tableMeta.columns);
+    }
+  });
+  allCols = [...new Set(allCols)].sort();
 
   const row = document.createElement('div');
   row.className = 'mapping-row-wrap';
   row.style.cssText = 'display: flex; flex-direction: column; gap: 0.3rem; background: var(--admin-card-bg-elevated); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--admin-border-main);';
 
   let colOptions = '';
-  tableMeta.columns.forEach(c => {
+  allCols.forEach(c => {
     const sel = (c === targetCol) ? 'selected' : '';
     colOptions += `<option value="${escapeHtml(c)}" ${sel}>${escapeHtml(c)}</option>`;
   });

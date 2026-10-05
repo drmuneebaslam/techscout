@@ -15,7 +15,7 @@ class CategoryController {
      */
     public function index(Request $request): void {
         $q = trim((string)$request->query('q', ''));
-        $entityScope = trim((string)($request->query('entity') ?? $request->query('type') ?? $request->query('scope') ?? 'all'));
+        $entityScope = 'article';
         $user = Auth::user();
         $userId = $user ? (int)$user['id'] : 0;
 
@@ -112,7 +112,7 @@ class CategoryController {
      */
     public function show(Request $request, array $params = []): void {
         $slug = $params['slug'] ?? '';
-        $entityType = trim((string)($request->query('entity') ?? $request->query('type') ?? $request->query('scope') ?? 'all'));
+        $entityType = 'article';
         $category = Database::fetch("SELECT c.*, p.name as parent_name, p.slug as parent_slug FROM categories c LEFT JOIN categories p ON c.parent_id = p.id WHERE c.slug = ?", [$slug]);
 
         if (!$category) {

@@ -174,52 +174,20 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
-        <!-- Content Type with Permission Enforcement -->
+        <!-- Content Type (Authors are restricted to articles) -->
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em;">
             Publication Format / Type
           </label>
           <select name="content_type" id="doc_content_type" onchange="onContentTypeChanged(this.value)" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc; font-size: 0.95rem;">
-            <option value="article" <?= $currentType === 'article' ? 'selected' : '' ?>>
+            <option value="article" selected>
               📝 Technical Article / Architectural Tutorial
             </option>
-            
-            <?php if ($canPrompts): ?>
-              <option value="prompt" <?= $currentType === 'prompt' ? 'selected' : '' ?>>
-                ⚡ Prompt Blueprint & Template (Authorized)
-              </option>
-            <?php else: ?>
-              <option value="prompt" disabled style="color: #64748b;">
-                🔒 Prompt Blueprint (Admin Approval Required)
-              </option>
-            <?php endif; ?>
-
-            <?php if ($canGpts): ?>
-              <option value="gpt_listing" <?= $currentType === 'gpt_listing' ? 'selected' : '' ?>>
-                🤖 Custom GPT & Agent Blueprint (Authorized)
-              </option>
-            <?php else: ?>
-              <option value="gpt_listing" disabled style="color: #64748b;">
-                🔒 Custom GPT Blueprint (Admin Approval Required)
-              </option>
-            <?php endif; ?>
-
-            <?php if ($canTools): ?>
-              <option value="ai_tool" <?= $currentType === 'ai_tool' ? 'selected' : '' ?>>
-                🛠️ AI Tool Benchmark / Review (Authorized)
-              </option>
-            <?php else: ?>
-              <option value="ai_tool" disabled style="color: #64748b;">
-                🔒 AI Tool Review (Admin Approval Required)
-              </option>
-            <?php endif; ?>
           </select>
           
-          <?php if (!$canPrompts || !$canGpts || !$canTools): ?>
-            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem;">
-              <span>💡 By default, authors can publish articles. Contact staff to unlock Prompt/GPT publishing.</span>
-            </div>
-          <?php endif; ?>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem;">
+            <span>💡 Authors are restricted to publishing technical articles.</span>
+          </div>
         </div>
 
         <!-- Category -->
@@ -229,8 +197,12 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
           </label>
           <select name="category_id" id="doc_category_id" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc; font-size: 0.95rem;">
             <?php foreach ($categories as $cat): ?>
+              <?php 
+                $appTo = strtolower($cat['applicable_to'] ?? 'all');
+                if ($appTo !== 'all' && $appTo !== 'article') continue;
+              ?>
               <option value="<?= $cat['id'] ?>" data-applicable="<?= htmlspecialchars($cat['applicable_to'] ?? 'all') ?>" <?= ($content['category_id'] ?? 0) == $cat['id'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cat['name']) ?> (<?= strtoupper($cat['applicable_to'] ?? 'ALL') ?>)
+                <?= htmlspecialchars($cat['name']) ?>
               </option>
             <?php endforeach; ?>
           </select>
@@ -282,8 +254,12 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
         </div>
         <select name="secondary_categories[]" id="doc_secondary_categories" multiple style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc; font-size: 0.95rem; min-height: 100px;">
             <?php foreach ($categories as $cat): ?>
+              <?php 
+                $appTo = strtolower($cat['applicable_to'] ?? 'all');
+                if ($appTo !== 'all' && $appTo !== 'article') continue;
+              ?>
               <option value="<?= $cat['id'] ?>" <?= in_array($cat['id'], $secondaryCategoryIds) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cat['name']) ?> (<?= strtoupper($cat['applicable_to'] ?? 'ALL') ?>)
+                <?= htmlspecialchars($cat['name']) ?>
               </option>
             <?php endforeach; ?>
         </select>

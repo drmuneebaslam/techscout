@@ -2032,6 +2032,57 @@ class ApiController {
     }
 
     /**
+     * GET /api/v1/content/{id}
+     * Retrieve a specific content item by ID or Slug
+     */
+    public function v1GetItem(Request $request, array $params): void {
+        \App\Core\BearerAuth::requireAuth($request, 'content:read');
+
+        $id = trim((string)($params['id'] ?? ''));
+        if (empty($id)) {
+            Response::json(['success' => false, 'error' => 'ID or Slug is required'], 400);
+            return;
+        }
+
+        $db = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT c.*, cat.name as category_name, cat.slug as category_slug, u.username as author_username
+            FROM contents c
+            LEFT JOIN categories cat ON cat.id = c.category_id
+            LEFT JOIN users u ON u.id = c.author_id
+            WHERE c.id = :id OR c.slug = :id OR c.uuid = :id
+            LIMIT 1
+        ");
+        $stmt->execute([':id' => $id]);
+        $content = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$content) {
+            Response::json(['success' => false, 'error' => 'Content not found'], 404);
+            return;
+        }
+
+        // Fetch additional details based on content type
+        if ($content['content_type'] === 'prompt') {
+            $metaStmt = $db->prepare("SELECT * FROM prompts WHERE content_id = ? LIMIT 1");
+            $metaStmt->execute([$content['id']]);
+            $content['prompt_meta'] = $metaStmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+        } elseif ($content['content_type'] === 'ai_tool') {
+            $metaStmt = $db->prepare("SELECT * FROM ai_tools WHERE content_id = ? LIMIT 1");
+            $metaStmt->execute([$content['id']]);
+            $content['tool_meta'] = $metaStmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+        } elseif ($content['content_type'] === 'gpt') {
+            $metaStmt = $db->prepare("SELECT * FROM gpt_listings WHERE content_id = ? LIMIT 1");
+            $metaStmt->execute([$content['id']]);
+            $content['gpt_meta'] = $metaStmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+        }
+
+        Response::json([
+            'success' => true,
+            'data' => $content
+        ]);
+    }
+
+    /**
      * GET /api/v1/admin/telemetry
      * Aggregate platform health, entity counts, error rates, and webhook telemetry
      */

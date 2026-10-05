@@ -13,7 +13,16 @@ class AuthController {
         if (Auth::check()) {
             Response::redirect(Auth::isAdmin() ? '/admin/dashboard' : '/author/dashboard');
         }
-        Response::view('auth/login', ['title' => 'Sign In to TechScout']);
+        $redirect = $request->query('redirect', '');
+        if (empty($redirect) && !empty($_SERVER['HTTP_REFERER'])) {
+            $referer = $_SERVER['HTTP_REFERER'];
+            $host = $_SERVER['HTTP_HOST'] ?? '';
+            if ($host && strpos($referer, $host) !== false && strpos($referer, '/auth/login') === false && strpos($referer, '/auth/register') === false) {
+                $parsed = parse_url($referer);
+                $redirect = ($parsed['path'] ?? '/') . (isset($parsed['query']) ? '?' . $parsed['query'] : '');
+            }
+        }
+        Response::view('auth/login', ['title' => 'Sign In to TechScout', 'redirect' => $redirect]);
     }
 
     public function login(Request $request): void {

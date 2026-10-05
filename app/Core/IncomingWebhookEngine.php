@@ -221,6 +221,21 @@ class IncomingWebhookEngine {
             $payload = [];
         }
 
+        // Support passing payload via GET (e.g. ?json={"foo":"bar"})
+        if (!empty($_GET['json']) && is_string($_GET['json'])) {
+            $jsonQuery = json_decode($_GET['json'], true);
+            if (is_array($jsonQuery)) {
+                $payload = array_merge($payload, $jsonQuery);
+            }
+        }
+        
+        // Merge remaining GET params (excluding control keys)
+        $cleanGet = $_GET;
+        unset($cleanGet['token'], $cleanGet['table'], $cleanGet['mode'], $cleanGet['listen'], $cleanGet['simulate'], $cleanGet['json']);
+        if (!empty($cleanGet)) {
+            $payload = array_merge($payload, $cleanGet);
+        }
+
         // 4. Discover all database tables dynamically
         $tableDefinitions = self::getTableDefinitions();
         $allTableNames = array_keys($tableDefinitions);
@@ -342,7 +357,7 @@ class IncomingWebhookEngine {
                     if ($upsertRes['success']) {
                         $totalAffected += $upsertRes['affected'];
                         $tablesModified[$tbl] = ($tablesModified[$tbl] ?? 0) + 1;
-                        $processedResults[] = ['table' => $tbl, 'record_id' => $upsertRes['record_id'], 'status' => 'upserted'];
+                        $processedResults[] = ['table' => $tbl, 'record_id' => $upsertRes['record_id'], 'status' => $upsertRes['status'] ?? 'upserted'];
                     }
                 }
 
@@ -639,7 +654,7 @@ class IncomingWebhookEngine {
                         $processedResults[] = [
                             'index' => $index,
                             'table' => $targetTable,
-                            'status' => 'upserted',
+                            'status' => $upsertRes['status'] ?? 'upserted',
                             'record_id' => $contentId,
                             'slug' => $slugVal
                         ];
@@ -653,7 +668,7 @@ class IncomingWebhookEngine {
                         $processedResults[] = [
                             'index' => $index,
                             'table' => $targetTable,
-                            'status' => 'upserted',
+                            'status' => $upsertRes['status'] ?? 'upserted',
                             'record_id' => $upsertRes['record_id']
                         ];
                     }
@@ -709,18 +724,19 @@ class IncomingWebhookEngine {
         $values = array_values($data);
 
         if ($uniqueKey && isset($data[$uniqueKey])) {
-            $updates = [];
-            foreach ($columns as $c) {
-                if ($c !== $uniqueKey) {
-                    $updates[] = "`{$c}` = VALUES(`{$c}`)";
-                }
+            $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM `{$table}` WHERE `{$uniqueKey}` = ?");
+            $stmtCheck->execute([$data[$uniqueKey]]);
+            if ($stmtCheck->fetchColumn() > 0) {
+                return [
+                    'success' => true,
+                    'affected' => 0,
+                    'record_id' => $data[$uniqueKey],
+                    'status' => 'skipped (duplicate)'
+                ];
             }
-            $updateSql = !empty($updates) ? " ON DUPLICATE KEY UPDATE " . implode(', ', $updates) : "";
-            $sql = "INSERT INTO `{$table}` (`" . implode('`, `', $columns) . "`) VALUES (" . implode(', ', $placeholders) . ")" . $updateSql;
-        } else {
-            $sql = "INSERT INTO `{$table}` (`" . implode('`, `', $columns) . "`) VALUES (" . implode(', ', $placeholders) . ")";
         }
 
+        $sql = "INSERT IGNORE INTO `{$table}` (`" . implode('`, `', $columns) . "`) VALUES (" . implode(', ', $placeholders) . ")";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($values);
         $rowAff = $stmt->rowCount() ?: 1;
@@ -729,7 +745,8 @@ class IncomingWebhookEngine {
         return [
             'success' => true,
             'affected' => $rowAff,
-            'record_id' => $insId
+            'record_id' => $insId,
+            'status' => 'created'
         ];
     }
 
@@ -942,52 +959,62 @@ class IncomingWebhookEngine {
 
         // Generic dynamic introspection fallback for other database tables
         $defs = self::getTableDefinitions();
-        $def = $defs[$table] ?? null;
-
-        if (!$def) {
-            return [
-                "table" => $table,
-                "title" => "Sample " . ucfirst($table) . " Entry",
-                "status" => "active"
-            ];
+        $tables = array_map('trim', explode(',', $table));
+        
+        $sample = ["table" => $table];
+        $foundAny = false;
+        
+        foreach ($tables as $tbl) {
+            $def = $defs[$tbl] ?? null;
+            if (!$def) continue;
+            
+            $foundAny = true;
+            foreach ($def['column_meta'] as $col) {
+                $name = $col['COLUMN_NAME'];
+                $type = strtolower($col['DATA_TYPE']);
+    
+                if (in_array($name, ['id', 'created_at', 'modified_at', 'updated_at', 'last_login', 'deleted_at'], true)) {
+                    continue;
+                }
+                
+                if (isset($sample[$name])) continue;
+    
+                if ($name === 'uuid') {
+                    $sample[$name] = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+                } elseif ($name === 'title' || $name === 'name') {
+                    $sample[$name] = "Sample " . ucfirst(str_replace('_', ' ', $tbl)) . " Item";
+                } elseif ($name === 'slug') {
+                    $sample[$name] = str_replace('_', '-', $tbl) . "-sample-item";
+                } elseif ($name === 'summary' || $name === 'description') {
+                    $sample[$name] = "High-performance enterprise data ingested dynamically into {$tbl}.";
+                } elseif ($name === 'status') {
+                    $sample[$name] = 'published';
+                } elseif ($name === 'email') {
+                    $sample[$name] = 'creator@techscout.online';
+                } elseif ($name === 'prompt_template') {
+                    $sample[$name] = "Cinematic shot of futuristic cyberpunk metropolis, neon volumetric lighting --ar 16:9 --v 6.0";
+                } elseif ($name === 'aspect_ratio') {
+                    $sample[$name] = '16:9';
+                } elseif ($name === 'website_url' || $name === 'featured_image_url' || str_ends_with($name, '_url')) {
+                    $sample[$name] = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800';
+                } elseif ($type === 'int' || $type === 'bigint' || $type === 'tinyint') {
+                    $sample[$name] = 1;
+                } elseif ($type === 'decimal' || $type === 'float') {
+                    $sample[$name] = 4.95;
+                } elseif ($type === 'json' || str_ends_with($name, '_json')) {
+                    $sample[$name] = ["key" => "value", "tags" => ["tech", "ai"]];
+                } else {
+                    $sample[$name] = "Sample value for {$name}";
+                }
+            }
         }
 
-        $sample = ["table" => $table];
-        foreach ($def['column_meta'] as $col) {
-            $name = $col['COLUMN_NAME'];
-            $type = strtolower($col['DATA_TYPE']);
-
-            if (in_array($name, ['id', 'created_at', 'modified_at', 'updated_at', 'last_login', 'deleted_at'], true)) {
-                continue;
-            }
-
-            if ($name === 'uuid') {
-                $sample[$name] = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
-            } elseif ($name === 'title' || $name === 'name') {
-                $sample[$name] = "Sample " . ucfirst(str_replace('_', ' ', $table)) . " Item";
-            } elseif ($name === 'slug') {
-                $sample[$name] = str_replace('_', '-', $table) . "-sample-item";
-            } elseif ($name === 'summary' || $name === 'description') {
-                $sample[$name] = "High-performance enterprise data ingested dynamically into {$table}.";
-            } elseif ($name === 'status') {
-                $sample[$name] = 'published';
-            } elseif ($name === 'email') {
-                $sample[$name] = 'creator@techscout.online';
-            } elseif ($name === 'prompt_template') {
-                $sample[$name] = "Cinematic shot of futuristic cyberpunk metropolis, neon volumetric lighting --ar 16:9 --v 6.0";
-            } elseif ($name === 'aspect_ratio') {
-                $sample[$name] = '16:9';
-            } elseif ($name === 'website_url' || $name === 'featured_image_url' || str_ends_with($name, '_url')) {
-                $sample[$name] = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800';
-            } elseif ($type === 'int' || $type === 'bigint' || $type === 'tinyint') {
-                $sample[$name] = 1;
-            } elseif ($type === 'decimal' || $type === 'float') {
-                $sample[$name] = 4.95;
-            } elseif ($type === 'json' || str_ends_with($name, '_json')) {
-                $sample[$name] = ["key" => "value", "tags" => ["tech", "ai"]];
-            } else {
-                $sample[$name] = "Sample value for {$name}";
-            }
+        if (!$foundAny) {
+            return [
+                "table" => $table,
+                "title" => "Sample " . ucfirst(str_replace(',', ' ', $table)) . " Entry",
+                "status" => "active"
+            ];
         }
 
         return $sample;
