@@ -20,27 +20,27 @@ class TagHelper {
             $slug = Sanitizer::slug($name);
             if (empty($slug)) continue;
 
-            Database::execute("INSERT IGNORE INTO tags (name, slug) VALUES (?, ?)", [$name, $slug]);
-            $tag = Database::fetch("SELECT id FROM tags WHERE slug = ?", [$slug]);
-            if ($tag) {
-                $tagIds[] = (int)$tag['id'];
+            Database::execute("INSERT IGNORE INTO categories (name, slug, applicable_to, created_at) VALUES (?, ?, 'all', NOW())", [$name, $slug]);
+            $cat = Database::fetch("SELECT id FROM categories WHERE slug = ?", [$slug]);
+            if ($cat) {
+                $tagIds[] = (int)$cat['id'];
             }
         }
 
         // Clean & Re-associate
-        Database::execute("DELETE FROM content_tags WHERE content_id = ?", [$contentId]);
+        Database::execute("DELETE FROM content_categories WHERE content_id = ? AND is_primary = 0", [$contentId]);
         foreach (array_unique($tagIds) as $tId) {
-            Database::execute("INSERT IGNORE INTO content_tags (content_id, tag_id) VALUES (?, ?)", [$contentId, $tId]);
+            Database::execute("INSERT IGNORE INTO content_categories (content_id, category_id, is_primary) VALUES (?, ?, 0)", [$contentId, $tId]);
         }
     }
 
     public static function getTagsForContent(int $contentId): array {
         if ($contentId <= 0) return [];
-        return Database::query("SELECT t.id, t.name, t.slug 
-                                FROM tags t 
-                                JOIN content_tags ct ON t.id = ct.tag_id 
-                                WHERE ct.content_id = ? 
-                                ORDER BY t.name ASC", [$contentId]);
+        return Database::query("SELECT c.id, c.name, c.slug 
+                                FROM categories c 
+                                JOIN content_categories cc ON c.id = cc.category_id 
+                                WHERE cc.content_id = ? AND cc.is_primary = 0
+                                ORDER BY c.name ASC", [$contentId]);
     }
 
     public static function getTagsString(int $contentId): string {

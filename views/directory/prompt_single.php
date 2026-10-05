@@ -1088,6 +1088,25 @@ async function quickFollowCategory(catId, btn) {
         if (typeof showToast === 'function') showToast('Failed to update subscription.', 'error');
     }
 }
+
+function switchMainGalleryImg(idx, url, caption) {
+    const mainImg = document.getElementById('mainHeroVisual');
+    const mainCaption = document.getElementById('mainHeroCaption');
+    if (mainImg) {
+        mainImg.style.opacity = '0';
+        setTimeout(() => {
+            mainImg.src = url;
+            mainImg.style.opacity = '1';
+        }, 150);
+    }
+    if (mainCaption) mainCaption.textContent = caption;
+    
+    document.querySelectorAll('.gallery-thumb-item').forEach(el => {
+        el.style.borderColor = 'var(--ts-border-subtle)';
+    });
+    const activeThumb = document.querySelector(`.gallery-thumb-item[data-idx="${idx}"]`);
+    if (activeThumb) activeThumb.style.borderColor = 'var(--ts-primary)';
+}
 </script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
