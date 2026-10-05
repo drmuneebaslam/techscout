@@ -395,8 +395,29 @@ class AuthorStudioController {
             $contentId = (int)Database::lastInsertId();
         }
 
-        // Synchronize Arbitrary Content Tags
-        \App\Core\TagHelper::syncTags($contentId, $request->post('tags', ''));
+        // Synchronize Secondary Categories (Act as Tags)
+        $secondaryCategories = $request->post('secondary_categories', []);
+        if (!is_array($secondaryCategories)) {
+            $secondaryCategories = [];
+        }
+
+        try {
+            Database::execute("CREATE TABLE IF NOT EXISTS content_secondary_categories (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                content_id BIGINT UNSIGNED NOT NULL,
+                category_id INT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY content_category (content_id, category_id)
+            )");
+        } catch (\Throwable $e) {}
+
+        Database::execute("DELETE FROM content_secondary_categories WHERE content_id = ?", [$contentId]);
+        foreach ($secondaryCategories as $secCatId) {
+            $secCatId = (int)$secCatId;
+            if ($secCatId > 0 && $secCatId !== $categoryId) {
+                Database::execute("INSERT IGNORE INTO content_secondary_categories (content_id, category_id) VALUES (?, ?)", [$contentId, $secCatId]);
+            }
+        }
 
         // Entity Extension Records
         if ($type === 'article') {

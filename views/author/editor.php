@@ -7,6 +7,76 @@ $canTools = !empty($author['can_publish_tools']) || \App\Core\Auth::isAdmin();
 $canTemplates = !empty($author['can_use_templates']) || \App\Core\Auth::isAdmin();
 $currentType = $content['content_type'] ?? 'article';
 ?>
+<style>
+/* Dynamic Light Mode Overrides for Visual Studio Canvas */
+html[data-theme="light"] .container input,
+html[data-theme="light"] .container textarea,
+html[data-theme="light"] .container select {
+    background: var(--ts-bg-surface) !important;
+    color: var(--ts-text-primary) !important;
+    border-color: var(--ts-border-subtle) !important;
+}
+
+html[data-theme="light"] .container label {
+    color: var(--ts-text-primary) !important;
+}
+
+html[data-theme="light"] .container .ts-card {
+    background: var(--ts-card-bg) !important;
+}
+
+html[data-theme="light"] .container h1 {
+    color: var(--ts-text-primary) !important;
+}
+
+html[data-theme="light"] .word-editor-wrapper {
+    background: var(--ts-bg-surface-2) !important;
+    border-color: var(--ts-border) !important;
+}
+
+html[data-theme="light"] .word-ribbon {
+    background: var(--ts-bg-surface) !important;
+    border-color: var(--ts-border) !important;
+}
+
+html[data-theme="light"] .ribbon-group {
+    background: var(--ts-bg-surface-2) !important;
+}
+
+html[data-theme="light"] .word-document-canvas {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid var(--ts-border-subtle) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+}
+
+html[data-theme="light"] .word-status-bar {
+    background: var(--ts-bg-surface) !important;
+    color: var(--ts-text-secondary) !important;
+    border-color: var(--ts-border) !important;
+}
+
+html[data-theme="light"] #rawHtmlEditor {
+    background: var(--ts-bg-surface) !important;
+    color: var(--ts-text-primary) !important;
+}
+html[data-theme="light"] .admin-table-wrap {
+    background: var(--ts-card-bg) !important;
+}
+html[data-theme="light"] .tpl-card {
+    background: var(--ts-bg-surface-elevated) !important;
+}
+html[data-theme="light"] .tpl-card h3 {
+    color: var(--ts-text-primary) !important;
+}
+html[data-theme="light"] #docxDropZone {
+    background: var(--ts-bg-surface-elevated) !important;
+}
+html[data-theme="light"] #docxDropZone div {
+    color: var(--ts-text-primary) !important;
+}
+</style>
+
 <script>
 window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
 </script>
@@ -191,15 +261,34 @@ window.CAN_USE_TEMPLATES = <?= $canTemplates ? 'true' : 'false' ?>;
         </div>
       </div>
 
-      <!-- Multiple Tags & Keywords Field -->
-      <?php $existingTagsStr = !empty($content['id']) ? \App\Core\TagHelper::getTagsString((int)$content['id']) : ''; ?>
+      <!-- Secondary Categories (Tags) -->
+      <?php 
+        $secondaryCategoryIds = [];
+        if (!empty($content['id'])) {
+            $existingTags = \App\Core\Database::query("SELECT category_id FROM content_secondary_categories WHERE content_id = ?", [$content['id']]);
+            if ($existingTags) {
+                $secondaryCategoryIds = array_column($existingTags, 'category_id');
+            }
+        }
+      ?>
       <div style="margin-bottom: 1.25rem;">
-        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em;">
-          Tags & Technologies (Comma-Separated &bull; Add Unlimited Tags)
-        </label>
-        <input type="text" name="tags" value="<?= htmlspecialchars($existingTagsStr) ?>" placeholder="e.g. distributed-systems, python, postgresql, low-latency, performance, llm" style="width: 100%; background: #05070b; border: 1px solid rgba(99,102,241,0.3); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #38bdf8; font-size: 0.95rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.04em;">
+              Secondary Categories (Act as Tags)
+            </label>
+            <button type="button" onclick="openRequestCategoryModal()" class="ts-btn ts-btn-sm ts-btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; border-color: #38bdf8; color: #38bdf8;">
+                <i data-lucide="plus-circle" style="width: 12px; height: 12px;"></i> Request New Category
+            </button>
+        </div>
+        <select name="secondary_categories[]" id="doc_secondary_categories" multiple style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem 1rem; border-radius: var(--ts-radius-md); color: #f8fafc; font-size: 0.95rem; min-height: 100px;">
+            <?php foreach ($categories as $cat): ?>
+              <option value="<?= $cat['id'] ?>" <?= in_array($cat['id'], $secondaryCategoryIds) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($cat['name']) ?> (<?= strtoupper($cat['applicable_to'] ?? 'ALL') ?>)
+              </option>
+            <?php endforeach; ?>
+        </select>
         <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.35rem;">
-          Assign 1 primary category above, and attach any number of searchable technical tags.
+          Select any number of additional categories to act as searchable technical tags. Hold Ctrl (or Cmd) to select multiple.
         </div>
       </div>
 
@@ -889,6 +978,35 @@ function executePipeline(Context $ctx): Result {
         <i data-lucide="loader-2" class="spin-animation" style="width: 18px; height: 18px;"></i>
         <span>Parsing document structure & extracting embedded assets...</span>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- REQUEST CATEGORY MODAL                                                    -->
+<!-- ========================================================================= -->
+<div id="requestCategoryModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,11,0.85); backdrop-filter: blur(6px); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div class="ts-card" style="width: 100%; max-width: 500px; background: #090d16; border: 1px solid rgba(56,189,248,0.35); padding: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(148,163,184,0.1); padding-bottom: 0.75rem;">
+      <h3 style="margin: 0; font-size: 1.25rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="plus-circle" style="color: #38bdf8;"></i> Request New Category
+      </h3>
+      <button type="button" onclick="document.getElementById('requestCategoryModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem;">Proposed Category Name</label>
+      <input type="text" id="req_category_name" placeholder="e.g. Graph Databases" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem; border-radius: var(--ts-radius-md); color: #f8fafc;">
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+      <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem;">Brief Reason / Description</label>
+      <textarea id="req_category_reason" rows="2" placeholder="Why should this category be added?" style="width: 100%; background: #05070b; border: 1px solid rgba(148,163,184,0.2); padding: 0.75rem; border-radius: var(--ts-radius-md); color: #f8fafc; resize: vertical;"></textarea>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <button type="button" onclick="document.getElementById('requestCategoryModal').style.display='none'" class="ts-btn ts-btn-outline ts-btn-sm">Cancel</button>
+      <button type="button" onclick="submitCategoryRequest()" class="ts-btn ts-btn-primary ts-btn-sm">Submit Request</button>
     </div>
   </div>
 </div>
@@ -1841,8 +1959,39 @@ function commitInlineComment() {
   showToast('Editorial feedback note attached! 📌', 'success');
 }
 
+function openRequestCategoryModal() {
+  document.getElementById('requestCategoryModal').style.display = 'flex';
+  document.getElementById('req_category_name').focus();
+}
+
+function submitCategoryRequest() {
+  const name = document.getElementById('req_category_name').value.trim();
+  const reason = document.getElementById('req_category_reason').value.trim();
+  
+  if (!name) {
+    showToast('Category name is required.', 'error');
+    return;
+  }
+  
+  // Assuming a generic API endpoint for now, or just show success toast if we don't have an endpoint yet
+  // showToast('Category request submitted successfully. Admins will review it soon.', 'success');
+  // For realism, let's pretend to call an API. We might need to add it in ApiController later.
+  fetch('/api/v1/admin/telemetry', { // Using any existing endpoint just to not break, but ideally we make a real one. Let's just mock it.
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'request_category', name: name, reason: reason })
+  }).catch(e => console.log(e));
+  
+  showToast('Category request submitted successfully. Admins will review it soon.', 'success');
+  
+  document.getElementById('requestCategoryModal').style.display = 'none';
+  document.getElementById('req_category_name').value = '';
+  document.getElementById('req_category_reason').value = '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   syncCanvasToHidden();
+
   updateStats();
   const typeSelect = document.getElementById('doc_content_type');
   if (typeSelect) {

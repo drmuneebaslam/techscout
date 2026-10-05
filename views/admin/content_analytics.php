@@ -68,57 +68,57 @@ $viewsDiff = (int)($analytics['views_diff_pct'] ?? 0);
   <!-- YouTube Studio / TikTok Style 4-Metric Primary Overview Deck -->
   <div class="admin-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem;">
     <!-- Metric 1: Views -->
-    <div class="admin-stat-card" style="border-top: 3px solid #38bdf8;">
+    <div class="admin-stat-card" style="border-top: 3px solid var(--admin-cyan);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
         <span class="admin-stat-label">👁️ Total Views</span>
         <span class="ts-badge ts-badge-cyan" style="font-size: 0.65rem;"><?= $analytics['unique_visitors'] ?> unique</span>
       </div>
-      <div class="admin-stat-value" style="color: #38bdf8; font-family: var(--admin-font-mono);">
+      <div class="admin-stat-value" style="color: var(--admin-cyan); font-family: var(--admin-font-mono);">
         <?= number_format($analytics['total_views']) ?>
       </div>
-      <div style="font-size: 0.72rem; color: <?= $viewsDiff >= 0 ? '#34d399' : '#f87171' ?>; margin-top: 0.25rem; font-weight: 600;">
+      <div style="font-size: 0.72rem; color: <?= $viewsDiff >= 0 ? 'var(--admin-emerald)' : 'var(--admin-rose)' ?>; margin-top: 0.25rem; font-weight: 600;">
         <?= $viewsDiff >= 0 ? "↑ {$viewsDiff}% vs category average" : "↓ " . abs($viewsDiff) . "% vs category average" ?>
       </div>
     </div>
 
     <!-- Metric 2: Watch Time -->
-    <div class="admin-stat-card" style="border-top: 3px solid #10b981;">
+    <div class="admin-stat-card" style="border-top: 3px solid var(--admin-emerald);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
         <span class="admin-stat-label">⏱️ Total Read Time</span>
         <span class="ts-badge ts-badge-green" style="font-size: 0.65rem;">Cumulative</span>
       </div>
-      <div class="admin-stat-value" style="color: #10b981; font-family: var(--admin-font-mono);">
-        <?= $totalWatchHours ?> <span style="font-size: 1rem; color: #94a3b8; font-weight: 600;">hrs</span>
+      <div class="admin-stat-value" style="color: var(--admin-emerald); font-family: var(--admin-font-mono);">
+        <?= $totalWatchHours ?> <span style="font-size: 1rem; color: var(--admin-text-secondary); font-weight: 600;">hrs</span>
       </div>
-      <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.25rem;">
+      <div style="font-size: 0.72rem; color: var(--admin-text-secondary); margin-top: 0.25rem;">
         Community attention invested
       </div>
     </div>
 
     <!-- Metric 3: Avg View Duration -->
-    <div class="admin-stat-card" style="border-top: 3px solid #a855f7;">
+    <div class="admin-stat-card" style="border-top: 3px solid var(--admin-primary);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
         <span class="admin-stat-label">📈 Avg View Duration</span>
         <span class="ts-badge ts-badge-purple" style="font-size: 0.65rem;"><?= $analytics['avg_scroll'] ?>% scroll</span>
       </div>
-      <div class="admin-stat-value" style="color: #c084fc; font-family: var(--admin-font-mono);">
+      <div class="admin-stat-value" style="color: var(--admin-primary); font-family: var(--admin-font-mono);">
         <?= $avgMin ?>m <?= $avgSec ?>s
       </div>
-      <div style="font-size: 0.72rem; color: #34d399; margin-top: 0.25rem; font-weight: 600;">
+      <div style="font-size: 0.72rem; color: var(--admin-emerald); margin-top: 0.25rem; font-weight: 600;">
         <?= $analytics['completion_rate'] ?>% reader completion rate
       </div>
     </div>
 
     <!-- Metric 4: Engagement Rate -->
-    <div class="admin-stat-card" style="border-top: 3px solid #ec4899;">
+    <div class="admin-stat-card" style="border-top: 3px solid var(--admin-pink);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
         <span class="admin-stat-label">⚡ Engagement Rate</span>
         <span class="ts-badge ts-badge-pink" style="font-size: 0.65rem;"><?= $analytics['total_bookmarks'] ?> saves</span>
       </div>
-      <div class="admin-stat-value" style="color: #f472b6; font-family: var(--admin-font-mono);">
+      <div class="admin-stat-value" style="color: var(--admin-pink); font-family: var(--admin-font-mono);">
         <?= $analytics['engagement_rate'] ?>%
       </div>
-      <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.25rem;">
+      <div style="font-size: 0.72rem; color: var(--admin-text-secondary); margin-top: 0.25rem;">
         <?= $analytics['total_reactions'] ?> reactions &bull; <?= $analytics['total_comments'] ?> discussions
       </div>
     </div>

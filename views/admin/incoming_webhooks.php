@@ -31,6 +31,17 @@
   </div>
 </div>
 
+  <!-- Page Tabs -->
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--admin-border-main); padding-bottom: 0.5rem; flex-wrap: wrap;">
+    <button type="button" onclick="switchPageTab('endpoints')" id="page_tab_endpoints" class="admin-btn admin-btn-primary admin-btn-sm" style="font-weight: 700;">
+      🌐 Webhook Endpoints
+    </button>
+    <button type="button" onclick="switchPageTab('logs')" id="page_tab_logs" class="admin-btn admin-btn-outline admin-btn-sm" style="font-weight: 700;">
+      📋 Global Activity Logs
+    </button>
+  </div>
+
+<div id="page_pane_endpoints">
   <!-- Endpoints Overview Table -->
   <div class="admin-table-wrap" style="margin-bottom: 2rem;">
     <table class="admin-table">
@@ -128,16 +139,21 @@
       </tbody>
     </table>
   </div>
+</div>
 
+<div id="page_pane_logs" style="display: none;">
   <!-- Recent Ingestion Activity Log Table -->
   <div class="admin-table-wrap" style="padding: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
       <h3 style="font-size: 1.15rem; color: var(--admin-text-primary); margin: 0; font-weight: 800;">Recent Ingestion Activity Logs</h3>
-      <form action="<?= url('/admin/incoming-webhooks/clear-logs') ?>" method="POST" onsubmit="return confirm('Clear all incoming webhook execution logs?');" style="margin: 0;">
-        <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; font-size: 0.75rem;">
-          <i data-lucide="trash"></i> Clear Logs
-        </button>
-      </form>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <input type="text" id="logFilterInput" onkeyup="filterActivityLogs()" placeholder="Search logs..." class="admin-input" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; width: 250px;">
+        <form action="<?= url('/admin/incoming-webhooks/clear-logs') ?>" method="POST" onsubmit="return confirm('Clear all incoming webhook execution logs?');" style="margin: 0;">
+          <button type="submit" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; font-size: 0.75rem;">
+            <i data-lucide="trash"></i> Clear Logs
+          </button>
+        </form>
+      </div>
     </div>
 
     <table class="admin-table">
@@ -203,6 +219,7 @@
       </tbody>
     </table>
   </div>
+</div>
 
 <!-- ========================================================================= -->
 <!-- MODAL 1: FLOATING LIVE LISTENER & DYNAMIC FIELD MAPPER STUDIO MODAL       -->
@@ -871,7 +888,8 @@ function addMappingRow(jsonKey = '', targetCol = '') {
   const tableMeta = PERMITTED_TABLES[table] || { columns: [] };
 
   const row = document.createElement('div');
-  row.style.cssText = 'display: flex; gap: 0.5rem; align-items: center; background: var(--admin-card-bg-elevated); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--admin-border-main);';
+  row.className = 'mapping-row-wrap';
+  row.style.cssText = 'display: flex; flex-direction: column; gap: 0.3rem; background: var(--admin-card-bg-elevated); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--admin-border-main);';
 
   let colOptions = '';
   tableMeta.columns.forEach(c => {
@@ -880,16 +898,47 @@ function addMappingRow(jsonKey = '', targetCol = '') {
   });
 
   row.innerHTML = `
-    <input type="text" list="jsonKeysList" class="admin-input map-json-key" placeholder="JSON Key (e.g. data.title)" value="${escapeHtml(jsonKey)}" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
-    <span style="color: var(--admin-text-secondary);">&rarr;</span>
-    <select class="admin-input map-target-col" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
-      ${colOptions}
-    </select>
-    <button type="button" onclick="this.parentElement.remove()" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; padding: 0.2rem 0.4rem;" title="Remove Row">&times;</button>
+    <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%;">
+      <input type="text" list="jsonKeysList" class="admin-input map-json-key" placeholder="JSON Key (e.g. data.title)" value="${escapeHtml(jsonKey)}" oninput="updateFieldPreviews()" onchange="updateFieldPreviews()" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
+      <span style="color: var(--admin-text-secondary);">&rarr;</span>
+      <select class="admin-input map-target-col" style="flex: 1; font-family: var(--admin-font-mono); font-size: 0.78rem;">
+        ${colOptions}
+      </select>
+      <button type="button" onclick="this.closest('.mapping-row-wrap').remove(); updateFieldPreviews();" class="admin-btn admin-btn-outline admin-btn-sm" style="color: #ef4444; padding: 0.2rem 0.4rem;" title="Remove Row">&times;</button>
+    </div>
+    <div style="font-size: 0.72rem; color: var(--admin-text-secondary); padding-left: 0.2rem;">
+      Preview: <span class="map-preview-val" style="font-family: var(--admin-font-mono); color: #94a3b8;">N/A</span>
+    </div>
   `;
 
   container.appendChild(row);
+  if (typeof updateFieldPreviews === 'function') updateFieldPreviews();
 }
+
+window.updateFieldPreviews = function() {
+    const simEl = document.getElementById('simPayloadInput');
+    if (!simEl) return;
+    let payload = {};
+    try { payload = JSON.parse(simEl.value); } catch(e) {}
+    const flat = flattenJSON(payload);
+    
+    document.querySelectorAll('#mappingRowsContainer > .mapping-row-wrap').forEach(row => {
+        const key = row.querySelector('.map-json-key').value.trim();
+        const previewEl = row.querySelector('.map-preview-val');
+        if (!key) {
+             previewEl.textContent = 'Enter key...';
+             previewEl.style.color = 'var(--admin-text-secondary)';
+        } else if (flat[key] !== undefined) {
+             let val = String(flat[key]);
+             if (val.length > 50) val = val.substring(0, 50) + '...';
+             previewEl.textContent = val;
+             previewEl.style.color = '#34d399';
+        } else {
+             previewEl.textContent = 'Not found in sample payload';
+             previewEl.style.color = '#f87171';
+        }
+    });
+};
 
 async function saveFieldMappings(e) {
   e.preventDefault();
@@ -997,7 +1046,8 @@ async function pollLatestLogs() {
           <div style="color: #38bdf8; font-size: 0.72rem; margin-bottom: 0.4rem; font-weight: 700;">[${log.created_at}] Status: ${log.status.toUpperCase()} &bull; Code: ${log.response_code} &bull; Affected: ${log.records_affected}</div>
           <div style="background: rgba(15,23,42,0.5); padding: 0.5rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">${fieldsHtml}</div>
         `;
-        viewer.prepend(entry);
+        viewer.innerHTML = ''; // Only show latest to prevent clutter
+        viewer.appendChild(entry);
       });
       document.getElementById('streamCounter').textContent = data.logs.length + ' payloads synced';
     }
@@ -1037,6 +1087,7 @@ function handleSimulatorChange() {
   } catch(e) {
     document.getElementById('dynamicCurlPreviewBox').style.display = 'none';
   }
+  if (typeof updateFieldPreviews === 'function') updateFieldPreviews();
 }
 
 async function sendTestSimulation() {
@@ -1099,6 +1150,30 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+function filterActivityLogs() {
+  const filterVal = document.getElementById('logFilterInput').value.toLowerCase();
+  const rows = document.querySelectorAll('#page_pane_logs table tbody tr');
+  rows.forEach(row => {
+    if (row.cells.length < 2) return; // Skip empty row
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(filterVal) ? '' : 'none';
+  });
+}
+
+function switchPageTab(tab) {
+  const panes = ['endpoints', 'logs'];
+  panes.forEach(p => {
+    const btn = document.getElementById('page_tab_' + p);
+    const pane = document.getElementById('page_pane_' + p);
+    if (p === tab) {
+      btn.className = 'admin-btn admin-btn-primary admin-btn-sm';
+      pane.style.display = 'block';
+    } else {
+      btn.className = 'admin-btn admin-btn-outline admin-btn-sm';
+      pane.style.display = 'none';
+    }
+  });
 }
 </script>
 
