@@ -49,8 +49,9 @@ class SecurityAnomalyEngine {
         );
 
         $failCount = (int)($recent['cnt'] ?? 0);
+        $maxRetries = (int)\App\Core\Config::get('auth_max_login_retries', self::MAX_FAILED_ATTEMPTS);
 
-        if ($failCount >= self::MAX_FAILED_ATTEMPTS) {
+        if ($failCount >= $maxRetries) {
             $lockedUntil = date('Y-m-d H:i:s', strtotime('+' . self::LOCKOUT_DURATION_MINUTES . ' minutes'));
             $reason = "Triggered automatic 15-minute brute-force lockout ({$failCount} consecutive failed attempts)";
 
@@ -83,7 +84,7 @@ class SecurityAnomalyEngine {
         return [
             'locked' => false,
             'failures' => $failCount,
-            'attempts_left' => max(0, self::MAX_FAILED_ATTEMPTS - $failCount)
+            'attempts_left' => max(0, $maxRetries - $failCount)
         ];
     }
 

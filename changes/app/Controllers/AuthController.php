@@ -86,6 +86,14 @@ class AuthController {
         if (Auth::check()) {
             Response::redirect('/');
         }
+        
+        $regEnabled = \App\Core\Config::get('enable_user_registration', '1');
+        if ($regEnabled === '0') {
+            Session::flash('error', 'Public user registration is currently disabled by the administrator.');
+            Response::redirect('/auth/login');
+            return;
+        }
+
         Response::view('auth/register', ['title' => 'Create a TechScout Account']);
     }
 
@@ -96,6 +104,13 @@ class AuthController {
         $password = (string)$request->post('password', '');
         $devRole = Sanitizer::clean((string)$request->post('developer_role', 'Full-Stack Developer'));
         $termsAgreed = (bool)$request->post('terms_agreed');
+
+        $regEnabled = \App\Core\Config::get('enable_user_registration', '1');
+        if ($regEnabled === '0') {
+            Session::flash('error', 'Public user registration is currently disabled by the administrator.');
+            Response::redirect('/auth/login');
+            return;
+        }
 
         if (empty($termsAgreed)) {
             Session::flash('error', 'You must agree to the Terms of Service & Privacy Policy to register.');
@@ -122,8 +137,9 @@ class AuthController {
             return;
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 6) {
-            Session::flash('error', 'Please provide a valid email and a password of at least 6 characters.');
+        $minPassLen = (int)\App\Core\Config::get('auth_min_password_len', '6');
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < $minPassLen) {
+            Session::flash('error', 'Please provide a valid email and a password of at least ' . $minPassLen . ' characters.');
             Response::redirect('/auth/register');
             return;
         }

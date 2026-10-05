@@ -7,21 +7,8 @@ FTP_PASS = "Fp9QFWfj5fm"
 TARGET_DIR = "/htdocs/"
 
 files_to_upload = [
-    "app/Controllers/AdminController.php",
-    "app/Controllers/ApiController.php",
     "app/Controllers/AuthController.php",
-    "app/Controllers/BlogController.php",
-    "app/Controllers/CategoryController.php",
-    "app/Core/IncomingWebhookEngine.php",
-    "app/Models/Content.php",
-    "database/schema.sql",
-    "index.php",
-    "views/admin/incoming_webhooks.php",
-    "views/auth/login.php",
-    "views/author/editor.php",
-    "views/public/categories.php",
-    "views/public/category_single.php",
-    "database/migrations/003_drop_tags.sql"
+    "app/Models/SecurityAnomalyEngine.php",
 ]
 
 def upload_files():
