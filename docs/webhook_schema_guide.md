@@ -94,35 +94,62 @@ Every post, article, tool, or prompt requires this base structure.
 
 ---
 
-### B. Ingesting an "AI Prompt" (Image/Text Prompts)
-*Requires: `contents` + `prompts`*
+### B. Ingesting an "AI Image Prompt" (Complete Master Example)
+*Requires: `contents`, `prompts`, and `tags`*
 
-**`prompts` Fields:**
+To create a highly detailed Image Prompt with a featured image, primary category, and secondary categories, you map the fields across the three tables:
+
+1. **`contents`**: Handles the universal metadata (Title, Primary Category, Featured Image URL).
+2. **`prompts`**: Handles all the granular image generation parameters (Aspect Ratio, CFG Scale, Negative Prompts).
+3. **`tags`**: Acts as your **Secondary Categories** (or granular descriptor tags) to make the prompt highly discoverable.
+
+**`prompts` Key Fields Supported:**
+* `prompt_type` (enum: `text` or `image`)
 * `prompt_template` (string, required): The actual prompt text
-* `ai_model_name` (string): e.g., "Midjourney v6", "GPT-4"
-* `version` (string, default: "1.0")
-* `use_case` (string)
-* `tokens_estimated` (integer)
-* `is_tested` (boolean: 0 or 1)
+* `negative_prompt` (string)
+* `target_models` (JSON array string, e.g. `["Midjourney", "DALL-E 3"]`)
+* `aspect_ratio` (string, e.g. `16:9`)
+* `cfg_scale` (decimal)
+* `steps` (integer)
+* `sampler` (string)
+* `style_preset` (string)
+* `difficulty_level` (enum: `beginner`, `intermediate`, `advanced`)
+* `how_to_use` (string)
+* `sample_output` (string)
 
-**Example Payload:**
+**Comprehensive Image Prompt Payload Example:**
 ```json
 {
   "tables": {
     "contents": {
-      "title": "Cinematic Cyberpunk Cityscape",
+      "title": "Cinematic Cyberpunk Cityscape in the Rain",
       "content_type": "prompt",
-      "category_name": "Image Generation"
+      "category_name": "Image Generation", 
+      "featured_image_url": "https://example.com/cyberpunk-city-preview.jpg",
+      "summary": "A highly detailed neon-lit street level view of a futuristic city."
     },
     "prompts": {
-      "prompt_template": "A neon-lit cyberpunk city in the rain, 8k, photorealistic --v 6.0",
-      "ai_model_name": "Midjourney",
-      "use_case": "Concept Art",
-      "is_tested": 1
-    }
+      "prompt_type": "image",
+      "prompt_template": "A neon-lit cyberpunk city street level in the rain, 8k resolution, cinematic lighting, photorealistic, reflections on wet pavement --v 6.0",
+      "negative_prompt": "blurry, low resolution, cartoon, 3d render, watermark",
+      "target_models": "[\"Midjourney v6\"]",
+      "aspect_ratio": "16:9",
+      "cfg_scale": 7.0,
+      "steps": 40,
+      "sampler": "Euler a",
+      "style_preset": "Cinematic",
+      "difficulty_level": "intermediate",
+      "how_to_use": "Copy the prompt and paste it directly into Midjourney. Adjust the --ar flag if you want a vertical image."
+    },
+    "tags": [
+      { "name": "Cyberpunk" },
+      { "name": "Sci-Fi" },
+      { "name": "Neon Lighting" }
+    ]
   }
 }
 ```
+*Note: In the example above, `category_name: "Image Generation"` acts as the Primary Category, while the `tags` array (`Cyberpunk`, `Sci-Fi`) acts as your Secondary Categories.*
 
 ---
 
