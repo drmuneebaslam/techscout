@@ -349,15 +349,40 @@ class IncomingWebhookEngine {
                     }
 
                     $tblCols = $pdo->query("SHOW COLUMNS FROM `{$tbl}`")->fetchAll(\PDO::FETCH_COLUMN);
-                    if ($sharedContentId && in_array('content_id', $tblCols, true) && !isset($tblData['content_id'])) {
-                        $tblData['content_id'] = $sharedContentId;
+                    
+                    // Map common foreign key column names
+                    $fkCols = ['content_id', 'prompt_id', 'article_id', 'tool_id', 'job_id', 'listing_id', 'post_id'];
+                    $fkColMatched = null;
+                    foreach ($fkCols as $fk) {
+                        if (in_array($fk, $tblCols, true)) {
+                            $fkColMatched = $fk;
+                            break;
+                        }
                     }
 
-                    $upsertRes = self::upsertTableRow($pdo, $tbl, $tblData, $tableDefinitions[$tbl]['unique_key'] ?? null);
-                    if ($upsertRes['success']) {
-                        $totalAffected += $upsertRes['affected'];
-                        $tablesModified[$tbl] = ($tablesModified[$tbl] ?? 0) + 1;
-                        $processedResults[] = ['table' => $tbl, 'record_id' => $upsertRes['record_id'], 'status' => $upsertRes['status'] ?? 'upserted'];
+                    // Process array of rows or single row
+                    if (isset($tblData[0]) && is_array($tblData[0])) {
+                        foreach ($tblData as $row) {
+                            if ($sharedContentId && $fkColMatched && !isset($row[$fkColMatched])) {
+                                $row[$fkColMatched] = $sharedContentId;
+                            }
+                            $upsertRes = self::upsertTableRow($pdo, $tbl, $row, $tableDefinitions[$tbl]['unique_key'] ?? null);
+                            if ($upsertRes['success']) {
+                                $totalAffected += $upsertRes['affected'];
+                                $tablesModified[$tbl] = ($tablesModified[$tbl] ?? 0) + 1;
+                                $processedResults[] = ['table' => $tbl, 'record_id' => $upsertRes['record_id'], 'status' => $upsertRes['status'] ?? 'upserted'];
+                            }
+                        }
+                    } else {
+                        if ($sharedContentId && $fkColMatched && !isset($tblData[$fkColMatched])) {
+                            $tblData[$fkColMatched] = $sharedContentId;
+                        }
+                        $upsertRes = self::upsertTableRow($pdo, $tbl, $tblData, $tableDefinitions[$tbl]['unique_key'] ?? null);
+                        if ($upsertRes['success']) {
+                            $totalAffected += $upsertRes['affected'];
+                            $tablesModified[$tbl] = ($tablesModified[$tbl] ?? 0) + 1;
+                            $processedResults[] = ['table' => $tbl, 'record_id' => $upsertRes['record_id'], 'status' => $upsertRes['status'] ?? 'upserted'];
+                        }
                     }
                 }
 
@@ -763,7 +788,13 @@ class IncomingWebhookEngine {
         if ($contentId <= 0 || empty($tags)) return;
 
         foreach ($tags as $rawTag) {
-            $tag = trim((string)$rawTag);
+            $tag = '';
+            if (is_array($rawTag)) {
+                $tag = trim((string)($rawTag['name'] ?? ($rawTag['tag'] ?? '')));
+            } else {
+                $tag = trim((string)$rawTag);
+            }
+            
             if ($tag === '') continue;
 
             $slug = self::slugify($tag);
