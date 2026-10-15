@@ -728,6 +728,21 @@ CREATE TABLE `content_categories` (
 ) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
+-- Table structure for: `content_secondary_categories`
+--
+DROP TABLE IF EXISTS `content_secondary_categories`;
+CREATE TABLE `content_secondary_categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `content_id` bigint unsigned NOT NULL,
+  `category_id` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_category` (`content_id`,`category_id`),
+  KEY `idx_csc_category` (`category_id`),
+  KEY `idx_csc_content` (`content_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
 -- Table structure for: `content_filters`
 --
 DROP TABLE IF EXISTS `content_filters`;
@@ -1494,7 +1509,7 @@ CREATE TABLE `newsletter_subscriptions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` enum('pending','subscribed','unsubscribed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'subscribed',
-  `subscriber_type` enum('all','weekly_digest','ai_tools_only','developer_only') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'all',
+  `subscriber_type` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'all',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
@@ -2082,6 +2097,49 @@ CREATE TABLE `webhooks` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `webhooks_chk_1` CHECK (json_valid(`events_json`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Table structure for: `visitor_logs`
+--
+DROP TABLE IF EXISTS `visitor_logs`;
+CREATE TABLE `visitor_logs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `session_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `visitor_hash` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `country_code` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `region` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `username` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `request_method` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GET',
+  `request_uri` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `route_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `http_referer` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `referrer_domain` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `browser` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `browser_version` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `os` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `device_type` enum('desktop','mobile','tablet','bot') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'desktop',
+  `is_bot` tinyint(1) NOT NULL DEFAULT '0',
+  `bot_name` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `http_status` smallint NOT NULL DEFAULT '200',
+  `response_time_ms` decimal(8,2) DEFAULT '0.00',
+  `client_language` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `client_timezone` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_vl_created` (`created_at`),
+  KEY `idx_vl_ip` (`ip_address`),
+  KEY `idx_vl_hash` (`visitor_hash`),
+  KEY `idx_vl_user` (`user_id`),
+  KEY `idx_vl_bot` (`is_bot`),
+  KEY `idx_vl_device` (`device_type`),
+  KEY `idx_vl_uri` (`request_uri`(191)),
+  KEY `idx_vl_country` (`country_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

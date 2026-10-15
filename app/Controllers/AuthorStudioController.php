@@ -402,22 +402,25 @@ class AuthorStudioController {
         }
 
         try {
-            Database::execute("CREATE TABLE IF NOT EXISTS content_secondary_categories (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                content_id BIGINT UNSIGNED NOT NULL,
-                category_id INT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE KEY content_category (content_id, category_id)
-            )");
+            Database::execute("DELETE FROM content_secondary_categories WHERE content_id = ?", [$contentId]);
+            foreach ($secondaryCategories as $secCatId) {
+                $secCatId = (int)$secCatId;
+                if ($secCatId > 0 && $secCatId !== $categoryId) {
+                    Database::execute("INSERT IGNORE INTO content_secondary_categories (content_id, category_id) VALUES (?, ?)", [$contentId, $secCatId]);
+                }
+            }
         } catch (\Throwable $e) {}
 
-        Database::execute("DELETE FROM content_secondary_categories WHERE content_id = ?", [$contentId]);
-        foreach ($secondaryCategories as $secCatId) {
-            $secCatId = (int)$secCatId;
-            if ($secCatId > 0 && $secCatId !== $categoryId) {
-                Database::execute("INSERT IGNORE INTO content_secondary_categories (content_id, category_id) VALUES (?, ?)", [$contentId, $secCatId]);
+        // Also sync secondary categories with content_categories (is_primary = 0)
+        try {
+            Database::execute("DELETE FROM content_categories WHERE content_id = ? AND is_primary = 0", [$contentId]);
+            foreach ($secondaryCategories as $secCatId) {
+                $secCatId = (int)$secCatId;
+                if ($secCatId > 0 && $secCatId !== $categoryId) {
+                    Database::execute("INSERT IGNORE INTO content_categories (content_id, category_id, is_primary) VALUES (?, ?, 0)", [$contentId, $secCatId]);
+                }
             }
-        }
+        } catch (\Throwable $e) {}
 
         // Entity Extension Records
         if ($type === 'article') {

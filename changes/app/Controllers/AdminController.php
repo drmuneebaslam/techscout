@@ -5810,6 +5810,34 @@ class AdminController {
             }
         }
 
+        // Handle Maintenance Until UTC Datetime Synchronization
+        if ($activeTab === 'general') {
+            $localTime = trim((string)($allPosts['site_maintenance_until_local'] ?? ''));
+            $utcTime = trim((string)($allPosts['site_maintenance_until_utc'] ?? ''));
+            
+            if (!empty($utcTime)) {
+                try {
+                    $dtUtc = new \DateTime($utcTime, new \DateTimeZone('UTC'));
+                    $allPosts['site_maintenance_until_utc'] = $dtUtc->format('Y-m-d H:i:s');
+                    $diffSec = $dtUtc->getTimestamp() - time();
+                    if ($diffSec > 0) {
+                        $allPosts['site_maintenance_countdown_minutes'] = (string)max(1, (int)round($diffSec / 60));
+                    }
+                } catch (\Throwable $e) {}
+            } elseif (!empty($localTime)) {
+                $adminTz = \App\Core\DateHelper::timezone();
+                try {
+                    $dtLocal = new \DateTime($localTime, new \DateTimeZone($adminTz));
+                    $dtLocal->setTimezone(new \DateTimeZone('UTC'));
+                    $allPosts['site_maintenance_until_utc'] = $dtLocal->format('Y-m-d H:i:s');
+                    $diffSec = $dtLocal->getTimestamp() - time();
+                    if ($diffSec > 0) {
+                        $allPosts['site_maintenance_countdown_minutes'] = (string)max(1, (int)round($diffSec / 60));
+                    }
+                } catch (\Throwable $e) {}
+            }
+        }
+
         foreach ($allPosts as $key => $val) {
             if (is_array($val)) {
                 $val = json_encode($val);
@@ -9546,6 +9574,303 @@ class AdminController {
             Session::flash('error', 'Error updating feedback: ' . $e->getMessage());
         }
         Response::redirect('/admin/author-feedbacks');
+    }
+
+    /**
+     * Comprehensive Visitor Tracking & Real-Time Traffic Analytics Hub [TS-VISIT-01]
+     */
+    public function visitorsHub(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+
+        $search = trim((string)$request->query('search', ''));
+        $deviceFilter = trim((string)$request->query('device', 'all'));
+        $statusFilter = trim((string)$request->query('status', 'all'));
+        $botFilter = trim((string)$request->query('bot', 'all'));
+        $page = max(1, (int)$request->query('page', 1));
+        $perPage = 50;
+        $offset = ($page - 1) * $perPage;
+
+        $where = ["1=1"];
+        $params = [];
+
+        if (!empty($search)) {
+            $where[] = "(ip_address LIKE ? OR request_uri LIKE ? OR username LIKE ? OR country_name LIKE ? OR user_agent LIKE ? OR browser LIKE ? OR os LIKE ?)";
+            $searchTerm = "%{$search}%";
+            $params = array_merge($params, array_fill(0, 7, $searchTerm));
+        }
+
+        if ($deviceFilter !== 'all' && in_array($deviceFilter, ['desktop', 'mobile', 'tablet', 'bot'], true)) {
+            $where[] = "device_type = ?";
+            $params[] = $deviceFilter;
+        }
+
+        if ($statusFilter !== 'all' && is_numeric($statusFilter)) {
+            $where[] = "http_status = ?";
+            $params[] = (int)$statusFilter;
+        }
+
+        if ($botFilter === 'only_bots') {
+            $where[] = "is_bot = 1";
+        } elseif ($botFilter === 'only_humans') {
+            $where[] = "is_bot = 0";
+        }
+
+        $whereClause = implode(" AND ", $where);
+
+        // Fetch paginated logs
+        $logs = [];
+        $totalLogs = 0;
+        try {
+            $totalRow = Database::fetch("SELECT COUNT(*) as cnt FROM visitor_logs WHERE {$whereClause}", $params);
+            $totalLogs = (int)($totalRow['cnt'] ?? 0);
+
+            $logs = Database::query("
+                SELECT * FROM visitor_logs 
+                WHERE {$whereClause} 
+                ORDER BY id DESC 
+                LIMIT {$perPage} OFFSET {$offset}
+            ", $params);
+        } catch (\Throwable $e) {}
+
+        $totalPages = max(1, (int)ceil($totalLogs / $perPage));
+
+        // High-level Intelligence Metrics (UTC aggregated)
+        $metrics = [
+            'total_visits' => 0,
+            'today_visits' => 0,
+            'unique_visitors' => 0,
+            'unique_ips' => 0,
+            'bot_count' => 0,
+            'human_count' => 0,
+            'avg_latency' => 0.0,
+            'desktop_count' => 0,
+            'mobile_count' => 0,
+            'tablet_count' => 0,
+        ];
+
+        try {
+            $kpi = Database::fetch("
+                SELECT 
+                    COUNT(*) as total_visits,
+                    COUNT(DISTINCT visitor_hash) as unique_visitors,
+                    COUNT(DISTINCT ip_address) as unique_ips,
+                    SUM(CASE WHEN is_bot = 1 THEN 1 ELSE 0 END) as bot_count,
+                    SUM(CASE WHEN is_bot = 0 THEN 1 ELSE 0 END) as human_count,
+                    AVG(response_time_ms) as avg_latency,
+                    SUM(CASE WHEN created_at >= UTC_DATE() THEN 1 ELSE 0 END) as today_visits,
+                    SUM(CASE WHEN device_type = 'desktop' THEN 1 ELSE 0 END) as desktop_count,
+                    SUM(CASE WHEN device_type = 'mobile' THEN 1 ELSE 0 END) as mobile_count,
+                    SUM(CASE WHEN device_type = 'tablet' THEN 1 ELSE 0 END) as tablet_count
+                FROM visitor_logs
+            ");
+            if ($kpi) {
+                $metrics['total_visits'] = (int)($kpi['total_visits'] ?? 0);
+                $metrics['today_visits'] = (int)($kpi['today_visits'] ?? 0);
+                $metrics['unique_visitors'] = (int)($kpi['unique_visitors'] ?? 0);
+                $metrics['unique_ips'] = (int)($kpi['unique_ips'] ?? 0);
+                $metrics['bot_count'] = (int)($kpi['bot_count'] ?? 0);
+                $metrics['human_count'] = (int)($kpi['human_count'] ?? 0);
+                $metrics['avg_latency'] = round((float)($kpi['avg_latency'] ?? 0.0), 1);
+                $metrics['desktop_count'] = (int)($kpi['desktop_count'] ?? 0);
+                $metrics['mobile_count'] = (int)($kpi['mobile_count'] ?? 0);
+                $metrics['tablet_count'] = (int)($kpi['tablet_count'] ?? 0);
+            }
+        } catch (\Throwable $e) {}
+
+        // Top Geo Countries
+        $topCountries = [];
+        try {
+            $topCountries = Database::query("
+                SELECT country_code, country_name, COUNT(*) as visit_count 
+                FROM visitor_logs 
+                WHERE country_name IS NOT NULL AND country_name != '' 
+                GROUP BY country_code, country_name 
+                ORDER BY visit_count DESC 
+                LIMIT 8
+            ");
+        } catch (\Throwable $e) {}
+
+        // Top Requested Paths
+        $topPaths = [];
+        try {
+            $topPaths = Database::query("
+                SELECT request_uri, COUNT(*) as hit_count, AVG(response_time_ms) as avg_ms 
+                FROM visitor_logs 
+                GROUP BY request_uri 
+                ORDER BY hit_count DESC 
+                LIMIT 8
+            ");
+        } catch (\Throwable $e) {}
+
+        // Top Browsers
+        $topBrowsers = [];
+        try {
+            $topBrowsers = Database::query("
+                SELECT browser, COUNT(*) as hit_count 
+                FROM visitor_logs 
+                WHERE browser IS NOT NULL 
+                GROUP BY browser 
+                ORDER BY hit_count DESC 
+                LIMIT 6
+            ");
+        } catch (\Throwable $e) {}
+
+        Response::view('admin/visitors', [
+            'title' => 'Live Visitor Intelligence & Traffic Stream | Admin Hub',
+            'logs' => $logs,
+            'metrics' => $metrics,
+            'topCountries' => $topCountries,
+            'topPaths' => $topPaths,
+            'topBrowsers' => $topBrowsers,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'totalLogs' => $totalLogs,
+            'filters' => [
+                'search' => $search,
+                'device' => $deviceFilter,
+                'status' => $statusFilter,
+                'bot' => $botFilter
+            ]
+        ]);
+    }
+
+    /**
+     * Live Polling Stream for Visitors (Real-Time HUD updates)
+     */
+    public function visitorsLiveStream(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+        $lastId = (int)$request->query('since_id', 0);
+
+        try {
+            $newLogs = Database::query("
+                SELECT * FROM visitor_logs 
+                WHERE id > ? 
+                ORDER BY id DESC 
+                LIMIT 30
+            ", [$lastId]);
+
+            Response::json([
+                'success' => true,
+                'logs' => $newLogs,
+                'server_time_utc' => gmdate('Y-m-d H:i:s'),
+                'count' => count($newLogs)
+            ]);
+        } catch (\Throwable $e) {
+            Response::json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Export Visitor Logs to CSV with UTF-8 BOM
+     */
+    public function exportVisitorLogsCsv(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+
+        $logs = [];
+        try {
+            $logs = Database::query("SELECT * FROM visitor_logs ORDER BY id DESC LIMIT 5000");
+        } catch (\Throwable $e) {}
+
+        $filename = 'techscout_visitor_intelligence_' . gmdate('Ymd_His') . '_utc.csv';
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $out = fopen('php://output', 'w');
+        // Output UTF-8 BOM for Microsoft Excel compatibility
+        fwrite($out, "\xEF\xBB\xBF");
+
+        fputcsv($out, [
+            'Log ID', 'Session ID', 'Visitor Hash', 'IP Address', 'Country Code', 'Country Name',
+            'City', 'Region', 'User ID', 'Username', 'HTTP Method', 'Request URI',
+            'Route Name', 'HTTP Referer', 'Referrer Domain', 'Browser', 'Version',
+            'OS', 'Device Type', 'Is Bot', 'Bot Name', 'Status Code', 'Response Time (ms)',
+            'Client Timezone', 'UTC Timestamp'
+        ]);
+
+        foreach ($logs as $log) {
+            fputcsv($out, [
+                $log['id'],
+                $log['session_id'],
+                $log['visitor_hash'],
+                $log['ip_address'],
+                $log['country_code'] ?? 'N/A',
+                $log['country_name'] ?? 'N/A',
+                $log['city'] ?? 'N/A',
+                $log['region'] ?? 'N/A',
+                $log['user_id'] ?? 'Guest',
+                $log['username'] ?? 'Anonymous',
+                $log['request_method'],
+                $log['request_uri'],
+                $log['route_name'] ?? '',
+                $log['http_referer'] ?? '',
+                $log['referrer_domain'] ?? '',
+                $log['browser'] ?? 'Unknown',
+                $log['browser_version'] ?? '',
+                $log['os'] ?? 'Unknown',
+                $log['device_type'],
+                $log['is_bot'] ? 'Yes' : 'No',
+                $log['bot_name'] ?? '',
+                $log['http_status'],
+                $log['response_time_ms'],
+                $log['client_timezone'] ?? 'UTC',
+                $log['created_at'] . ' UTC'
+            ]);
+        }
+        fclose($out);
+        exit;
+    }
+
+    /**
+     * Purge Old Visitor Intelligence Logs
+     */
+    public function purgeVisitorLogs(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+        $retention = $request->post('retention', '30_days');
+
+        try {
+            if ($retention === 'all') {
+                Database::execute("TRUNCATE TABLE visitor_logs");
+                Session::flash('success', 'All visitor intelligence records purged successfully.');
+            } elseif ($retention === '7_days') {
+                Database::execute("DELETE FROM visitor_logs WHERE created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)");
+                Session::flash('success', 'Visitor records older than 7 days purged successfully.');
+            } elseif ($retention === '30_days') {
+                Database::execute("DELETE FROM visitor_logs WHERE created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)");
+                Session::flash('success', 'Visitor records older than 30 days purged successfully.');
+            } elseif ($retention === '90_days') {
+                Database::execute("DELETE FROM visitor_logs WHERE created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL 90 DAY)");
+                Session::flash('success', 'Visitor records older than 90 days purged successfully.');
+            }
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Purge failed: ' . $e->getMessage());
+        }
+
+        Response::redirect('/admin/visitors');
+    }
+
+    /**
+     * Instant Block IP via Firewall Rules
+     */
+    public function blockVisitorIp(Request $request): void {
+        Auth::requireRole(['admin', 'super_admin']);
+        $ip = trim((string)$request->post('ip_address', ''));
+        $reason = trim((string)$request->post('reason', 'Suspicious activity detected in Visitor Hub'));
+
+        if (!empty($ip)) {
+            try {
+                Database::execute("
+                    INSERT INTO firewall_rules (rule_type, target_value, action, reason, is_active) 
+                    VALUES ('ip', ?, 'block', ?, 1)
+                ", [$ip, $reason]);
+                Session::flash('success', "IP {$ip} successfully blocked and added to Firewall perimeter.");
+            } catch (\Throwable $e) {
+                Session::flash('error', "Failed to block IP: " . $e->getMessage());
+            }
+        }
+
+        Response::redirect($request->referrer() ?: '/admin/visitors');
     }
 }
 

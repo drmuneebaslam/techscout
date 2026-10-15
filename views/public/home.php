@@ -503,7 +503,7 @@
     fetch('<?= url('/api/v1/newsletter/subscribe') ?>', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ email: email, subscriber_type: 'homepage_dispatch' })
+      body: new URLSearchParams({ email: email, subscriber_type: 'all' })
     })
     .then(r => r.json())
     .then(data => {

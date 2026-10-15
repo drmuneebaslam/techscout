@@ -1368,7 +1368,16 @@ class ApiController {
     // ------------------------------------------------------------------------
     public function subscribeNewsletter(Request $request): void {
         $email = trim(strtolower((string)$request->input('email', '')));
-        $type = trim((string)$request->input('subscriber_type', 'general'));
+        $rawType = trim(strtolower((string)$request->input('subscriber_type', 'all')));
+        $allowedTypes = ['all', 'weekly_digest', 'ai_tools_only', 'developer_only'];
+        $typeMapping = [
+            'homepage_dispatch' => 'all',
+            'general' => 'all',
+            'weekly' => 'weekly_digest',
+            'ai_tools' => 'ai_tools_only',
+            'developer' => 'developer_only'
+        ];
+        $type = $typeMapping[$rawType] ?? (in_array($rawType, $allowedTypes, true) ? $rawType : 'all');
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             Response::json(['success' => false, 'error' => 'Please provide a valid email address.'], 400);

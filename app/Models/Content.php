@@ -186,7 +186,18 @@ class Content {
     }
 
     public static function getTagsForContent(int $contentId): array {
-        return Database::query("SELECT c.name, c.slug FROM categories c INNER JOIN content_secondary_categories csc ON c.id = csc.category_id WHERE csc.content_id = ?", [$contentId]);
+        try {
+            $tags = Database::query("SELECT c.name, c.slug FROM categories c INNER JOIN content_secondary_categories csc ON c.id = csc.category_id WHERE csc.content_id = ?", [$contentId]);
+            if (!empty($tags)) {
+                return $tags;
+            }
+        } catch (\Throwable $e) {}
+
+        try {
+            return Database::query("SELECT c.name, c.slug FROM categories c INNER JOIN content_categories cc ON c.id = cc.category_id WHERE cc.content_id = ? AND cc.is_primary = 0", [$contentId]);
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     public static function search(string $query, string $type = 'all', int $limit = 20): array {
@@ -313,7 +324,35 @@ class Content {
                 LEFT JOIN prompts p ON c.id = p.content_id
                 WHERE sec_cat.slug = ? AND c.status = 'published' AND c.visibility = 'public' AND c.content_type = 'article'
                 ORDER BY c.published_at DESC LIMIT {$limit}";
-        return Database::query($sql, [$tagSlug]);
+        try {
+            $results = Database::query($sql, [$tagSlug]);
+            if (!empty($results)) {
+                return $results;
+            }
+        } catch (\Throwable $e) {}
+
+        try {
+            $fallbackSql = "SELECT c.*, cat.name as category_name, cat.slug as category_slug,
+                                   a.display_name as author_name, a.slug as author_slug, a.avatar_url as author_avatar,
+                                   art.reading_time_mins, art.difficulty_level,
+                                   tool.pricing_model, tool.rating_avg as tool_rating, tool.website_url,
+                                   gpt.openai_url, gpt.model_base,
+                                   p.copy_count
+                            FROM contents c
+                            JOIN content_categories cc ON c.id = cc.content_id AND cc.is_primary = 0
+                            JOIN categories sec_cat ON cc.category_id = sec_cat.id
+                            LEFT JOIN categories cat ON c.category_id = cat.id
+                            LEFT JOIN authors a ON c.author_id = a.id
+                            LEFT JOIN articles art ON c.id = art.content_id
+                            LEFT JOIN ai_tools tool ON c.id = tool.content_id
+                            LEFT JOIN gpt_listings gpt ON c.id = gpt.content_id
+                            LEFT JOIN prompts p ON c.id = p.content_id
+                            WHERE sec_cat.slug = ? AND c.status = 'published' AND c.visibility = 'public' AND c.content_type = 'article'
+                            ORDER BY c.published_at DESC LIMIT {$limit}";
+            return Database::query($fallbackSql, [$tagSlug]);
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 }
 

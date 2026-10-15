@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+$requestStartTime = microtime(true);
+
 // Direct High-Performance Favicon, Manifest & Service Worker Serving
 if (isset($_SERVER['REQUEST_URI'])) {
     $cleanUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '';
@@ -204,6 +206,13 @@ if (!$isFullyInstalled && !$isStaticAsset && !$isInstallRoute) {
 
 $router = new Router();
 $request = new Request();
+
+// Zero-Latency Telemetry & Comprehensive Visitor Tracking Hook [TS-VISIT-01]
+register_shutdown_function(function() use ($request, $requestStartTime) {
+    try {
+        \App\Core\VisitorTracker::track($request, $requestStartTime);
+    } catch (\Throwable $e) {}
+});
 
 // ----------------------------------------------------------------------------
 // 0. WEB INSTALLER & SETUP WIZARD ROUTES
@@ -982,6 +991,15 @@ $router->post('/user/sessions/revoke/{id}', [AuthController::class, 'revokeSessi
 $router->post('/user/sessions/terminate-others', [AuthController::class, 'terminateOtherSessions']);
 
 // ----------------------------------------------------------------------------
+// 9.1 VISITOR INTELLIGENCE & TRAFFIC TRACKING [TS-VISIT-01]
+// ----------------------------------------------------------------------------
+$router->get('/admin/visitors', [AdminController::class, 'visitorsHub'], ['admin']);
+$router->get('/admin/visitors/stream', [AdminController::class, 'visitorsLiveStream'], ['admin']);
+$router->get('/admin/visitors/export', [AdminController::class, 'exportVisitorLogsCsv'], ['admin']);
+$router->post('/admin/visitors/purge', [AdminController::class, 'purgeVisitorLogs'], ['admin']);
+$router->post('/admin/visitors/block-ip', [AdminController::class, 'blockVisitorIp'], ['admin']);
+
+// ----------------------------------------------------------------------------
 // 10. PLATFORM MAINTENANCE MODE & READ-ONLY INTERCEPTOR
 // ----------------------------------------------------------------------------
 try {
@@ -989,6 +1007,18 @@ try {
     $val = strtolower((string)($maintSetting['key_value'] ?? '0'));
     $isFullMaint = in_array($val, ['1', 'true', 'on', 'yes', 'full', 'lockout'], true);
     $isReadOnly = in_array($val, ['read_only', 'readonly'], true);
+
+    // Auto-expiry check against stored UTC maintenance target
+    $untilUtcRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_until_utc'");
+    $maintenanceUntilUtc = trim((string)($untilUtcRow['key_value'] ?? ''));
+
+    if ($isFullMaint && !empty($maintenanceUntilUtc)) {
+        $nowUtc = gmdate('Y-m-d H:i:s');
+        if ($nowUtc >= $maintenanceUntilUtc) {
+            $isFullMaint = false;
+            \App\Core\Database::execute("UPDATE site_settings SET key_value = '0' WHERE key_name = 'site_maintenance_mode'");
+        }
+    }
 
     $path = $request->getPath();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -1025,17 +1055,32 @@ try {
     $isPreview503 = ($request->query('preview_503') === '1' || $request->query('test_maint') === '1');
 
     if (($isFullMaint && !$isAdmin && !$isAdminPath && !$hasBypass) || $isPreview503) {
-        http_response_code(503);
-        header('Retry-After: 300');
         $msgRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_message'");
         $customMessage = $msgRow['key_value'] ?? 'TechScout core engineering systems are currently executing scheduled platform upgrades.';
         $countdownRow = \App\Core\Database::fetch("SELECT key_value FROM site_settings WHERE key_name = 'site_maintenance_countdown_minutes'");
-        $countdownMinutes = (int)($countdownRow['key_value'] ?? 45);
+        $fallbackMinutes = (int)($countdownRow['key_value'] ?? 45);
+
+        $remainingSeconds = $fallbackMinutes * 60;
+        if (!empty($maintenanceUntilUtc)) {
+            $targetTimestamp = strtotime($maintenanceUntilUtc . ' UTC');
+            if ($targetTimestamp) {
+                $remainingSeconds = max(5, $targetTimestamp - time());
+            }
+        } else {
+            $remainingSeconds = $fallbackMinutes * 60;
+            $maintenanceUntilUtc = gmdate('Y-m-d H:i:s', time() + $remainingSeconds);
+        }
+        $countdownMinutes = max(1, (int)round($remainingSeconds / 60));
+
+        http_response_code(503);
+        header('Retry-After: ' . $remainingSeconds);
 
         \App\Core\Response::view('errors/503', [
             'title' => 'Platform Upgrades Underway (HTTP 503) | TechScout',
             'customMessage' => $customMessage,
-            'countdownMinutes' => $countdownMinutes
+            'countdownMinutes' => $countdownMinutes,
+            'remainingSeconds' => $remainingSeconds,
+            'maintenanceUntilUtc' => $maintenanceUntilUtc
         ]);
         exit;
     } elseif ($isReadOnly && $method === 'POST' && !$isAdmin && !$isAdminPath && !$hasBypass) {

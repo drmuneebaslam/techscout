@@ -398,6 +398,10 @@ $activeAdminTheme = (!empty($_GET['theme']) && $_GET['theme'] === 'dark')
               <a href="<?= url('/admin/analytics') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/analytics') ? 'active' : '' ?>" data-tooltip="CMS Analytics HUD">
                 <i data-lucide="bar-chart-3"></i> <span>CMS Analytics HUD</span>
               </a>
+              <a href="<?= url('/admin/visitors') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/visitors') ? 'active' : '' ?>" data-tooltip="Live Visitor Tracking & Forensics">
+                <i data-lucide="radar"></i> <span>Live Visitors</span>
+                <span class="ts-badge" style="background: rgba(16,185,129,0.15); color: #10b981; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 999px; margin-left: auto;">LIVE</span>
+              </a>
             <?php endif; ?>
             <?php if ($isSuperAdmin || $canAccess('articles.publish') || $canAccess('articles.edit')): ?>
               <a href="<?= url('/admin/content') ?>" class="admin-nav-link <?= str_contains($currentPath, '/admin/content') ? 'active' : '' ?>" data-tooltip="Content Review Queue">

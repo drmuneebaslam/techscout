@@ -46,6 +46,10 @@ class Request {
         return $this->method;
     }
 
+    public function method(): string {
+        return $this->method;
+    }
+
     public function getPath(): string {
         return $this->path;
     }
@@ -112,6 +116,14 @@ class Request {
             return (string)$_SERVER[$direct];
         }
         return $default;
+    }
+
+    public function referrer(?string $default = null): ?string {
+        return $_SERVER['HTTP_REFERER'] ?? $default;
+    }
+
+    public function referer(?string $default = null): ?string {
+        return $this->referrer($default);
     }
 
     public function isAjax(): bool {

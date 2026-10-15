@@ -209,29 +209,66 @@
             <input type="text" name="site_copyright" value="<?= htmlspecialchars($settings['site_copyright'] ?? '© 2026 TechScout Platform • Built for builders, engineers, and creators.') ?>" class="admin-modal-input">
           </div>
 
-          <div style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 1.5rem;">
+          <div class="maint-settings-box" style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.25); border-radius: 12px; padding: 1.5rem;">
             <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin-bottom: 1.25rem;">
               <input type="checkbox" name="site_maintenance_mode" value="1" <?= !empty($settings['site_maintenance_mode']) ? 'checked' : '' ?> style="accent-color: #ef4444; width: 20px; height: 20px;">
               <div>
                 <strong style="color: #ef4444; font-size: 1rem;">Enable Platform Maintenance Mode (HTTP 503) [TS-INF-09]</strong>
-                <p style="color: #94a3b8; font-size: 0.82rem; margin: 0.2rem 0 0 0;">When enabled, public visitors and regular members see a sleek 503 countdown screen while admin IPs bypass normally.</p>
+                <p style="color: var(--ts-text-secondary, #94a3b8); font-size: 0.82rem; margin: 0.2rem 0 0 0;">When enabled, public visitors and regular members see a sleek 503 countdown screen while admin IPs bypass normally.</p>
               </div>
             </label>
 
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1rem;">
+            <!-- Datetime & Timezone Control Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; background: var(--ts-bg-surface, rgba(15,23,42,0.45)); border: 1px solid var(--ts-border-subtle, rgba(148,163,184,0.15)); border-radius: 10px; padding: 1.25rem;">
               <div>
-                <label class="ts-form-label" style="color: #f8fafc; font-size: 0.8rem; font-weight: 700;">Estimated Return Duration (Minutes)</label>
-                <input type="number" name="site_maintenance_countdown_minutes" value="<?= htmlspecialchars($settings['site_maintenance_countdown_minutes'] ?? '45') ?>" class="admin-modal-input" min="5" max="1440" style="font-family: var(--admin-font-mono);">
+                <label class="ts-form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span>Maintenance End Date &amp; Time</span>
+                  <span id="ts_admin_tz_badge" style="font-size: 0.7rem; color: #38bdf8; font-family: var(--admin-font-mono);">Detected: <?= htmlspecialchars(\App\Core\DateHelper::timezone()) ?></span>
+                </label>
+                <input type="datetime-local" id="site_maintenance_until_local" name="site_maintenance_until_local" class="admin-modal-input" style="font-family: var(--admin-font-mono); font-size: 0.88rem;">
+                <input type="hidden" id="site_maintenance_until_utc" name="site_maintenance_until_utc" value="<?= htmlspecialchars($settings['site_maintenance_until_utc'] ?? '') ?>">
+                
+                <!-- Quick Duration Presets -->
+                <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" onclick="setMaintenancePreset(30)" class="admin-btn admin-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">+30m</button>
+                  <button type="button" onclick="setMaintenancePreset(60)" class="admin-btn admin-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">+1h</button>
+                  <button type="button" onclick="setMaintenancePreset(120)" class="admin-btn admin-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">+2h</button>
+                  <button type="button" onclick="setMaintenancePreset(360)" class="admin-btn admin-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">+6h</button>
+                  <button type="button" onclick="setMaintenancePreset(720)" class="admin-btn admin-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">+12h</button>
+                  <button type="button" onclick="setMaintenancePreset(1440)" class="admin-btn admin-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">+24h</button>
+                </div>
               </div>
+
               <div>
-                <label class="ts-form-label" style="color: #f8fafc; font-size: 0.8rem; font-weight: 700;">Public Maintenance Notice Message</label>
-                <input type="text" name="site_maintenance_message" value="<?= htmlspecialchars($settings['site_maintenance_message'] ?? 'TechScout core engineering systems are currently executing scheduled platform upgrades.') ?>" class="admin-modal-input">
+                <label class="ts-form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; display: flex; justify-content: space-between;">
+                  <span>System UTC Timestamp Storage</span>
+                  <span style="font-size: 0.7rem; color: #10b981; font-weight: 700;">Zero-Drift Standard</span>
+                </label>
+                <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--ts-border-subtle, rgba(148,163,184,0.12)); border-radius: 8px; padding: 0.75rem; font-family: var(--admin-font-mono); font-size: 0.8rem;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                    <span style="color: var(--ts-text-secondary, #94a3b8);">Database UTC:</span>
+                    <strong id="ts_utc_preview_val" style="color: #38bdf8;">--:--:-- UTC</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                    <span style="color: var(--ts-text-secondary, #94a3b8);">Duration:</span>
+                    <strong id="ts_remaining_duration_badge" style="color: #10b981;">--</strong>
+                  </div>
+                  <div style="font-size: 0.72rem; color: var(--ts-text-tertiary, #64748b);">
+                    Automatically synchronized and converted to every visitor's specific timezone on the HTTP 503 screen.
+                  </div>
+                </div>
+                <input type="hidden" id="site_maintenance_countdown_minutes" name="site_maintenance_countdown_minutes" value="<?= htmlspecialchars($settings['site_maintenance_countdown_minutes'] ?? '45') ?>">
               </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <label class="ts-form-label" style="font-size: 0.8rem; font-weight: 700;">Public Maintenance Notice Message</label>
+              <input type="text" name="site_maintenance_message" value="<?= htmlspecialchars($settings['site_maintenance_message'] ?? 'TechScout core engineering systems are currently executing scheduled platform upgrades.') ?>" class="admin-modal-input">
             </div>
 
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                <label class="ts-form-label" style="color: #f8fafc; font-size: 0.8rem; font-weight: 700; margin: 0;">Admin Bypass IP Whitelist (Comma-separated IPs / CIDRs)</label>
+                <label class="ts-form-label" style="font-size: 0.8rem; font-weight: 700; margin: 0;">Admin Bypass IP Whitelist (Comma-separated IPs / CIDRs)</label>
                 <button type="button" onclick="addCurrentIpToWhitelist('<?= \App\Core\Request::ip() ?>')" class="admin-btn admin-btn-outline" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">
                   + Add My Current IP (<?= \App\Core\Request::ip() ?>)
                 </button>
@@ -250,6 +287,102 @@
               input.value = existing.join(', ');
             }
           }
+
+          function padZero(n) { return n < 10 ? '0' + n : n; }
+
+          function formatLocalDateTime(d) {
+            return `${d.getFullYear()}-${padZero(d.getMonth() + 1)}-${padZero(d.getDate())}T${padZero(d.getHours())}:${padZero(d.getMinutes())}`;
+          }
+
+          function formatUtcDateTime(d) {
+            return `${d.getUTCFullYear()}-${padZero(d.getUTCMonth() + 1)}-${padZero(d.getUTCDate())} ${padZero(d.getUTCHours())}:${padZero(d.getUTCMinutes())}:${padZero(d.getUTCSeconds())}`;
+          }
+
+          function updateMaintenanceUiFromDate(targetDate) {
+            const localInput = document.getElementById('site_maintenance_until_local');
+            const utcInput = document.getElementById('site_maintenance_until_utc');
+            const minsInput = document.getElementById('site_maintenance_countdown_minutes');
+            const utcPreview = document.getElementById('ts_utc_preview_val');
+            const durationBadge = document.getElementById('ts_remaining_duration_badge');
+
+            if (localInput && targetDate) {
+              localInput.value = formatLocalDateTime(targetDate);
+            }
+
+            if (targetDate) {
+              const utcStr = formatUtcDateTime(targetDate);
+              if (utcInput) utcInput.value = utcStr;
+              if (utcPreview) utcPreview.innerText = utcStr + ' UTC';
+
+              const diffMs = targetDate.getTime() - Date.now();
+              const diffMins = Math.max(1, Math.round(diffMs / 60000));
+              if (minsInput) minsInput.value = diffMins;
+
+              if (durationBadge) {
+                if (diffMs <= 0) {
+                  durationBadge.innerText = 'Expired / Past';
+                  durationBadge.style.color = '#ef4444';
+                } else {
+                  const hours = Math.floor(diffMins / 60);
+                  const remMins = diffMins % 60;
+                  durationBadge.innerText = (hours > 0 ? `${hours}h ` : '') + `${remMins}m remaining`;
+                  durationBadge.style.color = '#10b981';
+                }
+              }
+            }
+          }
+
+          function setMaintenancePreset(minutes) {
+            const target = new Date(Date.now() + minutes * 60000);
+            updateMaintenanceUiFromDate(target);
+          }
+
+          document.addEventListener('DOMContentLoaded', function() {
+            const tzBadge = document.getElementById('ts_admin_tz_badge');
+            try {
+              const detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+              if (detectedTz && tzBadge) {
+                tzBadge.innerText = 'Local: ' + detectedTz;
+              }
+            } catch(e) {}
+
+            const utcInput = document.getElementById('site_maintenance_until_utc');
+            const localInput = document.getElementById('site_maintenance_until_local');
+
+            let initialDate = null;
+            if (utcInput && utcInput.value && utcInput.value.trim() !== '') {
+              // Parse UTC string "YYYY-MM-DD HH:MM:SS"
+              const parts = utcInput.value.trim().split(/[- :]/);
+              if (parts.length >= 5) {
+                initialDate = new Date(Date.UTC(
+                  parseInt(parts[0], 10),
+                  parseInt(parts[1], 10) - 1,
+                  parseInt(parts[2], 10),
+                  parseInt(parts[3], 10),
+                  parseInt(parts[4], 10),
+                  parts[5] ? parseInt(parts[5], 10) : 0
+                ));
+              }
+            }
+
+            if (!initialDate || isNaN(initialDate.getTime()) || initialDate.getTime() < Date.now()) {
+              // Default to 45 minutes in future
+              initialDate = new Date(Date.now() + 45 * 60000);
+            }
+
+            updateMaintenanceUiFromDate(initialDate);
+
+            if (localInput) {
+              localInput.addEventListener('change', function() {
+                if (localInput.value) {
+                  const picked = new Date(localInput.value);
+                  if (!isNaN(picked.getTime())) {
+                    updateMaintenanceUiFromDate(picked);
+                  }
+                }
+              });
+            }
+          });
           </script>
         </div>
 
