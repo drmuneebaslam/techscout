@@ -1023,7 +1023,7 @@ try {
     $path = $request->getPath();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $isAdmin = \App\Core\Auth::isAdmin();
-    $isAdminPath = str_starts_with($path, '/admin') || str_starts_with($path, '/login') || str_starts_with($path, '/logout') || str_starts_with($path, '/assets') || str_starts_with($path, '/auth');
+    $isAdminPath = str_starts_with($path, '/admin') || str_starts_with($path, '/login') || str_starts_with($path, '/logout') || str_starts_with($path, '/assets') || str_starts_with($path, '/auth') || str_starts_with($path, '/api/v1/deploy');
     
     // Simulate guest view test or preview
     if ($request->query('simulate_guest') === '1') {
